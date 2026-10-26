@@ -75,12 +75,12 @@ namespace Protobot.Parts
                 if (p.Contains("hinge") || p.Contains("slide")) return "hinges";
                 if (p.Contains("/wheels/")) return name.Contains("omni") ? "omni_wheels" : "wheels";
                 if (p.Contains("sprocket") || p.Contains("chain") || name.Contains("drive wheel")) return "sprockets";
+                // Gears before bearings: names like "HS 36T Gear, No Insert" mention inserts.
+                if (p.Contains("/gears") || (name.Contains("gear") && !p.Contains("advanced"))) return "gears";
                 if (p.Contains("spacer") || name.Contains("washer") || name.Contains("bushing")) return "spacers";
-                if (name.Contains("collar") || name.Contains("bearing") || name.Contains("lock bar") || name.Contains("insert")
+                if (name.Contains("collar") || name.Contains("bearing") || name.Contains("lock bar") || name.StartsWith("insert")
                     || name.Contains("retainer") || name.Contains("adapter")) return "bearings";
                 if (p.Contains("shaft")) return "shafts";
-                if (name.Contains("gear") && !p.Contains("advanced")) return "gears";
-                if (p.Contains("/gears")) return "gears";
                 return "advanced";
             }
 

@@ -453,6 +453,34 @@
    ]
   },
   {
+   "path": "Electronics/Sensors/Potentiometer V2",
+   "size": [
+    0.051022,
+    0.018662,
+    0.01735
+   ],
+   "triangles": 48464,
+   "bodies": 4,
+   "materials": [
+    {
+     "name": "Default",
+     "color": [
+      0.145098,
+      0.156863,
+      0.164706
+     ]
+    },
+    {
+     "name": "Default(1)",
+     "color": [
+      0.937255,
+      0.192157,
+      0.145098
+     ]
+    }
+   ]
+  },
+  {
    "path": "Electronics/Sensors/Potentiometer",
    "size": [
     0.038086,
@@ -1577,6 +1605,26 @@
    ]
   },
   {
+   "path": "Game Objects/High Stakes/Field Perimeter/Perimeter Parts/276-7596-004_Compressed",
+   "size": [
+    0.013999,
+    0.040818,
+    0.013997
+   ],
+   "triangles": 31898,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "192,192,192",
+     "color": [
+      0.752941,
+      0.752941,
+      0.752941
+     ]
+    }
+   ]
+  },
+  {
    "path": "Game Objects/High Stakes/Field Perimeter/Perimeter Parts/276-7596-005",
    "size": [
     0.139373,
@@ -2181,6 +2229,26 @@
    ]
   },
   {
+   "path": "Game Objects/High Stakes/Hardware/276-8868-206_95893A815",
+   "size": [
+    0.007922,
+    0.0127,
+    0.007923
+   ],
+   "triangles": 16044,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "192,192,192(1)",
+     "color": [
+      0.25098,
+      0.25098,
+      0.25098
+     ]
+    }
+   ]
+  },
+  {
    "path": "Game Objects/High Stakes/Hardware/NNY_Imperial_275-1027-001",
    "size": [
     0.010051,
@@ -2629,6 +2697,26 @@
    ]
   },
   {
+   "path": "Game Objects/High Stakes/Stakes/Alliance Stake/Alliance Stake Blue",
+   "size": [
+    0.090742,
+    0.081253,
+    0.4246
+   ],
+   "triangles": 60168,
+   "bodies": 2,
+   "materials": [
+    {
+     "name": "Sky_Blue_Medium",
+     "color": [
+      0.0,
+      0.6,
+      0.8
+     ]
+    }
+   ]
+  },
+  {
    "path": "Game Objects/High Stakes/Stakes/Alliance Stake/Alliance Stake Post Blue",
    "size": [
     0.021336,
@@ -2669,6 +2757,74 @@
    ]
   },
   {
+   "path": "Game Objects/High Stakes/Stakes/Alliance Stake/Alliance Stake Red",
+   "size": [
+    0.090742,
+    0.081253,
+    0.4246
+   ],
+   "triangles": 60292,
+   "bodies": 2,
+   "materials": [
+    {
+     "name": "210,38,48",
+     "color": [
+      0.823529,
+      0.14902,
+      0.188235
+     ]
+    },
+    {
+     "name": "Smooth_-_Red(1)",
+     "color": [
+      0.823529,
+      0.14902,
+      0.188235
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Game Objects/High Stakes/Stakes/Alliance Stake/Alliance Stake Top Blue",
+   "size": [
+    0.090742,
+    0.081253,
+    0.0508
+   ],
+   "triangles": 64612,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Sky_Blue_Medium",
+     "color": [
+      0.0,
+      0.6,
+      0.8
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Game Objects/High Stakes/Stakes/Alliance Stake/Alliance Stake Top Red",
+   "size": [
+    0.090742,
+    0.081253,
+    0.0508
+   ],
+   "triangles": 64612,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Smooth_-_Red(1)",
+     "color": [
+      0.823529,
+      0.14902,
+      0.188235
+     ]
+    }
+   ]
+  },
+  {
    "path": "Game Objects/High Stakes/Stakes/Field Stake Mount",
    "size": [
     0.082523,
@@ -2698,6 +2854,34 @@
    "triangles": 496,
    "bodies": 1,
    "materials": [
+    {
+     "name": "37,40,42",
+     "color": [
+      0.145098,
+      0.156863,
+      0.164706
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Game Objects/High Stakes/Stakes/Field Stake/Neutral Stake",
+   "size": [
+    0.090742,
+    0.081253,
+    0.6372
+   ],
+   "triangles": 57642,
+   "bodies": 2,
+   "materials": [
+    {
+     "name": "206,220,0",
+     "color": [
+      0.807843,
+      0.862745,
+      0.0
+     ]
+    },
     {
      "name": "37,40,42",
      "color": [
@@ -2784,6 +2968,46 @@
       0.25098,
       0.25098,
       0.25098
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Game Objects/High Stakes/Stakes/Mobile Goal/276-8868-204",
+   "size": [
+    0.089039,
+    0.099883,
+    0.060598
+   ],
+   "triangles": 79229,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "206,220,0",
+     "color": [
+      0.807843,
+      0.862745,
+      0.0
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Game Objects/High Stakes/Stakes/Neutral Stake Top",
+   "size": [
+    0.090742,
+    0.081253,
+    0.0508
+   ],
+   "triangles": 64612,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "206,220,0",
+     "color": [
+      0.807843,
+      0.862745,
+      0.0
      ]
     }
    ]
@@ -3173,6 +3397,26 @@
    ]
   },
   {
+   "path": "Motion/Advanced Gears/Drop off Cam",
+   "size": [
+    0.06743,
+    0.01524,
+    0.09123
+   ],
+   "triangles": 30326,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "32,92,64",
+     "color": [
+      0.12549,
+      0.360784,
+      0.25098
+     ]
+    }
+   ]
+  },
+  {
    "path": "Motion/Advanced Gears/Hand Crank",
    "size": [
     0.050789,
@@ -3228,6 +3472,26 @@
       0.329412,
       0.345098,
       0.352941
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Advanced Gears/Lead Screw Segment",
+   "size": [
+    0.03138,
+    0.0147,
+    0.0147
+   ],
+   "triangles": 30468,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "32,92,64",
+     "color": [
+      0.12549,
+      0.360784,
+      0.25098
      ]
     }
    ]
@@ -3368,6 +3632,26 @@
     0.015831
    ],
    "triangles": 1196,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Smooth_-_Dark_Sea_Green",
+     "color": [
+      0.180392,
+      0.541176,
+      0.341176
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Advanced Gears/Worm Gear",
+   "size": [
+    0.014582,
+    0.014582,
+    0.0189
+   ],
+   "triangles": 21755,
    "bodies": 1,
    "materials": [
     {
@@ -8664,6 +8948,4486 @@
       0.180392,
       0.541176,
       0.341176
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Sprockets/9P 15T Drive Wheel, Shaved",
+   "size": [
+    0.050773,
+    0.00744,
+    0.05068
+   ],
+   "triangles": 26212,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Smooth_-_Dark_Gray",
+     "color": [
+      0.25098,
+      0.25098,
+      0.25098
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Sprockets/9P 15T Drive Wheel",
+   "size": [
+    0.050773,
+    0.0254,
+    0.05068
+   ],
+   "triangles": 51290,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Smooth_-_Dark_Gray",
+     "color": [
+      0.25098,
+      0.25098,
+      0.25098
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Sprockets/Reference Files/6P 16T Sprocket",
+   "size": [
+    0.035529,
+    0.0127,
+    0.035529
+   ],
+   "triangles": 127820,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "166,25,46",
+     "color": [
+      0.65098,
+      0.098039,
+      0.180392
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Sprockets/Reference Files/6P 24T Sprocket",
+   "size": [
+    0.051952,
+    0.0127,
+    0.051952
+   ],
+   "triangles": 181035,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "166,25,46",
+     "color": [
+      0.65098,
+      0.098039,
+      0.180392
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Sprockets/Reference Files/6P 32T Sprocket",
+   "size": [
+    0.068239,
+    0.0127,
+    0.068239
+   ],
+   "triangles": 246976,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "166,25,46",
+     "color": [
+      0.65098,
+      0.098039,
+      0.180392
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Sprockets/Reference Files/6P 40T Sprocket",
+   "size": [
+    0.084476,
+    0.0127,
+    0.084476
+   ],
+   "triangles": 323119,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "166,25,46",
+     "color": [
+      0.65098,
+      0.098039,
+      0.180392
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Sprockets/Reference Files/6P 8T Sprocket",
+   "size": [
+    0.019879,
+    0.0127,
+    0.019879
+   ],
+   "triangles": 3456,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "64,64,64",
+     "color": [
+      0.25098,
+      0.25098,
+      0.25098
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Sprockets/Reference Files/9P 12T Sprocket, No Insert",
+   "size": [
+    0.042988,
+    0.013335,
+    0.042988
+   ],
+   "triangles": 36452,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Smooth_-_Dark_Sea_Green",
+     "color": [
+      0.203922,
+      0.552941,
+      0.360784
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Sprockets/Reference Files/9P 18T Sprocket, No Insert",
+   "size": [
+    0.060586,
+    0.013335,
+    0.061512
+   ],
+   "triangles": 74652,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Smooth_-_Dark_Sea_Green",
+     "color": [
+      0.203922,
+      0.552941,
+      0.360784
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Sprockets/Reference Files/9P 24T Sprocket, No Insert",
+   "size": [
+    0.080152,
+    0.013335,
+    0.080152
+   ],
+   "triangles": 124150,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Smooth_-_Dark_Sea_Green",
+     "color": [
+      0.203922,
+      0.552941,
+      0.360784
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Sprockets/Reference Files/9P 30T Sprocket, No Insert",
+   "size": [
+    0.013335,
+    0.098289,
+    0.098827
+   ],
+   "triangles": 144988,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Smooth_-_Dark_Sea_Green",
+     "color": [
+      0.203922,
+      0.552941,
+      0.360784
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Sprockets/Reference Files/9P 6T Sprocket, No Insert",
+   "size": [
+    0.02151,
+    0.013335,
+    0.024743
+   ],
+   "triangles": 18400,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Smooth_-_Dark_Sea_Green",
+     "color": [
+      0.203922,
+      0.552941,
+      0.360784
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/V5 Flywheel Weight",
+   "size": [
+    0.085198,
+    0.003023,
+    0.085207
+   ],
+   "triangles": 3064,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Black-Oxide_Stainless_Steel",
+     "color": [
+      0.25098,
+      0.25098,
+      0.25098
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/6 Wheel Leg",
+   "size": [
+    0.152399,
+    0.152399,
+    0.0254
+   ],
+   "triangles": 22749,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Gray",
+     "color": [
+      0.411765,
+      0.411765,
+      0.411765
+     ]
+    },
+    {
+     "name": "Rubber_-_Black_-_Version_1.1",
+     "color": [
+      0.25098,
+      0.25098,
+      0.25098
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/Bogie Wheel Double",
+   "size": [
+    0.0495,
+    0.0395,
+    0.059
+   ],
+   "triangles": 122244,
+   "bodies": 9,
+   "materials": [
+    {
+     "name": "Chrome_-_Polished_1",
+     "color": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    {
+     "name": "Glossy_-_Black_1",
+     "color": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    {
+     "name": "Gray_1",
+     "color": [
+      0.411765,
+      0.411765,
+      0.411765
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/Bogie Wheel Single",
+   "size": [
+    0.0245,
+    0.0395,
+    0.0395
+   ],
+   "triangles": 65166,
+   "bodies": 4,
+   "materials": [
+    {
+     "name": "Chrome_-_Polished_1",
+     "color": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    {
+     "name": "Glossy_-_Black_1",
+     "color": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    {
+     "name": "Gray_1",
+     "color": [
+      0.411765,
+      0.411765,
+      0.411765
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/Flex Wheels/1.625 Flex Wheel",
+   "size": [
+    0.041275,
+    0.041275,
+    0.0127
+   ],
+   "triangles": 1640,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "30a_Flex_Wheel",
+     "color": [
+      0.784314,
+      0.784314,
+      0.784314
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/Flex Wheels/1.625 Flex Wheel/1.625 30A .125",
+   "size": [
+    0.041266,
+    0.04127,
+    0.003175
+   ],
+   "triangles": 1644,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "30a_Flex_Wheel",
+     "color": [
+      0.784314,
+      0.784314,
+      0.784314
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/Flex Wheels/1.625 Flex Wheel/1.625 30A .250",
+   "size": [
+    0.041266,
+    0.04127,
+    0.00635
+   ],
+   "triangles": 1644,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "30a_Flex_Wheel",
+     "color": [
+      0.784314,
+      0.784314,
+      0.784314
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/Flex Wheels/1.625 Flex Wheel/1.625 30A .375",
+   "size": [
+    0.041266,
+    0.04127,
+    0.009525
+   ],
+   "triangles": 1644,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "30a_Flex_Wheel",
+     "color": [
+      0.784314,
+      0.784314,
+      0.784314
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/Flex Wheels/1.625 Flex Wheel/1.625 30A .500",
+   "size": [
+    0.041275,
+    0.041275,
+    0.0127
+   ],
+   "triangles": 1640,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "30a_Flex_Wheel",
+     "color": [
+      0.784314,
+      0.784314,
+      0.784314
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/Flex Wheels/1.625 Flex Wheel/1.625 40A .125",
+   "size": [
+    0.041266,
+    0.04127,
+    0.003175
+   ],
+   "triangles": 1644,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "40a_Flex_Wheel",
+     "color": [
+      0.545098,
+      0.545098,
+      0.545098
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/Flex Wheels/1.625 Flex Wheel/1.625 40A .250",
+   "size": [
+    0.041266,
+    0.04127,
+    0.00635
+   ],
+   "triangles": 1644,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "40a_Flex_Wheel",
+     "color": [
+      0.545098,
+      0.545098,
+      0.545098
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/Flex Wheels/1.625 Flex Wheel/1.625 40A .375",
+   "size": [
+    0.041266,
+    0.04127,
+    0.009525
+   ],
+   "triangles": 1644,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "40a_Flex_Wheel",
+     "color": [
+      0.545098,
+      0.545098,
+      0.545098
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/Flex Wheels/1.625 Flex Wheel/1.625 40A .500",
+   "size": [
+    0.041275,
+    0.041275,
+    0.0127
+   ],
+   "triangles": 1640,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "40a_Flex_Wheel",
+     "color": [
+      0.545098,
+      0.545098,
+      0.545098
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/Flex Wheels/1.625 Flex Wheel/1.625 60A .125",
+   "size": [
+    0.041266,
+    0.04127,
+    0.003175
+   ],
+   "triangles": 1644,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "60a_Flex_Wheel",
+     "color": [
+      0.270588,
+      0.270588,
+      0.270588
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/Flex Wheels/1.625 Flex Wheel/1.625 60A .250",
+   "size": [
+    0.041266,
+    0.04127,
+    0.00635
+   ],
+   "triangles": 1644,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "60a_Flex_Wheel",
+     "color": [
+      0.270588,
+      0.270588,
+      0.270588
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/Flex Wheels/1.625 Flex Wheel/1.625 60A .375",
+   "size": [
+    0.041266,
+    0.04127,
+    0.009525
+   ],
+   "triangles": 1644,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "60a_Flex_Wheel",
+     "color": [
+      0.270588,
+      0.270588,
+      0.270588
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/Flex Wheels/1.625 Flex Wheel/1.625 60A .500",
+   "size": [
+    0.041275,
+    0.041275,
+    0.0127
+   ],
+   "triangles": 1640,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "60a_Flex_Wheel",
+     "color": [
+      0.270588,
+      0.270588,
+      0.270588
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/Flex Wheels/2.000 Flex Wheel",
+   "size": [
+    0.050789,
+    0.050794,
+    0.0127
+   ],
+   "triangles": 1572,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "40a_Flex_Wheel",
+     "color": [
+      0.501961,
+      0.501961,
+      0.501961
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/Flex Wheels/2.000 Flex Wheel/2.000 30A .125",
+   "size": [
+    0.050789,
+    0.050794,
+    0.003175
+   ],
+   "triangles": 1572,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "30a_Flex_Wheel",
+     "color": [
+      0.784314,
+      0.784314,
+      0.784314
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/Flex Wheels/2.000 Flex Wheel/2.000 30A .250",
+   "size": [
+    0.050789,
+    0.050794,
+    0.00635
+   ],
+   "triangles": 1572,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "30a_Flex_Wheel",
+     "color": [
+      0.784314,
+      0.784314,
+      0.784314
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/Flex Wheels/2.000 Flex Wheel/2.000 30A .375",
+   "size": [
+    0.050789,
+    0.050794,
+    0.009525
+   ],
+   "triangles": 1572,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "30a_Flex_Wheel",
+     "color": [
+      0.784314,
+      0.784314,
+      0.784314
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/Flex Wheels/2.000 Flex Wheel/2.000 30A .500",
+   "size": [
+    0.050789,
+    0.050794,
+    0.0127
+   ],
+   "triangles": 1572,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "30a_Flex_Wheel",
+     "color": [
+      0.784314,
+      0.784314,
+      0.784314
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/Flex Wheels/2.000 Flex Wheel/2.000 40A .125",
+   "size": [
+    0.050789,
+    0.050794,
+    0.003175
+   ],
+   "triangles": 1572,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "40a_Flex_Wheel",
+     "color": [
+      0.501961,
+      0.501961,
+      0.501961
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/Flex Wheels/2.000 Flex Wheel/2.000 40A .250",
+   "size": [
+    0.050789,
+    0.050794,
+    0.00635
+   ],
+   "triangles": 1572,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "40a_Flex_Wheel",
+     "color": [
+      0.501961,
+      0.501961,
+      0.501961
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/Flex Wheels/2.000 Flex Wheel/2.000 40A .375",
+   "size": [
+    0.050789,
+    0.050794,
+    0.009525
+   ],
+   "triangles": 1572,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "40a_Flex_Wheel",
+     "color": [
+      0.501961,
+      0.501961,
+      0.501961
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/Flex Wheels/2.000 Flex Wheel/2.000 40A .500",
+   "size": [
+    0.050789,
+    0.050794,
+    0.0127
+   ],
+   "triangles": 1572,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "40a_Flex_Wheel",
+     "color": [
+      0.501961,
+      0.501961,
+      0.501961
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/Flex Wheels/2.000 Flex Wheel/2.000 60A .125",
+   "size": [
+    0.050789,
+    0.050794,
+    0.003175
+   ],
+   "triangles": 1572,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "60a_Flex_Wheel",
+     "color": [
+      0.270588,
+      0.270588,
+      0.270588
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/Flex Wheels/2.000 Flex Wheel/2.000 60A .250",
+   "size": [
+    0.050789,
+    0.050794,
+    0.00635
+   ],
+   "triangles": 1572,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "60a_Flex_Wheel",
+     "color": [
+      0.270588,
+      0.270588,
+      0.270588
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/Flex Wheels/2.000 Flex Wheel/2.000 60A .375",
+   "size": [
+    0.050789,
+    0.050794,
+    0.009525
+   ],
+   "triangles": 1572,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "60a_Flex_Wheel",
+     "color": [
+      0.270588,
+      0.270588,
+      0.270588
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/Flex Wheels/2.000 Flex Wheel/2.000 60A .500",
+   "size": [
+    0.050789,
+    0.050794,
+    0.0127
+   ],
+   "triangles": 1572,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "60a_Flex_Wheel",
+     "color": [
+      0.270588,
+      0.270588,
+      0.270588
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/Flex Wheels/3.000 Flex Wheel",
+   "size": [
+    0.0762,
+    0.0762,
+    0.0254
+   ],
+   "triangles": 3908,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "30a_Flex_Wheel",
+     "color": [
+      0.784314,
+      0.784314,
+      0.784314
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/Flex Wheels/3.000 Flex Wheel/3.000 30A .125",
+   "size": [
+    0.076183,
+    0.076191,
+    0.003175
+   ],
+   "triangles": 3340,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "30a_Flex_Wheel",
+     "color": [
+      0.784314,
+      0.784314,
+      0.784314
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/Flex Wheels/3.000 Flex Wheel/3.000 30A .250",
+   "size": [
+    0.076183,
+    0.076191,
+    0.00635
+   ],
+   "triangles": 3340,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "30a_Flex_Wheel",
+     "color": [
+      0.784314,
+      0.784314,
+      0.784314
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/Flex Wheels/3.000 Flex Wheel/3.000 30A .375",
+   "size": [
+    0.076183,
+    0.076191,
+    0.009525
+   ],
+   "triangles": 3292,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "30a_Flex_Wheel",
+     "color": [
+      0.784314,
+      0.784314,
+      0.784314
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/Flex Wheels/3.000 Flex Wheel/3.000 30A .500",
+   "size": [
+    0.076183,
+    0.076191,
+    0.0127
+   ],
+   "triangles": 3292,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "30a_Flex_Wheel",
+     "color": [
+      0.784314,
+      0.784314,
+      0.784314
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/Flex Wheels/3.000 Flex Wheel/3.000 30A .750",
+   "size": [
+    0.076183,
+    0.076191,
+    0.01905
+   ],
+   "triangles": 3616,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "30a_Flex_Wheel",
+     "color": [
+      0.784314,
+      0.784314,
+      0.784314
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/Flex Wheels/3.000 Flex Wheel/3.000 30A 1.000",
+   "size": [
+    0.0762,
+    0.0762,
+    0.0254
+   ],
+   "triangles": 3908,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "30a_Flex_Wheel",
+     "color": [
+      0.784314,
+      0.784314,
+      0.784314
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/Flex Wheels/3.000 Flex Wheel/3.000 40A .125",
+   "size": [
+    0.076183,
+    0.076191,
+    0.003175
+   ],
+   "triangles": 3340,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "40a_Flex_Wheel",
+     "color": [
+      0.545098,
+      0.545098,
+      0.545098
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/Flex Wheels/3.000 Flex Wheel/3.000 40A .250",
+   "size": [
+    0.076183,
+    0.076191,
+    0.00635
+   ],
+   "triangles": 3340,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "40a_Flex_Wheel",
+     "color": [
+      0.545098,
+      0.545098,
+      0.545098
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/Flex Wheels/3.000 Flex Wheel/3.000 40A .375",
+   "size": [
+    0.076183,
+    0.076191,
+    0.009525
+   ],
+   "triangles": 3292,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "40a_Flex_Wheel",
+     "color": [
+      0.545098,
+      0.545098,
+      0.545098
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/Flex Wheels/3.000 Flex Wheel/3.000 40A .500",
+   "size": [
+    0.076183,
+    0.076191,
+    0.0127
+   ],
+   "triangles": 3292,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "40a_Flex_Wheel",
+     "color": [
+      0.545098,
+      0.545098,
+      0.545098
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/Flex Wheels/3.000 Flex Wheel/3.000 40A .750",
+   "size": [
+    0.076183,
+    0.076191,
+    0.01905
+   ],
+   "triangles": 3616,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "40a_Flex_Wheel",
+     "color": [
+      0.545098,
+      0.545098,
+      0.545098
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/Flex Wheels/3.000 Flex Wheel/3.000 40A 1.000",
+   "size": [
+    0.0762,
+    0.0762,
+    0.0254
+   ],
+   "triangles": 3908,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "40a_Flex_Wheel",
+     "color": [
+      0.545098,
+      0.545098,
+      0.545098
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/Flex Wheels/3.000 Flex Wheel/3.000 60A .125",
+   "size": [
+    0.076183,
+    0.076191,
+    0.003175
+   ],
+   "triangles": 3340,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "60a_Flex_Wheel",
+     "color": [
+      0.270588,
+      0.270588,
+      0.270588
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/Flex Wheels/3.000 Flex Wheel/3.000 60A .250",
+   "size": [
+    0.076183,
+    0.076191,
+    0.00635
+   ],
+   "triangles": 3340,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "60a_Flex_Wheel",
+     "color": [
+      0.270588,
+      0.270588,
+      0.270588
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/Flex Wheels/3.000 Flex Wheel/3.000 60A .375",
+   "size": [
+    0.076183,
+    0.076191,
+    0.009525
+   ],
+   "triangles": 3292,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "60a_Flex_Wheel",
+     "color": [
+      0.270588,
+      0.270588,
+      0.270588
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/Flex Wheels/3.000 Flex Wheel/3.000 60A .500",
+   "size": [
+    0.076183,
+    0.076191,
+    0.0127
+   ],
+   "triangles": 3292,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "60a_Flex_Wheel",
+     "color": [
+      0.270588,
+      0.270588,
+      0.270588
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/Flex Wheels/3.000 Flex Wheel/3.000 60A .750",
+   "size": [
+    0.076183,
+    0.076191,
+    0.01905
+   ],
+   "triangles": 3616,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "60a_Flex_Wheel",
+     "color": [
+      0.270588,
+      0.270588,
+      0.270588
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/Flex Wheels/3.000 Flex Wheel/3.000 60A 1.000",
+   "size": [
+    0.0762,
+    0.0762,
+    0.0254
+   ],
+   "triangles": 3908,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "60a_Flex_Wheel",
+     "color": [
+      0.270588,
+      0.270588,
+      0.270588
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/Flex Wheels/4.000 Flex Wheel",
+   "size": [
+    0.101577,
+    0.101589,
+    0.0254
+   ],
+   "triangles": 3256,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "30a_Flex_Wheel",
+     "color": [
+      0.784314,
+      0.784314,
+      0.784314
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/Flex Wheels/4.000 Flex Wheel/4.000 30A .125",
+   "size": [
+    0.101577,
+    0.101589,
+    0.003175
+   ],
+   "triangles": 3260,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "30a_Flex_Wheel",
+     "color": [
+      0.784314,
+      0.784314,
+      0.784314
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/Flex Wheels/4.000 Flex Wheel/4.000 30A .250",
+   "size": [
+    0.101577,
+    0.101589,
+    0.00635
+   ],
+   "triangles": 3260,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "30a_Flex_Wheel",
+     "color": [
+      0.784314,
+      0.784314,
+      0.784314
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/Flex Wheels/4.000 Flex Wheel/4.000 30A .375",
+   "size": [
+    0.101577,
+    0.101589,
+    0.009525
+   ],
+   "triangles": 3260,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "30a_Flex_Wheel",
+     "color": [
+      0.784314,
+      0.784314,
+      0.784314
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/Flex Wheels/4.000 Flex Wheel/4.000 30A .500",
+   "size": [
+    0.101577,
+    0.101589,
+    0.0127
+   ],
+   "triangles": 3256,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "30a_Flex_Wheel",
+     "color": [
+      0.784314,
+      0.784314,
+      0.784314
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/Flex Wheels/4.000 Flex Wheel/4.000 30A .750",
+   "size": [
+    0.101577,
+    0.101589,
+    0.01905
+   ],
+   "triangles": 3256,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "30a_Flex_Wheel",
+     "color": [
+      0.784314,
+      0.784314,
+      0.784314
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/Flex Wheels/4.000 Flex Wheel/4.000 30A 1.000",
+   "size": [
+    0.101577,
+    0.101589,
+    0.0254
+   ],
+   "triangles": 3256,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "30a_Flex_Wheel",
+     "color": [
+      0.784314,
+      0.784314,
+      0.784314
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/Flex Wheels/4.000 Flex Wheel/4.000 40A .125",
+   "size": [
+    0.101577,
+    0.101589,
+    0.003175
+   ],
+   "triangles": 3260,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "40a_Flex_Wheel",
+     "color": [
+      0.501961,
+      0.501961,
+      0.501961
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/Flex Wheels/4.000 Flex Wheel/4.000 40A .250",
+   "size": [
+    0.101577,
+    0.101589,
+    0.00635
+   ],
+   "triangles": 3260,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "40a_Flex_Wheel",
+     "color": [
+      0.501961,
+      0.501961,
+      0.501961
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/Flex Wheels/4.000 Flex Wheel/4.000 40A .375",
+   "size": [
+    0.101577,
+    0.101589,
+    0.009525
+   ],
+   "triangles": 3260,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "40a_Flex_Wheel",
+     "color": [
+      0.501961,
+      0.501961,
+      0.501961
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/Flex Wheels/4.000 Flex Wheel/4.000 40A .500",
+   "size": [
+    0.101577,
+    0.101589,
+    0.0127
+   ],
+   "triangles": 3256,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "40a_Flex_Wheel",
+     "color": [
+      0.501961,
+      0.501961,
+      0.501961
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/Flex Wheels/4.000 Flex Wheel/4.000 40A .750",
+   "size": [
+    0.101577,
+    0.101589,
+    0.01905
+   ],
+   "triangles": 3256,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "40a_Flex_Wheel",
+     "color": [
+      0.501961,
+      0.501961,
+      0.501961
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/Flex Wheels/4.000 Flex Wheel/4.000 40A 1.000",
+   "size": [
+    0.101577,
+    0.101589,
+    0.0254
+   ],
+   "triangles": 3256,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "40a_Flex_Wheel",
+     "color": [
+      0.501961,
+      0.501961,
+      0.501961
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/Flex Wheels/4.000 Flex Wheel/4.000 60A .125",
+   "size": [
+    0.101577,
+    0.101589,
+    0.003175
+   ],
+   "triangles": 3260,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "60a_Flex_Wheel",
+     "color": [
+      0.270588,
+      0.270588,
+      0.270588
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/Flex Wheels/4.000 Flex Wheel/4.000 60A .250",
+   "size": [
+    0.101577,
+    0.101589,
+    0.00635
+   ],
+   "triangles": 3260,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "60a_Flex_Wheel",
+     "color": [
+      0.270588,
+      0.270588,
+      0.270588
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/Flex Wheels/4.000 Flex Wheel/4.000 60A .375",
+   "size": [
+    0.101577,
+    0.101589,
+    0.009525
+   ],
+   "triangles": 3260,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "60a_Flex_Wheel",
+     "color": [
+      0.270588,
+      0.270588,
+      0.270588
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/Flex Wheels/4.000 Flex Wheel/4.000 60A .500",
+   "size": [
+    0.101577,
+    0.101589,
+    0.0127
+   ],
+   "triangles": 3256,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "60a_Flex_Wheel",
+     "color": [
+      0.270588,
+      0.270588,
+      0.270588
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/Flex Wheels/4.000 Flex Wheel/4.000 60A .750",
+   "size": [
+    0.101577,
+    0.101589,
+    0.01905
+   ],
+   "triangles": 3256,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "60a_Flex_Wheel",
+     "color": [
+      0.270588,
+      0.270588,
+      0.270588
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/Flex Wheels/4.000 Flex Wheel/4.000 60A 1.000",
+   "size": [
+    0.101577,
+    0.101589,
+    0.0254
+   ],
+   "triangles": 3256,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "60a_Flex_Wheel",
+     "color": [
+      0.270588,
+      0.270588,
+      0.270588
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/Flex Wheels/VersaHex Adapters .125",
+   "size": [
+    0.01778,
+    0.005545,
+    0.01778
+   ],
+   "triangles": 1264,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "64,64,64",
+     "color": [
+      0.25098,
+      0.25098,
+      0.25098
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/Flex Wheels/VersaHex Adapters .250",
+   "size": [
+    0.01778,
+    0.00872,
+    0.017772
+   ],
+   "triangles": 1256,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "64,64,64",
+     "color": [
+      0.25098,
+      0.25098,
+      0.25098
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/Flex Wheels/VersaHub",
+   "size": [
+    0.05465,
+    0.0127,
+    0.055862
+   ],
+   "triangles": 34442,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "64,64,64",
+     "color": [
+      0.25098,
+      0.25098,
+      0.25098
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/Intake Roller",
+   "size": [
+    0.038098,
+    0.0127,
+    0.038098
+   ],
+   "triangles": 1920,
+   "bodies": 3,
+   "materials": [
+    {
+     "name": "Glossy_-_Black",
+     "color": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    {
+     "name": "Smooth_-_Black",
+     "color": [
+      0.019608,
+      0.019608,
+      0.019608
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/Omni Wheel/2 Omni AS, No Insert",
+   "size": [
+    0.015875,
+    0.050524,
+    0.050524
+   ],
+   "triangles": 107388,
+   "bodies": 15,
+   "materials": [
+    {
+     "name": "Omni_Roller",
+     "color": [
+      0.65098,
+      0.65098,
+      0.65098
+     ]
+    },
+    {
+     "name": "Smooth_-_White_2",
+     "color": [
+      0.141176,
+      0.141176,
+      0.141176
+     ]
+    },
+    {
+     "name": "Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/Omni Wheel/2.75 Omni Half",
+   "size": [
+    0.069979,
+    0.015,
+    0.06918
+   ],
+   "triangles": 122658,
+   "bodies": 22,
+   "materials": [
+    {
+     "name": "Chrome_-_Polished_Black",
+     "color": [
+      0.678431,
+      0.678431,
+      0.678431
+     ]
+    },
+    {
+     "name": "Rubber_-_Black_-_Version_1.1_1",
+     "color": [
+      0.65098,
+      0.65098,
+      0.65098
+     ]
+    },
+    {
+     "name": "Smooth_-_White_1",
+     "color": [
+      0.65098,
+      0.65098,
+      0.65098
+     ]
+    },
+    {
+     "name": "Smooth_-_White_2",
+     "color": [
+      0.113725,
+      0.113725,
+      0.113725
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/Omni Wheel/2.75 Omni Old",
+   "size": [
+    0.071321,
+    0.019315,
+    0.071321
+   ],
+   "triangles": 136895,
+   "bodies": 40,
+   "materials": [
+    {
+     "name": "Chrome_-_Polished_1",
+     "color": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    {
+     "name": "Gray_1",
+     "color": [
+      0.411765,
+      0.411765,
+      0.411765
+     ]
+    },
+    {
+     "name": "Smooth_-_Dark_Forest_Green_1",
+     "color": [
+      0.129412,
+      0.541176,
+      0.129412
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/Omni Wheel/3.25 Omni Half",
+   "size": [
+    0.082503,
+    0.010739,
+    0.082148
+   ],
+   "triangles": 222537,
+   "bodies": 34,
+   "materials": [
+    {
+     "name": "Rubber_-_Black_-_Version_1.1_1",
+     "color": [
+      0.65098,
+      0.65098,
+      0.65098
+     ]
+    },
+    {
+     "name": "Smooth_-_White_1",
+     "color": [
+      0.113725,
+      0.113725,
+      0.113725
+     ]
+    },
+    {
+     "name": "Smooth_-_White_2",
+     "color": [
+      0.65098,
+      0.65098,
+      0.65098
+     ]
+    },
+    {
+     "name": "Stainless_-_Polished",
+     "color": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/Omni Wheel/4 Omni Half",
+   "size": [
+    0.105372,
+    0.105372,
+    0.013385
+   ],
+   "triangles": 104838,
+   "bodies": 37,
+   "materials": [
+    {
+     "name": "Rubber_-_Black_-_Version_1.1_1",
+     "color": [
+      0.65098,
+      0.65098,
+      0.65098
+     ]
+    },
+    {
+     "name": "Smooth_-_White_1",
+     "color": [
+      0.65098,
+      0.65098,
+      0.65098
+     ]
+    },
+    {
+     "name": "Smooth_-_White_2",
+     "color": [
+      0.113725,
+      0.113725,
+      0.113725
+     ]
+    },
+    {
+     "name": "Steel_-_VEX",
+     "color": [
+      0.854902,
+      0.854902,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/Reference Files/2 Mecanum Left",
+   "size": [
+    0.051207,
+    0.0381,
+    0.050799
+   ],
+   "triangles": 581174,
+   "bodies": 34,
+   "materials": [
+    {
+     "name": "137,141,141",
+     "color": [
+      0.537255,
+      0.552941,
+      0.552941
+     ]
+    },
+    {
+     "name": "Black-Oxide_Stainless_Steel",
+     "color": [
+      0.356863,
+      0.356863,
+      0.356863
+     ]
+    },
+    {
+     "name": "V5",
+     "color": [
+      0.152941,
+      0.164706,
+      0.172549
+     ]
+    },
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    },
+    {
+     "name": "Wheel_Rubber",
+     "color": [
+      0.65098,
+      0.65098,
+      0.65098
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/Reference Files/2 Mecanum Right",
+   "size": [
+    0.051207,
+    0.0381,
+    0.050799
+   ],
+   "triangles": 575498,
+   "bodies": 34,
+   "materials": [
+    {
+     "name": "137,141,141",
+     "color": [
+      0.537255,
+      0.552941,
+      0.552941
+     ]
+    },
+    {
+     "name": "Black-Oxide_Stainless_Steel",
+     "color": [
+      0.356863,
+      0.356863,
+      0.356863
+     ]
+    },
+    {
+     "name": "V5",
+     "color": [
+      0.152941,
+      0.164706,
+      0.172549
+     ]
+    },
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    },
+    {
+     "name": "Wheel_Rubber",
+     "color": [
+      0.65098,
+      0.65098,
+      0.65098
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/Reference Files/2.75 Omni Antistatic",
+   "size": [
+    0.069884,
+    0.024792,
+    0.069899
+   ],
+   "triangles": 558044,
+   "bodies": 55,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    },
+    {
+     "name": "Wheel_Plastic",
+     "color": [
+      0.141176,
+      0.141176,
+      0.141176
+     ]
+    },
+    {
+     "name": "Wheel_Rubber",
+     "color": [
+      0.65098,
+      0.65098,
+      0.65098
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/Reference Files/2.75 Omni",
+   "size": [
+    0.069998,
+    0.031,
+    0.07
+   ],
+   "triangles": 276196,
+   "bodies": 43,
+   "materials": [
+    {
+     "name": "Chrome_-_Polished_Black",
+     "color": [
+      0.678431,
+      0.678431,
+      0.678431
+     ]
+    },
+    {
+     "name": "Rubber_-_Black_-_Version_1.1_1",
+     "color": [
+      0.65098,
+      0.65098,
+      0.65098
+     ]
+    },
+    {
+     "name": "Smooth_-_White_1",
+     "color": [
+      0.65098,
+      0.65098,
+      0.65098
+     ]
+    },
+    {
+     "name": "Smooth_-_White_2",
+     "color": [
+      0.113725,
+      0.113725,
+      0.113725
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/Reference Files/2.75 Traction Antistatic",
+   "size": [
+    0.069842,
+    0.069834,
+    0.025
+   ],
+   "triangles": 156686,
+   "bodies": 2,
+   "materials": [
+    {
+     "name": "Wheel_Plastic",
+     "color": [
+      0.141176,
+      0.141176,
+      0.141176
+     ]
+    },
+    {
+     "name": "Wheel_Rubber",
+     "color": [
+      0.65098,
+      0.65098,
+      0.65098
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/Reference Files/2.75 Traction",
+   "size": [
+    0.069851,
+    0.019989,
+    0.069851
+   ],
+   "triangles": 153267,
+   "bodies": 3,
+   "materials": [
+    {
+     "name": "Gray",
+     "color": [
+      0.411765,
+      0.411765,
+      0.411765
+     ]
+    },
+    {
+     "name": "Light_Gray",
+     "color": [
+      0.411765,
+      0.411765,
+      0.411765
+     ]
+    },
+    {
+     "name": "Smooth_-_White_1",
+     "color": [
+      0.129412,
+      0.541176,
+      0.129412
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/Reference Files/3.25 Omni Antistatic",
+   "size": [
+    0.082544,
+    0.024778,
+    0.082515
+   ],
+   "triangles": 61912,
+   "bodies": 45,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    },
+    {
+     "name": "Wheel_Plastic",
+     "color": [
+      0.141176,
+      0.141176,
+      0.141176
+     ]
+    },
+    {
+     "name": "Wheel_Rubber",
+     "color": [
+      0.65098,
+      0.65098,
+      0.65098
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/Reference Files/3.25 Omni",
+   "size": [
+    0.082506,
+    0.024779,
+    0.082494
+   ],
+   "triangles": 530240,
+   "bodies": 67,
+   "materials": [
+    {
+     "name": "Wheel_Pins",
+     "color": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    {
+     "name": "Wheel_Plastic",
+     "color": [
+      0.113725,
+      0.113725,
+      0.113725
+     ]
+    },
+    {
+     "name": "Wheel_Rubber",
+     "color": [
+      0.65098,
+      0.65098,
+      0.65098
+     ]
+    },
+    {
+     "name": "Wheel_Rubber_2",
+     "color": [
+      0.65098,
+      0.65098,
+      0.65098
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/Reference Files/3.25 Traction Antistatic",
+   "size": [
+    0.082514,
+    0.08255,
+    0.025
+   ],
+   "triangles": 205142,
+   "bodies": 2,
+   "materials": [
+    {
+     "name": "Wheel_Plastic",
+     "color": [
+      0.141176,
+      0.141176,
+      0.141176
+     ]
+    },
+    {
+     "name": "Wheel_Rubber",
+     "color": [
+      0.65098,
+      0.65098,
+      0.65098
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/Reference Files/3.25 Traction",
+   "size": [
+    0.082,
+    0.01905,
+    0.082536
+   ],
+   "triangles": 158986,
+   "bodies": 2,
+   "materials": [
+    {
+     "name": "Old_Hub",
+     "color": [
+      0.25098,
+      0.25098,
+      0.25098
+     ]
+    },
+    {
+     "name": "Old_Wheel_Rubber",
+     "color": [
+      0.168627,
+      0.541176,
+      0.341176
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/Reference Files/4 Mecanum Left",
+   "size": [
+    0.102954,
+    0.051553,
+    0.102837
+   ],
+   "triangles": 266916,
+   "bodies": 44,
+   "materials": [
+    {
+     "name": "Old_Hub",
+     "color": [
+      0.270588,
+      0.270588,
+      0.270588
+     ]
+    },
+    {
+     "name": "Old_Wheel_Rubber",
+     "color": [
+      0.243137,
+      0.580392,
+      0.4
+     ]
+    },
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/Reference Files/4 Mecanum Right",
+   "size": [
+    0.102954,
+    0.051553,
+    0.102837
+   ],
+   "triangles": 265856,
+   "bodies": 44,
+   "materials": [
+    {
+     "name": "Old_Hub",
+     "color": [
+      0.270588,
+      0.270588,
+      0.270588
+     ]
+    },
+    {
+     "name": "Old_Wheel_Rubber",
+     "color": [
+      0.243137,
+      0.580392,
+      0.4
+     ]
+    },
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/Reference Files/4 Omni Antistatic",
+   "size": [
+    0.101617,
+    0.024785,
+    0.101605
+   ],
+   "triangles": 68456,
+   "bodies": 53,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    },
+    {
+     "name": "Wheel_Plastic",
+     "color": [
+      0.141176,
+      0.141176,
+      0.141176
+     ]
+    },
+    {
+     "name": "Wheel_Rubber",
+     "color": [
+      0.65098,
+      0.65098,
+      0.65098
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/Reference Files/4 Omni Locked",
+   "size": [
+    0.106206,
+    0.032379,
+    0.10621
+   ],
+   "triangles": 363122,
+   "bodies": 97,
+   "materials": [
+    {
+     "name": "Rubber_-_Black_-_Version_1.1_1",
+     "color": [
+      0.65098,
+      0.65098,
+      0.65098
+     ]
+    },
+    {
+     "name": "Screws",
+     "color": [
+      0.87451,
+      0.87451,
+      0.87451
+     ]
+    },
+    {
+     "name": "Smooth_-_White_1",
+     "color": [
+      0.65098,
+      0.65098,
+      0.65098
+     ]
+    },
+    {
+     "name": "Smooth_-_White_2",
+     "color": [
+      0.113725,
+      0.113725,
+      0.113725
+     ]
+    },
+    {
+     "name": "Steel_-_VEX",
+     "color": [
+      0.854902,
+      0.854902,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/Reference Files/4 Omni",
+   "size": [
+    0.106206,
+    0.029221,
+    0.10621
+   ],
+   "triangles": 244000,
+   "bodies": 73,
+   "materials": [
+    {
+     "name": "Rubber_-_Black_-_Version_1.1_1",
+     "color": [
+      0.65098,
+      0.65098,
+      0.65098
+     ]
+    },
+    {
+     "name": "Smooth_-_White_1",
+     "color": [
+      0.65098,
+      0.65098,
+      0.65098
+     ]
+    },
+    {
+     "name": "Smooth_-_White_2",
+     "color": [
+      0.113725,
+      0.113725,
+      0.113725
+     ]
+    },
+    {
+     "name": "Steel_-_VEX",
+     "color": [
+      0.854902,
+      0.854902,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/Reference Files/4 Traction 169",
+   "size": [
+    0.111112,
+    0.021082,
+    0.111116
+   ],
+   "triangles": 334144,
+   "bodies": 32,
+   "materials": [
+    {
+     "name": "Plastic_-_Glossy_(Green)",
+     "color": [
+      0.266667,
+      0.588235,
+      0.282353
+     ]
+    },
+    {
+     "name": "Smooth_-_Dark_Gray",
+     "color": [
+      0.25098,
+      0.25098,
+      0.25098
+     ]
+    },
+    {
+     "name": "Smooth_-_Dark_Sea_Green",
+     "color": [
+      0.180392,
+      0.541176,
+      0.341176
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/Reference Files/4 Traction Antistatic",
+   "size": [
+    0.101555,
+    0.1016,
+    0.025
+   ],
+   "triangles": 270168,
+   "bodies": 2,
+   "materials": [
+    {
+     "name": "Wheel_Plastic",
+     "color": [
+      0.141176,
+      0.141176,
+      0.141176
+     ]
+    },
+    {
+     "name": "Wheel_Rubber",
+     "color": [
+      0.65098,
+      0.65098,
+      0.65098
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/Reference Files/4 Traction Tire",
+   "size": [
+    0.1016,
+    0.019148,
+    0.10157
+   ],
+   "triangles": 137680,
+   "bodies": 2,
+   "materials": [
+    {
+     "name": "Smooth_-_Black_1",
+     "color": [
+      0.113725,
+      0.113725,
+      0.113725
+     ]
+    },
+    {
+     "name": "Smooth_-_Dark_Forest_Green_1",
+     "color": [
+      0.129412,
+      0.541176,
+      0.129412
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/Reference Files/4 Traction",
+   "size": [
+    0.101595,
+    0.0223,
+    0.101595
+   ],
+   "triangles": 194304,
+   "bodies": 2,
+   "materials": [
+    {
+     "name": "32,92,64",
+     "color": [
+      0.65098,
+      0.65098,
+      0.65098
+     ]
+    },
+    {
+     "name": "Smooth_-_Black_1",
+     "color": [
+      0.113725,
+      0.113725,
+      0.113725
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Wheels/Traction Wheel/5 Traction",
+   "size": [
+    0.129492,
+    0.0256,
+    0.129496
+   ],
+   "triangles": 183707,
+   "bodies": 2,
+   "materials": [
+    {
+     "name": "Gray_1",
+     "color": [
+      0.411765,
+      0.411765,
+      0.411765
+     ]
+    },
+    {
+     "name": "Smooth_-_Dark_Forest_Green_1",
+     "color": [
+      0.129412,
+      0.541176,
+      0.129412
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/1-Post Hex Nut Retainer",
+   "size": [
+    0.021594,
+    0.011589,
+    0.009475
+   ],
+   "triangles": 7101,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Smooth_-_Black",
+     "color": [
+      0.019608,
+      0.019608,
+      0.019608
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/1-Post Standoff Retainer",
+   "size": [
+    0.019952,
+    0.009477,
+    0.009475
+   ],
+   "triangles": 7878,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Acetal",
+     "color": [
+      0.05098,
+      0.05098,
+      0.05098
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/4-Post Hex Nut Retainer",
+   "size": [
+    0.017273,
+    0.017273,
+    0.009475
+   ],
+   "triangles": 13252,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Smooth_-_Black",
+     "color": [
+      0.019608,
+      0.019608,
+      0.019608
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/4-Post Standoff Retainer",
+   "size": [
+    0.01721,
+    0.01721,
+    0.009398
+   ],
+   "triangles": 12036,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Acetal",
+     "color": [
+      0.05098,
+      0.05098,
+      0.05098
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Angle/Aluminum 1x1/Alu Angle 1x1x35",
+   "size": [
+    0.0127,
+    0.4445,
+    0.0127
+   ],
+   "triangles": 9692,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Aluminum",
+     "color": [
+      1.0,
+      1.0,
+      1.0
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Angle/Aluminum 2x2/Alu Angle 2x2x35",
+   "size": [
+    0.026987,
+    0.4445,
+    0.026988
+   ],
+   "triangles": 25700,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Aluminum",
+     "color": [
+      1.0,
+      1.0,
+      1.0
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Angle/Steel 2x2/Steel  Angle 2x2x35",
+   "size": [
+    0.026591,
+    0.4445,
+    0.026591
+   ],
+   "triangles": 25412,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Angle/Steel 3x3/Steel Angle 3x3x35",
+   "size": [
+    0.039291,
+    0.4445,
+    0.039291
+   ],
+   "triangles": 41468,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Brackets/Bevel Gearbox Bracket",
+   "size": [
+    0.052568,
+    0.045334,
+    0.032634
+   ],
+   "triangles": 4592,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Brackets/Rack Gearbox Bracket V2",
+   "size": [
+    0.028677,
+    0.047879,
+    0.0508
+   ],
+   "triangles": 3916,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Default",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Brackets/Rack Gearbox Bracket",
+   "size": [
+    0.024562,
+    0.0508,
+    0.0524
+   ],
+   "triangles": 4844,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Brackets/Swerve Bracket",
+   "size": [
+    0.040437,
+    0.0635,
+    0.07366
+   ],
+   "triangles": 1444,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Brackets/Winch Bracket",
+   "size": [
+    0.063754,
+    0.0508,
+    0.0635
+   ],
+   "triangles": 2248,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Brackets/Worm Gearbox Bracket",
+   "size": [
+    0.054762,
+    0.036932,
+    0.040792
+   ],
+   "triangles": 4016,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/C Channel/Aluminum 1x2x1 Half/Alu Half C 1x2x1x35",
+   "size": [
+    0.0127,
+    0.4445,
+    0.014288
+   ],
+   "triangles": 11584,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Aluminum",
+     "color": [
+      1.0,
+      1.0,
+      1.0
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/C Channel/Aluminum 1x2x1/Alu C 1x2x1x35",
+   "size": [
+    0.0254,
+    0.4445,
+    0.014288
+   ],
+   "triangles": 22748,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Aluminum",
+     "color": [
+      1.0,
+      1.0,
+      1.0
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/C Channel/Aluminum 1x3x1 Half Thick Cut/Alu C Half Thick 1x3x1x35",
+   "size": [
+    0.016739,
+    0.4445,
+    0.014288
+   ],
+   "triangles": 9408,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Alu",
+     "color": [
+      1.0,
+      1.0,
+      1.0
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/C Channel/Aluminum 1x3x1 Half/Alu C Half 1x3x1x35",
+   "size": [
+    0.0127,
+    0.4445,
+    0.014288
+   ],
+   "triangles": 9408,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Aluminum",
+     "color": [
+      1.0,
+      1.0,
+      1.0
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/C Channel/Aluminum 1x3x1/Alu C 1x3x1x35",
+   "size": [
+    0.0381,
+    0.4445,
+    0.014288
+   ],
+   "triangles": 22864,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Aluminum",
+     "color": [
+      1.0,
+      1.0,
+      1.0
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/C Channel/Aluminum 1x5x1/Alu C 1x5x1x35",
+   "size": [
+    0.0635,
+    0.4445,
+    0.014288
+   ],
+   "triangles": 30984,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Alu",
+     "color": [
+      1.0,
+      1.0,
+      1.0
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/C Channel/Aluminum 2x2x2/Alu C 2x2x2x20",
+   "size": [
+    0.028575,
+    0.254,
+    0.026988
+   ],
+   "triangles": 22172,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Aluminum",
+     "color": [
+      1.0,
+      1.0,
+      1.0
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/C Channel/Steel 1x2x1 Half/Steel Half C 1x2x1x35",
+   "size": [
+    0.0127,
+    0.4445,
+    0.013891
+   ],
+   "triangles": 11414,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/C Channel/Steel 1x2x1/Steel C 1x2x1x35",
+   "size": [
+    0.0254,
+    0.4445,
+    0.013891
+   ],
+   "triangles": 22408,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/C Channel/Steel 1x5x1 Half Thick Cut/Steel Half C Thick 1x5x1x35",
+   "size": [
+    0.016739,
+    0.4445,
+    0.013891
+   ],
+   "triangles": 9262,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/C Channel/Steel 1x5x1 Half/Steel Half C 1x5x1x35",
+   "size": [
+    0.0127,
+    0.4445,
+    0.013891
+   ],
+   "triangles": 9262,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/C Channel/Steel 1x5x1/Steel C Chan 1x5x1x35",
+   "size": [
+    0.0635,
+    0.4445,
+    0.013891
+   ],
+   "triangles": 30692,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Chassis Rails/Alu Chassis Rail 2x1x25",
+   "size": [
+    0.318364,
+    0.024562,
+    0.013132
+   ],
+   "triangles": 11688,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Metal",
+     "color": [
+      1.0,
+      1.0,
+      1.0
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Chassis Rails/Steel Chassis Rail 2x1x16",
+   "size": [
+    0.2032,
+    0.02413,
+    0.0127
+   ],
+   "triangles": 7512,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Chassis Rails/Steel Chassis Rail 2x1x25",
+   "size": [
+    0.3175,
+    0.02413,
+    0.0127
+   ],
+   "triangles": 11688,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Chassis Rails/Steel Chassis Rail 2x1x35",
+   "size": [
+    0.4445,
+    0.02413,
+    0.0127
+   ],
+   "triangles": 16328,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Chassis Rails/Steel Chassis Rail 3x2x35",
+   "size": [
+    0.4445,
+    0.03683,
+    0.0254
+   ],
+   "triangles": 28856,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Gussets/30 Bent Gusset",
+   "size": [
+    0.079135,
+    0.022568,
+    0.0254
+   ],
+   "triangles": 2044,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Aluminum",
+     "color": [
+      1.0,
+      1.0,
+      1.0
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Gussets/45 Bent Gusset",
+   "size": [
+    0.070642,
+    0.030375,
+    0.0254
+   ],
+   "triangles": 2040,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Aluminum",
+     "color": [
+      1.0,
+      1.0,
+      1.0
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Gussets/45 Flat Gusset",
+   "size": [
+    0.057541,
+    0.001575,
+    0.032141
+   ],
+   "triangles": 768,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Aluminum",
+     "color": [
+      1.0,
+      1.0,
+      1.0
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Gussets/45 Old Gusset",
+   "size": [
+    0.029134,
+    0.050814,
+    0.001168
+   ],
+   "triangles": 764,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Gussets/60 Bent Gusset",
+   "size": [
+    0.060076,
+    0.035472,
+    0.0254
+   ],
+   "triangles": 2052,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Aluminum",
+     "color": [
+      1.0,
+      1.0,
+      1.0
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Gussets/60 Flat Gusset",
+   "size": [
+    0.052311,
+    0.001575,
+    0.036209
+   ],
+   "triangles": 772,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Aluminum",
+     "color": [
+      1.0,
+      1.0,
+      1.0
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Gussets/90 Angle Gusset",
+   "size": [
+    0.021438,
+    0.023106,
+    0.023107
+   ],
+   "triangles": 844,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Aluminum",
+     "color": [
+      1.0,
+      1.0,
+      1.0
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Gussets/90 Bent Gusset",
+   "size": [
+    0.03683,
+    0.03683,
+    0.0254
+   ],
+   "triangles": 1608,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Aluminum",
+     "color": [
+      1.0,
+      1.0,
+      1.0
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Gussets/90 Flat Gusset",
+   "size": [
+    0.0508,
+    0.001575,
+    0.0508
+   ],
+   "triangles": 1036,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Aluminum",
+     "color": [
+      1.0,
+      1.0,
+      1.0
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Gussets/90 Plate Gusset",
+   "size": [
+    0.050495,
+    0.001575,
+    0.050495
+   ],
+   "triangles": 1108,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Aluminum",
+     "color": [
+      1.0,
+      1.0,
+      1.0
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Gussets/Angle Corner Gusset",
+   "size": [
+    0.052488,
+    0.052488,
+    0.023089
+   ],
+   "triangles": 5300,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Aluminum",
+     "color": [
+      1.0,
+      1.0,
+      1.0
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Gussets/Angle Coupler Gusset",
+   "size": [
+    0.0508,
+    0.024232,
+    0.024232
+   ],
+   "triangles": 2648,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Aluminum",
+     "color": [
+      1.0,
+      1.0,
+      1.0
+     ]
+    },
+    {
+     "name": "Aluminum_90",
+     "color": [
+      1.0,
+      1.0,
+      1.0
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Gussets/Angle Gusset",
+   "size": [
+    0.0127,
+    0.03556,
+    0.04445
+   ],
+   "triangles": 332,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Gussets/C Channel Coupler",
+   "size": [
+    0.022225,
+    0.0508,
+    0.0127
+   ],
+   "triangles": 1512,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Aluminum",
+     "color": [
+      1.0,
+      1.0,
+      1.0
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Gussets/Pivot Gusset",
+   "size": [
+    0.03683,
+    0.000813,
+    0.03683
+   ],
+   "triangles": 1004,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Gussets/Plus Gusset",
+   "size": [
+    0.03556,
+    0.000813,
+    0.03556
+   ],
+   "triangles": 656,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Hardware/Coupler",
+   "size": [
+    0.004166,
+    0.004166,
+    0.0127
+   ],
+   "triangles": 9506,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Screws",
+     "color": [
+      0.752941,
+      0.752941,
+      0.752941
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Hardware/Coupler/Coupler Hex .5",
+   "size": [
+    0.004166,
+    0.004166,
+    0.0127
+   ],
+   "triangles": 8886,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Screws",
+     "color": [
+      0.854902,
+      0.854902,
+      0.854902
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Hardware/Coupler/Coupler Hex 1",
+   "size": [
+    0.004166,
+    0.004166,
+    0.0254
+   ],
+   "triangles": 17072,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Screws",
+     "color": [
+      0.854902,
+      0.854902,
+      0.854902
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Hardware/Coupler/Coupler Star .5",
+   "size": [
+    0.004166,
+    0.004166,
+    0.0127
+   ],
+   "triangles": 9506,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Screws",
+     "color": [
+      0.854902,
+      0.854902,
+      0.854902
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Hardware/Coupler/Coupler Star 1",
+   "size": [
+    0.004166,
+    0.004166,
+    0.0254
+   ],
+   "triangles": 17694,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Screws",
+     "color": [
+      0.854902,
+      0.854902,
+      0.854902
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Hardware/Nut Alu",
+   "size": [
+    0.008731,
+    0.010082,
+    0.003175
+   ],
+   "triangles": 5536,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Standoffs",
+     "color": [
+      0.752941,
+      0.752941,
+      0.752941
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Hardware/Nut Hex",
+   "size": [
+    0.00984,
+    0.008522,
+    0.003099
+   ],
+   "triangles": 1382,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Hardware/Nut Keps",
+   "size": [
+    0.009972,
+    0.003759,
+    0.009972
+   ],
+   "triangles": 2326,
+   "bodies": 2,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Hardware/Nut Low Profile",
+   "size": [
+    0.007332,
+    0.00635,
+    0.004763
+   ],
+   "triangles": 2118,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Hardware/Nut M5 Thin Hex",
+   "size": [
+    0.008,
+    0.009238,
+    0.0027
+   ],
+   "triangles": 3976,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Hardware/Nut Nylock",
+   "size": [
+    0.009373,
+    0.008117,
+    0.005741
+   ],
+   "triangles": 3238,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Smooth_-_Off-White",
+     "color": [
+      1.0,
+      1.0,
+      1.0
+     ]
+    },
+    {
+     "name": "Steel_-_VEX",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Hardware/Nut Nylon",
+   "size": [
+    0.008731,
+    0.010082,
+    0.003175
+   ],
+   "triangles": 5536,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Nylon_6",
+     "color": [
+      0.039216,
+      0.039216,
+      0.039216
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Hardware/Nut Thin Nylock",
+   "size": [
+    0.009373,
+    0.008117,
+    0.004801
+   ],
+   "triangles": 3238,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Smooth_-_Off-White",
+     "color": [
+      0.0,
+      0.0,
+      0.117647
+     ]
+    },
+    {
+     "name": "Steel_-_VEX",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Hardware/Nylon Hardware/Nut Nylon - Black",
+   "size": [
+    0.008731,
+    0.010082,
+    0.003175
+   ],
+   "triangles": 5536,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Nylon_6",
+     "color": [
+      0.039216,
+      0.039216,
+      0.039216
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Hardware/Nylon Hardware/Nut Nylon Flange Thread-Forming - Grainger",
+   "size": [
+    0.011693,
+    0.011695,
+    0.005842
+   ],
+   "triangles": 10486,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Smooth_-_Black",
+     "color": [
+      0.019608,
+      0.019608,
+      0.019608
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Hardware/Nylon Hardware/Nut Nylon Thread-Forming - McMaster-Carr",
+   "size": [
+    0.008731,
+    0.010082,
+    0.003556
+   ],
+   "triangles": 5894,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Smooth_-_Black",
+     "color": [
+      0.019608,
+      0.019608,
+      0.019608
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Hardware/Rubber Bumper Smooth",
+   "size": [
+    0.019046,
+    0.019048,
+    0.020637
+   ],
+   "triangles": 4660,
+   "bodies": 2,
+   "materials": [
+    {
+     "name": "Default",
+     "color": [
+      0.74902,
+      0.74902,
+      0.74902
+     ]
+    },
+    {
+     "name": "Smooth_-_Black",
+     "color": [
+      0.019608,
+      0.019608,
+      0.019608
+     ]
+    },
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Hardware/Rubber Bumper Threaded",
+   "size": [
+    0.019046,
+    0.019048,
+    0.020637
+   ],
+   "triangles": 12954,
+   "bodies": 2,
+   "materials": [
+    {
+     "name": "Default",
+     "color": [
+      0.74902,
+      0.74902,
+      0.74902
+     ]
+    },
+    {
+     "name": "Smooth_-_Black",
+     "color": [
+      0.019608,
+      0.019608,
+      0.019608
+     ]
+    },
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Hardware/Rubber Link bent",
+   "size": [
+    0.01189,
+    0.010414,
+    0.031168
+   ],
+   "triangles": 10264,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Iron_Gray",
+     "color": [
+      0.180392,
+      0.541176,
+      0.341176
+     ]
+    },
+    {
+     "name": "Screws",
+     "color": [
+      0.87451,
+      0.87451,
+      0.87451
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Hardware/Rubber Link",
+   "size": [
+    0.010414,
+    0.010414,
+    0.031242
+   ],
+   "triangles": 9318,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Screws",
+     "color": [
+      0.87451,
+      0.87451,
+      0.87451
+     ]
+    },
+    {
+     "name": "VEX_Green",
+     "color": [
+      0.180392,
+      0.541176,
+      0.341176
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Hardware/Screw Shoulder Robosource",
+   "size": [
+    0.007917,
+    0.007925,
+    0.009576
+   ],
+   "triangles": 2684,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Hardware/Screw Shoulder Robosource/SScrew Shoulder Smooth .290 x .09",
+   "size": [
+    0.007917,
+    0.007925,
+    0.009576
+   ],
+   "triangles": 2684,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Hardware/Screw Shoulder Robosource/SScrew Shoulder Smooth .375 x .12",
+   "size": [
+    0.007917,
+    0.007925,
+    0.011735
+   ],
+   "triangles": 2684,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Hardware/Screw Shoulder Robosource/SScrew Shoulder Smooth .500 x .04",
+   "size": [
+    0.007917,
+    0.007925,
+    0.01491
+   ],
+   "triangles": 2684,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Hardware/Screw Shoulder Robosource/SScrew Shoulder Smooth .500 x .18",
+   "size": [
+    0.007917,
+    0.007925,
+    0.01491
+   ],
+   "triangles": 2684,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Hardware/Screw Shoulder Robosource/SScrew Shoulder Smooth 1.000 x .12",
+   "size": [
+    0.007922,
+    0.00792,
+    0.02761
+   ],
+   "triangles": 2354,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Hardware/Screw Shoulder Robosource/SScrew Shoulder Smooth 1.500 x .18",
+   "size": [
+    0.007922,
+    0.007918,
+    0.04031
+   ],
+   "triangles": 1982,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Hardware/Screw Shoulder Robosource/SScrew Shoulder Smooth 2.000 x .04",
+   "size": [
+    0.007925,
+    0.007925,
+    0.05301
+   ],
+   "triangles": 1806,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Hardware/Screw Shoulder Robosource/SScrew Shoulder Threaded .290 x .09",
+   "size": [
+    0.007917,
+    0.007925,
+    0.009576
+   ],
+   "triangles": 6904,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Hardware/Screw Shoulder Robosource/SScrew Shoulder Threaded .375 x .12",
+   "size": [
+    0.007917,
+    0.007925,
+    0.011735
+   ],
+   "triangles": 6916,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Hardware/Screw Shoulder Robosource/SScrew Shoulder Threaded .500 x .04",
+   "size": [
+    0.007917,
+    0.007925,
+    0.01491
+   ],
+   "triangles": 11016,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Hardware/Screw Shoulder Robosource/SScrew Shoulder Threaded .500 x .18",
+   "size": [
+    0.007917,
+    0.007925,
+    0.01491
+   ],
+   "triangles": 6920,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Hardware/Screw Shoulder Robosource/SScrew Shoulder Threaded 1.000 x .12",
+   "size": [
+    0.007922,
+    0.00792,
+    0.02761
+   ],
+   "triangles": 18872,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Hardware/Screw Shoulder Robosource/SScrew Shoulder Threaded 1.500 x .18",
+   "size": [
+    0.007922,
+    0.007918,
+    0.04031
+   ],
+   "triangles": 18458,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Hardware/Screw Shoulder Robosource/SScrew Shoulder Threaded 2.000 x .04",
+   "size": [
+    0.007925,
+    0.007925,
+    0.05301
+   ],
+   "triangles": 26486,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Hardware/Screw Shoulder VEX",
+   "size": [
+    0.010732,
+    0.007468,
+    0.007468
+   ],
+   "triangles": 8556,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Black-Oxide_Stainless_Steel",
+     "color": [
+      0.137255,
+      0.113725,
+      0.113725
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Hardware/Screw Steel - Hex",
+   "size": [
+    0.007917,
+    0.007925,
+    0.00856
+   ],
+   "triangles": 1940,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Screws",
+     "color": [
+      0.752941,
+      0.752941,
+      0.752941
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Hardware/Screw Steel - Hex/SScrew Hex Smooth .250",
+   "size": [
+    0.007917,
+    0.007925,
+    0.00856
+   ],
+   "triangles": 1940,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Screws",
+     "color": [
+      0.854902,
+      0.854902,
+      0.854902
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Hardware/Screw Steel - Hex/SScrew Hex Smooth .375",
+   "size": [
+    0.007917,
+    0.007925,
+    0.011735
+   ],
+   "triangles": 2042,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Screws",
+     "color": [
+      0.854902,
+      0.854902,
+      0.854902
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Hardware/Screw Steel - Hex/SScrew Hex Smooth .500",
+   "size": [
+    0.007917,
+    0.007925,
+    0.01491
+   ],
+   "triangles": 2042,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Screws",
+     "color": [
+      0.854902,
+      0.854902,
+      0.854902
      ]
     }
    ]
