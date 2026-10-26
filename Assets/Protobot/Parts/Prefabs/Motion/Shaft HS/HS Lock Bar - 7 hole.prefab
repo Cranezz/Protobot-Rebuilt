@@ -1,0 +1,167 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1001 &2872549839547028810
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: -8679921383154817045, guid: 43238e57e68469f40aa29b6d43cb3fa8, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 43238e57e68469f40aa29b6d43cb3fa8, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 43238e57e68469f40aa29b6d43cb3fa8, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 43238e57e68469f40aa29b6d43cb3fa8, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7071067
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 43238e57e68469f40aa29b6d43cb3fa8, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 43238e57e68469f40aa29b6d43cb3fa8, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 43238e57e68469f40aa29b6d43cb3fa8, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 43238e57e68469f40aa29b6d43cb3fa8, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 43238e57e68469f40aa29b6d43cb3fa8, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 43238e57e68469f40aa29b6d43cb3fa8, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 43238e57e68469f40aa29b6d43cb3fa8, type: 3}
+      propertyPath: m_Name
+      value: HS Lock Bar - 7 hole
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 43238e57e68469f40aa29b6d43cb3fa8, type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 8329350212030676554, guid: 43238e57e68469f40aa29b6d43cb3fa8, type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 43238e57e68469f40aa29b6d43cb3fa8, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 888949534141412450}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 43238e57e68469f40aa29b6d43cb3fa8, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 825819685035014422}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 43238e57e68469f40aa29b6d43cb3fa8, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8256592480985102665}
+    - targetCorrespondingSourceObject: {fileID: 8329350212030676554, guid: 43238e57e68469f40aa29b6d43cb3fa8, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2968811913269944152}
+  m_SourcePrefab: {fileID: 100100000, guid: 43238e57e68469f40aa29b6d43cb3fa8, type: 3}
+--- !u!1 &3106411779006359579 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 43238e57e68469f40aa29b6d43cb3fa8, type: 3}
+  m_PrefabInstance: {fileID: 2872549839547028810}
+  m_PrefabAsset: {fileID: 0}
+--- !u!54 &888949534141412450
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3106411779006359579}
+  serializedVersion: 5
+  m_Mass: 0.010098111
+  m_LinearDamping: 0.05
+  m_AngularDamping: 0.15
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 1
+  m_Constraints: 0
+  m_CollisionDetection: 3
+--- !u!114 &825819685035014422
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3106411779006359579}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8df26144e8874854cafce42158106248, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.PartBody
+  partId: Motion/Shaft HS/HS Lock Bar - 7 hole
+--- !u!114 &8256592480985102665
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3106411779006359579}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c9079664a2442a24cb6df6ea05dc2af7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
+  cursor: 2
+  title: HS Lock Bar - 7 hole
+  hint: "88.9 \xD7 12.7 \xD7 1.4 mm  \xB7  10.1 g  \xB7  hold to pick up"
+  highlightBrightness: 1.3
+--- !u!1 &6073828946324482816 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8329350212030676554, guid: 43238e57e68469f40aa29b6d43cb3fa8, type: 3}
+  m_PrefabInstance: {fileID: 2872549839547028810}
+  m_PrefabAsset: {fileID: 0}
+--- !u!64 &2968811913269944152
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6073828946324482816}
+  m_Material: {fileID: 13400000, guid: 3122d1684761a0f468db748b5e9a9624, type: 2}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 1
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -6376458628152525029, guid: 43238e57e68469f40aa29b6d43cb3fa8, type: 3}

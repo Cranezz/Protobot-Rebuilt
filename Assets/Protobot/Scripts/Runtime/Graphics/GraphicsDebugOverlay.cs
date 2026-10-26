@@ -9,7 +9,7 @@ namespace Protobot.GraphicsQuality
     /// </summary>
     public class GraphicsDebugOverlay : MonoBehaviour
     {
-        [SerializeField] bool visible = true;
+        [SerializeField] bool visible;
 
         float smoothedFrameTime;
         GUIStyle style;

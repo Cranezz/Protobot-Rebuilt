@@ -30,11 +30,31 @@ namespace Protobot.Parts
         public string binId;
         public GameObject model;
 
-        /// <summary>Real-world bounding size in metres, as measured in Fusion.</summary>
+        /// <summary>Ready-to-use prefab: the model plus Rigidbody, colliders and grab/hover components.</summary>
+        public GameObject prefab;
+        public Sprite thumbnail;
+
+        /// <summary>Real-world bounding size in metres, as measured from the part's mesh.</summary>
         public Vector3 size;
         public int triangles;
 
-        /// <summary>Full-length metal that the player cuts to size with the saw.</summary>
+        /// <summary>Estimated from the mesh volume and the density of its material (aluminium, steel, plastic...).</summary>
+        public float massKg;
+
+        /// <summary>Full-length stock (metal, shafts) that the player cuts to size with the saw.</summary>
         public bool cuttable;
+
+        /// <summary>"444.5 × 25.4 × 14.3 mm", largest dimension first.</summary>
+        public string SizeLabel
+        {
+            get
+            {
+                var d = new[] { size.x, size.y, size.z };
+                System.Array.Sort(d);
+                return $"{d[2] * 1000f:0.#} × {d[1] * 1000f:0.#} × {d[0] * 1000f:0.#} mm";
+            }
+        }
+
+        public string MassLabel => massKg >= 1f ? $"{massKg:0.00} kg" : $"{massKg * 1000f:0.#} g";
     }
 }

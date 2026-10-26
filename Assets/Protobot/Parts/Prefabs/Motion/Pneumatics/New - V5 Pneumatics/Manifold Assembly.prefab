@@ -1,0 +1,209 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1001 &3038924949083011919
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: -8679921383154817045, guid: 656e67cd81b60d64d8bcac0ab8a01689, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 656e67cd81b60d64d8bcac0ab8a01689, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 656e67cd81b60d64d8bcac0ab8a01689, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 656e67cd81b60d64d8bcac0ab8a01689, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7071067
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 656e67cd81b60d64d8bcac0ab8a01689, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 656e67cd81b60d64d8bcac0ab8a01689, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 656e67cd81b60d64d8bcac0ab8a01689, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 656e67cd81b60d64d8bcac0ab8a01689, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 656e67cd81b60d64d8bcac0ab8a01689, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 656e67cd81b60d64d8bcac0ab8a01689, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -7175497441153661879, guid: 656e67cd81b60d64d8bcac0ab8a01689, type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: -7023904948913636619, guid: 656e67cd81b60d64d8bcac0ab8a01689, type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 656e67cd81b60d64d8bcac0ab8a01689, type: 3}
+      propertyPath: m_Name
+      value: Manifold Assembly
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 656e67cd81b60d64d8bcac0ab8a01689, type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 6903552206138281603, guid: 656e67cd81b60d64d8bcac0ab8a01689, type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 8329350212030676554, guid: 656e67cd81b60d64d8bcac0ab8a01689, type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 656e67cd81b60d64d8bcac0ab8a01689, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4700537001834400129}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 656e67cd81b60d64d8bcac0ab8a01689, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1295038047648421214}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 656e67cd81b60d64d8bcac0ab8a01689, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3197329675483726125}
+    - targetCorrespondingSourceObject: {fileID: -7175497441153661879, guid: 656e67cd81b60d64d8bcac0ab8a01689, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8749222021025910621}
+    - targetCorrespondingSourceObject: {fileID: 6903552206138281603, guid: 656e67cd81b60d64d8bcac0ab8a01689, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2985313362588923669}
+  m_SourcePrefab: {fileID: 100100000, guid: 656e67cd81b60d64d8bcac0ab8a01689, type: 3}
+--- !u!1 &2804906879105828382 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 656e67cd81b60d64d8bcac0ab8a01689, type: 3}
+  m_PrefabInstance: {fileID: 3038924949083011919}
+  m_PrefabAsset: {fileID: 0}
+--- !u!54 &4700537001834400129
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2804906879105828382}
+  serializedVersion: 5
+  m_Mass: 0.020384211
+  m_LinearDamping: 0.05
+  m_AngularDamping: 0.15
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 1
+  m_Constraints: 0
+  m_CollisionDetection: 3
+--- !u!114 &1295038047648421214
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2804906879105828382}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8df26144e8874854cafce42158106248, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.PartBody
+  partId: Motion/Pneumatics/New - V5 Pneumatics/Manifold Assembly
+--- !u!114 &3197329675483726125
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2804906879105828382}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c9079664a2442a24cb6df6ea05dc2af7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
+  cursor: 2
+  title: Manifold Assembly
+  hint: "36.4 \xD7 32.7 \xD7 25.4 mm  \xB7  20.4 g  \xB7  hold to pick up"
+  highlightBrightness: 1.3
+--- !u!1 &3911355642616872710 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: -7175497441153661879, guid: 656e67cd81b60d64d8bcac0ab8a01689, type: 3}
+  m_PrefabInstance: {fileID: 3038924949083011919}
+  m_PrefabAsset: {fileID: 0}
+--- !u!64 &8749222021025910621
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3911355642616872710}
+  m_Material: {fileID: 13400000, guid: 7b41823d24d681e45af2872a54c4ecbe, type: 2}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 1
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 5204967558659232906, guid: 656e67cd81b60d64d8bcac0ab8a01689, type: 3}
+--- !u!1 &8494411239292057036 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6903552206138281603, guid: 656e67cd81b60d64d8bcac0ab8a01689, type: 3}
+  m_PrefabInstance: {fileID: 3038924949083011919}
+  m_PrefabAsset: {fileID: 0}
+--- !u!64 &2985313362588923669
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8494411239292057036}
+  m_Material: {fileID: 13400000, guid: 7b41823d24d681e45af2872a54c4ecbe, type: 2}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 1
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 4389570535146816399, guid: 656e67cd81b60d64d8bcac0ab8a01689, type: 3}

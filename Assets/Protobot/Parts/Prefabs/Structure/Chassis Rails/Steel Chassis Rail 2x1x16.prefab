@@ -1,0 +1,171 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1001 &8432120152371914593
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: -8679921383154817045, guid: a3642f46ad344f3439463b4570f36fd7, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: a3642f46ad344f3439463b4570f36fd7, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: a3642f46ad344f3439463b4570f36fd7, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: a3642f46ad344f3439463b4570f36fd7, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7071067
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: a3642f46ad344f3439463b4570f36fd7, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: a3642f46ad344f3439463b4570f36fd7, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: a3642f46ad344f3439463b4570f36fd7, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: a3642f46ad344f3439463b4570f36fd7, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: a3642f46ad344f3439463b4570f36fd7, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: a3642f46ad344f3439463b4570f36fd7, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: a3642f46ad344f3439463b4570f36fd7, type: 3}
+      propertyPath: m_Name
+      value: Steel Chassis Rail 2x1x16
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: a3642f46ad344f3439463b4570f36fd7, type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 1487460747418248249, guid: a3642f46ad344f3439463b4570f36fd7, type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 6342991350794063318, guid: a3642f46ad344f3439463b4570f36fd7, type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: a3642f46ad344f3439463b4570f36fd7, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1806316816405077100}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: a3642f46ad344f3439463b4570f36fd7, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6198134133221768856}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: a3642f46ad344f3439463b4570f36fd7, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2591380532116575795}
+    - targetCorrespondingSourceObject: {fileID: 1487460747418248249, guid: a3642f46ad344f3439463b4570f36fd7, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 273797527121656598}
+  m_SourcePrefab: {fileID: 100100000, guid: a3642f46ad344f3439463b4570f36fd7, type: 3}
+--- !u!1 &7034742676427227992 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1487460747418248249, guid: a3642f46ad344f3439463b4570f36fd7, type: 3}
+  m_PrefabInstance: {fileID: 8432120152371914593}
+  m_PrefabAsset: {fileID: 0}
+--- !u!64 &273797527121656598
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7034742676427227992}
+  m_Material: {fileID: 13400000, guid: 3122d1684761a0f468db748b5e9a9624, type: 2}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 1
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 6474491390285617096, guid: a3642f46ad344f3439463b4570f36fd7, type: 3}
+--- !u!1 &8774561610632485424 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: a3642f46ad344f3439463b4570f36fd7, type: 3}
+  m_PrefabInstance: {fileID: 8432120152371914593}
+  m_PrefabAsset: {fileID: 0}
+--- !u!54 &1806316816405077100
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8774561610632485424}
+  serializedVersion: 5
+  m_Mass: 0.05481631
+  m_LinearDamping: 0.05
+  m_AngularDamping: 0.15
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 1
+  m_Constraints: 0
+  m_CollisionDetection: 3
+--- !u!114 &6198134133221768856
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8774561610632485424}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8df26144e8874854cafce42158106248, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.PartBody
+  partId: Structure/Chassis Rails/Steel Chassis Rail 2x1x16
+--- !u!114 &2591380532116575795
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8774561610632485424}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c9079664a2442a24cb6df6ea05dc2af7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
+  cursor: 2
+  title: Steel Chassis Rail 2x1x16
+  hint: "203.2 \xD7 24.1 \xD7 12.7 mm  \xB7  54.8 g  \xB7  hold to pick up"
+  highlightBrightness: 1.3

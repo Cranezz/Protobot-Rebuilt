@@ -1,3 +1,4 @@
+using Protobot.Core;
 using Protobot.Player;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -5,23 +6,22 @@ using UnityEngine.InputSystem;
 namespace Protobot.InputHandling
 {
     /// <summary>
-    /// Keyboard + mouse controls for the player: WASD to walk, Shift to sprint, C (hold) to crouch,
-    /// Space to jump, and hold the right mouse button to look around. While the right button is up the
-    /// mouse is a normal cursor for pointing at things in the workshop.
+    /// Keyboard + mouse controls for the player: the mouse looks around (the cursor is locked to the
+    /// centre), WASD to walk, Shift to sprint, C (hold) to crouch, Space to jump.
+    /// Nothing moves while a menu is open.
     /// </summary>
     public class DesktopPlayerInput : MonoBehaviour
     {
+        const float BaseSensitivity = 0.1f;
+
         [SerializeField] PlayerMotor motor;
+        [SerializeField] Camera viewCamera;
         [SerializeField] InputActionAsset actions;
-        [SerializeField] float mouseSensitivity = 0.12f;
 
         InputAction move;
         InputAction sprint;
         InputAction crouch;
         InputAction jump;
-
-        /// <summary>True while the right mouse button is held and the mouse turns the view.</summary>
-        public bool IsLooking { get; private set; }
 
         void OnEnable()
         {
@@ -31,33 +31,43 @@ namespace Protobot.InputHandling
             crouch = map.FindAction("Crouch", true);
             jump = map.FindAction("Jump", true);
             map.Enable();
+            ControlSettings.Changed += ApplyCameraSettings;
+            ApplyCameraSettings(ControlSettings.Current);
         }
 
         void OnDisable()
         {
             actions.FindActionMap("Player")?.Disable();
-            SetLooking(false);
+            ControlSettings.Changed -= ApplyCameraSettings;
         }
 
         void Update()
         {
-            var mouse = Mouse.current;
-            SetLooking(mouse != null && mouse.rightButton.isPressed && Application.isFocused);
+            if (MenuState.AnyOpen || !Application.isFocused)
+            {
+                motor.SetMoveInput(Vector2.zero, false, crouch.IsPressed());
+                return;
+            }
 
             motor.SetMoveInput(move.ReadValue<Vector2>(), sprint.IsPressed(), crouch.IsPressed());
             if (jump.WasPressedThisFrame())
                 motor.Jump();
 
-            if (IsLooking)
-                motor.Look(mouse.delta.ReadValue() * mouseSensitivity);
+            var mouse = Mouse.current;
+            if (mouse != null && Cursor.lockState == CursorLockMode.Locked)
+            {
+                var settings = ControlSettings.Current;
+                var delta = mouse.delta.ReadValue() * (BaseSensitivity * settings.mouseSensitivity);
+                if (settings.invertY)
+                    delta.y = -delta.y;
+                motor.Look(delta);
+            }
         }
 
-        void SetLooking(bool looking)
+        void ApplyCameraSettings(ControlSettingsData settings)
         {
-            if (looking == IsLooking)
-                return;
-            IsLooking = looking;
-            Cursor.lockState = looking ? CursorLockMode.Locked : CursorLockMode.None;
+            if (viewCamera != null)
+                viewCamera.fieldOfView = settings.fieldOfView;
         }
     }
 }

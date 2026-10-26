@@ -1,0 +1,217 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1001 &8011795205717164944
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: -8679921383154817045, guid: ff36ecc5eb103da4cbca5f263e8a9cdc, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: ff36ecc5eb103da4cbca5f263e8a9cdc, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: ff36ecc5eb103da4cbca5f263e8a9cdc, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: ff36ecc5eb103da4cbca5f263e8a9cdc, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7071067
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: ff36ecc5eb103da4cbca5f263e8a9cdc, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: ff36ecc5eb103da4cbca5f263e8a9cdc, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: ff36ecc5eb103da4cbca5f263e8a9cdc, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: ff36ecc5eb103da4cbca5f263e8a9cdc, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: ff36ecc5eb103da4cbca5f263e8a9cdc, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: ff36ecc5eb103da4cbca5f263e8a9cdc, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -7175497441153661879, guid: ff36ecc5eb103da4cbca5f263e8a9cdc, type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: -7023904948913636619, guid: ff36ecc5eb103da4cbca5f263e8a9cdc, type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: -6476212384906687300, guid: ff36ecc5eb103da4cbca5f263e8a9cdc, type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: ff36ecc5eb103da4cbca5f263e8a9cdc, type: 3}
+      propertyPath: m_Name
+      value: HS 60T Gear, No Insert
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: ff36ecc5eb103da4cbca5f263e8a9cdc, type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 4445948748397649984, guid: ff36ecc5eb103da4cbca5f263e8a9cdc, type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 6903552206138281603, guid: ff36ecc5eb103da4cbca5f263e8a9cdc, type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 8329350212030676554, guid: ff36ecc5eb103da4cbca5f263e8a9cdc, type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: ff36ecc5eb103da4cbca5f263e8a9cdc, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3486332965334713828}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: ff36ecc5eb103da4cbca5f263e8a9cdc, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1798918131605223868}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: ff36ecc5eb103da4cbca5f263e8a9cdc, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5260852232986057818}
+    - targetCorrespondingSourceObject: {fileID: 4445948748397649984, guid: ff36ecc5eb103da4cbca5f263e8a9cdc, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4709306520571955307}
+    - targetCorrespondingSourceObject: {fileID: -6476212384906687300, guid: ff36ecc5eb103da4cbca5f263e8a9cdc, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6218300980876129645}
+  m_SourcePrefab: {fileID: 100100000, guid: ff36ecc5eb103da4cbca5f263e8a9cdc, type: 3}
+--- !u!1 &5273788209943662380 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: -6476212384906687300, guid: ff36ecc5eb103da4cbca5f263e8a9cdc, type: 3}
+  m_PrefabInstance: {fileID: 8011795205717164944}
+  m_PrefabAsset: {fileID: 0}
+--- !u!64 &6218300980876129645
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5273788209943662380}
+  m_Material: {fileID: 13400000, guid: 7b41823d24d681e45af2872a54c4ecbe, type: 2}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 1
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -8073514604124154958, guid: ff36ecc5eb103da4cbca5f263e8a9cdc, type: 3}
+--- !u!1 &5952830299403887568 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4445948748397649984, guid: ff36ecc5eb103da4cbca5f263e8a9cdc, type: 3}
+  m_PrefabInstance: {fileID: 8011795205717164944}
+  m_PrefabAsset: {fileID: 0}
+--- !u!64 &4709306520571955307
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5952830299403887568}
+  m_Material: {fileID: 13400000, guid: 7b41823d24d681e45af2872a54c4ecbe, type: 2}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 1
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 6413805903724522286, guid: ff36ecc5eb103da4cbca5f263e8a9cdc, type: 3}
+--- !u!1 &7200961802748706497 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: ff36ecc5eb103da4cbca5f263e8a9cdc, type: 3}
+  m_PrefabInstance: {fileID: 8011795205717164944}
+  m_PrefabAsset: {fileID: 0}
+--- !u!54 &3486332965334713828
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7200961802748706497}
+  serializedVersion: 5
+  m_Mass: 0.021424923
+  m_LinearDamping: 0.05
+  m_AngularDamping: 0.15
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 1
+  m_Constraints: 0
+  m_CollisionDetection: 3
+--- !u!114 &1798918131605223868
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7200961802748706497}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8df26144e8874854cafce42158106248, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.PartBody
+  partId: Motion/Gears/Reference Files/HS 60T Gear, No Insert
+--- !u!114 &5260852232986057818
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7200961802748706497}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c9079664a2442a24cb6df6ea05dc2af7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
+  cursor: 2
+  title: HS 60T Gear, No Insert
+  hint: "65.6 \xD7 65.6 \xD7 12.7 mm  \xB7  21.4 g  \xB7  hold to pick up"
+  highlightBrightness: 1.3

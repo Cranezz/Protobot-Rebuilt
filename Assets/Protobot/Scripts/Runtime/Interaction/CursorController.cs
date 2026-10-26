@@ -1,14 +1,14 @@
 using System;
-using Protobot.InputHandling;
+using Protobot.Core;
+using Protobot.Menus;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 namespace Protobot.Interaction
 {
     /// <summary>
-    /// Finds what the mouse is over and changes the cursor to match: a pointing hand over things to click,
-    /// an open hand over parts to pick up, a closed hand while holding the button on a part. Shows a tooltip
-    /// with the object's name and what clicking does, and hides the cursor while the player is looking around.
+    /// In play the mouse is locked to the centre of the screen and drawn as a reticle: a dot normally,
+    /// a pointing hand over things to click, an open hand over parts (closed while holding one). A label
+    /// next to it names what you're aiming at. When a menu opens the normal mouse pointer comes back.
     /// </summary>
     public class CursorController : MonoBehaviour
     {
@@ -16,68 +16,104 @@ namespace Protobot.Interaction
         public struct CursorStyle
         {
             public CursorKind kind;
-            public Texture2D texture;
+            public Sprite sprite;
             public Vector2 hotspot;
         }
 
         [SerializeField] Camera viewCamera;
-        [SerializeField] DesktopPlayerInput player;
+        [SerializeField] Hud hud;
         [SerializeField] CursorStyle[] styles;
-        [SerializeField] HoverTooltip tooltip;
 
         [Tooltip("How far away (m) the player can reach things. Further away they still show their name.")]
-        [SerializeField] float reach = 3f;
+        [SerializeField] float reach = 2.5f;
         [SerializeField] LayerMask raycastMask = ~(1 << 2);  // everything except Ignore Raycast (the player)
 
         HoverTarget current;
-        CursorKind shownKind = (CursorKind)(-1);
+        bool menuMode;
 
         public HoverTarget Current => current;
         public bool CurrentInReach { get; private set; }
+        public RaycastHit CurrentHit { get; private set; }
+        public Camera ViewCamera => viewCamera;
+        public float Reach => reach;
+
+        /// <summary>Set by <see cref="PlayerHands"/> while it carries something, so the cursor shows a closed hand.</summary>
+        public HoverTarget Holding { get; set; }
+
+        void OnEnable()
+        {
+            menuMode = !MenuState.AnyOpen;  // forces the first Update to apply the right mode
+        }
 
         void OnDisable()
         {
             SetHover(null);
-            UnityEngine.Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
-            shownKind = (CursorKind)(-1);
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
         }
 
         void Update()
         {
-            var mouse = Mouse.current;
-            if (mouse == null)
-                return;
-
-            if (player != null && player.IsLooking)
+            if (MenuState.AnyOpen)
             {
-                UnityEngine.Cursor.visible = false;
-                SetHover(null);
-                tooltip?.Hide();
+                EnterMenuMode();
                 return;
             }
-            UnityEngine.Cursor.visible = true;
+            EnterPlayMode();
 
-            var screenPos = mouse.position.ReadValue();
+            if (Holding != null)
+            {
+                SetHover(null);
+                ShowKind(CursorKind.Grabbing);
+                hud.ShowTooltip(Holding.Title, "Release to drop  ·  Scroll to move closer/further", true);
+                return;
+            }
+
             HoverTarget target = null;
-            var distance = 0f;
-            if (Physics.Raycast(viewCamera.ScreenPointToRay(screenPos), out var hit, 30f, raycastMask, QueryTriggerInteraction.Collide))
+            var ray = viewCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
+            if (Physics.Raycast(ray, out var hit, 30f, raycastMask, QueryTriggerInteraction.Collide))
             {
                 target = hit.collider.GetComponentInParent<HoverTarget>();
-                distance = hit.distance;
+                CurrentHit = hit;
             }
 
             SetHover(target);
-            CurrentInReach = target != null && distance <= reach;
-
-            var kind = CurrentInReach ? target.Cursor : CursorKind.Default;
-            if (kind == CursorKind.Grab && mouse.leftButton.isPressed)
-                kind = CursorKind.Grabbing;
-            ShowCursor(kind);
+            CurrentInReach = target != null && hit.distance <= reach;
+            ShowKind(CurrentInReach ? target.Cursor : CursorKind.Default);
 
             if (target == null)
-                tooltip?.Hide();
+                hud.HideTooltip();
             else
-                tooltip?.Show(target.Title, CurrentInReach ? target.Hint : "Move closer to use", screenPos, CurrentInReach);
+                hud.ShowTooltip(target.Title, CurrentInReach ? target.Hint : "Move closer to use", CurrentInReach);
+        }
+
+        void EnterMenuMode()
+        {
+            if (menuMode)
+                return;
+            menuMode = true;
+            SetHover(null);
+            hud.SetReticleVisible(false);
+            hud.HideTooltip();
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+            var arrow = StyleFor(CursorKind.Default);
+            Cursor.SetCursor(arrow.sprite != null ? arrow.sprite.texture : null, arrow.hotspot, CursorMode.Auto);
+        }
+
+        void EnterPlayMode()
+        {
+            if (!menuMode)
+            {
+                // The editor (or alt-tab) can release the lock; take it back whenever we're playing.
+                if (Cursor.lockState != CursorLockMode.Locked && Application.isFocused)
+                    Cursor.lockState = CursorLockMode.Locked;
+                return;
+            }
+            menuMode = false;
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+            hud.SetReticleVisible(true);
         }
 
         void SetHover(HoverTarget target)
@@ -89,22 +125,22 @@ namespace Protobot.Interaction
             current = target;
             if (current != null)
                 current.SetHighlighted(true);
+            if (current == null)
+                CurrentInReach = false;
         }
 
-        void ShowCursor(CursorKind kind)
+        void ShowKind(CursorKind kind)
         {
-            if (kind == shownKind)
-                return;
-            shownKind = kind;
+            var style = StyleFor(kind);
+            hud.SetReticle(kind == CursorKind.Default ? null : style.sprite, kind != CursorKind.Default);
+        }
+
+        CursorStyle StyleFor(CursorKind kind)
+        {
             foreach (var style in styles)
-            {
                 if (style.kind == kind)
-                {
-                    UnityEngine.Cursor.SetCursor(style.texture, style.hotspot, CursorMode.Auto);
-                    return;
-                }
-            }
-            UnityEngine.Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
+                    return style;
+            return default;
         }
     }
 }

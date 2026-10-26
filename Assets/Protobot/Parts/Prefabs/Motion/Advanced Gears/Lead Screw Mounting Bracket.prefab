@@ -1,0 +1,175 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1001 &7472429307406434555
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: -8679921383154817045, guid: e41b01dd59a282d458f60f1ef2b29666, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: e41b01dd59a282d458f60f1ef2b29666, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: e41b01dd59a282d458f60f1ef2b29666, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: e41b01dd59a282d458f60f1ef2b29666, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7071067
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: e41b01dd59a282d458f60f1ef2b29666, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: e41b01dd59a282d458f60f1ef2b29666, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: e41b01dd59a282d458f60f1ef2b29666, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: e41b01dd59a282d458f60f1ef2b29666, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: e41b01dd59a282d458f60f1ef2b29666, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: e41b01dd59a282d458f60f1ef2b29666, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -7175497441153661879, guid: e41b01dd59a282d458f60f1ef2b29666, type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: e41b01dd59a282d458f60f1ef2b29666, type: 3}
+      propertyPath: m_Name
+      value: Lead Screw Mounting Bracket
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: e41b01dd59a282d458f60f1ef2b29666, type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 4445948748397649984, guid: e41b01dd59a282d458f60f1ef2b29666, type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 8329350212030676554, guid: e41b01dd59a282d458f60f1ef2b29666, type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e41b01dd59a282d458f60f1ef2b29666, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6105902253249113392}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e41b01dd59a282d458f60f1ef2b29666, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2276381498232756278}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e41b01dd59a282d458f60f1ef2b29666, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6867629999699512813}
+    - targetCorrespondingSourceObject: {fileID: 4445948748397649984, guid: e41b01dd59a282d458f60f1ef2b29666, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2851615840592525828}
+  m_SourcePrefab: {fileID: 100100000, guid: e41b01dd59a282d458f60f1ef2b29666, type: 3}
+--- !u!1 &6485262670948229307 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4445948748397649984, guid: e41b01dd59a282d458f60f1ef2b29666, type: 3}
+  m_PrefabInstance: {fileID: 7472429307406434555}
+  m_PrefabAsset: {fileID: 0}
+--- !u!64 &2851615840592525828
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6485262670948229307}
+  m_Material: {fileID: 13400000, guid: 7b41823d24d681e45af2872a54c4ecbe, type: 2}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 1
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 6413805903724522286, guid: e41b01dd59a282d458f60f1ef2b29666, type: 3}
+--- !u!1 &7742267256454839722 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: e41b01dd59a282d458f60f1ef2b29666, type: 3}
+  m_PrefabInstance: {fileID: 7472429307406434555}
+  m_PrefabAsset: {fileID: 0}
+--- !u!54 &6105902253249113392
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7742267256454839722}
+  serializedVersion: 5
+  m_Mass: 0.00868756
+  m_LinearDamping: 0.05
+  m_AngularDamping: 0.15
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 1
+  m_Constraints: 0
+  m_CollisionDetection: 3
+--- !u!114 &2276381498232756278
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7742267256454839722}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8df26144e8874854cafce42158106248, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.PartBody
+  partId: Motion/Advanced Gears/Lead Screw Mounting Bracket
+--- !u!114 &6867629999699512813
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7742267256454839722}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c9079664a2442a24cb6df6ea05dc2af7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
+  cursor: 2
+  title: Lead Screw Mounting Bracket
+  hint: "43.9 \xD7 32.5 \xD7 30.6 mm  \xB7  8.7 g  \xB7  hold to pick up"
+  highlightBrightness: 1.3

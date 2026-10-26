@@ -14,7 +14,8 @@ namespace Protobot.Editor
     ///  1. creates one shared URP material per CAD appearance (Aluminum, Steel, Rubber, plastics...);
     ///  2. assigns those materials to every part model by name;
     ///  3. writes the PartCatalog (every part, its bin and real size);
-    ///  4. makes the shelf bins in the open scene clickable and tags them with their category.
+    ///  4. builds a physical prefab and a thumbnail for every part (<see cref="PartPrefabBuilder"/>);
+    ///  5. makes the shelf bins in the open scene clickable and tags them with their category.
     /// Reads Assets/Protobot/Parts/Models/parts_manifest.json (Tools/Parts/make_parts_manifest.py).
     /// </summary>
     public static class PartLibraryBuilder
@@ -34,6 +35,7 @@ namespace Protobot.Editor
             var materials = BuildMaterials(manifest);
             AssignMaterials(manifest, materials);
             var catalog = BuildCatalog(manifest);
+            PartPrefabBuilder.BuildAll(catalog, false);
             SetupBins();
             Debug.Log($"[Parts] {catalog.parts.Count} parts, {materials.Count} materials.");
         }

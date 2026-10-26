@@ -1,0 +1,167 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1001 &7800465927120521339
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: -8679921383154817045, guid: 31e0ea674d0dd5c409305331a434421d, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 31e0ea674d0dd5c409305331a434421d, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 31e0ea674d0dd5c409305331a434421d, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 31e0ea674d0dd5c409305331a434421d, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7071067
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 31e0ea674d0dd5c409305331a434421d, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 31e0ea674d0dd5c409305331a434421d, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 31e0ea674d0dd5c409305331a434421d, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 31e0ea674d0dd5c409305331a434421d, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 31e0ea674d0dd5c409305331a434421d, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 31e0ea674d0dd5c409305331a434421d, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 31e0ea674d0dd5c409305331a434421d, type: 3}
+      propertyPath: m_Name
+      value: Winch Pawl
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 31e0ea674d0dd5c409305331a434421d, type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 2358492892965789101, guid: 31e0ea674d0dd5c409305331a434421d, type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 31e0ea674d0dd5c409305331a434421d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8438536861449941532}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 31e0ea674d0dd5c409305331a434421d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5555413510017467718}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 31e0ea674d0dd5c409305331a434421d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7271280938297989742}
+    - targetCorrespondingSourceObject: {fileID: 2358492892965789101, guid: 31e0ea674d0dd5c409305331a434421d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4396125062248514063}
+  m_SourcePrefab: {fileID: 100100000, guid: 31e0ea674d0dd5c409305331a434421d, type: 3}
+--- !u!1 &5547272165449848278 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2358492892965789101, guid: 31e0ea674d0dd5c409305331a434421d, type: 3}
+  m_PrefabInstance: {fileID: 7800465927120521339}
+  m_PrefabAsset: {fileID: 0}
+--- !u!64 &4396125062248514063
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5547272165449848278}
+  m_Material: {fileID: 13400000, guid: 7b41823d24d681e45af2872a54c4ecbe, type: 2}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 1
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -2725902946901990955, guid: 31e0ea674d0dd5c409305331a434421d, type: 3}
+--- !u!1 &6954045730671801642 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 31e0ea674d0dd5c409305331a434421d, type: 3}
+  m_PrefabInstance: {fileID: 7800465927120521339}
+  m_PrefabAsset: {fileID: 0}
+--- !u!54 &8438536861449941532
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6954045730671801642}
+  serializedVersion: 5
+  m_Mass: 0.0010333846
+  m_LinearDamping: 0.05
+  m_AngularDamping: 0.15
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 1
+  m_Constraints: 0
+  m_CollisionDetection: 3
+--- !u!114 &5555413510017467718
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6954045730671801642}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8df26144e8874854cafce42158106248, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.PartBody
+  partId: Motion/Advanced Gears/Winch Pawl
+--- !u!114 &7271280938297989742
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6954045730671801642}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c9079664a2442a24cb6df6ea05dc2af7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
+  cursor: 2
+  title: Winch Pawl
+  hint: "16.8 \xD7 15.8 \xD7 9.9 mm  \xB7  1 g  \xB7  hold to pick up"
+  highlightBrightness: 1.3
