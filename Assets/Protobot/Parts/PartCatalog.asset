@@ -5621,6 +5621,16 @@ MonoBehaviour:
     triangles: 724
     massKg: 0.0036787218
     cuttable: 0
+  - id: Structure/Standoff/Standoff 5.00
+    displayName: Standoff 5.00
+    binId: standoffs
+    model: {fileID: 919132149155446097, guid: f58b17e9e0bfe744697f579f9903701d, type: 3}
+    prefab: {fileID: 2128443369510724600, guid: c1f218184f240b24a93a5c3214c4c66f, type: 3}
+    thumbnail: {fileID: 21300000, guid: 84a27eb8c59cd3b45a6f56c441a023a5, type: 3}
+    size: {x: 0.007332, y: 0.00635, z: 0.127}
+    triangles: 676
+    massKg: 0.004699414
+    cuttable: 0
   - id: Structure/Standoff/Standoff 6.00
     displayName: Standoff 6.00
     binId: standoffs

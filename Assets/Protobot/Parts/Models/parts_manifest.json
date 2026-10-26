@@ -13333,6 +13333,26 @@
    ]
   },
   {
+   "path": "Structure/Standoff/Standoff 5.00",
+   "size": [
+    0.007332,
+    0.00635,
+    0.127
+   ],
+   "triangles": 676,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Standoffs",
+     "color": [
+      0.752941,
+      0.752941,
+      0.752941
+     ]
+    }
+   ]
+  },
+  {
    "path": "Structure/Standoff/Standoff 6.00",
    "size": [
     0.007332,
