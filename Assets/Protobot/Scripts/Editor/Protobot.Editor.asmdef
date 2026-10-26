@@ -2,7 +2,9 @@
     "name": "Protobot.Editor",
     "rootNamespace": "Protobot.Editor",
     "references": [
-        "Protobot.Runtime"
+        "Protobot.Runtime",
+        "Unity.RenderPipelines.Core.Runtime",
+        "Unity.RenderPipelines.Universal.Runtime"
     ],
     "includePlatforms": [
         "Editor"
