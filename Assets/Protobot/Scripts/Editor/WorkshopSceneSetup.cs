@@ -254,12 +254,17 @@ namespace Protobot.Editor
             if (camera == null)
                 return;
 
-            // Standing just inside the garage door, looking at the back bench.
-            camera.transform.SetPositionAndRotation(new Vector3(0f, 1.65f, -2.6f), Quaternion.LookRotation(new Vector3(0f, 1.05f, 2.5f) - new Vector3(0f, 1.65f, -2.6f)));
             camera.fieldOfView = 65f;
             camera.nearClipPlane = 0.01f;
             camera.farClipPlane = 200f;
             camera.clearFlags = CameraClearFlags.Skybox;
+
+            // Once the player exists the camera lives in its head (Tools > Protobot > Setup Player).
+            if (camera.transform.parent != null)
+                return;
+
+            // Standing just inside the garage door, looking at the back bench.
+            camera.transform.SetPositionAndRotation(new Vector3(0f, 1.65f, -2.6f), Quaternion.LookRotation(new Vector3(0f, 1.05f, 2.5f) - new Vector3(0f, 1.65f, -2.6f)));
         }
     }
 }

@@ -223,10 +223,10 @@ def build_bench_props(m, base, root):
     L.box("Toolbox_Body", (0.25, 0.5, 0.2), (X0 + 0.32, 1.9, top + 0.1), m["red"], grp)
     L.box("Toolbox_Handle", (0.03, 0.3, 0.04), (X0 + 0.32, 1.9, top + 0.23), base["black_plastic"], grp)
     # Cordless drill on the right bench.
-    L.box("Drill_Body", (0.06, 0.2, 0.07), (X1 - 0.3, 0.3, top + 0.2), m["yellow"], grp)
-    L.box("Drill_Grip", (0.05, 0.05, 0.14), (X1 - 0.3, 0.36, top + 0.12), base["black_plastic"], grp)
-    L.box("Drill_Battery", (0.08, 0.1, 0.06), (X1 - 0.3, 0.36, top + 0.03), base["black_plastic"], grp)
-    L.cylinder("Drill_Chuck", 0.016, 0.06, (X1 - 0.3, 0.17, top + 0.2), m["steel"], grp, rotation=(90, 0, 0), segments=8)
+    L.box("Drill_Body", (0.06, 0.2, 0.07), (X1 - 0.3, -0.25, top + 0.2), m["yellow"], grp)
+    L.box("Drill_Grip", (0.05, 0.05, 0.14), (X1 - 0.3, -0.19, top + 0.12), base["black_plastic"], grp)
+    L.box("Drill_Battery", (0.08, 0.1, 0.06), (X1 - 0.3, -0.19, top + 0.03), base["black_plastic"], grp)
+    L.cylinder("Drill_Chuck", 0.016, 0.06, (X1 - 0.3, -0.38, top + 0.2), m["steel"], grp, rotation=(90, 0, 0), segments=8)
     # Power strip along the back wall above the bench.
     L.box_span("PowerStrip", -2.6, -1.4, Y1 - 0.03, Y1, top + 0.15, top + 0.2, base["light_housing"], grp)
     # Clamp lamp on the right bench.

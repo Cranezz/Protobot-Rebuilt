@@ -47,6 +47,7 @@ namespace Protobot.Editor
             importer.globalScale = 1f;
             importer.useFileScale = true;
             importer.generateSecondaryUV = true;  // lightmap UVs for baked lighting
+            importer.addCollider = true;          // walls, benches and props block the player
             importer.bakeAxisConversion = true;   // Blender is Z-up: bake the conversion so every object has a clean transform
             importer.animationType = ModelImporterAnimationType.None;
             importer.importAnimation = false;

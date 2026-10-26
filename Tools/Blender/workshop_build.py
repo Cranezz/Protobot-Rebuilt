@@ -28,6 +28,9 @@ WIN_X, WIN_Z = (-0.7, 0.7), (1.3, 2.2)
 DOOR_Y, DOOR_H = (-2.6, -1.7), 2.05
 GARAGE_X, GARAGE_H = (-2.4, 2.4), 2.2
 
+# Bin shelf along the right wall, starting just clear of the back bench (which runs into the corner).
+BIN_SHELF_Y = (Y1 - BENCH_DEPTH - 0.05 - 1.93, Y1 - BENCH_DEPTH - 0.05)
+
 
 def materials():
     return {
@@ -165,9 +168,9 @@ def drawer_cabinet(name, x0, x1, y0, y1, m, parent, front="-y", drawers=4):
 
 def build_benches(m, root):
     grp = L.empty("Workbenches", root)
-    bench("Bench_Back", X0, 2.7, Y1 - BENCH_DEPTH, Y1, m, grp, "y")
+    bench("Bench_Back", X0, X1, Y1 - BENCH_DEPTH, Y1, m, grp, "y")
     bench("Bench_Left", X0, X0 + BENCH_DEPTH, -1.3, Y1 - BENCH_DEPTH, m, grp, "x")
-    bench("Bench_Right", X1 - BENCH_DEPTH, X1, -1.5, 1.15, m, grp, "x")
+    bench("Bench_Right", X1 - BENCH_DEPTH, X1, -1.5, BIN_SHELF_Y[0] - 0.07, m, grp, "x")
     drawer_cabinet("Cabinet_Back", -2.0, -1.4, Y1 - BENCH_DEPTH + 0.03, Y1 - 0.04, m, grp, "-y")
     drawer_cabinet("Cabinet_Left", X0 + 0.04, X0 + BENCH_DEPTH - 0.03, 0.4, 1.0, m, grp, "+x")
 
@@ -197,9 +200,10 @@ def build_lights(m, root):
 
 
 def build_bin_shelf(m, root):
-    """Steel shelving in the back-right corner holding the part bins (4 rows x 6 bins)."""
+    """Steel shelving against the right wall, next to the back bench, holding the part bins (4 rows x 6)."""
     grp = L.empty("BinShelf", root)
-    x0, x1, y0, y1 = X1 - 0.45, X1 - 0.02, 1.25, Y1 - 0.02
+    x0, x1 = X1 - 0.45, X1 - 0.02
+    y0, y1 = BIN_SHELF_Y
     levels = [0.08, 0.52, 0.96, 1.40, 1.84]
     for i, (px, py) in enumerate(((x0, y0), (x1, y0), (x0, y1), (x1, y1))):
         L.box(f"BinShelf_Post_{i}", (0.035, 0.035, 2.1), (px + (0.0175 if px == x0 else -0.0175), py + (0.0175 if py == y0 else -0.0175), 1.05), m["steel_shelf"], grp)

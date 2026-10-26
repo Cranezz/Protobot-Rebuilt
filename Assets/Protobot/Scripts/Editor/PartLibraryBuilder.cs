@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using Protobot.Interaction;
 using Protobot.Parts;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -110,7 +111,7 @@ namespace Protobot.Editor
                     model = AssetDatabase.LoadAssetAtPath<GameObject>(ModelPath(part)),
                     size = new Vector3(part.size[0], part.size[1], part.size[2]),
                     triangles = part.triangles,
-                    cuttable = binId is "c_channels" or "angles" or "plates" or "rails",
+                    cuttable = binId is "c_channels" or "angles" or "plates" or "rails" or "shafts",
                 });
             }
             EditorUtility.SetDirty(catalog);
@@ -154,6 +155,9 @@ namespace Protobot.Editor
                 collider.size = t.InverseTransformVector(bounds.size);
                 collider.size = new Vector3(Mathf.Abs(collider.size.x), Mathf.Abs(collider.size.y), Mathf.Abs(collider.size.z));
                 AddLabel(t, PartBins.All[index].label);
+                if (!t.TryGetComponent(out HoverTarget hover))
+                    hover = t.gameObject.AddComponent<HoverTarget>();
+                hover.Configure(CursorKind.Point, PartBins.All[index].label, "Click to browse parts");
                 EditorUtility.SetDirty(t.gameObject);
                 bins++;
             }
