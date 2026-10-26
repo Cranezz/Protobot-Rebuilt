@@ -10,7 +10,7 @@ namespace Protobot.GraphicsQuality
     [Serializable]
     public class GraphicsSettingsData
     {
-        public const int CurrentVersion = 1;
+        public const int CurrentVersion = 2;
 
         /// <summary>Bumped when the saved format changes, so old files can be upgraded.</summary>
         public int version = CurrentVersion;
@@ -25,6 +25,7 @@ namespace Protobot.GraphicsQuality
         public AmbientOcclusion ambientOcclusion = AmbientOcclusion.Off;
         public bool postProcessing = true;
         public TextureQuality textures = TextureQuality.Full;
+        public ModelDetail modelDetail = ModelDetail.High;
         public bool anisotropicFiltering = true;
         public bool hdr = true;
 
@@ -55,6 +56,7 @@ namespace Protobot.GraphicsQuality
                     ambientOcclusion = AmbientOcclusion.Off;
                     postProcessing = false;
                     textures = TextureQuality.Half;
+                    modelDetail = ModelDetail.Low;
                     anisotropicFiltering = false;
                     hdr = false;
                     break;
@@ -66,6 +68,7 @@ namespace Protobot.GraphicsQuality
                     ambientOcclusion = AmbientOcclusion.Off;
                     postProcessing = true;
                     textures = TextureQuality.Full;
+                    modelDetail = ModelDetail.Low;
                     anisotropicFiltering = false;
                     hdr = false;
                     break;
@@ -77,6 +80,7 @@ namespace Protobot.GraphicsQuality
                     ambientOcclusion = AmbientOcclusion.Off;
                     postProcessing = true;
                     textures = TextureQuality.Full;
+                    modelDetail = ModelDetail.Medium;
                     anisotropicFiltering = true;
                     hdr = true;
                     break;
@@ -88,6 +92,7 @@ namespace Protobot.GraphicsQuality
                     ambientOcclusion = AmbientOcclusion.Medium;
                     postProcessing = true;
                     textures = TextureQuality.Full;
+                    modelDetail = ModelDetail.High;
                     anisotropicFiltering = true;
                     hdr = true;
                     break;
@@ -99,6 +104,7 @@ namespace Protobot.GraphicsQuality
                     ambientOcclusion = AmbientOcclusion.High;
                     postProcessing = true;
                     textures = TextureQuality.Full;
+                    modelDetail = ModelDetail.Ultra;
                     anisotropicFiltering = true;
                     hdr = true;
                     break;
@@ -111,6 +117,7 @@ namespace Protobot.GraphicsQuality
                     ambientOcclusion = AmbientOcclusion.High;
                     postProcessing = true;
                     textures = TextureQuality.Full;
+                    modelDetail = ModelDetail.Ultra;
                     anisotropicFiltering = true;
                     hdr = true;
                     break;
@@ -139,6 +146,7 @@ namespace Protobot.GraphicsQuality
             && ambientOcclusion == other.ambientOcclusion
             && postProcessing == other.postProcessing
             && textures == other.textures
+            && modelDetail == other.modelDetail
             && anisotropicFiltering == other.anisotropicFiltering
             && hdr == other.hdr;
     }

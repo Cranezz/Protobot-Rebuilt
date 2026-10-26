@@ -1,0 +1,2504 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c551519bd5b67674dbff0231cf9a09ea, type: 3}
+  m_Name: PartCatalog
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.PartCatalog
+  parts:
+  - id: Electronics/Sensors/Analog Accelerometer
+    displayName: Analog Accelerometer
+    binId: sensors
+    model: {fileID: 0}
+    size: {x: 0.03048, y: 0.0254, z: 0.014351}
+    triangles: 1012
+    cuttable: 0
+  - id: Electronics/Sensors/Bumper Switch - V1
+    displayName: Bumper Switch - V1
+    binId: sensors
+    model: {fileID: 0}
+    size: {x: 0.053, y: 0.034095, z: 0.022955}
+    triangles: 46604
+    cuttable: 0
+  - id: Electronics/Sensors/Bumper Switch - V2
+    displayName: Bumper Switch - V2
+    binId: sensors
+    model: {fileID: 0}
+    size: {x: 0.050555, y: 0.025093, z: 0.023162}
+    triangles: 187985
+    cuttable: 0
+  - id: Electronics/Sensors/Light Sensor
+    displayName: Light Sensor
+    binId: sensors
+    model: {fileID: 919132149155446097, guid: 65ce07f9365f18a4c90b9149c092193b, type: 3}
+    size: {x: 0.026, y: 0.049121, z: 0.011}
+    triangles: 21892
+    cuttable: 0
+  - id: Electronics/Sensors/Limit Switch
+    displayName: Limit Switch
+    binId: sensors
+    model: {fileID: 0}
+    size: {x: 0.064308, y: 0.039726, z: 0.01255}
+    triangles: 10488
+    cuttable: 0
+  - id: Electronics/Sensors/Line Sensor Mounting Bar
+    displayName: Line Sensor Mounting Bar
+    binId: sensors
+    model: {fileID: 0}
+    size: {x: 0.01905, y: 0.089, z: 0.01905}
+    triangles: 700
+    cuttable: 0
+  - id: Electronics/Sensors/Line Tracker - V1
+    displayName: Line Tracker - V1
+    binId: sensors
+    model: {fileID: 0}
+    size: {x: 0.019293, y: 0.05477, z: 0.0212}
+    triangles: 20502
+    cuttable: 0
+  - id: Electronics/Sensors/Line Tracker - V2
+    displayName: Line Tracker - V2
+    binId: sensors
+    model: {fileID: 0}
+    size: {x: 0.012771, y: 0.056634, z: 0.0202}
+    triangles: 48690
+    cuttable: 0
+  - id: Electronics/Sensors/Optical Shaft Encoder
+    displayName: Optical Shaft Encoder
+    binId: sensors
+    model: {fileID: 0}
+    size: {x: 0.0675, y: 0.0505, z: 0.0202}
+    triangles: 53619
+    cuttable: 0
+  - id: Electronics/Sensors/Potentiometer
+    displayName: Potentiometer
+    binId: sensors
+    model: {fileID: 0}
+    size: {x: 0.038086, y: 0.00835, z: 0.037975}
+    triangles: 26450
+    cuttable: 0
+  - id: Electronics/Sensors/Ultrasonic Range Finder
+    displayName: Ultrasonic Range Finder
+    binId: sensors
+    model: {fileID: 0}
+    size: {x: 0.08125, y: 0.0303, z: 0.0205}
+    triangles: 29100
+    cuttable: 0
+  - id: Electronics/Sensors/V5 3 Wire Expander
+    displayName: V5 3 Wire Expander
+    binId: sensors
+    model: {fileID: 0}
+    size: {x: 0.026762, y: 0.076262, z: 0.02195}
+    triangles: 64196
+    cuttable: 0
+  - id: Electronics/Sensors/V5 Distance Sensor
+    displayName: V5 Distance Sensor
+    binId: sensors
+    model: {fileID: 0}
+    size: {x: 0.050387, y: 0.022396, z: 0.023252}
+    triangles: 58816
+    cuttable: 0
+  - id: Electronics/Sensors/V5 GPS Sensor
+    displayName: V5 GPS Sensor
+    binId: sensors
+    model: {fileID: 0}
+    size: {x: 0.0381, y: 0.0254, z: 0.0381}
+    triangles: 46720
+    cuttable: 0
+  - id: Electronics/Sensors/V5 Inertial Sensor
+    displayName: V5 Inertial Sensor
+    binId: sensors
+    model: {fileID: 0}
+    size: {x: 0.021997, y: 0.039397, z: 0.02165}
+    triangles: 13532
+    cuttable: 0
+  - id: Electronics/Sensors/V5 Optical Sensor
+    displayName: V5 Optical Sensor
+    binId: sensors
+    model: {fileID: 0}
+    size: {x: 0.050387, y: 0.022396, z: 0.024312}
+    triangles: 59552
+    cuttable: 0
+  - id: Electronics/Sensors/V5 Rotation Sensor
+    displayName: V5 Rotation Sensor
+    binId: sensors
+    model: {fileID: 0}
+    size: {x: 0.06675, y: 0.022, z: 0.0207}
+    triangles: 46980
+    cuttable: 0
+  - id: Electronics/Sensors/V5 Vision Sensor
+    displayName: V5 Vision Sensor
+    binId: sensors
+    model: {fileID: 0}
+    size: {x: 0.063395, y: 0.054975, z: 0.02265}
+    triangles: 279003
+    cuttable: 0
+  - id: Electronics/Sensors/Yaw Rate Gyroscope Sensor
+    displayName: Yaw Rate Gyroscope Sensor
+    binId: sensors
+    model: {fileID: 0}
+    size: {x: 0.03048, y: 0.0254, z: 0.014351}
+    triangles: 868
+    cuttable: 0
+  - id: Electronics/V5 3 Wire Expander
+    displayName: V5 3 Wire Expander
+    binId: brain
+    model: {fileID: 0}
+    size: {x: 0.026762, y: 0.076262, z: 0.0219}
+    triangles: 63564
+    cuttable: 0
+  - id: Electronics/V5 Battery Clip
+    displayName: V5 Battery Clip
+    binId: brain
+    model: {fileID: 0}
+    size: {x: 0.054778, y: 0.012391, z: 0.022714}
+    triangles: 12354
+    cuttable: 0
+  - id: Electronics/V5 Battery
+    displayName: V5 Battery
+    binId: brain
+    model: {fileID: 0}
+    size: {x: 0.162324, y: 0.046448, z: 0.0304}
+    triangles: 111807
+    cuttable: 0
+  - id: Electronics/V5 Brain Mount Long
+    displayName: V5 Brain Mount Long
+    binId: brain
+    model: {fileID: 0}
+    size: {x: 0.018535, y: 0.087716, z: 0.0094}
+    triangles: 23596
+    cuttable: 0
+  - id: Electronics/V5 Brain Mount Short
+    displayName: V5 Brain Mount Short
+    binId: brain
+    model: {fileID: 0}
+    size: {x: 0.018539, y: 0.0502, z: 0.0094}
+    triangles: 18200
+    cuttable: 0
+  - id: Electronics/V5 Brain
+    displayName: V5 Brain
+    binId: brain
+    model: {fileID: 919132149155446097, guid: 7bbe93a11f203d64387ecdd01abdcfd2, type: 3}
+    size: {x: 0.139961, y: 0.099822, z: 0.031507}
+    triangles: 435302
+    cuttable: 0
+  - id: Electronics/V5 Motor (5.5W)
+    displayName: V5 Motor (5.5W)
+    binId: motors
+    model: {fileID: 0}
+    size: {x: 0.05705, y: 0.0254, z: 0.064375}
+    triangles: 339411
+    cuttable: 0
+  - id: Electronics/V5 Motor
+    displayName: V5 Motor
+    binId: motors
+    model: {fileID: 919132149155446097, guid: 0165a9b23ac19804cb9ada05a6076d2e, type: 3}
+    size: {x: 0.0573, y: 0.07235, z: 0.033}
+    triangles: 225409
+    cuttable: 0
+  - id: Electronics/V5 Radio
+    displayName: V5 Radio
+    binId: brain
+    model: {fileID: 0}
+    size: {x: 0.0845, y: 0.02545, z: 0.022}
+    triangles: 53311
+    cuttable: 0
+  - id: Electronics/V5 Simple Battery
+    displayName: V5 Simple Battery
+    binId: brain
+    model: {fileID: 0}
+    size: {x: 0.176327, y: 0.046431, z: 0.030404}
+    triangles: 464
+    cuttable: 0
+  - id: Electronics/V5 Simple Brain
+    displayName: V5 Simple Brain
+    binId: brain
+    model: {fileID: 0}
+    size: {x: 0.099822, y: 0.153797, z: 0.031471}
+    triangles: 6660
+    cuttable: 0
+  - id: Electronics/V5 Simple Motor
+    displayName: V5 Simple Motor
+    binId: motors
+    model: {fileID: 0}
+    size: {x: 0.057328, y: 0.03302, z: 0.071628}
+    triangles: 4386
+    cuttable: 0
+  - id: Electronics/V5 Simple Radio
+    displayName: V5 Simple Radio
+    binId: brain
+    model: {fileID: 0}
+    size: {x: 0.084506, y: 0.0254, z: 0.022593}
+    triangles: 928
+    cuttable: 0
+  - id: Game Objects/High Stakes/Field Perimeter/Field Tile
+    displayName: Field Tile
+    binId: game
+    model: {fileID: 0}
+    size: {x: 0.618839, y: 0.016003, z: 0.618839}
+    triangles: 5356
+    cuttable: 0
+  - id: Game Objects/High Stakes/Field Perimeter/Perimeter Parts/276-7596-003
+    displayName: 276-7596-003
+    binId: game
+    model: {fileID: 0}
+    size: {x: 0.022489, y: 0.032525, z: 0.022489}
+    triangles: 13256
+    cuttable: 0
+  - id: Game Objects/High Stakes/Field Perimeter/Perimeter Parts/276-7596-005
+    displayName: 276-7596-005
+    binId: game
+    model: {fileID: 0}
+    size: {x: 0.139373, y: 0.02525, z: 0.105623}
+    triangles: 138910
+    cuttable: 0
+  - id: Game Objects/High Stakes/Field Perimeter/Perimeter Parts/276-7596-006
+    displayName: 276-7596-006
+    binId: game
+    model: {fileID: 0}
+    size: {x: 0.139382, y: 0.02865, z: 0.105632}
+    triangles: 150232
+    cuttable: 0
+  - id: Game Objects/High Stakes/Field Perimeter/Perimeter Parts/276-7596-008
+    displayName: 276-7596-008
+    binId: game
+    model: {fileID: 0}
+    size: {x: 0.121723, y: 0.121723, z: 0.0274}
+    triangles: 141838
+    cuttable: 0
+  - id: Game Objects/High Stakes/Field Perimeter/Perimeter Parts/276-7596-009
+    displayName: 276-7596-009
+    binId: game
+    model: {fileID: 0}
+    size: {x: 0.121732, y: 0.121732, z: 0.050927}
+    triangles: 206238
+    cuttable: 0
+  - id: Game Objects/High Stakes/Field Perimeter/Perimeter Parts/276-7596-010
+    displayName: 276-7596-010
+    binId: game
+    model: {fileID: 0}
+    size: {x: 0.0465, y: 0.0465, z: 0.0264}
+    triangles: 89840
+    cuttable: 0
+  - id: Game Objects/High Stakes/Field Perimeter/Perimeter Parts/276-7596-014
+    displayName: 276-7596-014
+    binId: game
+    model: {fileID: 0}
+    size: {x: 1.16205, y: 0.0025, z: 0.18796}
+    triangles: 12
+    cuttable: 0
+  - id: Game Objects/High Stakes/Field Perimeter/Perimeter Parts/276-7596-015
+    displayName: 276-7596-015
+    binId: game
+    model: {fileID: 0}
+    size: {x: 1.13665, y: 0.0025, z: 0.18796}
+    triangles: 12
+    cuttable: 0
+  - id: Game Objects/High Stakes/Field Perimeter/Perimeter Parts/276-7596-018
+    displayName: 276-7596-018
+    binId: game
+    model: {fileID: 0}
+    size: {x: 3.676528, y: 0.0254, z: 0.07275}
+    triangles: 588
+    cuttable: 0
+  - id: Game Objects/High Stakes/Field Perimeter/Perimeter Parts/276-7596-316
+    displayName: 276-7596-316
+    binId: game
+    model: {fileID: 0}
+    size: {x: 0.0508, y: 0.0762, z: 0.1914}
+    triangles: 1396
+    cuttable: 0
+  - id: Game Objects/High Stakes/Field Perimeter/Perimeter Parts/276-7596-317_Corner
+    displayName: 276-7596-317_Corner
+    binId: game
+    model: {fileID: 0}
+    size: {x: 0.05715, y: 0.05715, z: 0.1914}
+    triangles: 1048
+    cuttable: 0
+  - id: Game Objects/High Stakes/Field Perimeter/Perimeter Parts/276-7596-350_276-7596-301
+    displayName: 276-7596-350_276-7596-301
+    binId: game
+    model: {fileID: 0}
+    size: {x: 0.0508, y: 1.187785, z: 0.0635}
+    triangles: 6104
+    cuttable: 0
+  - id: Game Objects/High Stakes/Field Perimeter/Perimeter Parts/276-7596-350_276-7596-302
+    displayName: 276-7596-350_276-7596-302
+    binId: game
+    model: {fileID: 0}
+    size: {x: 0.0508, y: 1.187785, z: 0.0635}
+    triangles: 6260
+    cuttable: 0
+  - id: Game Objects/High Stakes/Field Perimeter/Perimeter Parts/276-7596-350_276-7596-303
+    displayName: 276-7596-350_276-7596-303
+    binId: game
+    model: {fileID: 0}
+    size: {x: 0.0508, y: 1.187785, z: 0.0635}
+    triangles: 5916
+    cuttable: 0
+  - id: Game Objects/High Stakes/Field Perimeter/Perimeter Parts/276-7596-350_276-7596-304
+    displayName: 276-7596-350_276-7596-304
+    binId: game
+    model: {fileID: 0}
+    size: {x: 0.0508, y: 1.187785, z: 0.0635}
+    triangles: 6026
+    cuttable: 0
+  - id: Game Objects/High Stakes/Field Perimeter/Perimeter Parts/276-7596-350_276-7596-305
+    displayName: 276-7596-350_276-7596-305
+    binId: game
+    model: {fileID: 0}
+    size: {x: 0.0508, y: 1.187785, z: 0.0635}
+    triangles: 5984
+    cuttable: 0
+  - id: Game Objects/High Stakes/Field Perimeter/Perimeter Parts/276-7596-350_276-7596-306
+    displayName: 276-7596-350_276-7596-306
+    binId: game
+    model: {fileID: 0}
+    size: {x: 0.0508, y: 1.187785, z: 0.0635}
+    triangles: 5948
+    cuttable: 0
+  - id: Game Objects/High Stakes/Field Perimeter/Perimeter Parts/276-7596-350_276-7596-307
+    displayName: 276-7596-350_276-7596-307
+    binId: game
+    model: {fileID: 0}
+    size: {x: 0.0508, y: 1.187785, z: 0.0635}
+    triangles: 7314
+    cuttable: 0
+  - id: Game Objects/High Stakes/Field Perimeter/Perimeter Parts/276-7596-350_276-7596-308
+    displayName: 276-7596-350_276-7596-308
+    binId: game
+    model: {fileID: 0}
+    size: {x: 0.0508, y: 1.187785, z: 0.0635}
+    triangles: 7665
+    cuttable: 0
+  - id: Game Objects/High Stakes/Field Perimeter/Perimeter Parts/276-7596-350_276-7596-309
+    displayName: 276-7596-350_276-7596-309
+    binId: game
+    model: {fileID: 0}
+    size: {x: 0.0508, y: 1.187785, z: 0.0635}
+    triangles: 6324
+    cuttable: 0
+  - id: Game Objects/High Stakes/Field Perimeter/Perimeter Parts/276-7596-350_276-7596-310
+    displayName: 276-7596-350_276-7596-310
+    binId: game
+    model: {fileID: 0}
+    size: {x: 0.0508, y: 1.187785, z: 0.0635}
+    triangles: 7027
+    cuttable: 0
+  - id: Game Objects/High Stakes/Field Perimeter/Perimeter Parts/276-7596-350_276-7596-311
+    displayName: 276-7596-350_276-7596-311
+    binId: game
+    model: {fileID: 0}
+    size: {x: 0.0508, y: 1.187785, z: 0.0635}
+    triangles: 6220
+    cuttable: 0
+  - id: Game Objects/High Stakes/Field Perimeter/Perimeter Parts/276-7596-350_276-7596-312
+    displayName: 276-7596-350_276-7596-312
+    binId: game
+    model: {fileID: 0}
+    size: {x: 0.0508, y: 1.187785, z: 0.0635}
+    triangles: 6032
+    cuttable: 0
+  - id: Game Objects/High Stakes/Field Perimeter/Perimeter Parts/276-7596-351_276-7596-313
+    displayName: 276-7596-351_276-7596-313
+    binId: game
+    model: {fileID: 0}
+    size: {x: 0.0508, y: 1.187785, z: 0.0793}
+    triangles: 4226
+    cuttable: 0
+  - id: Game Objects/High Stakes/Field Perimeter/Perimeter Parts/276-7596-351_276-7596-314
+    displayName: 276-7596-351_276-7596-314
+    binId: game
+    model: {fileID: 0}
+    size: {x: 0.0508, y: 1.187785, z: 0.0793}
+    triangles: 4914
+    cuttable: 0
+  - id: Game Objects/High Stakes/Field Perimeter/Perimeter Parts/276-7596-351_276-7596-315
+    displayName: 276-7596-351_276-7596-315
+    binId: game
+    model: {fileID: 0}
+    size: {x: 0.0508, y: 1.187785, z: 0.0793}
+    triangles: 4390
+    cuttable: 0
+  - id: Game Objects/High Stakes/Hardware/NNY_Imperial_275-1027-001
+    displayName: NNY_Imperial_275-1027-001
+    binId: game
+    model: {fileID: 0}
+    size: {x: 0.010051, y: 0.008731, z: 0.005953}
+    triangles: 9416
+    cuttable: 0
+  - id: Game Objects/High Stakes/Hardware/SBT0832_276-4990-001
+    displayName: SBT0832_276-4990-001
+    binId: game
+    model: {fileID: 0}
+    size: {x: 0.00792, y: 0.00856, z: 0.007916}
+    triangles: 5968
+    cuttable: 0
+  - id: Game Objects/High Stakes/Hardware/SBT0832_276-4992-001
+    displayName: SBT0832_276-4992-001
+    binId: game
+    model: {fileID: 0}
+    size: {x: 0.00792, y: 0.01491, z: 0.007914}
+    triangles: 5162
+    cuttable: 0
+  - id: Game Objects/High Stakes/Hardware/SBT0832_276-4995-001
+    displayName: SBT0832_276-4995-001
+    binId: game
+    model: {fileID: 0}
+    size: {x: 0.00792, y: 0.024435, z: 0.00792}
+    triangles: 4086
+    cuttable: 0
+  - id: Game Objects/High Stakes/Hardware/SBT0832_276-4997-001
+    displayName: SBT0832_276-4997-001
+    binId: game
+    model: {fileID: 0}
+    size: {x: 0.00792, y: 0.03396, z: 0.007917}
+    triangles: 3592
+    cuttable: 0
+  - id: Game Objects/High Stakes/Hardware/SBT0832_276-8016-001
+    displayName: SBT0832_276-8016-001
+    binId: game
+    model: {fileID: 0}
+    size: {x: 0.00792, y: 0.06571, z: 0.00792}
+    triangles: 2622
+    cuttable: 0
+  - id: Game Objects/High Stakes/Hardware/SPTM3-TC_228-7045-010
+    displayName: SPTM3-TC_228-7045-010
+    binId: game
+    model: {fileID: 0}
+    size: {x: 0.005999, y: 0.005998, z: 0.0125}
+    triangles: 5690
+    cuttable: 0
+  - id: Game Objects/High Stakes/Hardware/THF0832-0250_275-1014-001
+    displayName: THF0832-0250_275-1014-001
+    binId: game
+    model: {fileID: 0}
+    size: {x: 0.007301, y: 0.00635, z: 0.0127}
+    triangles: 5502
+    cuttable: 0
+  - id: Game Objects/High Stakes/Hardware/THF0832-0250_275-1017-001
+    displayName: THF0832-0250_275-1017-001
+    binId: game
+    model: {fileID: 0}
+    size: {x: 0.007301, y: 0.00635, z: 0.0381}
+    triangles: 3688
+    cuttable: 0
+  - id: Game Objects/High Stakes/Ladder/276-8868-052
+    displayName: 276-8868-052
+    binId: game
+    model: {fileID: 0}
+    size: {x: 1.150501, y: 0.055646, z: 0.051594}
+    triangles: 1988
+    cuttable: 0
+  - id: Game Objects/High Stakes/Ladder/276-8868-056
+    displayName: 276-8868-056
+    binId: game
+    model: {fileID: 0}
+    size: {x: 0.061174, y: 0.060589, z: 0.06935}
+    triangles: 23170
+    cuttable: 0
+  - id: Game Objects/High Stakes/Ladder/276-8868-057
+    displayName: 276-8868-057
+    binId: game
+    model: {fileID: 0}
+    size: {x: 0.054633, y: 0.050584, z: 0.0395}
+    triangles: 45434
+    cuttable: 0
+  - id: Game Objects/High Stakes/Ladder/Ladder Base
+    displayName: Ladder Base
+    binId: game
+    model: {fileID: 0}
+    size: {x: 0.203863, y: 0.203869, z: 0.0889}
+    triangles: 131926
+    cuttable: 0
+  - id: Game Objects/High Stakes/Ladder/Mounting Plate
+    displayName: Mounting Plate
+    binId: game
+    model: {fileID: 0}
+    size: {x: 0.3, y: 0.3, z: 0.00475}
+    triangles: 12612
+    cuttable: 0
+  - id: Game Objects/High Stakes/Ladder/Tier 1/276-8868-051_BLACK
+    displayName: 276-8868-051_BLACK
+    binId: game
+    model: {fileID: 0}
+    size: {x: 0.166285, y: 0.104013, z: 0.09525}
+    triangles: 53706
+    cuttable: 0
+  - id: Game Objects/High Stakes/Ladder/Tier 1/276-8868-053_BLACK
+    displayName: 276-8868-053_BLACK
+    binId: game
+    model: {fileID: 0}
+    size: {x: 0.78278, y: 0.055646, z: 0.051594}
+    triangles: 1178
+    cuttable: 0
+  - id: Game Objects/High Stakes/Ladder/Tier 2/276-8868-051_GREY
+    displayName: 276-8868-051_GREY
+    binId: game
+    model: {fileID: 0}
+    size: {x: 0.165748, y: 0.103745, z: 0.09525}
+    triangles: 55764
+    cuttable: 0
+  - id: Game Objects/High Stakes/Ladder/Tier 2/276-8868-053_GREY
+    displayName: 276-8868-053_GREY
+    binId: game
+    model: {fileID: 0}
+    size: {x: 0.78278, y: 0.055646, z: 0.051594}
+    triangles: 1178
+    cuttable: 0
+  - id: Game Objects/High Stakes/Ladder/Tier 3/276-8868-051
+    displayName: 276-8868-051
+    binId: game
+    model: {fileID: 0}
+    size: {x: 0.166699, y: 0.10422, z: 0.09525}
+    triangles: 51824
+    cuttable: 0
+  - id: Game Objects/High Stakes/Ladder/Tier 3/276-8868-053
+    displayName: 276-8868-053
+    binId: game
+    model: {fileID: 0}
+    size: {x: 0.78278, y: 0.055646, z: 0.051594}
+    triangles: 1178
+    cuttable: 0
+  - id: Game Objects/High Stakes/Rings/Blue Ring
+    displayName: Blue Ring
+    binId: game
+    model: {fileID: 0}
+    size: {x: 0.1778, y: 0.1778, z: 0.0508}
+    triangles: 25356
+    cuttable: 0
+  - id: Game Objects/High Stakes/Rings/Red Ring
+    displayName: Red Ring
+    binId: game
+    model: {fileID: 0}
+    size: {x: 0.1778, y: 0.1778, z: 0.0508}
+    triangles: 38248
+    cuttable: 0
+  - id: Game Objects/High Stakes/Stakes/Alliance Stake/Alliance Stake Post Blue
+    displayName: Alliance Stake Post Blue
+    binId: game
+    model: {fileID: 0}
+    size: {x: 0.021336, y: 0.4224, z: 0.021336}
+    triangles: 704
+    cuttable: 0
+  - id: Game Objects/High Stakes/Stakes/Alliance Stake/Alliance Stake Post Red
+    displayName: Alliance Stake Post Red
+    binId: game
+    model: {fileID: 0}
+    size: {x: 0.021336, y: 0.4224, z: 0.021336}
+    triangles: 704
+    cuttable: 0
+  - id: Game Objects/High Stakes/Stakes/Field Stake Mount
+    displayName: Field Stake Mount
+    binId: game
+    model: {fileID: 0}
+    size: {x: 0.082523, y: 0.039415, z: 0.01905}
+    triangles: 33898
+    cuttable: 0
+  - id: Game Objects/High Stakes/Stakes/Field Stake/Neutral Stake Post
+    displayName: Neutral Stake Post
+    binId: game
+    model: {fileID: 0}
+    size: {x: 0.021336, y: 0.635, z: 0.021336}
+    triangles: 496
+    cuttable: 0
+  - id: Game Objects/High Stakes/Stakes/High Stake/276-8868-058
+    displayName: 276-8868-058
+    binId: game
+    model: {fileID: 0}
+    size: {x: 0.021336, y: 0.127, z: 0.021336}
+    triangles: 1234
+    cuttable: 0
+  - id: Game Objects/High Stakes/Stakes/Mobile Goal/276-8868-201
+    displayName: 276-8868-201
+    binId: game
+    model: {fileID: 0}
+    size: {x: 0.253541, y: 0.277003, z: 0.061705}
+    triangles: 85898
+    cuttable: 0
+  - id: Game Objects/High Stakes/Stakes/Mobile Goal/276-8868-202
+    displayName: 276-8868-202
+    binId: game
+    model: {fileID: 0}
+    size: {x: 0.021336, y: 0.363, z: 0.021336}
+    triangles: 656
+    cuttable: 0
+  - id: Game Objects/High Stakes/Stakes/Mobile Goal/276-8868-203
+    displayName: 276-8868-203
+    binId: game
+    model: {fileID: 0}
+    size: {x: 0.189, y: 0.212344, z: 0.002921}
+    triangles: 852
+    cuttable: 0
+  - id: Game Objects/High Stakes/Tape/Wall Alliance Stations_Blue
+    displayName: Wall Alliance Stations_Blue
+    binId: game
+    model: {fileID: 0}
+    size: {x: 0.9144, y: 2.9464, z: 0.001}
+    triangles: 28
+    cuttable: 0
+  - id: Game Objects/High Stakes/Tape/Wall Alliance Stations_Red
+    displayName: Wall Alliance Stations_Red
+    binId: game
+    model: {fileID: 0}
+    size: {x: 0.9144, y: 2.9464, z: 0.001}
+    triangles: 28
+    cuttable: 0
+  - id: Game Objects/High Stakes/Tape/field_tape
+    displayName: field_tape
+    binId: game
+    model: {fileID: 0}
+    size: {x: 3.611347, y: 3.611347, z: 0.001}
+    triangles: 232
+    cuttable: 0
+  - id: Miscellaneous/Blue License Plate
+    displayName: Blue License Plate
+    binId: misc
+    model: {fileID: 0}
+    size: {x: 0.0632, y: 0.0061, z: 0.114}
+    triangles: 40292
+    cuttable: 0
+  - id: Miscellaneous/Red License Plate
+    displayName: Red License Plate
+    binId: misc
+    model: {fileID: 0}
+    size: {x: 0.0632, y: 0.0061, z: 0.114}
+    triangles: 40292
+    cuttable: 0
+  - id: Miscellaneous/Sizing Tool
+    displayName: Sizing Tool
+    binId: misc
+    model: {fileID: 0}
+    size: {x: 0.4699, y: 0.4572, z: 0.4699}
+    triangles: 32
+    cuttable: 0
+  - id: Miscellaneous/Sizing Tool/VEXU Small
+    displayName: VEXU Small
+    binId: misc
+    model: {fileID: 0}
+    size: {x: 0.3937, y: 0.381, z: 0.3937}
+    triangles: 32
+    cuttable: 0
+  - id: Miscellaneous/Sizing Tool/VRC High School - VEXU Large
+    displayName: VRC High School - VEXU Large
+    binId: misc
+    model: {fileID: 0}
+    size: {x: 0.4699, y: 0.4572, z: 0.4699}
+    triangles: 32
+    cuttable: 0
+  - id: Motion/1-Post Bearing Flat Hex Retainer
+    displayName: 1-Post Bearing Flat Hex Retainer
+    binId: bearings
+    model: {fileID: 0}
+    size: {x: 0.031769, y: 0.011589, z: 0.009475}
+    triangles: 9910
+    cuttable: 0
+  - id: Motion/1-Post Bearing Flat Standoff Retainer
+    displayName: 1-Post Bearing Flat Standoff Retainer
+    binId: bearings
+    model: {fileID: 0}
+    size: {x: 0.03178, y: 0.009477, z: 0.009475}
+    triangles: 9376
+    cuttable: 0
+  - id: Motion/Advanced Gears/12T Bevel Gear
+    displayName: 12T Bevel Gear
+    binId: advanced
+    model: {fileID: 0}
+    size: {x: 0.018727, y: 0.014278, z: 0.018727}
+    triangles: 19050
+    cuttable: 0
+  - id: Motion/Advanced Gears/24T Bevel Gear
+    displayName: 24T Bevel Gear
+    binId: advanced
+    model: {fileID: 0}
+    size: {x: 0.026897, y: 0.011036, z: 0.026897}
+    triangles: 15822
+    cuttable: 0
+  - id: Motion/Advanced Gears/36T Bevel Gear
+    displayName: 36T Bevel Gear
+    binId: advanced
+    model: {fileID: 0}
+    size: {x: 0.034629, y: 0.007438, z: 0.034629}
+    triangles: 13382
+    cuttable: 0
+  - id: Motion/Advanced Gears/36T Worm Wheel
+    displayName: 36T Worm Wheel
+    binId: advanced
+    model: {fileID: 0}
+    size: {x: 0.027517, y: 0.027517, z: 0.009525}
+    triangles: 6827
+    cuttable: 0
+  - id: Motion/Advanced Gears/Bevel Gearbox Bracket
+    displayName: Bevel Gearbox Bracket
+    binId: advanced
+    model: {fileID: 0}
+    size: {x: 0.052568, y: 0.045334, z: 0.032634}
+    triangles: 4592
+    cuttable: 0
+  - id: Motion/Advanced Gears/Cam Follower Mounting Bracket
+    displayName: Cam Follower Mounting Bracket
+    binId: advanced
+    model: {fileID: 0}
+    size: {x: 0.050782, y: 0.008298, z: 0.038082}
+    triangles: 11740
+    cuttable: 0
+  - id: Motion/Advanced Gears/Cam Follower
+    displayName: Cam Follower
+    binId: advanced
+    model: {fileID: 0}
+    size: {x: 0.0127, y: 0.012446, z: 0.129527}
+    triangles: 41043
+    cuttable: 0
+  - id: Motion/Advanced Gears/Differential
+    displayName: Differential
+    binId: advanced
+    model: {fileID: 0}
+    size: {x: 0.040186, y: 0.047078, z: 0.040186}
+    triangles: 43684
+    cuttable: 0
+  - id: Motion/Advanced Gears/Hand Crank
+    displayName: Hand Crank
+    binId: advanced
+    model: {fileID: 0}
+    size: {x: 0.050789, y: 0.019037, z: 0.03302}
+    triangles: 13568
+    cuttable: 0
+  - id: Motion/Advanced Gears/Lead Screw Mounting Bracket
+    displayName: Lead Screw Mounting Bracket
+    binId: advanced
+    model: {fileID: 0}
+    size: {x: 0.030607, y: 0.043906, z: 0.032494}
+    triangles: 67434
+    cuttable: 0
+  - id: Motion/Advanced Gears/Lead Screw Nut
+    displayName: Lead Screw Nut
+    binId: advanced
+    model: {fileID: 0}
+    size: {x: 0.018669, y: 0.034925, z: 0.02794}
+    triangles: 27420
+    cuttable: 0
+  - id: Motion/Advanced Gears/Rack Gear
+    displayName: Rack Gear
+    binId: advanced
+    model: {fileID: 0}
+    size: {x: 0.0633, y: 0.0144, z: 0.0098}
+    triangles: 50206
+    cuttable: 0
+  - id: Motion/Advanced Gears/Rack Gearbox Bracket
+    displayName: Rack Gearbox Bracket
+    binId: advanced
+    model: {fileID: 0}
+    size: {x: 0.024562, y: 0.0508, z: 0.0524}
+    triangles: 4844
+    cuttable: 0
+  - id: Motion/Advanced Gears/Ratchet Gear
+    displayName: Ratchet Gear
+    binId: advanced
+    model: {fileID: 0}
+    size: {x: 0.043601, y: 0.008128, z: 0.043548}
+    triangles: 7320
+    cuttable: 0
+  - id: Motion/Advanced Gears/Universal Joint
+    displayName: Universal Joint
+    binId: advanced
+    model: {fileID: 0}
+    size: {x: 0.010008, y: 0.02775, z: 0.010008}
+    triangles: 29128
+    cuttable: 0
+  - id: Motion/Advanced Gears/Winch Bracket
+    displayName: Winch Bracket
+    binId: advanced
+    model: {fileID: 0}
+    size: {x: 0.063754, y: 0.0508, z: 0.0635}
+    triangles: 2248
+    cuttable: 0
+  - id: Motion/Advanced Gears/Winch Drum
+    displayName: Winch Drum
+    binId: advanced
+    model: {fileID: 0}
+    size: {x: 0.039497, y: 0.035306, z: 0.035306}
+    triangles: 22186
+    cuttable: 0
+  - id: Motion/Advanced Gears/Winch Pawl
+    displayName: Winch Pawl
+    binId: advanced
+    model: {fileID: 0}
+    size: {x: 0.0168, y: 0.009906, z: 0.015831}
+    triangles: 1196
+    cuttable: 0
+  - id: Motion/Advanced Gears/Worm Gearbox Bracket
+    displayName: Worm Gearbox Bracket
+    binId: advanced
+    model: {fileID: 0}
+    size: {x: 0.054762, y: 0.036932, z: 0.040792}
+    triangles: 4016
+    cuttable: 0
+  - id: Motion/Chain 6P/IQ Chain
+    displayName: IQ Chain
+    binId: sprockets
+    model: {fileID: 0}
+    size: {x: 0.0113, y: 0.0044, z: 0.01075}
+    triangles: 1336
+    cuttable: 0
+  - id: Motion/Chain 9P/Chain Attachment Link
+    displayName: Chain Attachment Link
+    binId: sprockets
+    model: {fileID: 0}
+    size: {x: 0.01695, y: 0.038, z: 0.009374}
+    triangles: 9076
+    cuttable: 0
+  - id: Motion/Chain 9P/High Strength Chain Link
+    displayName: High Strength Chain Link
+    binId: sprockets
+    model: {fileID: 0}
+    size: {x: 0.015786, y: 0.005994, z: 0.014198}
+    triangles: 10392
+    cuttable: 0
+  - id: Motion/Chain 9P/Medium Flap
+    displayName: Medium Flap
+    binId: sprockets
+    model: {fileID: 0}
+    size: {x: 0.016948, y: 0.038, z: 0.0297}
+    triangles: 11052
+    cuttable: 0
+  - id: Motion/Chain 9P/Short Flap
+    displayName: Short Flap
+    binId: sprockets
+    model: {fileID: 0}
+    size: {x: 0.016949, y: 0.038, z: 0.0197}
+    triangles: 9888
+    cuttable: 0
+  - id: Motion/Chain 9P/Tall Flap
+    displayName: Tall Flap
+    binId: sprockets
+    model: {fileID: 0}
+    size: {x: 0.016948, y: 0.038, z: 0.0397}
+    triangles: 10676
+    cuttable: 0
+  - id: Motion/Chain 9P/Tank Tread Traction Link
+    displayName: Tank Tread Traction Link
+    binId: sprockets
+    model: {fileID: 0}
+    size: {x: 0.016948, y: 0.038, z: 0.0114}
+    triangles: 9256
+    cuttable: 0
+  - id: Motion/Chain 9P/Tread Link
+    displayName: Tread Link
+    binId: sprockets
+    model: {fileID: 0}
+    size: {x: 0.016948, y: 0.038, z: 0.0097}
+    triangles: 10968
+    cuttable: 0
+  - id: Motion/Gears/LS 12T Gear Steel
+    displayName: LS 12T Gear Steel
+    binId: gears
+    model: {fileID: 0}
+    size: {x: 0.009525, y: 0.014468, z: 0.014468}
+    triangles: 3196
+    cuttable: 0
+  - id: Motion/Gears/LS 12T Gear
+    displayName: LS 12T Gear
+    binId: gears
+    model: {fileID: 0}
+    size: {x: 0.009525, y: 0.014805, z: 0.014805}
+    triangles: 4315
+    cuttable: 0
+  - id: Motion/Gears/LS 36T Gear
+    displayName: LS 36T Gear
+    binId: gears
+    model: {fileID: 0}
+    size: {x: 0.009525, y: 0.040208, z: 0.040208}
+    triangles: 10802
+    cuttable: 0
+  - id: Motion/Gears/LS 60T Gear
+    displayName: LS 60T Gear
+    binId: gears
+    model: {fileID: 0}
+    size: {x: 0.009525, y: 0.065605, z: 0.065605}
+    triangles: 12968
+    cuttable: 0
+  - id: Motion/Gears/LS 84T Gear
+    displayName: LS 84T Gear
+    binId: gears
+    model: {fileID: 0}
+    size: {x: 0.090957, y: 0.0127, z: 0.090957}
+    triangles: 21615
+    cuttable: 0
+  - id: Motion/Gears/Reference Files/HS 12T Gear, No Insert
+    displayName: HS 12T Gear, No Insert
+    binId: bearings
+    model: {fileID: 0}
+    size: {x: 0.014336, y: 0.0127, z: 0.014336}
+    triangles: 5094
+    cuttable: 0
+  - id: Motion/Gears/Reference Files/HS 24T Gear, No Insert
+    displayName: HS 24T Gear, No Insert
+    binId: bearings
+    model: {fileID: 0}
+    size: {x: 0.02737, y: 0.0127, z: 0.02737}
+    triangles: 3380
+    cuttable: 0
+  - id: Motion/Gears/Reference Files/HS 36T Gear, No Insert
+    displayName: HS 36T Gear, No Insert
+    binId: bearings
+    model: {fileID: 0}
+    size: {x: 0.040125, y: 0.0127, z: 0.040125}
+    triangles: 64106
+    cuttable: 0
+  - id: Motion/Gears/Reference Files/HS 48T Gear, No Insert
+    displayName: HS 48T Gear, No Insert
+    binId: bearings
+    model: {fileID: 0}
+    size: {x: 0.052851, y: 0.0127, z: 0.052851}
+    triangles: 82850
+    cuttable: 0
+  - id: Motion/Gears/Reference Files/HS 60T Gear, No Insert
+    displayName: HS 60T Gear, No Insert
+    binId: bearings
+    model: {fileID: 0}
+    size: {x: 0.065565, y: 0.0127, z: 0.065565}
+    triangles: 107192
+    cuttable: 0
+  - id: Motion/Gears/Reference Files/HS 72T Gear, No Insert
+    displayName: HS 72T Gear, No Insert
+    binId: bearings
+    model: {fileID: 0}
+    size: {x: 0.078274, y: 0.0127, z: 0.078274}
+    triangles: 149344
+    cuttable: 0
+  - id: Motion/Gears/Reference Files/HS 84T Gear, No Insert
+    displayName: HS 84T Gear, No Insert
+    binId: bearings
+    model: {fileID: 0}
+    size: {x: 0.090981, y: 0.0127, z: 0.090981}
+    triangles: 175092
+    cuttable: 0
+  - id: Motion/HS Shaft Adapter Circle
+    displayName: HS Shaft Adapter Circle
+    binId: bearings
+    model: {fileID: 0}
+    size: {x: 0.00635, y: 0.0127, z: 0.00635}
+    triangles: 722
+    cuttable: 0
+  - id: Motion/HS Shaft Adapter Square
+    displayName: HS Shaft Adapter Square
+    binId: bearings
+    model: {fileID: 0}
+    size: {x: 0.00635, y: 0.0127, z: 0.00635}
+    triangles: 288
+    cuttable: 0
+  - id: Motion/Hinges/Reference Parts/2 Holes/Bottom 2
+    displayName: Bottom 2
+    binId: hinges
+    model: {fileID: 0}
+    size: {x: 0.022059, y: 0.0254, z: 0.006016}
+    triangles: 396
+    cuttable: 0
+  - id: Motion/Hinges/Reference Parts/2 Holes/Pin 2
+    displayName: Pin 2
+    binId: hinges
+    model: {fileID: 0}
+    size: {x: 0.003175, y: 0.0254, z: 0.003175}
+    triangles: 172
+    cuttable: 0
+  - id: Motion/Hinges/Reference Parts/2 Holes/Top 2
+    displayName: Top 2
+    binId: hinges
+    model: {fileID: 0}
+    size: {x: 0.022034, y: 0.0254, z: 0.005966}
+    triangles: 696
+    cuttable: 0
+  - id: Motion/Hinges/Reference Parts/3 Holes/Bottom 3
+    displayName: Bottom 3
+    binId: hinges
+    model: {fileID: 0}
+    size: {x: 0.022057, y: 0.0381, z: 0.006015}
+    triangles: 392
+    cuttable: 0
+  - id: Motion/Hinges/Reference Parts/3 Holes/Pin 3
+    displayName: Pin 3
+    binId: hinges
+    model: {fileID: 0}
+    size: {x: 0.003175, y: 0.0381, z: 0.003175}
+    triangles: 140
+    cuttable: 0
+  - id: Motion/Hinges/Reference Parts/3 Holes/Top 3
+    displayName: Top 3
+    binId: hinges
+    model: {fileID: 0}
+    size: {x: 0.022032, y: 0.0381, z: 0.005965}
+    triangles: 656
+    cuttable: 0
+  - id: Motion/Hinges/Reference Parts/4 Holes/Bottom 4
+    displayName: Bottom 4
+    binId: hinges
+    model: {fileID: 0}
+    size: {x: 0.022051, y: 0.0508, z: 0.00602}
+    triangles: 644
+    cuttable: 0
+  - id: Motion/Hinges/Reference Parts/4 Holes/Pin 4
+    displayName: Pin 4
+    binId: hinges
+    model: {fileID: 0}
+    size: {x: 0.003175, y: 0.0508, z: 0.003175}
+    triangles: 124
+    cuttable: 0
+  - id: Motion/Hinges/Reference Parts/4 Holes/Top 4
+    displayName: Top 4
+    binId: hinges
+    model: {fileID: 0}
+    size: {x: 0.022033, y: 0.0508, z: 0.005969}
+    triangles: 706
+    cuttable: 0
+  - id: Motion/Hinges/Reference Parts/5 Holes/Bottom 5
+    displayName: Bottom 5
+    binId: hinges
+    model: {fileID: 0}
+    size: {x: 0.022056, y: 0.0635, z: 0.006018}
+    triangles: 768
+    cuttable: 0
+  - id: Motion/Hinges/Reference Parts/5 Holes/Pin 5
+    displayName: Pin 5
+    binId: hinges
+    model: {fileID: 0}
+    size: {x: 0.003175, y: 0.0635, z: 0.003175}
+    triangles: 108
+    cuttable: 0
+  - id: Motion/Hinges/Reference Parts/5 Holes/Top 5
+    displayName: Top 5
+    binId: hinges
+    model: {fileID: 0}
+    size: {x: 0.022031, y: 0.0635, z: 0.005962}
+    triangles: 848
+    cuttable: 0
+  - id: Motion/Insert Circle
+    displayName: Insert Circle
+    binId: bearings
+    model: {fileID: 0}
+    size: {x: 0.010031, y: 0.010029, z: 0.00508}
+    triangles: 1100
+    cuttable: 0
+  - id: Motion/Insert Square
+    displayName: Insert Square
+    binId: bearings
+    model: {fileID: 0}
+    size: {x: 0.010031, y: 0.010029, z: 0.00508}
+    triangles: 1012
+    cuttable: 0
+  - id: Motion/Pneumatics/Legacy - SMC Pneumatics/Cylinder Mount
+    displayName: Cylinder Mount
+    binId: pneumatics
+    model: {fileID: 0}
+    size: {x: 0.0127, y: 0.01524, z: 0.01905}
+    triangles: 804
+    cuttable: 0
+  - id: Motion/Pneumatics/Legacy - SMC Pneumatics/Cylinder Rod Pivot
+    displayName: Cylinder Rod Pivot
+    binId: pneumatics
+    model: {fileID: 0}
+    size: {x: 0.03556, y: 0.017018, z: 0.014605}
+    triangles: 1020
+    cuttable: 0
+  - id: Motion/Pneumatics/Legacy - SMC Pneumatics/Fitting for Cylinders
+    displayName: Fitting for Cylinders
+    binId: pneumatics
+    model: {fileID: 0}
+    size: {x: 0.008, y: 0.008, z: 0.0187}
+    triangles: 3836
+    cuttable: 0
+  - id: Motion/Pneumatics/Legacy - SMC Pneumatics/Fitting for Reservoir
+    displayName: Fitting for Reservoir
+    binId: pneumatics
+    model: {fileID: 0}
+    size: {x: 0.012829, y: 0.01111, z: 0.022}
+    triangles: 3838
+    cuttable: 0
+  - id: Motion/Pneumatics/Legacy - SMC Pneumatics/Fitting for Valves
+    displayName: Fitting for Valves
+    binId: pneumatics
+    model: {fileID: 0}
+    size: {x: 0.008, y: 0.008, z: 0.0163}
+    triangles: 3866
+    cuttable: 0
+  - id: Motion/Pneumatics/Legacy - SMC Pneumatics/Flow Meter
+    displayName: Flow Meter
+    binId: pneumatics
+    model: {fileID: 0}
+    size: {x: 0.022094, y: 0.0096, z: 0.031}
+    triangles: 5238
+    cuttable: 0
+  - id: Motion/Pneumatics/Legacy - SMC Pneumatics/On Off Switch
+    displayName: On Off Switch
+    binId: pneumatics
+    model: {fileID: 0}
+    size: {x: 0.0476, y: 0.018, z: 0.041}
+    triangles: 11163
+    cuttable: 0
+  - id: Motion/Pneumatics/Legacy - SMC Pneumatics/Piston Nut
+    displayName: Piston Nut
+    binId: pneumatics
+    model: {fileID: 0}
+    size: {x: 0.007874, y: 0.002794, z: 0.009092}
+    triangles: 1436
+    cuttable: 0
+  - id: Motion/Pneumatics/Legacy - SMC Pneumatics/Pressure Regulator
+    displayName: Pressure Regulator
+    binId: pneumatics
+    model: {fileID: 0}
+    size: {x: 0.0287, y: 0.01059, z: 0.055999}
+    triangles: 10402
+    cuttable: 0
+  - id: Motion/Pneumatics/Legacy - SMC Pneumatics/Reservoir
+    displayName: Reservoir
+    binId: pneumatics
+    model: {fileID: 0}
+    size: {x: 0.039751, y: 0.200025, z: 0.039743}
+    triangles: 2310
+    cuttable: 0
+  - id: Motion/Pneumatics/Legacy - SMC Pneumatics/Solenoid - Double Acting
+    displayName: Solenoid - Double Acting
+    binId: pneumatics
+    model: {fileID: 0}
+    size: {x: 0.0565, y: 0.016398, z: 0.040796}
+    triangles: 6726
+    cuttable: 0
+  - id: Motion/Pneumatics/Legacy - SMC Pneumatics/Solenoid - Single Acting
+    displayName: Solenoid - Single Acting
+    binId: pneumatics
+    model: {fileID: 0}
+    size: {x: 0.0229, y: 0.021, z: 0.0356}
+    triangles: 3842
+    cuttable: 0
+  - id: Motion/Pneumatics/Legacy - SMC Pneumatics/T Fitting
+    displayName: T Fitting
+    binId: pneumatics
+    model: {fileID: 0}
+    size: {x: 0.036, y: 0.0106, z: 0.026498}
+    triangles: 7428
+    cuttable: 0
+  - id: Motion/Pneumatics/New - V5 Pneumatics/Air Flow Valve Fitting
+    displayName: Air Flow Valve Fitting
+    binId: pneumatics
+    model: {fileID: 0}
+    size: {x: 0.025176, y: 0.0112, z: 0.0274}
+    triangles: 35970
+    cuttable: 0
+  - id: Motion/Pneumatics/New - V5 Pneumatics/Air Reservoir
+    displayName: Air Reservoir
+    binId: pneumatics
+    model: {fileID: 0}
+    size: {x: 0.208, y: 0.0428, z: 0.0428}
+    triangles: 1744
+    cuttable: 0
+  - id: Motion/Pneumatics/New - V5 Pneumatics/Elbow Fitting
+    displayName: Elbow Fitting
+    binId: pneumatics
+    model: {fileID: 0}
+    size: {x: 0.011516, y: 0.023276, z: 0.0281}
+    triangles: 27422
+    cuttable: 0
+  - id: Motion/Pneumatics/New - V5 Pneumatics/Manifold Assembly
+    displayName: Manifold Assembly
+    binId: pneumatics
+    model: {fileID: 0}
+    size: {x: 0.0364, y: 0.0254, z: 0.0327}
+    triangles: 5184
+    cuttable: 0
+  - id: Motion/Pneumatics/New - V5 Pneumatics/Pneumatic Fitting Plug
+    displayName: Pneumatic Fitting Plug
+    binId: pneumatics
+    model: {fileID: 0}
+    size: {x: 0.004948, y: 0.004946, z: 0.0274}
+    triangles: 650
+    cuttable: 0
+  - id: Motion/Pneumatics/New - V5 Pneumatics/Pneumatic Hand Valve
+    displayName: Pneumatic Hand Valve
+    binId: pneumatics
+    model: {fileID: 0}
+    size: {x: 0.046355, y: 0.041063, z: 0.01778}
+    triangles: 3488
+    cuttable: 0
+  - id: Motion/Pneumatics/New - V5 Pneumatics/Schrader Valve
+    displayName: Schrader Valve
+    binId: pneumatics
+    model: {fileID: 0}
+    size: {x: 0.0316, y: 0.011547, z: 0.01}
+    triangles: 10536
+    cuttable: 0
+  - id: Motion/Pneumatics/New - V5 Pneumatics/Straight Pneumatic Fitting
+    displayName: Straight Pneumatic Fitting
+    binId: pneumatics
+    model: {fileID: 0}
+    size: {x: 0.011516, y: 0.01, z: 0.021991}
+    triangles: 13920
+    cuttable: 0
+  - id: Motion/Pneumatics/New - V5 Pneumatics/Tee Fittings
+    displayName: Tee Fittings
+    binId: pneumatics
+    model: {fileID: 0}
+    size: {x: 0.037351, y: 0.0112, z: 0.024276}
+    triangles: 29502
+    cuttable: 0
+  - id: Motion/Pneumatics/Reference Parts/Pistons/25mm Stroke Pneumatic Cylinder
+      Body
+    displayName: 25mm Stroke Pneumatic Cylinder Body
+    binId: pneumatics
+    model: {fileID: 0}
+    size: {x: 0.0925, y: 0.012, z: 0.012}
+    triangles: 1052
+    cuttable: 0
+  - id: Motion/Pneumatics/Reference Parts/Pistons/25mm Stroke Pneumatic Cylinder
+      Rod
+    displayName: 25mm Stroke Pneumatic Cylinder Rod
+    binId: pneumatics
+    model: {fileID: 0}
+    size: {x: 0.09025, y: 0.004, z: 0.003993}
+    triangles: 308
+    cuttable: 0
+  - id: Motion/Pneumatics/Reference Parts/Pistons/50mm Stroke Pneumatic Cylinder
+      Body
+    displayName: 50mm Stroke Pneumatic Cylinder Body
+    binId: pneumatics
+    model: {fileID: 0}
+    size: {x: 0.1175, y: 0.012, z: 0.012}
+    triangles: 968
+    cuttable: 0
+  - id: Motion/Pneumatics/Reference Parts/Pistons/50mm Stroke Pneumatic Cylinder
+      Rod
+    displayName: 50mm Stroke Pneumatic Cylinder Rod
+    binId: pneumatics
+    model: {fileID: 0}
+    size: {x: 0.11525, y: 0.004, z: 0.004}
+    triangles: 188
+    cuttable: 0
+  - id: Motion/Pneumatics/Reference Parts/Pistons/75mm Piston Body
+    displayName: 75mm Piston Body
+    binId: pneumatics
+    model: {fileID: 0}
+    size: {x: 0.1425, y: 0.012, z: 0.012}
+    triangles: 916
+    cuttable: 0
+  - id: Motion/Pneumatics/Reference Parts/Pistons/75mm Piston Rod
+    displayName: 75mm Piston Rod
+    binId: pneumatics
+    model: {fileID: 0}
+    size: {x: 0.14025, y: 0.004, z: 0.004}
+    triangles: 188
+    cuttable: 0
+  - id: Motion/Pneumatics/Reference Parts/Pistons/Double Acting Piston Body
+    displayName: Double Acting Piston Body
+    binId: pneumatics
+    model: {fileID: 0}
+    size: {x: 0.012, y: 0.11874, z: 0.012}
+    triangles: 1734
+    cuttable: 0
+  - id: Motion/Pneumatics/Reference Parts/Pistons/Double Acting Piston Rod
+    displayName: Double Acting Piston Rod
+    binId: pneumatics
+    model: {fileID: 0}
+    size: {x: 0.009984, y: 0.105685, z: 0.009992}
+    triangles: 590
+    cuttable: 0
+  - id: Motion/Pneumatics/Reference Parts/Pistons/Single Acting Piston Body
+    displayName: Single Acting Piston Body
+    binId: pneumatics
+    model: {fileID: 0}
+    size: {x: 0.011939, y: 0.14097, z: 0.011938}
+    triangles: 1006
+    cuttable: 0
+  - id: Motion/Pneumatics/Reference Parts/Pistons/Single Acting Piston Rod
+    displayName: Single Acting Piston Rod
+    binId: pneumatics
+    model: {fileID: 0}
+    size: {x: 0.01, y: 0.109434, z: 0.009966}
+    triangles: 532
+    cuttable: 0
+  - id: Motion/Pulley
+    displayName: Pulley
+    binId: advanced
+    model: {fileID: 0}
+    size: {x: 0.028575, y: 0.009525, z: 0.028575}
+    triangles: 33410
+    cuttable: 0
+  - id: Motion/Reference Files/Ball Bearing Circle Insert
+    displayName: Ball Bearing Circle Insert
+    binId: bearings
+    model: {fileID: 0}
+    size: {x: 0.012698, y: 0.0127, z: 0.009225}
+    triangles: 11032
+    cuttable: 0
+  - id: Motion/Reference Files/Ball Bearing Housing
+    displayName: Ball Bearing Housing
+    binId: bearings
+    model: {fileID: 0}
+    size: {x: 0.0334, y: 0.0334, z: 0.010211}
+    triangles: 78068
+    cuttable: 0
+  - id: Motion/Reference Files/Ball Bearing Square Insert
+    displayName: Ball Bearing Square Insert
+    binId: bearings
+    model: {fileID: 0}
+    size: {x: 0.012698, y: 0.0127, z: 0.009225}
+    triangles: 9914
+    cuttable: 0
+  - id: Motion/Reference Files/Ball Bearing
+    displayName: Ball Bearing
+    binId: bearings
+    model: {fileID: 0}
+    size: {x: 0.007112, y: 0.024613, z: 0.024613}
+    triangles: 4190
+    cuttable: 0
+  - id: Motion/Reference Files/Set Screw
+    displayName: Set Screw
+    binId: advanced
+    model: {fileID: 0}
+    size: {x: 0.004166, y: 0.004166, z: 0.003302}
+    triangles: 5754
+    cuttable: 0
+  - id: Motion/Reference Files/Shaft Collar Metal
+    displayName: Shaft Collar Metal
+    binId: bearings
+    model: {fileID: 0}
+    size: {x: 0.010996, y: 0.00635, z: 0.010999}
+    triangles: 8530
+    cuttable: 0
+  - id: Motion/Shaft Collar Retainer with Bearing Flat
+    displayName: Shaft Collar Retainer with Bearing Flat
+    binId: bearings
+    model: {fileID: 0}
+    size: {x: 0.037772, y: 0.0145, z: 0.010025}
+    triangles: 18422
+    cuttable: 0
+  - id: Motion/Shaft HS/HS Bearing Flat
+    displayName: HS Bearing Flat
+    binId: bearings
+    model: {fileID: 0}
+    size: {x: 0.035538, y: 0.013778, z: 0.010211}
+    triangles: 13265
+    cuttable: 0
+  - id: Motion/Shaft HS/HS Bushing 0.1250
+    displayName: HS Bushing 0.1250
+    binId: spacers
+    model: {fileID: 0}
+    size: {x: 0.012686, y: 0.003175, z: 0.012687}
+    triangles: 8972
+    cuttable: 0
+  - id: Motion/Shaft HS/HS Bushing 0.3125
+    displayName: HS Bushing 0.3125
+    binId: spacers
+    model: {fileID: 0}
+    size: {x: 0.012685, y: 0.007938, z: 0.012687}
+    triangles: 8658
+    cuttable: 0
+  - id: Motion/Shaft HS/HS Lock Bar - 3 hole
+    displayName: HS Lock Bar - 3 hole
+    binId: bearings
+    model: {fileID: 0}
+    size: {x: 0.0127, y: 0.0381, z: 0.001422}
+    triangles: 472
+    cuttable: 0
+  - id: Motion/Shaft HS/HS Lock Bar - 5 hole
+    displayName: HS Lock Bar - 5 hole
+    binId: bearings
+    model: {fileID: 0}
+    size: {x: 0.0127, y: 0.0635, z: 0.001422}
+    triangles: 848
+    cuttable: 0
+  - id: Motion/Shaft HS/HS Lock Bar - 7 hole
+    displayName: HS Lock Bar - 7 hole
+    binId: bearings
+    model: {fileID: 0}
+    size: {x: 0.0127, y: 0.0889, z: 0.001422}
+    triangles: 1200
+    cuttable: 0
+  - id: Motion/Shaft HS/HS Pillow Bearing Block
+    displayName: HS Pillow Bearing Block
+    binId: bearings
+    model: {fileID: 0}
+    size: {x: 0.038, y: 0.0127, z: 0.013386}
+    triangles: 15522
+    cuttable: 0
+  - id: Motion/Shaft HS/HS Shaft Collar
+    displayName: HS Shaft Collar
+    binId: bearings
+    model: {fileID: 0}
+    size: {x: 0.020316, y: 0.0127, z: 0.020276}
+    triangles: 10038
+    cuttable: 0
+  - id: Motion/Shaft HS/HS Spacer
+    displayName: HS Spacer
+    binId: spacers
+    model: {fileID: 0}
+    size: {x: 0.009996, y: 0.009998, z: 0.001588}
+    triangles: 3432
+    cuttable: 0
+  - id: Motion/Shaft HS/HS Spacer/HSpacer .0625
+    displayName: HSpacer .0625
+    binId: spacers
+    model: {fileID: 0}
+    size: {x: 0.009996, y: 0.009998, z: 0.001588}
+    triangles: 3432
+    cuttable: 0
+  - id: Motion/Shaft HS/HS Spacer/HSpacer .1250
+    displayName: HSpacer .1250
+    binId: spacers
+    model: {fileID: 0}
+    size: {x: 0.009996, y: 0.009998, z: 0.003175}
+    triangles: 3432
+    cuttable: 0
+  - id: Motion/Shaft HS/HS Spacer/HSpacer .2500
+    displayName: HSpacer .2500
+    binId: spacers
+    model: {fileID: 0}
+    size: {x: 0.009996, y: 0.009998, z: 0.00635}
+    triangles: 3432
+    cuttable: 0
+  - id: Motion/Shaft HS/HS Spacer/HSpacer .5000
+    displayName: HSpacer .5000
+    binId: spacers
+    model: {fileID: 0}
+    size: {x: 0.01, y: 0.009998, z: 0.0127}
+    triangles: 3590
+    cuttable: 0
+  - id: Motion/Shaft HS/Low Profile HS Shaft Collar
+    displayName: Low Profile HS Shaft Collar
+    binId: bearings
+    model: {fileID: 0}
+    size: {x: 0.01998, y: 0.00635, z: 0.02}
+    triangles: 2294
+    cuttable: 0
+  - id: Motion/Shaft HS/Shaft HS
+    displayName: Shaft HS
+    binId: shafts
+    model: {fileID: 0}
+    size: {x: 0.00635, y: 0.3048, z: 0.00635}
+    triangles: 1044
+    cuttable: 0
+  - id: Motion/Shaft HS/Shaft HS/Shaft HS 0.5 in
+    displayName: Shaft HS 0.5 in
+    binId: shafts
+    model: {fileID: 0}
+    size: {x: 0.00635, y: 0.0127, z: 0.00635}
+    triangles: 674
+    cuttable: 0
+  - id: Motion/Shaft HS/Shaft HS/Shaft HS 1.0 in
+    displayName: Shaft HS 1.0 in
+    binId: shafts
+    model: {fileID: 0}
+    size: {x: 0.00635, y: 0.0254, z: 0.00635}
+    triangles: 624
+    cuttable: 0
+  - id: Motion/Shaft HS/Shaft HS/Shaft HS 1.5 in
+    displayName: Shaft HS 1.5 in
+    binId: shafts
+    model: {fileID: 0}
+    size: {x: 0.00635, y: 0.0381, z: 0.00635}
+    triangles: 526
+    cuttable: 0
+  - id: Motion/Shaft HS/Shaft HS/Shaft HS 10.0 in
+    displayName: Shaft HS 10.0 in
+    binId: shafts
+    model: {fileID: 0}
+    size: {x: 0.00635, y: 0.254, z: 0.00635}
+    triangles: 790
+    cuttable: 0
+  - id: Motion/Shaft HS/Shaft HS/Shaft HS 10.5 in
+    displayName: Shaft HS 10.5 in
+    binId: shafts
+    model: {fileID: 919132149155446097, guid: 63593de67e4d1554d9c5e41e82f2743b, type: 3}
+    size: {x: 0.00635, y: 0.2667, z: 0.00635}
+    triangles: 948
+    cuttable: 0
+  - id: Motion/Shaft HS/Shaft HS/Shaft HS 11.0 in
+    displayName: Shaft HS 11.0 in
+    binId: shafts
+    model: {fileID: 0}
+    size: {x: 0.00635, y: 0.2794, z: 0.00635}
+    triangles: 1064
+    cuttable: 0
+  - id: Motion/Shaft HS/Shaft HS/Shaft HS 11.5 in
+    displayName: Shaft HS 11.5 in
+    binId: shafts
+    model: {fileID: 0}
+    size: {x: 0.00635, y: 0.2921, z: 0.00635}
+    triangles: 1062
+    cuttable: 0
+  - id: Motion/Shaft HS/Shaft HS/Shaft HS 12.0 in
+    displayName: Shaft HS 12.0 in
+    binId: shafts
+    model: {fileID: 0}
+    size: {x: 0.00635, y: 0.3048, z: 0.00635}
+    triangles: 1044
+    cuttable: 0
+  - id: Motion/Shaft HS/Shaft HS/Shaft HS 12.5 in
+    displayName: Shaft HS 12.5 in
+    binId: shafts
+    model: {fileID: 0}
+    size: {x: 0.00635, y: 0.3175, z: 0.00635}
+    triangles: 990
+    cuttable: 0
+  - id: Motion/Shaft HS/Shaft HS/Shaft HS 13.0 in
+    displayName: Shaft HS 13.0 in
+    binId: shafts
+    model: {fileID: 0}
+    size: {x: 0.00635, y: 0.3302, z: 0.00635}
+    triangles: 1112
+    cuttable: 0
+  - id: Motion/Shaft HS/Shaft HS/Shaft HS 13.5 in
+    displayName: Shaft HS 13.5 in
+    binId: shafts
+    model: {fileID: 0}
+    size: {x: 0.00635, y: 0.3429, z: 0.00635}
+    triangles: 1092
+    cuttable: 0
+  - id: Motion/Shaft HS/Shaft HS/Shaft HS 14.0 in
+    displayName: Shaft HS 14.0 in
+    binId: shafts
+    model: {fileID: 0}
+    size: {x: 0.00635, y: 0.3556, z: 0.00635}
+    triangles: 1018
+    cuttable: 0
+  - id: Motion/Shaft HS/Shaft HS/Shaft HS 14.5 in
+    displayName: Shaft HS 14.5 in
+    binId: shafts
+    model: {fileID: 0}
+    size: {x: 0.00635, y: 0.3683, z: 0.00635}
+    triangles: 1154
+    cuttable: 0
+  - id: Motion/Shaft HS/Shaft HS/Shaft HS 15.0 in
+    displayName: Shaft HS 15.0 in
+    binId: shafts
+    model: {fileID: 0}
+    size: {x: 0.00635, y: 0.381, z: 0.00635}
+    triangles: 1142
+    cuttable: 0
+  - id: Motion/Shaft HS/Shaft HS/Shaft HS 15.5 in
+    displayName: Shaft HS 15.5 in
+    binId: shafts
+    model: {fileID: 0}
+    size: {x: 0.00635, y: 0.3937, z: 0.00635}
+    triangles: 1132
+    cuttable: 0
+  - id: Motion/Shaft HS/Shaft HS/Shaft HS 16.0 in
+    displayName: Shaft HS 16.0 in
+    binId: shafts
+    model: {fileID: 0}
+    size: {x: 0.00635, y: 0.4064, z: 0.00635}
+    triangles: 1134
+    cuttable: 0
+  - id: Motion/Shaft HS/Shaft HS/Shaft HS 16.5 in
+    displayName: Shaft HS 16.5 in
+    binId: shafts
+    model: {fileID: 0}
+    size: {x: 0.00635, y: 0.4191, z: 0.00635}
+    triangles: 1148
+    cuttable: 0
+  - id: Motion/Shaft HS/Shaft HS/Shaft HS 17.0 in
+    displayName: Shaft HS 17.0 in
+    binId: shafts
+    model: {fileID: 0}
+    size: {x: 0.00635, y: 0.4318, z: 0.00635}
+    triangles: 1168
+    cuttable: 0
+  - id: Motion/Shaft HS/Shaft HS/Shaft HS 17.5 in
+    displayName: Shaft HS 17.5 in
+    binId: shafts
+    model: {fileID: 0}
+    size: {x: 0.00635, y: 0.4445, z: 0.00635}
+    triangles: 1192
+    cuttable: 0
+  - id: Motion/Shaft HS/Shaft HS/Shaft HS 18.0 in
+    displayName: Shaft HS 18.0 in
+    binId: shafts
+    model: {fileID: 0}
+    size: {x: 0.00635, y: 0.4572, z: 0.00635}
+    triangles: 1316
+    cuttable: 0
+  - id: Motion/Shaft HS/Shaft HS/Shaft HS 18.5 in
+    displayName: Shaft HS 18.5 in
+    binId: shafts
+    model: {fileID: 0}
+    size: {x: 0.00635, y: 0.4699, z: 0.00635}
+    triangles: 1364
+    cuttable: 0
+  - id: Motion/Shaft HS/Shaft HS/Shaft HS 19.0 in
+    displayName: Shaft HS 19.0 in
+    binId: shafts
+    model: {fileID: 0}
+    size: {x: 0.00635, y: 0.4826, z: 0.00635}
+    triangles: 1188
+    cuttable: 0
+  - id: Motion/Shaft HS/Shaft HS/Shaft HS 19.5 in
+    displayName: Shaft HS 19.5 in
+    binId: shafts
+    model: {fileID: 0}
+    size: {x: 0.00635, y: 0.4953, z: 0.00635}
+    triangles: 1250
+    cuttable: 0
+  - id: Motion/Shaft HS/Shaft HS/Shaft HS 2.0 in
+    displayName: Shaft HS 2.0 in
+    binId: shafts
+    model: {fileID: 0}
+    size: {x: 0.00635, y: 0.0508, z: 0.00635}
+    triangles: 464
+    cuttable: 0
+  - id: Motion/Shaft HS/Shaft HS/Shaft HS 2.5 in
+    displayName: Shaft HS 2.5 in
+    binId: shafts
+    model: {fileID: 0}
+    size: {x: 0.00635, y: 0.0635, z: 0.00635}
+    triangles: 436
+    cuttable: 0
+  - id: Motion/Shaft HS/Shaft HS/Shaft HS 20.0 in
+    displayName: Shaft HS 20.0 in
+    binId: shafts
+    model: {fileID: 0}
+    size: {x: 0.00635, y: 0.508, z: 0.00635}
+    triangles: 1248
+    cuttable: 0
+  - id: Motion/Shaft HS/Shaft HS/Shaft HS 20.5 in
+    displayName: Shaft HS 20.5 in
+    binId: shafts
+    model: {fileID: 0}
+    size: {x: 0.00635, y: 0.5207, z: 0.00635}
+    triangles: 1058
+    cuttable: 0
+  - id: Motion/Shaft HS/Shaft HS/Shaft HS 21.0 in
+    displayName: Shaft HS 21.0 in
+    binId: shafts
+    model: {fileID: 0}
+    size: {x: 0.00635, y: 0.5334, z: 0.00635}
+    triangles: 886
+    cuttable: 0
+  - id: Motion/Shaft HS/Shaft HS/Shaft HS 21.5 in
+    displayName: Shaft HS 21.5 in
+    binId: shafts
+    model: {fileID: 0}
+    size: {x: 0.00635, y: 0.5461, z: 0.00635}
+    triangles: 1044
+    cuttable: 0
+  - id: Motion/Shaft HS/Shaft HS/Shaft HS 22.0 in
+    displayName: Shaft HS 22.0 in
+    binId: shafts
+    model: {fileID: 0}
+    size: {x: 0.00635, y: 0.5588, z: 0.00635}
+    triangles: 1024
+    cuttable: 0
+  - id: Motion/Shaft HS/Shaft HS/Shaft HS 22.5 in
+    displayName: Shaft HS 22.5 in
+    binId: shafts
+    model: {fileID: 0}
+    size: {x: 0.00635, y: 0.5715, z: 0.00635}
+    triangles: 1004
+    cuttable: 0
+  - id: Motion/Shaft HS/Shaft HS/Shaft HS 23.0 in
+    displayName: Shaft HS 23.0 in
+    binId: shafts
+    model: {fileID: 0}
+    size: {x: 0.00635, y: 0.5842, z: 0.00635}
+    triangles: 1090
+    cuttable: 0
+  - id: Motion/Shaft HS/Shaft HS/Shaft HS 23.5 in
+    displayName: Shaft HS 23.5 in
+    binId: shafts
+    model: {fileID: 0}
+    size: {x: 0.00635, y: 0.5969, z: 0.00635}
+    triangles: 982
+    cuttable: 0
+  - id: Motion/Shaft HS/Shaft HS/Shaft HS 24.0 in
+    displayName: Shaft HS 24.0 in
+    binId: shafts
+    model: {fileID: 0}
+    size: {x: 0.00635, y: 0.6096, z: 0.00635}
+    triangles: 994
+    cuttable: 0
+  - id: Motion/Shaft HS/Shaft HS/Shaft HS 3.0 in
+    displayName: Shaft HS 3.0 in
+    binId: shafts
+    model: {fileID: 0}
+    size: {x: 0.00635, y: 0.076201, z: 0.00635}
+    triangles: 406
+    cuttable: 0
+  - id: Motion/Shaft HS/Shaft HS/Shaft HS 3.5 in
+    displayName: Shaft HS 3.5 in
+    binId: shafts
+    model: {fileID: 0}
+    size: {x: 0.00635, y: 0.088901, z: 0.00635}
+    triangles: 394
+    cuttable: 0
+  - id: Motion/Shaft HS/Shaft HS/Shaft HS 4.0 in
+    displayName: Shaft HS 4.0 in
+    binId: shafts
+    model: {fileID: 0}
+    size: {x: 0.00635, y: 0.1016, z: 0.00635}
+    triangles: 410
+    cuttable: 0
+  - id: Motion/Shaft HS/Shaft HS/Shaft HS 4.5 in
+    displayName: Shaft HS 4.5 in
+    binId: shafts
+    model: {fileID: 0}
+    size: {x: 0.00635, y: 0.1143, z: 0.00635}
+    triangles: 408
+    cuttable: 0
+  - id: Motion/Shaft HS/Shaft HS/Shaft HS 5.0 in
+    displayName: Shaft HS 5.0 in
+    binId: shafts
+    model: {fileID: 0}
+    size: {x: 0.00635, y: 0.127, z: 0.00635}
+    triangles: 416
+    cuttable: 0
+  - id: Motion/Shaft HS/Shaft HS/Shaft HS 5.5 in
+    displayName: Shaft HS 5.5 in
+    binId: shafts
+    model: {fileID: 0}
+    size: {x: 0.00635, y: 0.1397, z: 0.00635}
+    triangles: 420
+    cuttable: 0
+  - id: Motion/Shaft HS/Shaft HS/Shaft HS 6.0 in
+    displayName: Shaft HS 6.0 in
+    binId: shafts
+    model: {fileID: 0}
+    size: {x: 0.00635, y: 0.152401, z: 0.00635}
+    triangles: 440
+    cuttable: 0
+  - id: Motion/Shaft HS/Shaft HS/Shaft HS 6.5 in
+    displayName: Shaft HS 6.5 in
+    binId: shafts
+    model: {fileID: 0}
+    size: {x: 0.00635, y: 0.1651, z: 0.00635}
+    triangles: 446
+    cuttable: 0
+  - id: Motion/Shaft HS/Shaft HS/Shaft HS 7.0 in
+    displayName: Shaft HS 7.0 in
+    binId: shafts
+    model: {fileID: 0}
+    size: {x: 0.00635, y: 0.1778, z: 0.00635}
+    triangles: 486
+    cuttable: 0
+  - id: Motion/Shaft HS/Shaft HS/Shaft HS 7.5 in
+    displayName: Shaft HS 7.5 in
+    binId: shafts
+    model: {fileID: 0}
+    size: {x: 0.00635, y: 0.1905, z: 0.00635}
+    triangles: 540
+    cuttable: 0
+  - id: Motion/Shaft HS/Shaft HS/Shaft HS 8.0 in
+    displayName: Shaft HS 8.0 in
+    binId: shafts
+    model: {fileID: 0}
+    size: {x: 0.00635, y: 0.2032, z: 0.00635}
+    triangles: 554
+    cuttable: 0
+  - id: Motion/Shaft HS/Shaft HS/Shaft HS 8.5 in
+    displayName: Shaft HS 8.5 in
+    binId: shafts
+    model: {fileID: 0}
+    size: {x: 0.00635, y: 0.2159, z: 0.00635}
+    triangles: 634
+    cuttable: 0
+  - id: Motion/Shaft HS/Shaft HS/Shaft HS 9.0 in
+    displayName: Shaft HS 9.0 in
+    binId: shafts
+    model: {fileID: 0}
+    size: {x: 0.00635, y: 0.2286, z: 0.00635}
+    triangles: 632
+    cuttable: 0
+  - id: Motion/Shaft HS/Shaft HS/Shaft HS 9.5 in
+    displayName: Shaft HS 9.5 in
+    binId: shafts
+    model: {fileID: 0}
+    size: {x: 0.00635, y: 0.2413, z: 0.00635}
+    triangles: 776
+    cuttable: 0
+  - id: Motion/Shaft LS/Bearing Flat - Drilled
+    displayName: Bearing Flat - Drilled
+    binId: bearings
+    model: {fileID: 0}
+    size: {x: 0.01016, y: 0.03556, z: 0.007036}
+    triangles: 1498
+    cuttable: 0
+  - id: Motion/Shaft LS/Bearing Flat - Shaved
+    displayName: Bearing Flat - Shaved
+    binId: bearings
+    model: {fileID: 0}
+    size: {x: 0.008572, y: 0.03556, z: 0.007036}
+    triangles: 1404
+    cuttable: 0
+  - id: Motion/Shaft LS/Bearing Flat Low Profile
+    displayName: Bearing Flat Low Profile
+    binId: bearings
+    model: {fileID: 0}
+    size: {x: 0.034, y: 0.0086, z: 0.00685}
+    triangles: 8300
+    cuttable: 0
+  - id: Motion/Shaft LS/Bearing Flat
+    displayName: Bearing Flat
+    binId: bearings
+    model: {fileID: 0}
+    size: {x: 0.01016, y: 0.03556, z: 0.007036}
+    triangles: 1392
+    cuttable: 0
+  - id: Motion/Shaft LS/LS Pillow Bearing Block
+    displayName: LS Pillow Bearing Block
+    binId: bearings
+    model: {fileID: 0}
+    size: {x: 0.01016, y: 0.03556, z: 0.013386}
+    triangles: 2664
+    cuttable: 0
+  - id: Motion/Shaft LS/Lock Bar Metal
+    displayName: Lock Bar Metal
+    binId: bearings
+    model: {fileID: 0}
+    size: {x: 0.03556, y: 0.012573, z: 0.001168}
+    triangles: 440
+    cuttable: 0
+  - id: Motion/Shaft LS/Lock Bar Plastic
+    displayName: Lock Bar Plastic
+    binId: bearings
+    model: {fileID: 0}
+    size: {x: 0.03556, y: 0.003175, z: 0.0127}
+    triangles: 10036
+    cuttable: 0
+  - id: Motion/Shaft LS/Shaft Collar Metal/Shaft Collar Hex Smooth
+    displayName: Shaft Collar Hex Smooth
+    binId: bearings
+    model: {fileID: 0}
+    size: {x: 0.010996, y: 0.007919, z: 0.015749}
+    triangles: 3642
+    cuttable: 0
+  - id: Motion/Shaft LS/Shaft Collar Metal/Shaft Collar Hex Threaded
+    displayName: Shaft Collar Hex Threaded
+    binId: bearings
+    model: {fileID: 0}
+    size: {x: 0.010996, y: 0.007925, z: 0.015749}
+    triangles: 13256
+    cuttable: 0
+  - id: Motion/Shaft LS/Shaft Collar Metal/Shaft Collar No Screw
+    displayName: Shaft Collar No Screw
+    binId: bearings
+    model: {fileID: 0}
+    size: {x: 0.010996, y: 0.00635, z: 0.010999}
+    triangles: 8530
+    cuttable: 0
+  - id: Motion/Shaft LS/Shaft Collar Metal/Shaft Collar Set Screw
+    displayName: Shaft Collar Set Screw
+    binId: bearings
+    model: {fileID: 0}
+    size: {x: 0.010996, y: 0.00635, z: 0.010999}
+    triangles: 3160
+    cuttable: 0
+  - id: Motion/Shaft LS/Shaft Collar Metal/Shaft Collar Star Smooth
+    displayName: Shaft Collar Star Smooth
+    binId: bearings
+    model: {fileID: 0}
+    size: {x: 0.010996, y: 0.007925, z: 0.015749}
+    triangles: 4174
+    cuttable: 0
+  - id: Motion/Shaft LS/Shaft Collar Metal/Shaft Collar Star Threaded
+    displayName: Shaft Collar Star Threaded
+    binId: bearings
+    model: {fileID: 0}
+    size: {x: 0.010996, y: 0.007925, z: 0.015749}
+    triangles: 14042
+    cuttable: 0
+  - id: Motion/Shaft LS/Shaft Collar Rubber
+    displayName: Shaft Collar Rubber
+    binId: bearings
+    model: {fileID: 0}
+    size: {x: 0.010993, y: 0.0096, z: 0.00635}
+    triangles: 1894
+    cuttable: 0
+  - id: Motion/Shaft LS/Shaft LS Capped
+    displayName: Shaft LS Capped
+    binId: shafts
+    model: {fileID: 0}
+    size: {x: 0.00508, y: 0.1524, z: 0.00508}
+    triangles: 204
+    cuttable: 0
+  - id: Motion/Shaft LS/Shaft LS Capped/Shaft LS Capped 0.5
+    displayName: Shaft LS Capped 0.5
+    binId: shafts
+    model: {fileID: 0}
+    size: {x: 0.00508, y: 0.0127, z: 0.00508}
+    triangles: 332
+    cuttable: 0
+  - id: Motion/Shaft LS/Shaft LS Capped/Shaft LS Capped 1.0
+    displayName: Shaft LS Capped 1.0
+    binId: shafts
+    model: {fileID: 0}
+    size: {x: 0.005076, y: 0.0254, z: 0.005078}
+    triangles: 328
+    cuttable: 0
+  - id: Motion/Shaft LS/Shaft LS Capped/Shaft LS Capped 1.5
+    displayName: Shaft LS Capped 1.5
+    binId: shafts
+    model: {fileID: 0}
+    size: {x: 0.00508, y: 0.0381, z: 0.005068}
+    triangles: 292
+    cuttable: 0
+  - id: Motion/Shaft LS/Shaft LS Capped/Shaft LS Capped 2.0
+    displayName: Shaft LS Capped 2.0
+    binId: shafts
+    model: {fileID: 0}
+    size: {x: 0.00508, y: 0.0508, z: 0.00508}
+    triangles: 268
+    cuttable: 0
+  - id: Motion/Shaft LS/Shaft LS Capped/Shaft LS Capped 2.5
+    displayName: Shaft LS Capped 2.5
+    binId: shafts
+    model: {fileID: 0}
+    size: {x: 0.00508, y: 0.0635, z: 0.00508}
+    triangles: 252
+    cuttable: 0
+  - id: Motion/Shaft LS/Shaft LS Capped/Shaft LS Capped 3.0
+    displayName: Shaft LS Capped 3.0
+    binId: shafts
+    model: {fileID: 0}
+    size: {x: 0.005068, y: 0.0762, z: 0.005074}
+    triangles: 240
+    cuttable: 0
+  - id: Motion/Shaft LS/Shaft LS Capped/Shaft LS Capped 3.5
+    displayName: Shaft LS Capped 3.5
+    binId: shafts
+    model: {fileID: 0}
+    size: {x: 0.00508, y: 0.0889, z: 0.005052}
+    triangles: 228
+    cuttable: 0
+  - id: Motion/Shaft LS/Shaft LS Capped/Shaft LS Capped 4.0
+    displayName: Shaft LS Capped 4.0
+    binId: shafts
+    model: {fileID: 0}
+    size: {x: 0.00508, y: 0.1016, z: 0.00508}
+    triangles: 220
+    cuttable: 0
+  - id: Motion/Shaft LS/Shaft LS Capped/Shaft LS Capped 4.5
+    displayName: Shaft LS Capped 4.5
+    binId: shafts
+    model: {fileID: 0}
+    size: {x: 0.005063, y: 0.1143, z: 0.005071}
+    triangles: 216
+    cuttable: 0
+  - id: Motion/Shaft LS/Shaft LS Capped/Shaft LS Capped 5.0
+    displayName: Shaft LS Capped 5.0
+    binId: shafts
+    model: {fileID: 0}
+    size: {x: 0.00506, y: 0.127, z: 0.00507}
+    triangles: 208
+    cuttable: 0
+  - id: Motion/Shaft LS/Shaft LS Capped/Shaft LS Capped 5.5
+    displayName: Shaft LS Capped 5.5
+    binId: shafts
+    model: {fileID: 0}
+    size: {x: 0.00508, y: 0.1397, z: 0.00508}
+    triangles: 204
+    cuttable: 0
+  - id: Motion/Shaft LS/Shaft LS Capped/Shaft LS Capped 6.0
+    displayName: Shaft LS Capped 6.0
+    binId: shafts
+    model: {fileID: 0}
+    size: {x: 0.00508, y: 0.1524, z: 0.00508}
+    triangles: 204
+    cuttable: 0
+  - id: Motion/Shaft LS/Shaft LS
+    displayName: Shaft LS
+    binId: shafts
+    model: {fileID: 0}
+    size: {x: 0.003195, y: 0.3048, z: 0.003195}
+    triangles: 316
+    cuttable: 0
+  - id: Motion/Shaft LS/Shaft LS/Shaft LS 0.5
+    displayName: Shaft LS 0.5
+    binId: shafts
+    model: {fileID: 0}
+    size: {x: 0.003175, y: 0.0127, z: 0.003175}
+    triangles: 468
+    cuttable: 0
+  - id: Motion/Shaft LS/Shaft LS/Shaft LS 1.0
+    displayName: Shaft LS 1.0
+    binId: shafts
+    model: {fileID: 0}
+    size: {x: 0.003175, y: 0.0254, z: 0.003175}
+    triangles: 412
+    cuttable: 0
+  - id: Motion/Shaft LS/Shaft LS/Shaft LS 1.5
+    displayName: Shaft LS 1.5
+    binId: shafts
+    model: {fileID: 0}
+    size: {x: 0.003175, y: 0.0381, z: 0.003175}
+    triangles: 388
+    cuttable: 0
+  - id: Motion/Shaft LS/Shaft LS/Shaft LS 10.0
+    displayName: Shaft LS 10.0
+    binId: shafts
+    model: {fileID: 0}
+    size: {x: 0.003195, y: 0.254, z: 0.003195}
+    triangles: 316
+    cuttable: 0
+  - id: Motion/Shaft LS/Shaft LS/Shaft LS 10.5
+    displayName: Shaft LS 10.5
+    binId: shafts
+    model: {fileID: 0}
+    size: {x: 0.003195, y: 0.2667, z: 0.003195}
+    triangles: 316
+    cuttable: 0
+  - id: Motion/Shaft LS/Shaft LS/Shaft LS 11.0
+    displayName: Shaft LS 11.0
+    binId: shafts
+    model: {fileID: 0}
+    size: {x: 0.003195, y: 0.2794, z: 0.003195}
+    triangles: 316
+    cuttable: 0
+  - id: Motion/Shaft LS/Shaft LS/Shaft LS 11.5
+    displayName: Shaft LS 11.5
+    binId: shafts
+    model: {fileID: 0}
+    size: {x: 0.003195, y: 0.2921, z: 0.003195}
+    triangles: 316
+    cuttable: 0
+  - id: Motion/Shaft LS/Shaft LS/Shaft LS 12.0
+    displayName: Shaft LS 12.0
+    binId: shafts
+    model: {fileID: 0}
+    size: {x: 0.003195, y: 0.3048, z: 0.003195}
+    triangles: 316
+    cuttable: 0
+  - id: Motion/Shaft LS/Shaft LS/Shaft LS 2.0
+    displayName: Shaft LS 2.0
+    binId: shafts
+    model: {fileID: 0}
+    size: {x: 0.003175, y: 0.0508, z: 0.003175}
+    triangles: 372
+    cuttable: 0
+  - id: Motion/Shaft LS/Shaft LS/Shaft LS 2.5
+    displayName: Shaft LS 2.5
+    binId: shafts
+    model: {fileID: 0}
+    size: {x: 0.003175, y: 0.0635, z: 0.003175}
+    triangles: 324
+    cuttable: 0
+  - id: Motion/Shaft LS/Shaft LS/Shaft LS 3.0
+    displayName: Shaft LS 3.0
+    binId: shafts
+    model: {fileID: 0}
+    size: {x: 0.003175, y: 0.0762, z: 0.003175}
+    triangles: 324
+    cuttable: 0
+  - id: Motion/Shaft LS/Shaft LS/Shaft LS 3.5
+    displayName: Shaft LS 3.5
+    binId: shafts
+    model: {fileID: 0}
+    size: {x: 0.003195, y: 0.0889, z: 0.003195}
+    triangles: 316
+    cuttable: 0
+  - id: Motion/Shaft LS/Shaft LS/Shaft LS 4.0
+    displayName: Shaft LS 4.0
+    binId: shafts
+    model: {fileID: 0}
+    size: {x: 0.003195, y: 0.1016, z: 0.003195}
+    triangles: 316
+    cuttable: 0
+  - id: Motion/Shaft LS/Shaft LS/Shaft LS 4.5
+    displayName: Shaft LS 4.5
+    binId: shafts
+    model: {fileID: 0}
+    size: {x: 0.003195, y: 0.1143, z: 0.003195}
+    triangles: 316
+    cuttable: 0
+  - id: Motion/Shaft LS/Shaft LS/Shaft LS 5.0
+    displayName: Shaft LS 5.0
+    binId: shafts
+    model: {fileID: 0}
+    size: {x: 0.003195, y: 0.127, z: 0.003195}
+    triangles: 316
+    cuttable: 0
+  - id: Motion/Shaft LS/Shaft LS/Shaft LS 5.5
+    displayName: Shaft LS 5.5
+    binId: shafts
+    model: {fileID: 0}
+    size: {x: 0.003195, y: 0.1397, z: 0.003195}
+    triangles: 316
+    cuttable: 0
+  - id: Motion/Shaft LS/Shaft LS/Shaft LS 6.0
+    displayName: Shaft LS 6.0
+    binId: shafts
+    model: {fileID: 0}
+    size: {x: 0.003195, y: 0.1524, z: 0.003195}
+    triangles: 316
+    cuttable: 0
+  - id: Motion/Shaft LS/Shaft LS/Shaft LS 6.5
+    displayName: Shaft LS 6.5
+    binId: shafts
+    model: {fileID: 0}
+    size: {x: 0.003195, y: 0.1651, z: 0.003195}
+    triangles: 316
+    cuttable: 0
+  - id: Motion/Shaft LS/Shaft LS/Shaft LS 7.0
+    displayName: Shaft LS 7.0
+    binId: shafts
+    model: {fileID: 0}
+    size: {x: 0.003195, y: 0.1778, z: 0.003195}
+    triangles: 316
+    cuttable: 0
+  - id: Motion/Shaft LS/Shaft LS/Shaft LS 7.5
+    displayName: Shaft LS 7.5
+    binId: shafts
+    model: {fileID: 0}
+    size: {x: 0.003195, y: 0.1905, z: 0.003195}
+    triangles: 316
+    cuttable: 0
+  - id: Motion/Shaft LS/Shaft LS/Shaft LS 8.0
+    displayName: Shaft LS 8.0
+    binId: shafts
+    model: {fileID: 0}
+    size: {x: 0.003195, y: 0.2032, z: 0.003195}
+    triangles: 316
+    cuttable: 0
+  - id: Motion/Shaft LS/Shaft LS/Shaft LS 8.5
+    displayName: Shaft LS 8.5
+    binId: shafts
+    model: {fileID: 0}
+    size: {x: 0.003195, y: 0.2159, z: 0.003195}
+    triangles: 316
+    cuttable: 0
+  - id: Motion/Shaft LS/Shaft LS/Shaft LS 9.0
+    displayName: Shaft LS 9.0
+    binId: shafts
+    model: {fileID: 0}
+    size: {x: 0.003195, y: 0.2286, z: 0.003195}
+    triangles: 316
+    cuttable: 0
+  - id: Motion/Shaft LS/Shaft LS/Shaft LS 9.5
+    displayName: Shaft LS 9.5
+    binId: shafts
+    model: {fileID: 0}
+    size: {x: 0.003195, y: 0.2413, z: 0.003195}
+    triangles: 316
+    cuttable: 0
+  - id: Motion/Slide Assembly Parts/Inner Acetal Slide Truck
+    displayName: Inner Acetal Slide Truck
+    binId: hinges
+    model: {fileID: 0}
+    size: {x: 0.017446, y: 0.050786, z: 0.008373}
+    triangles: 26200
+    cuttable: 0
+  - id: Motion/Slide Assembly Parts/Inner Slide Member
+    displayName: Inner Slide Member
+    binId: hinges
+    model: {fileID: 0}
+    size: {x: 0.3048, y: 0.018339, z: 0.010364}
+    triangles: 3084
+    cuttable: 0
+  - id: Motion/Slide Assembly Parts/Outer Slide Member
+    displayName: Outer Slide Member
+    binId: hinges
+    model: {fileID: 0}
+    size: {x: 0.3048, y: 0.021477, z: 0.011821}
+    triangles: 2988
+    cuttable: 0
+  - id: Motion/Spacers/Spacer Nylon .313 OD
+    displayName: Spacer Nylon .313 OD
+    binId: spacers
+    model: {fileID: 0}
+    size: {x: 0.009521, y: 0.009523, z: 0.003175}
+    triangles: 528
+    cuttable: 0
+  - id: Motion/Spacers/Spacer Nylon .313 OD/NSpacer .313 OD x .125
+    displayName: NSpacer .313 OD x .125
+    binId: spacers
+    model: {fileID: 0}
+    size: {x: 0.009521, y: 0.009523, z: 0.003175}
+    triangles: 528
+    cuttable: 0
+  - id: Motion/Spacers/Spacer Nylon .313 OD/NSpacer .313 OD x .250
+    displayName: NSpacer .313 OD x .250
+    binId: spacers
+    model: {fileID: 0}
+    size: {x: 0.009521, y: 0.009523, z: 0.00635}
+    triangles: 528
+    cuttable: 0
+  - id: Motion/Spacers/Spacer Nylon .313 OD/NSpacer .313 OD x .375
+    displayName: NSpacer .313 OD x .375
+    binId: spacers
+    model: {fileID: 0}
+    size: {x: 0.009525, y: 0.009523, z: 0.009525}
+    triangles: 682
+    cuttable: 0
+  - id: Motion/Spacers/Spacer Nylon .313 OD/NSpacer .313 OD x .500
+    displayName: NSpacer .313 OD x .500
+    binId: spacers
+    model: {fileID: 0}
+    size: {x: 0.009525, y: 0.009523, z: 0.0127}
+    triangles: 682
+    cuttable: 0
+  - id: Motion/Spacers/Spacer Nylon .313 OD/NSpacer .313 OD x .875
+    displayName: NSpacer .313 OD x .875
+    binId: spacers
+    model: {fileID: 0}
+    size: {x: 0.009525, y: 0.009525, z: 0.022225}
+    triangles: 524
+    cuttable: 0
+  - id: Motion/Spacers/Spacer Nylon .375 OD
+    displayName: Spacer Nylon .375 OD
+    binId: spacers
+    model: {fileID: 0}
+    size: {x: 0.009521, y: 0.009523, z: 0.003175}
+    triangles: 528
+    cuttable: 0
+  - id: Motion/Spacers/Spacer Nylon .375 OD/NSpacer .375 OD x .125
+    displayName: NSpacer .375 OD x .125
+    binId: spacers
+    model: {fileID: 0}
+    size: {x: 0.009521, y: 0.009523, z: 0.003175}
+    triangles: 528
+    cuttable: 0
+  - id: Motion/Spacers/Spacer Nylon .375 OD/NSpacer .375 OD x .250
+    displayName: NSpacer .375 OD x .250
+    binId: spacers
+    model: {fileID: 0}
+    size: {x: 0.009521, y: 0.009523, z: 0.00635}
+    triangles: 528
+    cuttable: 0
+  - id: Motion/Spacers/Spacer Nylon .375 OD/NSpacer .375 OD x .375
+    displayName: NSpacer .375 OD x .375
+    binId: spacers
+    model: {fileID: 0}
+    size: {x: 0.009525, y: 0.009523, z: 0.009525}
+    triangles: 682
+    cuttable: 0
+  - id: Motion/Spacers/Spacer Nylon .375 OD/NSpacer .375 OD x .500
+    displayName: NSpacer .375 OD x .500
+    binId: spacers
+    model: {fileID: 0}
+    size: {x: 0.009525, y: 0.009523, z: 0.0127}
+    triangles: 682
+    cuttable: 0
+  - id: Motion/Spacers/Spacer Nylon .375 OD/NSpacer .375 OD x .875
+    displayName: NSpacer .375 OD x .875
+    binId: spacers
+    model: {fileID: 0}
+    size: {x: 0.009525, y: 0.009525, z: 0.022225}
+    triangles: 524
+    cuttable: 0
+  - id: Motion/Spacers/Spacer Nylon .375 OD/NSpacer .375 OD x 1.000
+    displayName: NSpacer .375 OD x 1.000
+    binId: spacers
+    model: {fileID: 0}
+    size: {x: 0.009525, y: 0.009525, z: 0.0254}
+    triangles: 496
+    cuttable: 0
+  - id: Motion/Spacers/Spacer Nylon .500 OD
+    displayName: Spacer Nylon .500 OD
+    binId: spacers
+    model: {fileID: 0}
+    size: {x: 0.012696, y: 0.012698, z: 0.003175}
+    triangles: 576
+    cuttable: 0
+  - id: Motion/Spacers/Spacer Nylon .500 OD/NSpacer Black .500 OD x .125
+    displayName: NSpacer Black .500 OD x .125
+    binId: spacers
+    model: {fileID: 0}
+    size: {x: 0.012696, y: 0.012698, z: 0.003175}
+    triangles: 576
+    cuttable: 0
+  - id: Motion/Spacers/Spacer Nylon .500 OD/NSpacer Black .500 OD x .250
+    displayName: NSpacer Black .500 OD x .250
+    binId: spacers
+    model: {fileID: 0}
+    size: {x: 0.012696, y: 0.012698, z: 0.00635}
+    triangles: 576
+    cuttable: 0
+  - id: Motion/Spacers/Spacer Nylon .500 OD/NSpacer Black .500 OD x .375
+    displayName: NSpacer Black .500 OD x .375
+    binId: spacers
+    model: {fileID: 0}
+    size: {x: 0.012696, y: 0.012698, z: 0.009525}
+    triangles: 576
+    cuttable: 0
+  - id: Motion/Spacers/Spacer Nylon .500 OD/NSpacer Black .500 OD x .500
+    displayName: NSpacer Black .500 OD x .500
+    binId: spacers
+    model: {fileID: 0}
+    size: {x: 0.0127, y: 0.012698, z: 0.0127}
+    triangles: 754
+    cuttable: 0
+  - id: Motion/Spacers/Spacer Nylon .500 OD/NSpacer White .500 OD x .125
+    displayName: NSpacer White .500 OD x .125
+    binId: spacers
+    model: {fileID: 0}
+    size: {x: 0.012696, y: 0.012698, z: 0.003175}
+    triangles: 576
+    cuttable: 0
+  - id: Motion/Spacers/Spacer Nylon .500 OD/NSpacer White .500 OD x .250
+    displayName: NSpacer White .500 OD x .250
+    binId: spacers
+    model: {fileID: 0}
+    size: {x: 0.012696, y: 0.012698, z: 0.00635}
+    triangles: 576
+    cuttable: 0
+  - id: Motion/Spacers/Spacer Nylon .500 OD/NSpacer White .500 OD x .375
+    displayName: NSpacer White .500 OD x .375
+    binId: spacers
+    model: {fileID: 0}
+    size: {x: 0.012696, y: 0.012698, z: 0.009525}
+    triangles: 576
+    cuttable: 0
+  - id: Motion/Spacers/Spacer Nylon .500 OD/NSpacer White .500 OD x .500
+    displayName: NSpacer White .500 OD x .500
+    binId: spacers
+    model: {fileID: 0}
+    size: {x: 0.0127, y: 0.012698, z: 0.0127}
+    triangles: 754
+    cuttable: 0
+  - id: Motion/Spacers/Spacer Nylon Click On
+    displayName: Spacer Nylon Click On
+    binId: spacers
+    model: {fileID: 0}
+    size: {x: 0.008537, y: 0.009523, z: 0.001588}
+    triangles: 468
+    cuttable: 0
+  - id: Motion/Spacers/Spacer Nylon Click On/Nspacer Click On x .0625
+    displayName: Nspacer Click On x .0625
+    binId: spacers
+    model: {fileID: 0}
+    size: {x: 0.008537, y: 0.009523, z: 0.001588}
+    triangles: 468
+    cuttable: 0
+  - id: Motion/Spacers/Spacer Nylon Click On/Nspacer Click On x .1250
+    displayName: Nspacer Click On x .1250
+    binId: spacers
+    model: {fileID: 0}
+    size: {x: 0.008537, y: 0.009523, z: 0.003175}
+    triangles: 468
+    cuttable: 0
+  - id: Motion/Spacers/Spacer Nylon Click On/Nspacer Click On x .2500
+    displayName: Nspacer Click On x .2500
+    binId: spacers
+    model: {fileID: 0}
+    size: {x: 0.008537, y: 0.009523, z: 0.00635}
+    triangles: 468
+    cuttable: 0
+  - id: Motion/Spacers/Spacer Plastic
+    displayName: Spacer Plastic
+    binId: spacers
+    model: {fileID: 0}
+    size: {x: 0.008124, y: 0.008126, z: 0.0046}
+    triangles: 2460
+    cuttable: 0
+  - id: Motion/Spacers/Spacer Plastic/PSpacer 4.6
+    displayName: PSpacer 4.6
+    binId: spacers
+    model: {fileID: 0}
+    size: {x: 0.008124, y: 0.008126, z: 0.0046}
+    triangles: 2460
+    cuttable: 0
+  - id: Motion/Spacers/Spacer Plastic/PSpacer 8.0
+    displayName: PSpacer 8.0
+    binId: spacers
+    model: {fileID: 0}
+    size: {x: 0.008124, y: 0.008126, z: 0.008}
+    triangles: 2460
+    cuttable: 0
+  - id: Motion/Spacers/Washer Steel
+    displayName: Washer Steel
+    binId: spacers
+    model: {fileID: 0}
+    size: {x: 0.009521, y: 0.009523, z: 0.000794}
+    triangles: 516
+    cuttable: 0
+  - id: Motion/Spacers/Washer Steel/SWasher .375 OD x .015625
+    displayName: SWasher .375 OD x .015625
+    binId: spacers
+    model: {fileID: 0}
+    size: {x: 0.009521, y: 0.009523, z: 0.000397}
+    triangles: 516
+    cuttable: 0
+  - id: Motion/Spacers/Washer Steel/SWasher .375 OD x .031250
+    displayName: SWasher .375 OD x .031250
+    binId: spacers
+    model: {fileID: 0}
+    size: {x: 0.009521, y: 0.009523, z: 0.000794}
+    triangles: 516
+    cuttable: 0
+  - id: Motion/Spacers/Washer Steel/SWasher .375 OD x .062500
+    displayName: SWasher .375 OD x .062500
+    binId: spacers
+    model: {fileID: 0}
+    size: {x: 0.009521, y: 0.009523, z: 0.001588}
+    triangles: 516
+    cuttable: 0
+  - id: Motion/Spacers/Washer Teflon
+    displayName: Washer Teflon
+    binId: spacers
+    model: {fileID: 0}
+    size: {x: 0.009521, y: 0.009523, z: 0.001016}
+    triangles: 516
+    cuttable: 0
+  - id: Motion/Spacers/Washer Teflon/TWasher .375 OD x .03125
+    displayName: TWasher .375 OD x .03125
+    binId: spacers
+    model: {fileID: 0}
+    size: {x: 0.009521, y: 0.009523, z: 0.000794}
+    triangles: 516
+    cuttable: 0
+  - id: Motion/Spacers/Washer Teflon/TWasher .375 OD x .04000
+    displayName: TWasher .375 OD x .04000
+    binId: spacers
+    model: {fileID: 0}
+    size: {x: 0.009521, y: 0.009523, z: 0.001016}
+    triangles: 516
+    cuttable: 0
+  - id: Motion/Spacers/Washer Teflon/TWasher .375 OD x .06250
+    displayName: TWasher .375 OD x .06250
+    binId: spacers
+    model: {fileID: 0}
+    size: {x: 0.009521, y: 0.009523, z: 0.001588}
+    triangles: 516
+    cuttable: 0
+  - id: Motion/Spacers/Washer Teflon/TWasher .500 OD x .04000
+    displayName: TWasher .500 OD x .04000
+    binId: spacers
+    model: {fileID: 0}
+    size: {x: 0.012696, y: 0.012698, z: 0.001016}
+    triangles: 564
+    cuttable: 0
+  - id: Motion/Sprockets/3P 10T Sprocket
+    displayName: 3P 10T Sprocket
+    binId: sprockets
+    model: {fileID: 0}
+    size: {x: 0.013323, y: 0.0125, z: 0.013376}
+    triangles: 6908
+    cuttable: 0
+  - id: Motion/Sprockets/3P 12T Sprocket
+    displayName: 3P 12T Sprocket
+    binId: sprockets
+    model: {fileID: 0}
+    size: {x: 0.019268, y: 0.0125, z: 0.019233}
+    triangles: 7442
+    cuttable: 0
+  - id: Motion/Sprockets/3P 24T Sprocket
+    displayName: 3P 24T Sprocket
+    binId: sprockets
+    model: {fileID: 0}
+    size: {x: 0.030016, y: 0.0125, z: 0.030016}
+    triangles: 11324
+    cuttable: 0
+  - id: Motion/Sprockets/3P 40T Sprocket
+    displayName: 3P 40T Sprocket
+    binId: sprockets
+    model: {fileID: 0}
+    size: {x: 0.049017, y: 0.0125, z: 0.049017}
+    triangles: 18236
+    cuttable: 0
+  - id: Motion/Sprockets/3P 48T Sprocket
+    displayName: 3P 48T Sprocket
+    binId: sprockets
+    model: {fileID: 0}
+    size: {x: 0.058594, y: 0.0125, z: 0.058594}
+    triangles: 18526
+    cuttable: 0

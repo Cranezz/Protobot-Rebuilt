@@ -1,0 +1,8672 @@
+{
+ "parts": [
+  {
+   "path": "Electronics/Sensors/Analog Accelerometer",
+   "size": [
+    0.03048,
+    0.0254,
+    0.014351
+   ],
+   "triangles": 1012,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Aluminum_-_VEX",
+     "color": [
+      1.0,
+      0.992157,
+      0.952941
+     ]
+    },
+    {
+     "name": "Glossy_-_Black",
+     "color": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    {
+     "name": "Smooth_-_Black",
+     "color": [
+      0.019608,
+      0.019608,
+      0.019608
+     ]
+    },
+    {
+     "name": "Smooth_-_Ivory",
+     "color": [
+      0.968627,
+      0.968627,
+      0.898039
+     ]
+    },
+    {
+     "name": "Titanium_-_Polished_-_Version_1.1",
+     "color": [
+      1.0,
+      0.901961,
+      0.666667
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Electronics/Sensors/Bumper Switch - V1",
+   "size": [
+    0.053,
+    0.034095,
+    0.022955
+   ],
+   "triangles": 46604,
+   "bodies": 5,
+   "materials": [
+    {
+     "name": "Smooth_-_Black",
+     "color": [
+      0.145098,
+      0.145098,
+      0.137255
+     ]
+    },
+    {
+     "name": "Smooth_-_Dark_Gray",
+     "color": [
+      0.25098,
+      0.25098,
+      0.25098
+     ]
+    },
+    {
+     "name": "Smooth_-_Red",
+     "color": [
+      0.8,
+      0.0,
+      0.0
+     ]
+    },
+    {
+     "name": "Smooth_-_White",
+     "color": [
+      0.921569,
+      0.921569,
+      0.921569
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Electronics/Sensors/Bumper Switch - V2",
+   "size": [
+    0.050555,
+    0.025093,
+    0.023162
+   ],
+   "triangles": 187985,
+   "bodies": 9,
+   "materials": [
+    {
+     "name": "198,193,188",
+     "color": [
+      0.078431,
+      0.078431,
+      0.078431
+     ]
+    },
+    {
+     "name": "198,193,188_1",
+     "color": [
+      0.776471,
+      0.756863,
+      0.737255
+     ]
+    },
+    {
+     "name": "210,38,48",
+     "color": [
+      0.823529,
+      0.14902,
+      0.188235
+     ]
+    },
+    {
+     "name": "64,64,64",
+     "color": [
+      0.25098,
+      0.25098,
+      0.25098
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Electronics/Sensors/Light Sensor",
+   "size": [
+    0.026,
+    0.049121,
+    0.011
+   ],
+   "triangles": 21892,
+   "bodies": 5,
+   "materials": [
+    {
+     "name": "Ceramic",
+     "color": [
+      1.0,
+      1.0,
+      1.0
+     ]
+    },
+    {
+     "name": "Rubber_-_Black",
+     "color": [
+      0.25098,
+      0.25098,
+      0.25098
+     ]
+    },
+    {
+     "name": "Smooth_-_Black",
+     "color": [
+      0.145098,
+      0.145098,
+      0.137255
+     ]
+    },
+    {
+     "name": "Smooth_-_Dark_Gray",
+     "color": [
+      0.25098,
+      0.25098,
+      0.25098
+     ]
+    },
+    {
+     "name": "Smooth_-_Ivory",
+     "color": [
+      0.968627,
+      0.968627,
+      0.898039
+     ]
+    },
+    {
+     "name": "Smooth_-_Red",
+     "color": [
+      0.8,
+      0.0,
+      0.0
+     ]
+    },
+    {
+     "name": "Smooth_-_White",
+     "color": [
+      0.921569,
+      0.921569,
+      0.921569
+     ]
+    },
+    {
+     "name": "Titanium_-_Polished",
+     "color": [
+      1.0,
+      0.901961,
+      0.666667
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Electronics/Sensors/Limit Switch",
+   "size": [
+    0.064308,
+    0.039726,
+    0.01255
+   ],
+   "triangles": 10488,
+   "bodies": 4,
+   "materials": [
+    {
+     "name": "Glossy_-_Black",
+     "color": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    {
+     "name": "Gray",
+     "color": [
+      0.411765,
+      0.411765,
+      0.411765
+     ]
+    },
+    {
+     "name": "Smooth_-_Black",
+     "color": [
+      0.145098,
+      0.145098,
+      0.137255
+     ]
+    },
+    {
+     "name": "Smooth_-_Red",
+     "color": [
+      0.8,
+      0.0,
+      0.0
+     ]
+    },
+    {
+     "name": "Smooth_-_White",
+     "color": [
+      0.921569,
+      0.921569,
+      0.921569
+     ]
+    },
+    {
+     "name": "Steel_-_VEX",
+     "color": [
+      0.827451,
+      0.827451,
+      0.827451
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Electronics/Sensors/Line Sensor Mounting Bar",
+   "size": [
+    0.01905,
+    0.089,
+    0.01905
+   ],
+   "triangles": 700,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Steel_-_VEX",
+     "color": [
+      0.854902,
+      0.854902,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Electronics/Sensors/Line Tracker - V1",
+   "size": [
+    0.019293,
+    0.05477,
+    0.0212
+   ],
+   "triangles": 20502,
+   "bodies": 5,
+   "materials": [
+    {
+     "name": "Glossy_-_Black_1",
+     "color": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    {
+     "name": "Rubber_-_Black",
+     "color": [
+      0.25098,
+      0.25098,
+      0.25098
+     ]
+    },
+    {
+     "name": "Smooth_-_Black",
+     "color": [
+      0.145098,
+      0.145098,
+      0.137255
+     ]
+    },
+    {
+     "name": "Smooth_-_Dark_Gray",
+     "color": [
+      0.25098,
+      0.25098,
+      0.25098
+     ]
+    },
+    {
+     "name": "Smooth_-_Red",
+     "color": [
+      0.8,
+      0.0,
+      0.0
+     ]
+    },
+    {
+     "name": "Smooth_-_White",
+     "color": [
+      0.921569,
+      0.921569,
+      0.921569
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Electronics/Sensors/Line Tracker - V2",
+   "size": [
+    0.012771,
+    0.056634,
+    0.0202
+   ],
+   "triangles": 48690,
+   "bodies": 6,
+   "materials": [
+    {
+     "name": "Glossy_-_Black_1",
+     "color": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    {
+     "name": "Rubber_-_Black",
+     "color": [
+      0.25098,
+      0.25098,
+      0.25098
+     ]
+    },
+    {
+     "name": "Smooth_-_Black_1",
+     "color": [
+      0.019608,
+      0.019608,
+      0.019608
+     ]
+    },
+    {
+     "name": "Smooth_-_Dark_Gray",
+     "color": [
+      0.25098,
+      0.25098,
+      0.25098
+     ]
+    },
+    {
+     "name": "Smooth_-_Red",
+     "color": [
+      0.8,
+      0.0,
+      0.0
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Electronics/Sensors/Optical Shaft Encoder",
+   "size": [
+    0.0675,
+    0.0505,
+    0.0202
+   ],
+   "triangles": 53619,
+   "bodies": 5,
+   "materials": [
+    {
+     "name": "Glossy_-_Black_1",
+     "color": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    {
+     "name": "Gray",
+     "color": [
+      0.411765,
+      0.411765,
+      0.411765
+     ]
+    },
+    {
+     "name": "Red_1",
+     "color": [
+      0.698039,
+      0.0,
+      0.0
+     ]
+    },
+    {
+     "name": "Rubber_-_Black",
+     "color": [
+      0.25098,
+      0.25098,
+      0.25098
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Electronics/Sensors/Potentiometer",
+   "size": [
+    0.038086,
+    0.00835,
+    0.037975
+   ],
+   "triangles": 26450,
+   "bodies": 3,
+   "materials": [
+    {
+     "name": "Cool_White",
+     "color": [
+      0.94902,
+      0.94902,
+      1.0
+     ]
+    },
+    {
+     "name": "Glossy_-_Black",
+     "color": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    {
+     "name": "Glossy_-_Gold",
+     "color": [
+      1.0,
+      0.839216,
+      0.0
+     ]
+    },
+    {
+     "name": "Red",
+     "color": [
+      0.698039,
+      0.0,
+      0.0
+     ]
+    },
+    {
+     "name": "Snow",
+     "color": [
+      1.0,
+      1.0,
+      1.0
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Electronics/Sensors/Ultrasonic Range Finder",
+   "size": [
+    0.08125,
+    0.0303,
+    0.0205
+   ],
+   "triangles": 29100,
+   "bodies": 5,
+   "materials": [
+    {
+     "name": "Black_Cast",
+     "color": [
+      0.105882,
+      0.105882,
+      0.105882
+     ]
+    },
+    {
+     "name": "Glossy_-_Black",
+     "color": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    {
+     "name": "Gray",
+     "color": [
+      0.411765,
+      0.411765,
+      0.411765
+     ]
+    },
+    {
+     "name": "Red_1",
+     "color": [
+      0.698039,
+      0.0,
+      0.0
+     ]
+    },
+    {
+     "name": "Rubber_-_Black",
+     "color": [
+      0.25098,
+      0.25098,
+      0.25098
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Electronics/Sensors/V5 3 Wire Expander",
+   "size": [
+    0.026762,
+    0.076262,
+    0.02195
+   ],
+   "triangles": 64196,
+   "bodies": 30,
+   "materials": [
+    {
+     "name": "Default",
+     "color": [
+      0.145098,
+      0.156863,
+      0.164706
+     ]
+    },
+    {
+     "name": "Default(1)",
+     "color": [
+      0.937255,
+      0.192157,
+      0.145098
+     ]
+    },
+    {
+     "name": "Default(2)",
+     "color": [
+      0.627451,
+      0.627451,
+      0.627451
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Electronics/Sensors/V5 Distance Sensor",
+   "size": [
+    0.050387,
+    0.022396,
+    0.023252
+   ],
+   "triangles": 58816,
+   "bodies": 10,
+   "materials": [
+    {
+     "name": "Default",
+     "color": [
+      0.145098,
+      0.156863,
+      0.164706
+     ]
+    },
+    {
+     "name": "Default(1)",
+     "color": [
+      0.937255,
+      0.192157,
+      0.145098
+     ]
+    },
+    {
+     "name": "Default(2)",
+     "color": [
+      0.627451,
+      0.627451,
+      0.627451
+     ]
+    },
+    {
+     "name": "Polycarbonate_-_Clear",
+     "color": [
+      0.8,
+      0.8,
+      0.8
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Electronics/Sensors/V5 GPS Sensor",
+   "size": [
+    0.0381,
+    0.0254,
+    0.0381
+   ],
+   "triangles": 46720,
+   "bodies": 11,
+   "materials": [
+    {
+     "name": "Default",
+     "color": [
+      0.145098,
+      0.156863,
+      0.164706
+     ]
+    },
+    {
+     "name": "Default(1)",
+     "color": [
+      0.631373,
+      0.627451,
+      0.647059
+     ]
+    },
+    {
+     "name": "Default(2)",
+     "color": [
+      0.937255,
+      0.192157,
+      0.145098
+     ]
+    },
+    {
+     "name": "Stainless_-_Polished",
+     "color": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Electronics/Sensors/V5 Inertial Sensor",
+   "size": [
+    0.021997,
+    0.039397,
+    0.02165
+   ],
+   "triangles": 13532,
+   "bodies": 3,
+   "materials": [
+    {
+     "name": "Default",
+     "color": [
+      0.145098,
+      0.156863,
+      0.164706
+     ]
+    },
+    {
+     "name": "Default(1)",
+     "color": [
+      0.937255,
+      0.192157,
+      0.145098
+     ]
+    },
+    {
+     "name": "Default(2)",
+     "color": [
+      0.627451,
+      0.627451,
+      0.627451
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Electronics/Sensors/V5 Optical Sensor",
+   "size": [
+    0.050387,
+    0.022396,
+    0.024312
+   ],
+   "triangles": 59552,
+   "bodies": 10,
+   "materials": [
+    {
+     "name": "Default",
+     "color": [
+      0.145098,
+      0.156863,
+      0.164706
+     ]
+    },
+    {
+     "name": "Default(1)",
+     "color": [
+      0.937255,
+      0.192157,
+      0.145098
+     ]
+    },
+    {
+     "name": "Default(2)",
+     "color": [
+      0.627451,
+      0.627451,
+      0.627451
+     ]
+    },
+    {
+     "name": "Polycarbonate_-_Clear",
+     "color": [
+      0.8,
+      0.8,
+      0.8
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Electronics/Sensors/V5 Rotation Sensor",
+   "size": [
+    0.06675,
+    0.022,
+    0.0207
+   ],
+   "triangles": 46980,
+   "bodies": 10,
+   "materials": [
+    {
+     "name": "Default",
+     "color": [
+      0.145098,
+      0.156863,
+      0.164706
+     ]
+    },
+    {
+     "name": "Default(1)",
+     "color": [
+      0.929412,
+      0.192157,
+      0.145098
+     ]
+    },
+    {
+     "name": "Default(2)",
+     "color": [
+      0.639216,
+      0.627451,
+      0.643137
+     ]
+    },
+    {
+     "name": "Stainless_-_Polished",
+     "color": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Electronics/Sensors/V5 Vision Sensor",
+   "size": [
+    0.063395,
+    0.054975,
+    0.02265
+   ],
+   "triangles": 279003,
+   "bodies": 19,
+   "materials": [
+    {
+     "name": "0,255,0",
+     "color": [
+      1.0,
+      1.0,
+      1.0
+     ]
+    },
+    {
+     "name": "175,155,135",
+     "color": [
+      0.784314,
+      0.784314,
+      0.0
+     ]
+    },
+    {
+     "name": "192,192,192",
+     "color": [
+      0.752941,
+      0.752941,
+      0.752941
+     ]
+    },
+    {
+     "name": "202,209,238",
+     "color": [
+      0.792157,
+      0.819608,
+      0.933333
+     ]
+    },
+    {
+     "name": "250,250,250",
+     "color": [
+      0.980392,
+      0.980392,
+      0.980392
+     ]
+    },
+    {
+     "name": "252,188,132",
+     "color": [
+      0.988235,
+      0.737255,
+      0.517647
+     ]
+    },
+    {
+     "name": "255,206,127",
+     "color": [
+      1.0,
+      0.807843,
+      0.498039
+     ]
+    },
+    {
+     "name": "255,242,232",
+     "color": [
+      1.0,
+      0.94902,
+      0.909804
+     ]
+    },
+    {
+     "name": "255,255,0",
+     "color": [
+      0.145098,
+      0.156863,
+      0.164706
+     ]
+    },
+    {
+     "name": "255,255,255",
+     "color": [
+      1.0,
+      1.0,
+      1.0
+     ]
+    },
+    {
+     "name": "60,60,60",
+     "color": [
+      0.235294,
+      0.235294,
+      0.235294
+     ]
+    },
+    {
+     "name": "64,64,64",
+     "color": [
+      0.25098,
+      0.25098,
+      0.25098
+     ]
+    },
+    {
+     "name": "Body",
+     "color": [
+      0.145098,
+      0.156863,
+      0.164706
+     ]
+    },
+    {
+     "name": "Body(1)",
+     "color": [
+      0.937255,
+      0.192157,
+      0.145098
+     ]
+    },
+    {
+     "name": "Body(2)",
+     "color": [
+      0.627451,
+      0.627451,
+      0.627451
+     ]
+    },
+    {
+     "name": "Button",
+     "color": [
+      1.0,
+      0.0,
+      0.0
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Electronics/Sensors/Yaw Rate Gyroscope Sensor",
+   "size": [
+    0.03048,
+    0.0254,
+    0.014351
+   ],
+   "triangles": 868,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Aluminum_-_VEX",
+     "color": [
+      1.0,
+      0.988235,
+      0.909804
+     ]
+    },
+    {
+     "name": "Glossy_-_Black",
+     "color": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    {
+     "name": "Smooth_-_Ivory",
+     "color": [
+      0.968627,
+      0.968627,
+      0.898039
+     ]
+    },
+    {
+     "name": "Titanium_-_Polished_-_Version_1.1",
+     "color": [
+      1.0,
+      0.901961,
+      0.666667
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Electronics/V5 3 Wire Expander",
+   "size": [
+    0.026762,
+    0.076262,
+    0.0219
+   ],
+   "triangles": 63564,
+   "bodies": 30,
+   "materials": [
+    {
+     "name": "Default",
+     "color": [
+      0.145098,
+      0.156863,
+      0.164706
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Electronics/V5 Battery Clip",
+   "size": [
+    0.054778,
+    0.012391,
+    0.022714
+   ],
+   "triangles": 12354,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Default",
+     "color": [
+      0.145098,
+      0.156863,
+      0.164706
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Electronics/V5 Battery",
+   "size": [
+    0.162324,
+    0.046448,
+    0.0304
+   ],
+   "triangles": 111807,
+   "bodies": 8,
+   "materials": [
+    {
+     "name": "Body",
+     "color": [
+      0.145098,
+      0.156863,
+      0.164706
+     ]
+    },
+    {
+     "name": "Body(1)",
+     "color": [
+      0.937255,
+      0.192157,
+      0.164706
+     ]
+    },
+    {
+     "name": "Body(2)",
+     "color": [
+      0.627451,
+      0.627451,
+      0.627451
+     ]
+    },
+    {
+     "name": "Power_Indicator",
+     "color": [
+      0.0,
+      1.0,
+      0.0
+     ]
+    },
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Electronics/V5 Brain Mount Long",
+   "size": [
+    0.018535,
+    0.087716,
+    0.0094
+   ],
+   "triangles": 23596,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Omni_Wheel_Grey",
+     "color": [
+      0.141176,
+      0.141176,
+      0.141176
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Electronics/V5 Brain Mount Short",
+   "size": [
+    0.018539,
+    0.0502,
+    0.0094
+   ],
+   "triangles": 18200,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Omni_Wheel_Grey",
+     "color": [
+      0.141176,
+      0.141176,
+      0.141176
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Electronics/V5 Brain",
+   "size": [
+    0.139961,
+    0.099822,
+    0.031507
+   ],
+   "triangles": 435302,
+   "bodies": 29,
+   "materials": [
+    {
+     "name": "126,126,126",
+     "color": [
+      0.494118,
+      0.494118,
+      0.494118
+     ]
+    },
+    {
+     "name": "202,209,238",
+     "color": [
+      0.792157,
+      0.819608,
+      0.933333
+     ]
+    },
+    {
+     "name": "229,229,229",
+     "color": [
+      0.898039,
+      0.898039,
+      0.898039
+     ]
+    },
+    {
+     "name": "255,0,0",
+     "color": [
+      1.0,
+      0.0,
+      0.0
+     ]
+    },
+    {
+     "name": "255,242,232",
+     "color": [
+      1.0,
+      0.94902,
+      0.909804
+     ]
+    },
+    {
+     "name": "Battery_Micro_USB_Ports",
+     "color": [
+      0.156863,
+      0.156863,
+      0.156863
+     ]
+    },
+    {
+     "name": "Button_Board",
+     "color": [
+      0.752941,
+      0.752941,
+      0.752941
+     ]
+    },
+    {
+     "name": "Button_Board_Part_Two",
+     "color": [
+      0.098039,
+      0.098039,
+      0.098039
+     ]
+    },
+    {
+     "name": "Main_Body",
+     "color": [
+      0.145098,
+      0.156863,
+      0.164706
+     ]
+    },
+    {
+     "name": "Micro_USB_Contact_Points",
+     "color": [
+      0.752941,
+      0.752941,
+      0.0
+     ]
+    },
+    {
+     "name": "Port_21",
+     "color": [
+      0.156863,
+      0.156863,
+      0.156863
+     ]
+    },
+    {
+     "name": "Port_Contact_Points",
+     "color": [
+      1.0,
+      0.792157,
+      0.262745
+     ]
+    },
+    {
+     "name": "Power_Button_Logo",
+     "color": [
+      0.65098,
+      0.098039,
+      0.180392
+     ]
+    },
+    {
+     "name": "SD_Slot",
+     "color": [
+      0.294118,
+      0.294118,
+      0.294118
+     ]
+    },
+    {
+     "name": "Screen",
+     "color": [
+      0.501961,
+      0.501961,
+      0.501961
+     ]
+    },
+    {
+     "name": "Screen_Border",
+     "color": [
+      0.329412,
+      0.345098,
+      0.352941
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Electronics/V5 Motor (5.5W)",
+   "size": [
+    0.05705,
+    0.0254,
+    0.064375
+   ],
+   "triangles": 339411,
+   "bodies": 18,
+   "materials": [
+    {
+     "name": "Default",
+     "color": [
+      0.74902,
+      0.74902,
+      0.74902
+     ]
+    },
+    {
+     "name": "Default(1)_1",
+     "color": [
+      0.145098,
+      0.156863,
+      0.164706
+     ]
+    },
+    {
+     "name": "Default(2)",
+     "color": [
+      1.0,
+      1.0,
+      0.74902
+     ]
+    },
+    {
+     "name": "Default(3)",
+     "color": [
+      0.258824,
+      0.258824,
+      0.258824
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Electronics/V5 Motor",
+   "size": [
+    0.0573,
+    0.07235,
+    0.033
+   ],
+   "triangles": 225409,
+   "bodies": 16,
+   "materials": [
+    {
+     "name": "0,150,57",
+     "color": [
+      0.0,
+      0.588235,
+      0.223529
+     ]
+    },
+    {
+     "name": "165,132,0",
+     "color": [
+      0.647059,
+      0.517647,
+      0.0
+     ]
+    },
+    {
+     "name": "192,192,192",
+     "color": [
+      0.752941,
+      0.752941,
+      0.752941
+     ]
+    },
+    {
+     "name": "198,198,208",
+     "color": [
+      0.776471,
+      0.776471,
+      0.815686
+     ]
+    },
+    {
+     "name": "255,0,0",
+     "color": [
+      1.0,
+      0.0,
+      0.0
+     ]
+    },
+    {
+     "name": "255,255,192",
+     "color": [
+      1.0,
+      1.0,
+      0.752941
+     ]
+    },
+    {
+     "name": "37,40,42",
+     "color": [
+      0.145098,
+      0.156863,
+      0.164706
+     ]
+    },
+    {
+     "name": "37,40,42(2)",
+     "color": [
+      0.937255,
+      0.192157,
+      0.145098
+     ]
+    },
+    {
+     "name": "37,40,42(3)",
+     "color": [
+      0.937255,
+      0.192157,
+      0.145098
+     ]
+    },
+    {
+     "name": "37,40,42(4)",
+     "color": [
+      0.627451,
+      0.627451,
+      0.627451
+     ]
+    },
+    {
+     "name": "64,64,64",
+     "color": [
+      0.25098,
+      0.25098,
+      0.25098
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Electronics/V5 Radio",
+   "size": [
+    0.0845,
+    0.02545,
+    0.022
+   ],
+   "triangles": 53311,
+   "bodies": 9,
+   "materials": [
+    {
+     "name": "165,132,0",
+     "color": [
+      0.647059,
+      0.517647,
+      0.0
+     ]
+    },
+    {
+     "name": "192,192,192",
+     "color": [
+      0.752941,
+      0.752941,
+      0.752941
+     ]
+    },
+    {
+     "name": "202,209,238",
+     "color": [
+      1.0,
+      0.0,
+      0.0
+     ]
+    },
+    {
+     "name": "64,64,64",
+     "color": [
+      0.25098,
+      0.25098,
+      0.25098
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Electronics/V5 Simple Battery",
+   "size": [
+    0.176327,
+    0.046431,
+    0.030404
+   ],
+   "triangles": 464,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "37,40,42",
+     "color": [
+      0.145098,
+      0.156863,
+      0.164706
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Electronics/V5 Simple Brain",
+   "size": [
+    0.099822,
+    0.153797,
+    0.031471
+   ],
+   "triangles": 6660,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Default",
+     "color": [
+      0.145098,
+      0.156863,
+      0.164706
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Electronics/V5 Simple Motor",
+   "size": [
+    0.057328,
+    0.03302,
+    0.071628
+   ],
+   "triangles": 4386,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "37,40,42",
+     "color": [
+      0.145098,
+      0.156863,
+      0.164706
+     ]
+    },
+    {
+     "name": "37,40,42(1)",
+     "color": [
+      0.901961,
+      1.0,
+      0.0
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Electronics/V5 Simple Radio",
+   "size": [
+    0.084506,
+    0.0254,
+    0.022593
+   ],
+   "triangles": 928,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "37,40,42",
+     "color": [
+      0.145098,
+      0.156863,
+      0.164706
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Game Objects/High Stakes/Field Perimeter/Field Tile",
+   "size": [
+    0.618839,
+    0.016003,
+    0.618839
+   ],
+   "triangles": 5356,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "124,126,127",
+     "color": [
+      0.486275,
+      0.494118,
+      0.498039
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Game Objects/High Stakes/Field Perimeter/Perimeter Parts/276-7596-003",
+   "size": [
+    0.022489,
+    0.032525,
+    0.022489
+   ],
+   "triangles": 13256,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "112,115,114",
+     "color": [
+      0.439216,
+      0.45098,
+      0.447059
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Game Objects/High Stakes/Field Perimeter/Perimeter Parts/276-7596-005",
+   "size": [
+    0.139373,
+    0.02525,
+    0.105623
+   ],
+   "triangles": 138910,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "64,64,64",
+     "color": [
+      0.25098,
+      0.25098,
+      0.25098
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Game Objects/High Stakes/Field Perimeter/Perimeter Parts/276-7596-006",
+   "size": [
+    0.139382,
+    0.02865,
+    0.105632
+   ],
+   "triangles": 150232,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "255,255,255",
+     "color": [
+      1.0,
+      1.0,
+      1.0
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Game Objects/High Stakes/Field Perimeter/Perimeter Parts/276-7596-008",
+   "size": [
+    0.121723,
+    0.121723,
+    0.0274
+   ],
+   "triangles": 141838,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "64,64,64",
+     "color": [
+      0.25098,
+      0.25098,
+      0.25098
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Game Objects/High Stakes/Field Perimeter/Perimeter Parts/276-7596-009",
+   "size": [
+    0.121732,
+    0.121732,
+    0.050927
+   ],
+   "triangles": 206238,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "64,64,64",
+     "color": [
+      0.25098,
+      0.25098,
+      0.25098
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Game Objects/High Stakes/Field Perimeter/Perimeter Parts/276-7596-010",
+   "size": [
+    0.0465,
+    0.0465,
+    0.0264
+   ],
+   "triangles": 89840,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "64,64,64",
+     "color": [
+      0.25098,
+      0.25098,
+      0.25098
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Game Objects/High Stakes/Field Perimeter/Perimeter Parts/276-7596-014",
+   "size": [
+    1.16205,
+    0.0025,
+    0.18796
+   ],
+   "triangles": 12,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "255,255,255",
+     "color": [
+      1.0,
+      1.0,
+      1.0
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Game Objects/High Stakes/Field Perimeter/Perimeter Parts/276-7596-015",
+   "size": [
+    1.13665,
+    0.0025,
+    0.18796
+   ],
+   "triangles": 12,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "255,255,255",
+     "color": [
+      1.0,
+      1.0,
+      1.0
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Game Objects/High Stakes/Field Perimeter/Perimeter Parts/276-7596-018",
+   "size": [
+    3.676528,
+    0.0254,
+    0.07275
+   ],
+   "triangles": 588,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "192,192,192",
+     "color": [
+      0.752941,
+      0.752941,
+      0.752941
+     ]
+    },
+    {
+     "name": "84,88,90",
+     "color": [
+      0.329412,
+      0.345098,
+      0.352941
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Game Objects/High Stakes/Field Perimeter/Perimeter Parts/276-7596-316",
+   "size": [
+    0.0508,
+    0.0762,
+    0.1914
+   ],
+   "triangles": 1396,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "255,255,255",
+     "color": [
+      1.0,
+      1.0,
+      1.0
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Game Objects/High Stakes/Field Perimeter/Perimeter Parts/276-7596-317_Corner",
+   "size": [
+    0.05715,
+    0.05715,
+    0.1914
+   ],
+   "triangles": 1048,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "255,255,255",
+     "color": [
+      1.0,
+      1.0,
+      1.0
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Game Objects/High Stakes/Field Perimeter/Perimeter Parts/276-7596-350_276-7596-301",
+   "size": [
+    0.0508,
+    1.187785,
+    0.0635
+   ],
+   "triangles": 6104,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "255,255,255",
+     "color": [
+      1.0,
+      1.0,
+      1.0
+     ]
+    },
+    {
+     "name": "37,40,42",
+     "color": [
+      0.145098,
+      0.156863,
+      0.164706
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Game Objects/High Stakes/Field Perimeter/Perimeter Parts/276-7596-350_276-7596-302",
+   "size": [
+    0.0508,
+    1.187785,
+    0.0635
+   ],
+   "triangles": 6260,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "255,255,255",
+     "color": [
+      1.0,
+      1.0,
+      1.0
+     ]
+    },
+    {
+     "name": "37,40,42",
+     "color": [
+      0.145098,
+      0.156863,
+      0.164706
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Game Objects/High Stakes/Field Perimeter/Perimeter Parts/276-7596-350_276-7596-303",
+   "size": [
+    0.0508,
+    1.187785,
+    0.0635
+   ],
+   "triangles": 5916,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "255,255,255",
+     "color": [
+      1.0,
+      1.0,
+      1.0
+     ]
+    },
+    {
+     "name": "37,40,42",
+     "color": [
+      0.145098,
+      0.156863,
+      0.164706
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Game Objects/High Stakes/Field Perimeter/Perimeter Parts/276-7596-350_276-7596-304",
+   "size": [
+    0.0508,
+    1.187785,
+    0.0635
+   ],
+   "triangles": 6026,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "255,255,255",
+     "color": [
+      1.0,
+      1.0,
+      1.0
+     ]
+    },
+    {
+     "name": "37,40,42",
+     "color": [
+      0.145098,
+      0.156863,
+      0.164706
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Game Objects/High Stakes/Field Perimeter/Perimeter Parts/276-7596-350_276-7596-305",
+   "size": [
+    0.0508,
+    1.187785,
+    0.0635
+   ],
+   "triangles": 5984,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "255,255,255",
+     "color": [
+      1.0,
+      1.0,
+      1.0
+     ]
+    },
+    {
+     "name": "37,40,42",
+     "color": [
+      0.145098,
+      0.156863,
+      0.164706
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Game Objects/High Stakes/Field Perimeter/Perimeter Parts/276-7596-350_276-7596-306",
+   "size": [
+    0.0508,
+    1.187785,
+    0.0635
+   ],
+   "triangles": 5948,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "255,255,255",
+     "color": [
+      1.0,
+      1.0,
+      1.0
+     ]
+    },
+    {
+     "name": "37,40,42",
+     "color": [
+      0.145098,
+      0.156863,
+      0.164706
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Game Objects/High Stakes/Field Perimeter/Perimeter Parts/276-7596-350_276-7596-307",
+   "size": [
+    0.0508,
+    1.187785,
+    0.0635
+   ],
+   "triangles": 7314,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "255,255,255",
+     "color": [
+      1.0,
+      1.0,
+      1.0
+     ]
+    },
+    {
+     "name": "37,40,42",
+     "color": [
+      0.145098,
+      0.156863,
+      0.164706
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Game Objects/High Stakes/Field Perimeter/Perimeter Parts/276-7596-350_276-7596-308",
+   "size": [
+    0.0508,
+    1.187785,
+    0.0635
+   ],
+   "triangles": 7665,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "255,255,255",
+     "color": [
+      1.0,
+      1.0,
+      1.0
+     ]
+    },
+    {
+     "name": "37,40,42",
+     "color": [
+      0.145098,
+      0.156863,
+      0.164706
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Game Objects/High Stakes/Field Perimeter/Perimeter Parts/276-7596-350_276-7596-309",
+   "size": [
+    0.0508,
+    1.187785,
+    0.0635
+   ],
+   "triangles": 6324,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "255,255,255",
+     "color": [
+      1.0,
+      1.0,
+      1.0
+     ]
+    },
+    {
+     "name": "37,40,42",
+     "color": [
+      0.145098,
+      0.156863,
+      0.164706
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Game Objects/High Stakes/Field Perimeter/Perimeter Parts/276-7596-350_276-7596-310",
+   "size": [
+    0.0508,
+    1.187785,
+    0.0635
+   ],
+   "triangles": 7027,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "255,255,255",
+     "color": [
+      1.0,
+      1.0,
+      1.0
+     ]
+    },
+    {
+     "name": "37,40,42",
+     "color": [
+      0.145098,
+      0.156863,
+      0.164706
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Game Objects/High Stakes/Field Perimeter/Perimeter Parts/276-7596-350_276-7596-311",
+   "size": [
+    0.0508,
+    1.187785,
+    0.0635
+   ],
+   "triangles": 6220,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "255,255,255",
+     "color": [
+      1.0,
+      1.0,
+      1.0
+     ]
+    },
+    {
+     "name": "37,40,42",
+     "color": [
+      0.145098,
+      0.156863,
+      0.164706
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Game Objects/High Stakes/Field Perimeter/Perimeter Parts/276-7596-350_276-7596-312",
+   "size": [
+    0.0508,
+    1.187785,
+    0.0635
+   ],
+   "triangles": 6032,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "255,255,255",
+     "color": [
+      1.0,
+      1.0,
+      1.0
+     ]
+    },
+    {
+     "name": "37,40,42",
+     "color": [
+      0.145098,
+      0.156863,
+      0.164706
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Game Objects/High Stakes/Field Perimeter/Perimeter Parts/276-7596-351_276-7596-313",
+   "size": [
+    0.0508,
+    1.187785,
+    0.0793
+   ],
+   "triangles": 4226,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "255,255,255",
+     "color": [
+      1.0,
+      1.0,
+      1.0
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Game Objects/High Stakes/Field Perimeter/Perimeter Parts/276-7596-351_276-7596-314",
+   "size": [
+    0.0508,
+    1.187785,
+    0.0793
+   ],
+   "triangles": 4914,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "255,255,255",
+     "color": [
+      1.0,
+      1.0,
+      1.0
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Game Objects/High Stakes/Field Perimeter/Perimeter Parts/276-7596-351_276-7596-315",
+   "size": [
+    0.0508,
+    1.187785,
+    0.0793
+   ],
+   "triangles": 4390,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "255,255,255",
+     "color": [
+      1.0,
+      1.0,
+      1.0
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Game Objects/High Stakes/Hardware/NNY_Imperial_275-1027-001",
+   "size": [
+    0.010051,
+    0.008731,
+    0.005953
+   ],
+   "triangles": 9416,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "255,255,255",
+     "color": [
+      1.0,
+      1.0,
+      1.0
+     ]
+    },
+    {
+     "name": "Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Game Objects/High Stakes/Hardware/SBT0832_276-4990-001",
+   "size": [
+    0.00792,
+    0.00856,
+    0.007916
+   ],
+   "triangles": 5968,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Game Objects/High Stakes/Hardware/SBT0832_276-4992-001",
+   "size": [
+    0.00792,
+    0.01491,
+    0.007914
+   ],
+   "triangles": 5162,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Game Objects/High Stakes/Hardware/SBT0832_276-4995-001",
+   "size": [
+    0.00792,
+    0.024435,
+    0.00792
+   ],
+   "triangles": 4086,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Game Objects/High Stakes/Hardware/SBT0832_276-4997-001",
+   "size": [
+    0.00792,
+    0.03396,
+    0.007917
+   ],
+   "triangles": 3592,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Game Objects/High Stakes/Hardware/SBT0832_276-8016-001",
+   "size": [
+    0.00792,
+    0.06571,
+    0.00792
+   ],
+   "triangles": 2622,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Game Objects/High Stakes/Hardware/SPTM3-TC_228-7045-010",
+   "size": [
+    0.005999,
+    0.005998,
+    0.0125
+   ],
+   "triangles": 5690,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Game Objects/High Stakes/Hardware/THF0832-0250_275-1014-001",
+   "size": [
+    0.007301,
+    0.00635,
+    0.0127
+   ],
+   "triangles": 5502,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Standoffs",
+     "color": [
+      0.752941,
+      0.752941,
+      0.752941
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Game Objects/High Stakes/Hardware/THF0832-0250_275-1017-001",
+   "size": [
+    0.007301,
+    0.00635,
+    0.0381
+   ],
+   "triangles": 3688,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Standoffs",
+     "color": [
+      0.752941,
+      0.752941,
+      0.752941
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Game Objects/High Stakes/Ladder/276-8868-052",
+   "size": [
+    1.150501,
+    0.055646,
+    0.051594
+   ],
+   "triangles": 1988,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "37,40,42",
+     "color": [
+      0.145098,
+      0.156863,
+      0.164706
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Game Objects/High Stakes/Ladder/276-8868-056",
+   "size": [
+    0.061174,
+    0.060589,
+    0.06935
+   ],
+   "triangles": 23170,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "206,220,0",
+     "color": [
+      0.807843,
+      0.862745,
+      0.0
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Game Objects/High Stakes/Ladder/276-8868-057",
+   "size": [
+    0.054633,
+    0.050584,
+    0.0395
+   ],
+   "triangles": 45434,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "206,220,0",
+     "color": [
+      0.807843,
+      0.862745,
+      0.0
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Game Objects/High Stakes/Ladder/Ladder Base",
+   "size": [
+    0.203863,
+    0.203869,
+    0.0889
+   ],
+   "triangles": 131926,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "37,40,42",
+     "color": [
+      0.145098,
+      0.156863,
+      0.164706
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Game Objects/High Stakes/Ladder/Mounting Plate",
+   "size": [
+    0.3,
+    0.3,
+    0.00475
+   ],
+   "triangles": 12612,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "64,64,64",
+     "color": [
+      0.25098,
+      0.25098,
+      0.25098
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Game Objects/High Stakes/Ladder/Tier 1/276-8868-051_BLACK",
+   "size": [
+    0.166285,
+    0.104013,
+    0.09525
+   ],
+   "triangles": 53706,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "84,88,90(1)",
+     "color": [
+      0.145098,
+      0.156863,
+      0.164706
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Game Objects/High Stakes/Ladder/Tier 1/276-8868-053_BLACK",
+   "size": [
+    0.78278,
+    0.055646,
+    0.051594
+   ],
+   "triangles": 1178,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "84,88,90(1)",
+     "color": [
+      0.145098,
+      0.156863,
+      0.164706
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Game Objects/High Stakes/Ladder/Tier 2/276-8868-051_GREY",
+   "size": [
+    0.165748,
+    0.103745,
+    0.09525
+   ],
+   "triangles": 55764,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "84,88,90",
+     "color": [
+      0.329412,
+      0.345098,
+      0.352941
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Game Objects/High Stakes/Ladder/Tier 2/276-8868-053_GREY",
+   "size": [
+    0.78278,
+    0.055646,
+    0.051594
+   ],
+   "triangles": 1178,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "84,88,90",
+     "color": [
+      0.329412,
+      0.345098,
+      0.352941
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Game Objects/High Stakes/Ladder/Tier 3/276-8868-051",
+   "size": [
+    0.166699,
+    0.10422,
+    0.09525
+   ],
+   "triangles": 51824,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "84,88,90(1)",
+     "color": [
+      0.807843,
+      0.862745,
+      0.0
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Game Objects/High Stakes/Ladder/Tier 3/276-8868-053",
+   "size": [
+    0.78278,
+    0.055646,
+    0.051594
+   ],
+   "triangles": 1178,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "84,88,90(1)",
+     "color": [
+      0.807843,
+      0.862745,
+      0.0
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Game Objects/High Stakes/Rings/Blue Ring",
+   "size": [
+    0.1778,
+    0.1778,
+    0.0508
+   ],
+   "triangles": 25356,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Sky_Blue_Medium",
+     "color": [
+      0.0,
+      0.6,
+      0.8
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Game Objects/High Stakes/Rings/Red Ring",
+   "size": [
+    0.1778,
+    0.1778,
+    0.0508
+   ],
+   "triangles": 38248,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "210,38,48",
+     "color": [
+      0.823529,
+      0.14902,
+      0.188235
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Game Objects/High Stakes/Stakes/Alliance Stake/Alliance Stake Post Blue",
+   "size": [
+    0.021336,
+    0.4224,
+    0.021336
+   ],
+   "triangles": 704,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Sky_Blue_Medium",
+     "color": [
+      0.0,
+      0.6,
+      0.8
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Game Objects/High Stakes/Stakes/Alliance Stake/Alliance Stake Post Red",
+   "size": [
+    0.021336,
+    0.4224,
+    0.021336
+   ],
+   "triangles": 704,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "210,38,48",
+     "color": [
+      0.823529,
+      0.14902,
+      0.188235
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Game Objects/High Stakes/Stakes/Field Stake Mount",
+   "size": [
+    0.082523,
+    0.039415,
+    0.01905
+   ],
+   "triangles": 33898,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "37,40,42",
+     "color": [
+      0.145098,
+      0.156863,
+      0.164706
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Game Objects/High Stakes/Stakes/Field Stake/Neutral Stake Post",
+   "size": [
+    0.021336,
+    0.635,
+    0.021336
+   ],
+   "triangles": 496,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "37,40,42",
+     "color": [
+      0.145098,
+      0.156863,
+      0.164706
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Game Objects/High Stakes/Stakes/High Stake/276-8868-058",
+   "size": [
+    0.021336,
+    0.127,
+    0.021336
+   ],
+   "triangles": 1234,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "206,220,0",
+     "color": [
+      0.807843,
+      0.862745,
+      0.0
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Game Objects/High Stakes/Stakes/Mobile Goal/276-8868-201",
+   "size": [
+    0.253541,
+    0.277003,
+    0.061705
+   ],
+   "triangles": 85898,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "206,220,0",
+     "color": [
+      0.807843,
+      0.862745,
+      0.0
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Game Objects/High Stakes/Stakes/Mobile Goal/276-8868-202",
+   "size": [
+    0.021336,
+    0.363,
+    0.021336
+   ],
+   "triangles": 656,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "206,220,0",
+     "color": [
+      0.807843,
+      0.862745,
+      0.0
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Game Objects/High Stakes/Stakes/Mobile Goal/276-8868-203",
+   "size": [
+    0.189,
+    0.212344,
+    0.002921
+   ],
+   "triangles": 852,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "64,64,64",
+     "color": [
+      0.25098,
+      0.25098,
+      0.25098
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Game Objects/High Stakes/Tape/Wall Alliance Stations_Blue",
+   "size": [
+    0.9144,
+    2.9464,
+    0.001
+   ],
+   "triangles": 28,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Sky_Blue_Medium",
+     "color": [
+      0.0,
+      0.6,
+      0.8
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Game Objects/High Stakes/Tape/Wall Alliance Stations_Red",
+   "size": [
+    0.9144,
+    2.9464,
+    0.001
+   ],
+   "triangles": 28,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "0,76,151(1)",
+     "color": [
+      0.823529,
+      0.14902,
+      0.188235
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Game Objects/High Stakes/Tape/field_tape",
+   "size": [
+    3.611347,
+    3.611347,
+    0.001
+   ],
+   "triangles": 232,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "255,255,255",
+     "color": [
+      1.0,
+      1.0,
+      1.0
+     ]
+    },
+    {
+     "name": "37,40,42",
+     "color": [
+      0.145098,
+      0.156863,
+      0.164706
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Miscellaneous/Blue License Plate",
+   "size": [
+    0.0632,
+    0.0061,
+    0.114
+   ],
+   "triangles": 40292,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "37,39,42",
+     "color": [
+      0.0,
+      0.501961,
+      1.0
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Miscellaneous/Red License Plate",
+   "size": [
+    0.0632,
+    0.0061,
+    0.114
+   ],
+   "triangles": 40292,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "37,39,42",
+     "color": [
+      1.0,
+      0.0,
+      0.0
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Miscellaneous/Sizing Tool",
+   "size": [
+    0.4699,
+    0.4572,
+    0.4699
+   ],
+   "triangles": 32,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Clear_-_Green_1",
+     "color": [
+      0.062745,
+      0.670588,
+      0.290196
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Miscellaneous/Sizing Tool/VEXU Small",
+   "size": [
+    0.3937,
+    0.381,
+    0.3937
+   ],
+   "triangles": 32,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Clear_-_Green_1",
+     "color": [
+      0.062745,
+      0.670588,
+      0.290196
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Miscellaneous/Sizing Tool/VRC High School - VEXU Large",
+   "size": [
+    0.4699,
+    0.4572,
+    0.4699
+   ],
+   "triangles": 32,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Clear_-_Green_1",
+     "color": [
+      0.062745,
+      0.670588,
+      0.290196
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/1-Post Bearing Flat Hex Retainer",
+   "size": [
+    0.031769,
+    0.011589,
+    0.009475
+   ],
+   "triangles": 9910,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Smooth_-_Black",
+     "color": [
+      0.019608,
+      0.019608,
+      0.019608
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/1-Post Bearing Flat Standoff Retainer",
+   "size": [
+    0.03178,
+    0.009477,
+    0.009475
+   ],
+   "triangles": 9376,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Acetal",
+     "color": [
+      0.05098,
+      0.05098,
+      0.05098
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Advanced Gears/12T Bevel Gear",
+   "size": [
+    0.018727,
+    0.014278,
+    0.018727
+   ],
+   "triangles": 19050,
+   "bodies": 17,
+   "materials": [
+    {
+     "name": "32,92,64",
+     "color": [
+      0.12549,
+      0.360784,
+      0.25098
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Advanced Gears/24T Bevel Gear",
+   "size": [
+    0.026897,
+    0.011036,
+    0.026897
+   ],
+   "triangles": 15822,
+   "bodies": 25,
+   "materials": [
+    {
+     "name": "Smooth_-_Dark_Sea_Green",
+     "color": [
+      0.180392,
+      0.541176,
+      0.341176
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Advanced Gears/36T Bevel Gear",
+   "size": [
+    0.034629,
+    0.007438,
+    0.034629
+   ],
+   "triangles": 13382,
+   "bodies": 33,
+   "materials": [
+    {
+     "name": "32,92,64",
+     "color": [
+      0.12549,
+      0.360784,
+      0.25098
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Advanced Gears/36T Worm Wheel",
+   "size": [
+    0.027517,
+    0.027517,
+    0.009525
+   ],
+   "triangles": 6827,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Smooth_-_Dark_Sea_Green",
+     "color": [
+      0.180392,
+      0.541176,
+      0.341176
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Advanced Gears/Bevel Gearbox Bracket",
+   "size": [
+    0.052568,
+    0.045334,
+    0.032634
+   ],
+   "triangles": 4592,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Advanced Gears/Cam Follower Mounting Bracket",
+   "size": [
+    0.050782,
+    0.008298,
+    0.038082
+   ],
+   "triangles": 11740,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "84,88,90",
+     "color": [
+      0.329412,
+      0.345098,
+      0.352941
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Advanced Gears/Cam Follower",
+   "size": [
+    0.0127,
+    0.012446,
+    0.129527
+   ],
+   "triangles": 41043,
+   "bodies": 3,
+   "materials": [
+    {
+     "name": "228,233,237",
+     "color": [
+      0.894118,
+      0.913725,
+      0.929412
+     ]
+    },
+    {
+     "name": "32,92,64",
+     "color": [
+      0.12549,
+      0.360784,
+      0.25098
+     ]
+    },
+    {
+     "name": "84,88,90",
+     "color": [
+      0.329412,
+      0.345098,
+      0.352941
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Advanced Gears/Differential",
+   "size": [
+    0.040186,
+    0.047078,
+    0.040186
+   ],
+   "triangles": 43684,
+   "bodies": 4,
+   "materials": [
+    {
+     "name": "Smooth_-_Dark_Sea_Green",
+     "color": [
+      0.180392,
+      0.541176,
+      0.341176
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Advanced Gears/Hand Crank",
+   "size": [
+    0.050789,
+    0.019037,
+    0.03302
+   ],
+   "triangles": 13568,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "32,92,64",
+     "color": [
+      0.12549,
+      0.360784,
+      0.25098
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Advanced Gears/Lead Screw Mounting Bracket",
+   "size": [
+    0.030607,
+    0.043906,
+    0.032494
+   ],
+   "triangles": 67434,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "84,88,90",
+     "color": [
+      0.329412,
+      0.345098,
+      0.352941
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Advanced Gears/Lead Screw Nut",
+   "size": [
+    0.018669,
+    0.034925,
+    0.02794
+   ],
+   "triangles": 27420,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "84,88,90",
+     "color": [
+      0.329412,
+      0.345098,
+      0.352941
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Advanced Gears/Rack Gear",
+   "size": [
+    0.0633,
+    0.0144,
+    0.0098
+   ],
+   "triangles": 50206,
+   "bodies": 4,
+   "materials": [
+    {
+     "name": "Smooth_-_Dark_Sea_Green",
+     "color": [
+      0.180392,
+      0.541176,
+      0.341176
+     ]
+    },
+    {
+     "name": "Titanium_-_Polished_1",
+     "color": [
+      1.0,
+      0.901961,
+      0.666667
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Advanced Gears/Rack Gearbox Bracket",
+   "size": [
+    0.024562,
+    0.0508,
+    0.0524
+   ],
+   "triangles": 4844,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Advanced Gears/Ratchet Gear",
+   "size": [
+    0.043601,
+    0.008128,
+    0.043548
+   ],
+   "triangles": 7320,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Smooth_-_Dark_Sea_Green",
+     "color": [
+      0.180392,
+      0.541176,
+      0.341176
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Advanced Gears/Universal Joint",
+   "size": [
+    0.010008,
+    0.02775,
+    0.010008
+   ],
+   "triangles": 29128,
+   "bodies": 7,
+   "materials": [
+    {
+     "name": "228,233,237",
+     "color": [
+      0.894118,
+      0.913725,
+      0.929412
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Advanced Gears/Winch Bracket",
+   "size": [
+    0.063754,
+    0.0508,
+    0.0635
+   ],
+   "triangles": 2248,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Advanced Gears/Winch Drum",
+   "size": [
+    0.039497,
+    0.035306,
+    0.035306
+   ],
+   "triangles": 22186,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Smooth_-_Dark_Sea_Green",
+     "color": [
+      0.180392,
+      0.541176,
+      0.341176
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Advanced Gears/Winch Pawl",
+   "size": [
+    0.0168,
+    0.009906,
+    0.015831
+   ],
+   "triangles": 1196,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Smooth_-_Dark_Sea_Green",
+     "color": [
+      0.180392,
+      0.541176,
+      0.341176
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Advanced Gears/Worm Gearbox Bracket",
+   "size": [
+    0.054762,
+    0.036932,
+    0.040792
+   ],
+   "triangles": 4016,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Chain 6P/IQ Chain",
+   "size": [
+    0.0113,
+    0.0044,
+    0.01075
+   ],
+   "triangles": 1336,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "84,88,90",
+     "color": [
+      0.329412,
+      0.345098,
+      0.352941
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Chain 9P/Chain Attachment Link",
+   "size": [
+    0.01695,
+    0.038,
+    0.009374
+   ],
+   "triangles": 9076,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Smooth_-_Dark_Gray",
+     "color": [
+      0.25098,
+      0.25098,
+      0.25098
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Chain 9P/High Strength Chain Link",
+   "size": [
+    0.015786,
+    0.005994,
+    0.014198
+   ],
+   "triangles": 10392,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Smooth_-_Dark_Gray",
+     "color": [
+      0.25098,
+      0.25098,
+      0.25098
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Chain 9P/Medium Flap",
+   "size": [
+    0.016948,
+    0.038,
+    0.0297
+   ],
+   "triangles": 11052,
+   "bodies": 2,
+   "materials": [
+    {
+     "name": "Rubber_-_Black_-_Version_1.1",
+     "color": [
+      0.25098,
+      0.25098,
+      0.25098
+     ]
+    },
+    {
+     "name": "Smooth_-_Dark_Gray",
+     "color": [
+      0.25098,
+      0.25098,
+      0.25098
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Chain 9P/Short Flap",
+   "size": [
+    0.016949,
+    0.038,
+    0.0197
+   ],
+   "triangles": 9888,
+   "bodies": 2,
+   "materials": [
+    {
+     "name": "Rubber_-_Black_-_Version_1.1",
+     "color": [
+      0.25098,
+      0.25098,
+      0.25098
+     ]
+    },
+    {
+     "name": "Smooth_-_Dark_Gray",
+     "color": [
+      0.25098,
+      0.25098,
+      0.25098
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Chain 9P/Tall Flap",
+   "size": [
+    0.016948,
+    0.038,
+    0.0397
+   ],
+   "triangles": 10676,
+   "bodies": 2,
+   "materials": [
+    {
+     "name": "Rubber_-_Black_-_Version_1.1",
+     "color": [
+      0.25098,
+      0.25098,
+      0.25098
+     ]
+    },
+    {
+     "name": "Smooth_-_Dark_Gray",
+     "color": [
+      0.25098,
+      0.25098,
+      0.25098
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Chain 9P/Tank Tread Traction Link",
+   "size": [
+    0.016948,
+    0.038,
+    0.0114
+   ],
+   "triangles": 9256,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Rubber_-_Black_-_Version_1.1",
+     "color": [
+      0.25098,
+      0.25098,
+      0.25098
+     ]
+    },
+    {
+     "name": "Smooth_-_Dark_Gray",
+     "color": [
+      0.25098,
+      0.25098,
+      0.25098
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Chain 9P/Tread Link",
+   "size": [
+    0.016948,
+    0.038,
+    0.0097
+   ],
+   "triangles": 10968,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Smooth_-_Dark_Sea_Green",
+     "color": [
+      0.180392,
+      0.541176,
+      0.341176
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Gears/LS 12T Gear Steel",
+   "size": [
+    0.009525,
+    0.014468,
+    0.014468
+   ],
+   "triangles": 3196,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Steel_Gear",
+     "color": [
+      0.639216,
+      0.639216,
+      0.67451
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Gears/LS 12T Gear",
+   "size": [
+    0.009525,
+    0.014805,
+    0.014805
+   ],
+   "triangles": 4315,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Smooth_-_Dark_Sea_Green",
+     "color": [
+      0.203922,
+      0.552941,
+      0.360784
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Gears/LS 36T Gear",
+   "size": [
+    0.009525,
+    0.040208,
+    0.040208
+   ],
+   "triangles": 10802,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Smooth_-_Dark_Sea_Green",
+     "color": [
+      0.203922,
+      0.552941,
+      0.360784
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Gears/LS 60T Gear",
+   "size": [
+    0.009525,
+    0.065605,
+    0.065605
+   ],
+   "triangles": 12968,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Smooth_-_Dark_Sea_Green",
+     "color": [
+      0.203922,
+      0.552941,
+      0.360784
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Gears/LS 84T Gear",
+   "size": [
+    0.090957,
+    0.0127,
+    0.090957
+   ],
+   "triangles": 21615,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Smooth_-_Dark_Sea_Green",
+     "color": [
+      0.180392,
+      0.541176,
+      0.341176
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Gears/Reference Files/HS 12T Gear, No Insert",
+   "size": [
+    0.014336,
+    0.0127,
+    0.014336
+   ],
+   "triangles": 5094,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Steel_Gear",
+     "color": [
+      0.639216,
+      0.639216,
+      0.67451
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Gears/Reference Files/HS 24T Gear, No Insert",
+   "size": [
+    0.02737,
+    0.0127,
+    0.02737
+   ],
+   "triangles": 3380,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Steel_Gear",
+     "color": [
+      0.639216,
+      0.639216,
+      0.67451
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Gears/Reference Files/HS 36T Gear, No Insert",
+   "size": [
+    0.040125,
+    0.0127,
+    0.040125
+   ],
+   "triangles": 64106,
+   "bodies": 2,
+   "materials": [
+    {
+     "name": "166,25,46",
+     "color": [
+      0.65098,
+      0.098039,
+      0.180392
+     ]
+    },
+    {
+     "name": "84,88,90",
+     "color": [
+      0.329412,
+      0.345098,
+      0.352941
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Gears/Reference Files/HS 48T Gear, No Insert",
+   "size": [
+    0.052851,
+    0.0127,
+    0.052851
+   ],
+   "triangles": 82850,
+   "bodies": 2,
+   "materials": [
+    {
+     "name": "166,25,46",
+     "color": [
+      0.65098,
+      0.098039,
+      0.180392
+     ]
+    },
+    {
+     "name": "84,88,90",
+     "color": [
+      0.329412,
+      0.345098,
+      0.352941
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Gears/Reference Files/HS 60T Gear, No Insert",
+   "size": [
+    0.065565,
+    0.0127,
+    0.065565
+   ],
+   "triangles": 107192,
+   "bodies": 2,
+   "materials": [
+    {
+     "name": "166,25,46",
+     "color": [
+      0.65098,
+      0.098039,
+      0.180392
+     ]
+    },
+    {
+     "name": "84,88,90",
+     "color": [
+      0.329412,
+      0.345098,
+      0.352941
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Gears/Reference Files/HS 72T Gear, No Insert",
+   "size": [
+    0.078274,
+    0.0127,
+    0.078274
+   ],
+   "triangles": 149344,
+   "bodies": 2,
+   "materials": [
+    {
+     "name": "166,25,46",
+     "color": [
+      0.65098,
+      0.098039,
+      0.180392
+     ]
+    },
+    {
+     "name": "84,88,90",
+     "color": [
+      0.329412,
+      0.345098,
+      0.352941
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Gears/Reference Files/HS 84T Gear, No Insert",
+   "size": [
+    0.090981,
+    0.0127,
+    0.090981
+   ],
+   "triangles": 175092,
+   "bodies": 2,
+   "materials": [
+    {
+     "name": "166,25,46",
+     "color": [
+      0.65098,
+      0.098039,
+      0.180392
+     ]
+    },
+    {
+     "name": "84,88,90",
+     "color": [
+      0.329412,
+      0.345098,
+      0.352941
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/HS Shaft Adapter Circle",
+   "size": [
+    0.00635,
+    0.0127,
+    0.00635
+   ],
+   "triangles": 722,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Sintered_Bronze",
+     "color": [
+      0.690196,
+      0.537255,
+      0.309804
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/HS Shaft Adapter Square",
+   "size": [
+    0.00635,
+    0.0127,
+    0.00635
+   ],
+   "triangles": 288,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Steel_Gear",
+     "color": [
+      0.639216,
+      0.639216,
+      0.67451
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Hinges/Reference Parts/2 Holes/Bottom 2",
+   "size": [
+    0.022059,
+    0.0254,
+    0.006016
+   ],
+   "triangles": 396,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Hinges/Reference Parts/2 Holes/Pin 2",
+   "size": [
+    0.003175,
+    0.0254,
+    0.003175
+   ],
+   "triangles": 172,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Hinges/Reference Parts/2 Holes/Top 2",
+   "size": [
+    0.022034,
+    0.0254,
+    0.005966
+   ],
+   "triangles": 696,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Hinges/Reference Parts/3 Holes/Bottom 3",
+   "size": [
+    0.022057,
+    0.0381,
+    0.006015
+   ],
+   "triangles": 392,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Hinges/Reference Parts/3 Holes/Pin 3",
+   "size": [
+    0.003175,
+    0.0381,
+    0.003175
+   ],
+   "triangles": 140,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Hinges/Reference Parts/3 Holes/Top 3",
+   "size": [
+    0.022032,
+    0.0381,
+    0.005965
+   ],
+   "triangles": 656,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Hinges/Reference Parts/4 Holes/Bottom 4",
+   "size": [
+    0.022051,
+    0.0508,
+    0.00602
+   ],
+   "triangles": 644,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Hinges/Reference Parts/4 Holes/Pin 4",
+   "size": [
+    0.003175,
+    0.0508,
+    0.003175
+   ],
+   "triangles": 124,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Hinges/Reference Parts/4 Holes/Top 4",
+   "size": [
+    0.022033,
+    0.0508,
+    0.005969
+   ],
+   "triangles": 706,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Hinges/Reference Parts/5 Holes/Bottom 5",
+   "size": [
+    0.022056,
+    0.0635,
+    0.006018
+   ],
+   "triangles": 768,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Hinges/Reference Parts/5 Holes/Pin 5",
+   "size": [
+    0.003175,
+    0.0635,
+    0.003175
+   ],
+   "triangles": 108,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Hinges/Reference Parts/5 Holes/Top 5",
+   "size": [
+    0.022031,
+    0.0635,
+    0.005962
+   ],
+   "triangles": 848,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Insert Circle",
+   "size": [
+    0.010031,
+    0.010029,
+    0.00508
+   ],
+   "triangles": 1100,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Smooth_-_Dark_Sea_Green",
+     "color": [
+      0.784314,
+      0.784314,
+      0.784314
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Insert Square",
+   "size": [
+    0.010031,
+    0.010029,
+    0.00508
+   ],
+   "triangles": 1012,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Anodized_-_Black",
+     "color": [
+      0.039216,
+      0.039216,
+      0.039216
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Pneumatics/Legacy - SMC Pneumatics/Cylinder Mount",
+   "size": [
+    0.0127,
+    0.01524,
+    0.01905
+   ],
+   "triangles": 804,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Pneumatics/Legacy - SMC Pneumatics/Cylinder Rod Pivot",
+   "size": [
+    0.03556,
+    0.017018,
+    0.014605
+   ],
+   "triangles": 1020,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Pneumatics/Legacy - SMC Pneumatics/Fitting for Cylinders",
+   "size": [
+    0.008,
+    0.008,
+    0.0187
+   ],
+   "triangles": 3836,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Default",
+     "color": [
+      0.74902,
+      0.74902,
+      0.74902
+     ]
+    },
+    {
+     "name": "Steel",
+     "color": [
+      0.878431,
+      0.87451,
+      0.858824
+     ]
+    },
+    {
+     "name": "Titanium_-_Polished",
+     "color": [
+      0.937255,
+      0.901961,
+      0.627451
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Pneumatics/Legacy - SMC Pneumatics/Fitting for Reservoir",
+   "size": [
+    0.012829,
+    0.01111,
+    0.022
+   ],
+   "triangles": 3838,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Brass_-_Satin",
+     "color": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    {
+     "name": "Smooth_-_Light_Orange",
+     "color": [
+      0.811765,
+      0.309804,
+      0.0
+     ]
+    },
+    {
+     "name": "Titanium_-_Polished",
+     "color": [
+      0.796078,
+      0.756863,
+      0.627451
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Pneumatics/Legacy - SMC Pneumatics/Fitting for Valves",
+   "size": [
+    0.008,
+    0.008,
+    0.0163
+   ],
+   "triangles": 3866,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Chrome_-_Polished",
+     "color": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    {
+     "name": "Steel",
+     "color": [
+      0.878431,
+      0.87451,
+      0.858824
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Pneumatics/Legacy - SMC Pneumatics/Flow Meter",
+   "size": [
+    0.022094,
+    0.0096,
+    0.031
+   ],
+   "triangles": 5238,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Chrome_-_Polished_Black",
+     "color": [
+      0.678431,
+      0.678431,
+      0.678431
+     ]
+    },
+    {
+     "name": "Cool_White",
+     "color": [
+      0.94902,
+      0.94902,
+      1.0
+     ]
+    },
+    {
+     "name": "Glossy_-_Black",
+     "color": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    {
+     "name": "Steel",
+     "color": [
+      0.878431,
+      0.87451,
+      0.858824
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Pneumatics/Legacy - SMC Pneumatics/On Off Switch",
+   "size": [
+    0.0476,
+    0.018,
+    0.041
+   ],
+   "triangles": 11163,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Cool_White",
+     "color": [
+      0.94902,
+      0.94902,
+      1.0
+     ]
+    },
+    {
+     "name": "Cyan",
+     "color": [
+      0.188235,
+      0.529412,
+      0.890196
+     ]
+    },
+    {
+     "name": "Smooth_-_White(1)",
+     "color": [
+      0.74902,
+      0.74902,
+      0.74902
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Pneumatics/Legacy - SMC Pneumatics/Piston Nut",
+   "size": [
+    0.007874,
+    0.002794,
+    0.009092
+   ],
+   "triangles": 1436,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Pneumatics/Legacy - SMC Pneumatics/Pressure Regulator",
+   "size": [
+    0.0287,
+    0.01059,
+    0.055999
+   ],
+   "triangles": 10402,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "55,55,55",
+     "color": [
+      0.215686,
+      0.215686,
+      0.215686
+     ]
+    },
+    {
+     "name": "55,55,55(1)",
+     "color": [
+      0.74902,
+      0.74902,
+      0.74902
+     ]
+    },
+    {
+     "name": "Aluminum_-_Polished",
+     "color": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    {
+     "name": "Bearing_Flat",
+     "color": [
+      0.047059,
+      0.047059,
+      0.047059
+     ]
+    },
+    {
+     "name": "Default",
+     "color": [
+      0.74902,
+      0.74902,
+      0.74902
+     ]
+    },
+    {
+     "name": "Steel_1",
+     "color": [
+      0.878431,
+      0.87451,
+      0.858824
+     ]
+    },
+    {
+     "name": "Titanium_-_Polished",
+     "color": [
+      0.937255,
+      0.901961,
+      0.627451
+     ]
+    },
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Pneumatics/Legacy - SMC Pneumatics/Reservoir",
+   "size": [
+    0.039751,
+    0.200025,
+    0.039743
+   ],
+   "triangles": 2310,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Steel",
+     "color": [
+      0.658824,
+      0.658824,
+      0.658824
+     ]
+    },
+    {
+     "name": "Steel_-_Polished",
+     "color": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Pneumatics/Legacy - SMC Pneumatics/Solenoid - Double Acting",
+   "size": [
+    0.0565,
+    0.016398,
+    0.040796
+   ],
+   "triangles": 6726,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Cool_White_1",
+     "color": [
+      0.94902,
+      0.94902,
+      1.0
+     ]
+    },
+    {
+     "name": "Cool_White_1(1)",
+     "color": [
+      0.239216,
+      0.415686,
+      1.0
+     ]
+    },
+    {
+     "name": "Iron_Gray",
+     "color": [
+      0.352941,
+      0.384314,
+      0.4
+     ]
+    },
+    {
+     "name": "Machined_-_Aluminum_1",
+     "color": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    {
+     "name": "Steel",
+     "color": [
+      0.878431,
+      0.87451,
+      0.858824
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Pneumatics/Legacy - SMC Pneumatics/Solenoid - Single Acting",
+   "size": [
+    0.0229,
+    0.021,
+    0.0356
+   ],
+   "triangles": 3842,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Cool_White_1",
+     "color": [
+      0.94902,
+      0.94902,
+      1.0
+     ]
+    },
+    {
+     "name": "Cool_White_1(1)",
+     "color": [
+      1.0,
+      0.384314,
+      0.0
+     ]
+    },
+    {
+     "name": "Machined_-_Aluminum",
+     "color": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Pneumatics/Legacy - SMC Pneumatics/T Fitting",
+   "size": [
+    0.036,
+    0.0106,
+    0.026498
+   ],
+   "triangles": 7428,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Smooth_-_White",
+     "color": [
+      0.921569,
+      0.921569,
+      0.921569
+     ]
+    },
+    {
+     "name": "Smooth_-_White(1)",
+     "color": [
+      0.878431,
+      0.87451,
+      0.858824
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Pneumatics/New - V5 Pneumatics/Air Flow Valve Fitting",
+   "size": [
+    0.025176,
+    0.0112,
+    0.0274
+   ],
+   "triangles": 35970,
+   "bodies": 7,
+   "materials": [
+    {
+     "name": "210,38,48",
+     "color": [
+      0.823529,
+      0.14902,
+      0.188235
+     ]
+    },
+    {
+     "name": "229,234,237",
+     "color": [
+      0.898039,
+      0.917647,
+      0.929412
+     ]
+    },
+    {
+     "name": "37,40,42",
+     "color": [
+      0.145098,
+      0.156863,
+      0.164706
+     ]
+    },
+    {
+     "name": "84,88,90",
+     "color": [
+      0.329412,
+      0.345098,
+      0.352941
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Pneumatics/New - V5 Pneumatics/Air Reservoir",
+   "size": [
+    0.208,
+    0.0428,
+    0.0428
+   ],
+   "triangles": 1744,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "84,88,90",
+     "color": [
+      0.329412,
+      0.345098,
+      0.352941
+     ]
+    },
+    {
+     "name": "Aluminum_-_Polished",
+     "color": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    {
+     "name": "Steel_-_Polished",
+     "color": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Pneumatics/New - V5 Pneumatics/Elbow Fitting",
+   "size": [
+    0.011516,
+    0.023276,
+    0.0281
+   ],
+   "triangles": 27422,
+   "bodies": 5,
+   "materials": [
+    {
+     "name": "210,38,48",
+     "color": [
+      0.823529,
+      0.14902,
+      0.188235
+     ]
+    },
+    {
+     "name": "229,234,237",
+     "color": [
+      0.898039,
+      0.917647,
+      0.929412
+     ]
+    },
+    {
+     "name": "37,40,42",
+     "color": [
+      0.145098,
+      0.156863,
+      0.164706
+     ]
+    },
+    {
+     "name": "84,88,90",
+     "color": [
+      0.329412,
+      0.345098,
+      0.352941
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Pneumatics/New - V5 Pneumatics/Manifold Assembly",
+   "size": [
+    0.0364,
+    0.0254,
+    0.0327
+   ],
+   "triangles": 5184,
+   "bodies": 2,
+   "materials": [
+    {
+     "name": "255,255,255",
+     "color": [
+      1.0,
+      1.0,
+      1.0
+     ]
+    },
+    {
+     "name": "26,26,26",
+     "color": [
+      0.101961,
+      0.101961,
+      0.101961
+     ]
+    },
+    {
+     "name": "84,88,90",
+     "color": [
+      0.329412,
+      0.345098,
+      0.352941
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Pneumatics/New - V5 Pneumatics/Pneumatic Fitting Plug",
+   "size": [
+    0.004948,
+    0.004946,
+    0.0274
+   ],
+   "triangles": 650,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "84,88,90",
+     "color": [
+      0.329412,
+      0.345098,
+      0.352941
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Pneumatics/New - V5 Pneumatics/Pneumatic Hand Valve",
+   "size": [
+    0.046355,
+    0.041063,
+    0.01778
+   ],
+   "triangles": 3488,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "192,192,192(3)",
+     "color": [
+      0.329412,
+      0.345098,
+      0.352941
+     ]
+    },
+    {
+     "name": "192,192,192(4)",
+     "color": [
+      0.898039,
+      0.917647,
+      0.929412
+     ]
+    },
+    {
+     "name": "192,192,192(5)",
+     "color": [
+      0.823529,
+      0.14902,
+      0.188235
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Pneumatics/New - V5 Pneumatics/Schrader Valve",
+   "size": [
+    0.0316,
+    0.011547,
+    0.01
+   ],
+   "triangles": 10536,
+   "bodies": 3,
+   "materials": [
+    {
+     "name": "165,132,0",
+     "color": [
+      0.647059,
+      0.517647,
+      0.0
+     ]
+    },
+    {
+     "name": "229,234,237",
+     "color": [
+      0.898039,
+      0.917647,
+      0.929412
+     ]
+    },
+    {
+     "name": "37,40,42",
+     "color": [
+      0.145098,
+      0.156863,
+      0.164706
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Pneumatics/New - V5 Pneumatics/Straight Pneumatic Fitting",
+   "size": [
+    0.011516,
+    0.01,
+    0.021991
+   ],
+   "triangles": 13920,
+   "bodies": 3,
+   "materials": [
+    {
+     "name": "198,193,188",
+     "color": [
+      0.776471,
+      0.756863,
+      0.737255
+     ]
+    },
+    {
+     "name": "210,38,48",
+     "color": [
+      0.823529,
+      0.14902,
+      0.188235
+     ]
+    },
+    {
+     "name": "37,40,42",
+     "color": [
+      0.145098,
+      0.156863,
+      0.164706
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Pneumatics/New - V5 Pneumatics/Tee Fittings",
+   "size": [
+    0.037351,
+    0.0112,
+    0.024276
+   ],
+   "triangles": 29502,
+   "bodies": 7,
+   "materials": [
+    {
+     "name": "210,38,48",
+     "color": [
+      0.823529,
+      0.14902,
+      0.188235
+     ]
+    },
+    {
+     "name": "229,234,237",
+     "color": [
+      0.898039,
+      0.917647,
+      0.929412
+     ]
+    },
+    {
+     "name": "84,88,90",
+     "color": [
+      0.329412,
+      0.345098,
+      0.352941
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Pneumatics/Reference Parts/Pistons/25mm Stroke Pneumatic Cylinder Body",
+   "size": [
+    0.0925,
+    0.012,
+    0.012
+   ],
+   "triangles": 1052,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Aluminum_-_Polished",
+     "color": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    {
+     "name": "Steel_-_Polished",
+     "color": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Pneumatics/Reference Parts/Pistons/25mm Stroke Pneumatic Cylinder Rod",
+   "size": [
+    0.09025,
+    0.004,
+    0.003993
+   ],
+   "triangles": 308,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Aluminum_-_Polished",
+     "color": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Pneumatics/Reference Parts/Pistons/50mm Stroke Pneumatic Cylinder Body",
+   "size": [
+    0.1175,
+    0.012,
+    0.012
+   ],
+   "triangles": 968,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Aluminum_-_Polished",
+     "color": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    {
+     "name": "Steel_-_Polished",
+     "color": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Pneumatics/Reference Parts/Pistons/50mm Stroke Pneumatic Cylinder Rod",
+   "size": [
+    0.11525,
+    0.004,
+    0.004
+   ],
+   "triangles": 188,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Aluminum_-_Polished",
+     "color": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Pneumatics/Reference Parts/Pistons/75mm Piston Body",
+   "size": [
+    0.1425,
+    0.012,
+    0.012
+   ],
+   "triangles": 916,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Aluminum_-_Polished",
+     "color": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    {
+     "name": "Steel_-_Polished",
+     "color": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Pneumatics/Reference Parts/Pistons/75mm Piston Rod",
+   "size": [
+    0.14025,
+    0.004,
+    0.004
+   ],
+   "triangles": 188,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Aluminum_-_Polished",
+     "color": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Pneumatics/Reference Parts/Pistons/Double Acting Piston Body",
+   "size": [
+    0.012,
+    0.11874,
+    0.012
+   ],
+   "triangles": 1734,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "192,192,192",
+     "color": [
+      0.752941,
+      0.752941,
+      0.752941
+     ]
+    },
+    {
+     "name": "Aluminum_-_Polished",
+     "color": [
+      0.956863,
+      0.956863,
+      0.956863
+     ]
+    },
+    {
+     "name": "Steel_-_Polished",
+     "color": [
+      0.745098,
+      0.737255,
+      0.729412
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Pneumatics/Reference Parts/Pistons/Double Acting Piston Rod",
+   "size": [
+    0.009984,
+    0.105685,
+    0.009992
+   ],
+   "triangles": 590,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Stainless_-_Brushed",
+     "color": [
+      0.745098,
+      0.737255,
+      0.729412
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Pneumatics/Reference Parts/Pistons/Single Acting Piston Body",
+   "size": [
+    0.011939,
+    0.14097,
+    0.011938
+   ],
+   "triangles": 1006,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "192,192,192",
+     "color": [
+      0.752941,
+      0.752941,
+      0.752941
+     ]
+    },
+    {
+     "name": "Aluminum_-_Polished",
+     "color": [
+      0.956863,
+      0.956863,
+      0.956863
+     ]
+    },
+    {
+     "name": "Steel_-_Polished",
+     "color": [
+      0.745098,
+      0.737255,
+      0.729412
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Pneumatics/Reference Parts/Pistons/Single Acting Piston Rod",
+   "size": [
+    0.01,
+    0.109434,
+    0.009966
+   ],
+   "triangles": 532,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Stainless_-_Brushed",
+     "color": [
+      0.745098,
+      0.737255,
+      0.729412
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Pulley",
+   "size": [
+    0.028575,
+    0.009525,
+    0.028575
+   ],
+   "triangles": 33410,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Smooth_-_Dark_Sea_Green",
+     "color": [
+      0.180392,
+      0.541176,
+      0.341176
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Reference Files/Ball Bearing Circle Insert",
+   "size": [
+    0.012698,
+    0.0127,
+    0.009225
+   ],
+   "triangles": 11032,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Smooth_-_Dark_Gray",
+     "color": [
+      0.270588,
+      0.270588,
+      0.270588
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Reference Files/Ball Bearing Housing",
+   "size": [
+    0.0334,
+    0.0334,
+    0.010211
+   ],
+   "triangles": 78068,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Omni_Wheel_Grey",
+     "color": [
+      0.141176,
+      0.141176,
+      0.141176
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Reference Files/Ball Bearing Square Insert",
+   "size": [
+    0.012698,
+    0.0127,
+    0.009225
+   ],
+   "triangles": 9914,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Smooth_-_Dark_Gray",
+     "color": [
+      0.270588,
+      0.270588,
+      0.270588
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Reference Files/Ball Bearing",
+   "size": [
+    0.007112,
+    0.024613,
+    0.024613
+   ],
+   "triangles": 4190,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "165,158,150",
+     "color": [
+      0.647059,
+      0.619608,
+      0.588235
+     ]
+    },
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Reference Files/Set Screw",
+   "size": [
+    0.004166,
+    0.004166,
+    0.003302
+   ],
+   "triangles": 5754,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Glossy_-_Black",
+     "color": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Reference Files/Shaft Collar Metal",
+   "size": [
+    0.010996,
+    0.00635,
+    0.010999
+   ],
+   "triangles": 8530,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Steel_-_VEX",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft Collar Retainer with Bearing Flat",
+   "size": [
+    0.037772,
+    0.0145,
+    0.010025
+   ],
+   "triangles": 18422,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Smooth_-_Black",
+     "color": [
+      0.019608,
+      0.019608,
+      0.019608
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft HS/HS Bearing Flat",
+   "size": [
+    0.035538,
+    0.013778,
+    0.010211
+   ],
+   "triangles": 13265,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Smooth_-_White",
+     "color": [
+      0.019608,
+      0.019608,
+      0.019608
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft HS/HS Bushing 0.1250",
+   "size": [
+    0.012686,
+    0.003175,
+    0.012687
+   ],
+   "triangles": 8972,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Smooth_-_Black(1)",
+     "color": [
+      0.05098,
+      0.05098,
+      0.05098
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft HS/HS Bushing 0.3125",
+   "size": [
+    0.012685,
+    0.007938,
+    0.012687
+   ],
+   "triangles": 8658,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Smooth_-_Black(1)",
+     "color": [
+      0.05098,
+      0.05098,
+      0.05098
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft HS/HS Lock Bar - 3 hole",
+   "size": [
+    0.0127,
+    0.0381,
+    0.001422
+   ],
+   "triangles": 472,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft HS/HS Lock Bar - 5 hole",
+   "size": [
+    0.0127,
+    0.0635,
+    0.001422
+   ],
+   "triangles": 848,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft HS/HS Lock Bar - 7 hole",
+   "size": [
+    0.0127,
+    0.0889,
+    0.001422
+   ],
+   "triangles": 1200,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft HS/HS Pillow Bearing Block",
+   "size": [
+    0.038,
+    0.0127,
+    0.013386
+   ],
+   "triangles": 15522,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Smooth_-_Black",
+     "color": [
+      0.019608,
+      0.019608,
+      0.019608
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft HS/HS Shaft Collar",
+   "size": [
+    0.020316,
+    0.0127,
+    0.020276
+   ],
+   "triangles": 10038,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Smooth_-_Black",
+     "color": [
+      0.019608,
+      0.019608,
+      0.019608
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft HS/HS Spacer",
+   "size": [
+    0.009996,
+    0.009998,
+    0.001588
+   ],
+   "triangles": 3432,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Smooth_-_Black",
+     "color": [
+      0.070588,
+      0.070588,
+      0.070588
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft HS/HS Spacer/HSpacer .0625",
+   "size": [
+    0.009996,
+    0.009998,
+    0.001588
+   ],
+   "triangles": 3432,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Smooth_-_Black",
+     "color": [
+      0.070588,
+      0.070588,
+      0.070588
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft HS/HS Spacer/HSpacer .1250",
+   "size": [
+    0.009996,
+    0.009998,
+    0.003175
+   ],
+   "triangles": 3432,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Smooth_-_Black",
+     "color": [
+      0.070588,
+      0.070588,
+      0.070588
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft HS/HS Spacer/HSpacer .2500",
+   "size": [
+    0.009996,
+    0.009998,
+    0.00635
+   ],
+   "triangles": 3432,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Smooth_-_Black",
+     "color": [
+      0.070588,
+      0.070588,
+      0.070588
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft HS/HS Spacer/HSpacer .5000",
+   "size": [
+    0.01,
+    0.009998,
+    0.0127
+   ],
+   "triangles": 3590,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Smooth_-_Black",
+     "color": [
+      0.070588,
+      0.070588,
+      0.070588
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft HS/Low Profile HS Shaft Collar",
+   "size": [
+    0.01998,
+    0.00635,
+    0.02
+   ],
+   "triangles": 2294,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "60,60,60",
+     "color": [
+      0.235294,
+      0.235294,
+      0.235294
+     ]
+    },
+    {
+     "name": "84,88,90",
+     "color": [
+      0.329412,
+      0.345098,
+      0.352941
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft HS/Shaft HS",
+   "size": [
+    0.00635,
+    0.3048,
+    0.00635
+   ],
+   "triangles": 1044,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft HS/Shaft HS/Shaft HS 0.5 in",
+   "size": [
+    0.00635,
+    0.0127,
+    0.00635
+   ],
+   "triangles": 674,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft HS/Shaft HS/Shaft HS 1.0 in",
+   "size": [
+    0.00635,
+    0.0254,
+    0.00635
+   ],
+   "triangles": 624,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft HS/Shaft HS/Shaft HS 1.5 in",
+   "size": [
+    0.00635,
+    0.0381,
+    0.00635
+   ],
+   "triangles": 526,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft HS/Shaft HS/Shaft HS 10.0 in",
+   "size": [
+    0.00635,
+    0.254,
+    0.00635
+   ],
+   "triangles": 790,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft HS/Shaft HS/Shaft HS 10.5 in",
+   "size": [
+    0.00635,
+    0.2667,
+    0.00635
+   ],
+   "triangles": 948,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft HS/Shaft HS/Shaft HS 11.0 in",
+   "size": [
+    0.00635,
+    0.2794,
+    0.00635
+   ],
+   "triangles": 1064,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft HS/Shaft HS/Shaft HS 11.5 in",
+   "size": [
+    0.00635,
+    0.2921,
+    0.00635
+   ],
+   "triangles": 1062,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft HS/Shaft HS/Shaft HS 12.0 in",
+   "size": [
+    0.00635,
+    0.3048,
+    0.00635
+   ],
+   "triangles": 1044,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft HS/Shaft HS/Shaft HS 12.5 in",
+   "size": [
+    0.00635,
+    0.3175,
+    0.00635
+   ],
+   "triangles": 990,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft HS/Shaft HS/Shaft HS 13.0 in",
+   "size": [
+    0.00635,
+    0.3302,
+    0.00635
+   ],
+   "triangles": 1112,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft HS/Shaft HS/Shaft HS 13.5 in",
+   "size": [
+    0.00635,
+    0.3429,
+    0.00635
+   ],
+   "triangles": 1092,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft HS/Shaft HS/Shaft HS 14.0 in",
+   "size": [
+    0.00635,
+    0.3556,
+    0.00635
+   ],
+   "triangles": 1018,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft HS/Shaft HS/Shaft HS 14.5 in",
+   "size": [
+    0.00635,
+    0.3683,
+    0.00635
+   ],
+   "triangles": 1154,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft HS/Shaft HS/Shaft HS 15.0 in",
+   "size": [
+    0.00635,
+    0.381,
+    0.00635
+   ],
+   "triangles": 1142,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft HS/Shaft HS/Shaft HS 15.5 in",
+   "size": [
+    0.00635,
+    0.3937,
+    0.00635
+   ],
+   "triangles": 1132,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft HS/Shaft HS/Shaft HS 16.0 in",
+   "size": [
+    0.00635,
+    0.4064,
+    0.00635
+   ],
+   "triangles": 1134,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft HS/Shaft HS/Shaft HS 16.5 in",
+   "size": [
+    0.00635,
+    0.4191,
+    0.00635
+   ],
+   "triangles": 1148,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft HS/Shaft HS/Shaft HS 17.0 in",
+   "size": [
+    0.00635,
+    0.4318,
+    0.00635
+   ],
+   "triangles": 1168,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft HS/Shaft HS/Shaft HS 17.5 in",
+   "size": [
+    0.00635,
+    0.4445,
+    0.00635
+   ],
+   "triangles": 1192,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft HS/Shaft HS/Shaft HS 18.0 in",
+   "size": [
+    0.00635,
+    0.4572,
+    0.00635
+   ],
+   "triangles": 1316,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft HS/Shaft HS/Shaft HS 18.5 in",
+   "size": [
+    0.00635,
+    0.4699,
+    0.00635
+   ],
+   "triangles": 1364,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft HS/Shaft HS/Shaft HS 19.0 in",
+   "size": [
+    0.00635,
+    0.4826,
+    0.00635
+   ],
+   "triangles": 1188,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft HS/Shaft HS/Shaft HS 19.5 in",
+   "size": [
+    0.00635,
+    0.4953,
+    0.00635
+   ],
+   "triangles": 1250,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft HS/Shaft HS/Shaft HS 2.0 in",
+   "size": [
+    0.00635,
+    0.0508,
+    0.00635
+   ],
+   "triangles": 464,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft HS/Shaft HS/Shaft HS 2.5 in",
+   "size": [
+    0.00635,
+    0.0635,
+    0.00635
+   ],
+   "triangles": 436,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft HS/Shaft HS/Shaft HS 20.0 in",
+   "size": [
+    0.00635,
+    0.508,
+    0.00635
+   ],
+   "triangles": 1248,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft HS/Shaft HS/Shaft HS 20.5 in",
+   "size": [
+    0.00635,
+    0.5207,
+    0.00635
+   ],
+   "triangles": 1058,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft HS/Shaft HS/Shaft HS 21.0 in",
+   "size": [
+    0.00635,
+    0.5334,
+    0.00635
+   ],
+   "triangles": 886,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft HS/Shaft HS/Shaft HS 21.5 in",
+   "size": [
+    0.00635,
+    0.5461,
+    0.00635
+   ],
+   "triangles": 1044,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft HS/Shaft HS/Shaft HS 22.0 in",
+   "size": [
+    0.00635,
+    0.5588,
+    0.00635
+   ],
+   "triangles": 1024,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft HS/Shaft HS/Shaft HS 22.5 in",
+   "size": [
+    0.00635,
+    0.5715,
+    0.00635
+   ],
+   "triangles": 1004,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft HS/Shaft HS/Shaft HS 23.0 in",
+   "size": [
+    0.00635,
+    0.5842,
+    0.00635
+   ],
+   "triangles": 1090,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft HS/Shaft HS/Shaft HS 23.5 in",
+   "size": [
+    0.00635,
+    0.5969,
+    0.00635
+   ],
+   "triangles": 982,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft HS/Shaft HS/Shaft HS 24.0 in",
+   "size": [
+    0.00635,
+    0.6096,
+    0.00635
+   ],
+   "triangles": 994,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft HS/Shaft HS/Shaft HS 3.0 in",
+   "size": [
+    0.00635,
+    0.076201,
+    0.00635
+   ],
+   "triangles": 406,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft HS/Shaft HS/Shaft HS 3.5 in",
+   "size": [
+    0.00635,
+    0.088901,
+    0.00635
+   ],
+   "triangles": 394,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft HS/Shaft HS/Shaft HS 4.0 in",
+   "size": [
+    0.00635,
+    0.1016,
+    0.00635
+   ],
+   "triangles": 410,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft HS/Shaft HS/Shaft HS 4.5 in",
+   "size": [
+    0.00635,
+    0.1143,
+    0.00635
+   ],
+   "triangles": 408,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft HS/Shaft HS/Shaft HS 5.0 in",
+   "size": [
+    0.00635,
+    0.127,
+    0.00635
+   ],
+   "triangles": 416,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft HS/Shaft HS/Shaft HS 5.5 in",
+   "size": [
+    0.00635,
+    0.1397,
+    0.00635
+   ],
+   "triangles": 420,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft HS/Shaft HS/Shaft HS 6.0 in",
+   "size": [
+    0.00635,
+    0.152401,
+    0.00635
+   ],
+   "triangles": 440,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft HS/Shaft HS/Shaft HS 6.5 in",
+   "size": [
+    0.00635,
+    0.1651,
+    0.00635
+   ],
+   "triangles": 446,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft HS/Shaft HS/Shaft HS 7.0 in",
+   "size": [
+    0.00635,
+    0.1778,
+    0.00635
+   ],
+   "triangles": 486,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft HS/Shaft HS/Shaft HS 7.5 in",
+   "size": [
+    0.00635,
+    0.1905,
+    0.00635
+   ],
+   "triangles": 540,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft HS/Shaft HS/Shaft HS 8.0 in",
+   "size": [
+    0.00635,
+    0.2032,
+    0.00635
+   ],
+   "triangles": 554,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft HS/Shaft HS/Shaft HS 8.5 in",
+   "size": [
+    0.00635,
+    0.2159,
+    0.00635
+   ],
+   "triangles": 634,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft HS/Shaft HS/Shaft HS 9.0 in",
+   "size": [
+    0.00635,
+    0.2286,
+    0.00635
+   ],
+   "triangles": 632,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft HS/Shaft HS/Shaft HS 9.5 in",
+   "size": [
+    0.00635,
+    0.2413,
+    0.00635
+   ],
+   "triangles": 776,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft LS/Bearing Flat - Drilled",
+   "size": [
+    0.01016,
+    0.03556,
+    0.007036
+   ],
+   "triangles": 1498,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Smooth_-_Black",
+     "color": [
+      0.019608,
+      0.019608,
+      0.019608
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft LS/Bearing Flat - Shaved",
+   "size": [
+    0.008572,
+    0.03556,
+    0.007036
+   ],
+   "triangles": 1404,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Smooth_-_Black",
+     "color": [
+      0.019608,
+      0.019608,
+      0.019608
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft LS/Bearing Flat Low Profile",
+   "size": [
+    0.034,
+    0.0086,
+    0.00685
+   ],
+   "triangles": 8300,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Acetal",
+     "color": [
+      0.05098,
+      0.05098,
+      0.05098
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft LS/Bearing Flat",
+   "size": [
+    0.01016,
+    0.03556,
+    0.007036
+   ],
+   "triangles": 1392,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Smooth_-_Black",
+     "color": [
+      0.019608,
+      0.019608,
+      0.019608
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft LS/LS Pillow Bearing Block",
+   "size": [
+    0.01016,
+    0.03556,
+    0.013386
+   ],
+   "triangles": 2664,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Smooth_-_Black",
+     "color": [
+      0.05098,
+      0.05098,
+      0.05098
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft LS/Lock Bar Metal",
+   "size": [
+    0.03556,
+    0.012573,
+    0.001168
+   ],
+   "triangles": 440,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Default",
+     "color": [
+      0.74902,
+      0.74902,
+      0.74902
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft LS/Lock Bar Plastic",
+   "size": [
+    0.03556,
+    0.003175,
+    0.0127
+   ],
+   "triangles": 10036,
+   "bodies": 2,
+   "materials": [
+    {
+     "name": "Glossy_-_Black",
+     "color": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft LS/Shaft Collar Metal/Shaft Collar Hex Smooth",
+   "size": [
+    0.010996,
+    0.007919,
+    0.015749
+   ],
+   "triangles": 3642,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Screws",
+     "color": [
+      0.854902,
+      0.854902,
+      0.854902
+     ]
+    },
+    {
+     "name": "Steel_-_VEX",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft LS/Shaft Collar Metal/Shaft Collar Hex Threaded",
+   "size": [
+    0.010996,
+    0.007925,
+    0.015749
+   ],
+   "triangles": 13256,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Screws",
+     "color": [
+      0.854902,
+      0.854902,
+      0.854902
+     ]
+    },
+    {
+     "name": "Steel_-_VEX",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft LS/Shaft Collar Metal/Shaft Collar No Screw",
+   "size": [
+    0.010996,
+    0.00635,
+    0.010999
+   ],
+   "triangles": 8530,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Steel_-_VEX",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft LS/Shaft Collar Metal/Shaft Collar Set Screw",
+   "size": [
+    0.010996,
+    0.00635,
+    0.010999
+   ],
+   "triangles": 3160,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Glossy_-_Black",
+     "color": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    {
+     "name": "Steel_-_VEX",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft LS/Shaft Collar Metal/Shaft Collar Star Smooth",
+   "size": [
+    0.010996,
+    0.007925,
+    0.015749
+   ],
+   "triangles": 4174,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Steel_-_VEX",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    },
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft LS/Shaft Collar Metal/Shaft Collar Star Threaded",
+   "size": [
+    0.010996,
+    0.007925,
+    0.015749
+   ],
+   "triangles": 14042,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Steel_-_VEX",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    },
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft LS/Shaft Collar Rubber",
+   "size": [
+    0.010993,
+    0.0096,
+    0.00635
+   ],
+   "triangles": 1894,
+   "bodies": 2,
+   "materials": [
+    {
+     "name": "Smooth_-_Black",
+     "color": [
+      0.05098,
+      0.05098,
+      0.05098
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft LS/Shaft LS Capped",
+   "size": [
+    0.00508,
+    0.1524,
+    0.00508
+   ],
+   "triangles": 204,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft LS/Shaft LS Capped/Shaft LS Capped 0.5",
+   "size": [
+    0.00508,
+    0.0127,
+    0.00508
+   ],
+   "triangles": 332,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft LS/Shaft LS Capped/Shaft LS Capped 1.0",
+   "size": [
+    0.005076,
+    0.0254,
+    0.005078
+   ],
+   "triangles": 328,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft LS/Shaft LS Capped/Shaft LS Capped 1.5",
+   "size": [
+    0.00508,
+    0.0381,
+    0.005068
+   ],
+   "triangles": 292,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft LS/Shaft LS Capped/Shaft LS Capped 2.0",
+   "size": [
+    0.00508,
+    0.0508,
+    0.00508
+   ],
+   "triangles": 268,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft LS/Shaft LS Capped/Shaft LS Capped 2.5",
+   "size": [
+    0.00508,
+    0.0635,
+    0.00508
+   ],
+   "triangles": 252,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft LS/Shaft LS Capped/Shaft LS Capped 3.0",
+   "size": [
+    0.005068,
+    0.0762,
+    0.005074
+   ],
+   "triangles": 240,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft LS/Shaft LS Capped/Shaft LS Capped 3.5",
+   "size": [
+    0.00508,
+    0.0889,
+    0.005052
+   ],
+   "triangles": 228,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft LS/Shaft LS Capped/Shaft LS Capped 4.0",
+   "size": [
+    0.00508,
+    0.1016,
+    0.00508
+   ],
+   "triangles": 220,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft LS/Shaft LS Capped/Shaft LS Capped 4.5",
+   "size": [
+    0.005063,
+    0.1143,
+    0.005071
+   ],
+   "triangles": 216,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft LS/Shaft LS Capped/Shaft LS Capped 5.0",
+   "size": [
+    0.00506,
+    0.127,
+    0.00507
+   ],
+   "triangles": 208,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft LS/Shaft LS Capped/Shaft LS Capped 5.5",
+   "size": [
+    0.00508,
+    0.1397,
+    0.00508
+   ],
+   "triangles": 204,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft LS/Shaft LS Capped/Shaft LS Capped 6.0",
+   "size": [
+    0.00508,
+    0.1524,
+    0.00508
+   ],
+   "triangles": 204,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft LS/Shaft LS",
+   "size": [
+    0.003195,
+    0.3048,
+    0.003195
+   ],
+   "triangles": 316,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft LS/Shaft LS/Shaft LS 0.5",
+   "size": [
+    0.003175,
+    0.0127,
+    0.003175
+   ],
+   "triangles": 468,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft LS/Shaft LS/Shaft LS 1.0",
+   "size": [
+    0.003175,
+    0.0254,
+    0.003175
+   ],
+   "triangles": 412,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft LS/Shaft LS/Shaft LS 1.5",
+   "size": [
+    0.003175,
+    0.0381,
+    0.003175
+   ],
+   "triangles": 388,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft LS/Shaft LS/Shaft LS 10.0",
+   "size": [
+    0.003195,
+    0.254,
+    0.003195
+   ],
+   "triangles": 316,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft LS/Shaft LS/Shaft LS 10.5",
+   "size": [
+    0.003195,
+    0.2667,
+    0.003195
+   ],
+   "triangles": 316,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft LS/Shaft LS/Shaft LS 11.0",
+   "size": [
+    0.003195,
+    0.2794,
+    0.003195
+   ],
+   "triangles": 316,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft LS/Shaft LS/Shaft LS 11.5",
+   "size": [
+    0.003195,
+    0.2921,
+    0.003195
+   ],
+   "triangles": 316,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft LS/Shaft LS/Shaft LS 12.0",
+   "size": [
+    0.003195,
+    0.3048,
+    0.003195
+   ],
+   "triangles": 316,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft LS/Shaft LS/Shaft LS 2.0",
+   "size": [
+    0.003175,
+    0.0508,
+    0.003175
+   ],
+   "triangles": 372,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft LS/Shaft LS/Shaft LS 2.5",
+   "size": [
+    0.003175,
+    0.0635,
+    0.003175
+   ],
+   "triangles": 324,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft LS/Shaft LS/Shaft LS 3.0",
+   "size": [
+    0.003175,
+    0.0762,
+    0.003175
+   ],
+   "triangles": 324,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft LS/Shaft LS/Shaft LS 3.5",
+   "size": [
+    0.003195,
+    0.0889,
+    0.003195
+   ],
+   "triangles": 316,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft LS/Shaft LS/Shaft LS 4.0",
+   "size": [
+    0.003195,
+    0.1016,
+    0.003195
+   ],
+   "triangles": 316,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft LS/Shaft LS/Shaft LS 4.5",
+   "size": [
+    0.003195,
+    0.1143,
+    0.003195
+   ],
+   "triangles": 316,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft LS/Shaft LS/Shaft LS 5.0",
+   "size": [
+    0.003195,
+    0.127,
+    0.003195
+   ],
+   "triangles": 316,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft LS/Shaft LS/Shaft LS 5.5",
+   "size": [
+    0.003195,
+    0.1397,
+    0.003195
+   ],
+   "triangles": 316,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft LS/Shaft LS/Shaft LS 6.0",
+   "size": [
+    0.003195,
+    0.1524,
+    0.003195
+   ],
+   "triangles": 316,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft LS/Shaft LS/Shaft LS 6.5",
+   "size": [
+    0.003195,
+    0.1651,
+    0.003195
+   ],
+   "triangles": 316,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft LS/Shaft LS/Shaft LS 7.0",
+   "size": [
+    0.003195,
+    0.1778,
+    0.003195
+   ],
+   "triangles": 316,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft LS/Shaft LS/Shaft LS 7.5",
+   "size": [
+    0.003195,
+    0.1905,
+    0.003195
+   ],
+   "triangles": 316,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft LS/Shaft LS/Shaft LS 8.0",
+   "size": [
+    0.003195,
+    0.2032,
+    0.003195
+   ],
+   "triangles": 316,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft LS/Shaft LS/Shaft LS 8.5",
+   "size": [
+    0.003195,
+    0.2159,
+    0.003195
+   ],
+   "triangles": 316,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft LS/Shaft LS/Shaft LS 9.0",
+   "size": [
+    0.003195,
+    0.2286,
+    0.003195
+   ],
+   "triangles": 316,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Shaft LS/Shaft LS/Shaft LS 9.5",
+   "size": [
+    0.003195,
+    0.2413,
+    0.003195
+   ],
+   "triangles": 316,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Slide Assembly Parts/Inner Acetal Slide Truck",
+   "size": [
+    0.017446,
+    0.050786,
+    0.008373
+   ],
+   "triangles": 26200,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Smooth_-_Dark_Sea_Green",
+     "color": [
+      0.180392,
+      0.541176,
+      0.341176
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Slide Assembly Parts/Inner Slide Member",
+   "size": [
+    0.3048,
+    0.018339,
+    0.010364
+   ],
+   "triangles": 3084,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Slide Assembly Parts/Outer Slide Member",
+   "size": [
+    0.3048,
+    0.021477,
+    0.011821
+   ],
+   "triangles": 2988,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Spacers/Spacer Nylon .313 OD",
+   "size": [
+    0.009521,
+    0.009523,
+    0.003175
+   ],
+   "triangles": 528,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Nylon_6",
+     "color": [
+      0.921569,
+      0.921569,
+      0.921569
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Spacers/Spacer Nylon .313 OD/NSpacer .313 OD x .125",
+   "size": [
+    0.009521,
+    0.009523,
+    0.003175
+   ],
+   "triangles": 528,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Nylon_6",
+     "color": [
+      0.921569,
+      0.921569,
+      0.921569
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Spacers/Spacer Nylon .313 OD/NSpacer .313 OD x .250",
+   "size": [
+    0.009521,
+    0.009523,
+    0.00635
+   ],
+   "triangles": 528,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Nylon_6",
+     "color": [
+      0.921569,
+      0.921569,
+      0.921569
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Spacers/Spacer Nylon .313 OD/NSpacer .313 OD x .375",
+   "size": [
+    0.009525,
+    0.009523,
+    0.009525
+   ],
+   "triangles": 682,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Nylon_6",
+     "color": [
+      0.921569,
+      0.921569,
+      0.921569
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Spacers/Spacer Nylon .313 OD/NSpacer .313 OD x .500",
+   "size": [
+    0.009525,
+    0.009523,
+    0.0127
+   ],
+   "triangles": 682,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Nylon_6",
+     "color": [
+      0.921569,
+      0.921569,
+      0.921569
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Spacers/Spacer Nylon .313 OD/NSpacer .313 OD x .875",
+   "size": [
+    0.009525,
+    0.009525,
+    0.022225
+   ],
+   "triangles": 524,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Nylon_6",
+     "color": [
+      0.921569,
+      0.921569,
+      0.921569
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Spacers/Spacer Nylon .375 OD",
+   "size": [
+    0.009521,
+    0.009523,
+    0.003175
+   ],
+   "triangles": 528,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Black_Nylon",
+     "color": [
+      0.039216,
+      0.039216,
+      0.039216
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Spacers/Spacer Nylon .375 OD/NSpacer .375 OD x .125",
+   "size": [
+    0.009521,
+    0.009523,
+    0.003175
+   ],
+   "triangles": 528,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Black_Nylon",
+     "color": [
+      0.039216,
+      0.039216,
+      0.039216
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Spacers/Spacer Nylon .375 OD/NSpacer .375 OD x .250",
+   "size": [
+    0.009521,
+    0.009523,
+    0.00635
+   ],
+   "triangles": 528,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Black_Nylon",
+     "color": [
+      0.039216,
+      0.039216,
+      0.039216
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Spacers/Spacer Nylon .375 OD/NSpacer .375 OD x .375",
+   "size": [
+    0.009525,
+    0.009523,
+    0.009525
+   ],
+   "triangles": 682,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Black_Nylon",
+     "color": [
+      0.039216,
+      0.039216,
+      0.039216
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Spacers/Spacer Nylon .375 OD/NSpacer .375 OD x .500",
+   "size": [
+    0.009525,
+    0.009523,
+    0.0127
+   ],
+   "triangles": 682,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Black_Nylon",
+     "color": [
+      0.039216,
+      0.039216,
+      0.039216
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Spacers/Spacer Nylon .375 OD/NSpacer .375 OD x .875",
+   "size": [
+    0.009525,
+    0.009525,
+    0.022225
+   ],
+   "triangles": 524,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Black_Nylon",
+     "color": [
+      0.039216,
+      0.039216,
+      0.039216
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Spacers/Spacer Nylon .375 OD/NSpacer .375 OD x 1.000",
+   "size": [
+    0.009525,
+    0.009525,
+    0.0254
+   ],
+   "triangles": 496,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Black_Nylon",
+     "color": [
+      0.039216,
+      0.039216,
+      0.039216
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Spacers/Spacer Nylon .500 OD",
+   "size": [
+    0.012696,
+    0.012698,
+    0.003175
+   ],
+   "triangles": 576,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Smooth_-_Black(1)",
+     "color": [
+      0.05098,
+      0.05098,
+      0.05098
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Spacers/Spacer Nylon .500 OD/NSpacer Black .500 OD x .125",
+   "size": [
+    0.012696,
+    0.012698,
+    0.003175
+   ],
+   "triangles": 576,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Smooth_-_Black(1)",
+     "color": [
+      0.05098,
+      0.05098,
+      0.05098
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Spacers/Spacer Nylon .500 OD/NSpacer Black .500 OD x .250",
+   "size": [
+    0.012696,
+    0.012698,
+    0.00635
+   ],
+   "triangles": 576,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Smooth_-_Black(1)",
+     "color": [
+      0.05098,
+      0.05098,
+      0.05098
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Spacers/Spacer Nylon .500 OD/NSpacer Black .500 OD x .375",
+   "size": [
+    0.012696,
+    0.012698,
+    0.009525
+   ],
+   "triangles": 576,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Smooth_-_Black(1)",
+     "color": [
+      0.05098,
+      0.05098,
+      0.05098
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Spacers/Spacer Nylon .500 OD/NSpacer Black .500 OD x .500",
+   "size": [
+    0.0127,
+    0.012698,
+    0.0127
+   ],
+   "triangles": 754,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Smooth_-_Black(1)",
+     "color": [
+      0.05098,
+      0.05098,
+      0.05098
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Spacers/Spacer Nylon .500 OD/NSpacer White .500 OD x .125",
+   "size": [
+    0.012696,
+    0.012698,
+    0.003175
+   ],
+   "triangles": 576,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Nylon_6",
+     "color": [
+      0.921569,
+      0.921569,
+      0.921569
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Spacers/Spacer Nylon .500 OD/NSpacer White .500 OD x .250",
+   "size": [
+    0.012696,
+    0.012698,
+    0.00635
+   ],
+   "triangles": 576,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Nylon_6",
+     "color": [
+      0.921569,
+      0.921569,
+      0.921569
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Spacers/Spacer Nylon .500 OD/NSpacer White .500 OD x .375",
+   "size": [
+    0.012696,
+    0.012698,
+    0.009525
+   ],
+   "triangles": 576,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Nylon_6",
+     "color": [
+      0.921569,
+      0.921569,
+      0.921569
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Spacers/Spacer Nylon .500 OD/NSpacer White .500 OD x .500",
+   "size": [
+    0.0127,
+    0.012698,
+    0.0127
+   ],
+   "triangles": 754,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Nylon_6",
+     "color": [
+      0.921569,
+      0.921569,
+      0.921569
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Spacers/Spacer Nylon Click On",
+   "size": [
+    0.008537,
+    0.009523,
+    0.001588
+   ],
+   "triangles": 468,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Black_Nylon",
+     "color": [
+      0.039216,
+      0.039216,
+      0.039216
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Spacers/Spacer Nylon Click On/Nspacer Click On x .0625",
+   "size": [
+    0.008537,
+    0.009523,
+    0.001588
+   ],
+   "triangles": 468,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Black_Nylon",
+     "color": [
+      0.039216,
+      0.039216,
+      0.039216
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Spacers/Spacer Nylon Click On/Nspacer Click On x .1250",
+   "size": [
+    0.008537,
+    0.009523,
+    0.003175
+   ],
+   "triangles": 468,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Black_Nylon",
+     "color": [
+      0.039216,
+      0.039216,
+      0.039216
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Spacers/Spacer Nylon Click On/Nspacer Click On x .2500",
+   "size": [
+    0.008537,
+    0.009523,
+    0.00635
+   ],
+   "triangles": 468,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Black_Nylon",
+     "color": [
+      0.039216,
+      0.039216,
+      0.039216
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Spacers/Spacer Plastic",
+   "size": [
+    0.008124,
+    0.008126,
+    0.0046
+   ],
+   "triangles": 2460,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Smooth_-_Black",
+     "color": [
+      0.062745,
+      0.062745,
+      0.062745
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Spacers/Spacer Plastic/PSpacer 4.6",
+   "size": [
+    0.008124,
+    0.008126,
+    0.0046
+   ],
+   "triangles": 2460,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Smooth_-_Black",
+     "color": [
+      0.07451,
+      0.07451,
+      0.07451
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Spacers/Spacer Plastic/PSpacer 8.0",
+   "size": [
+    0.008124,
+    0.008126,
+    0.008
+   ],
+   "triangles": 2460,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Smooth_-_Black",
+     "color": [
+      0.07451,
+      0.07451,
+      0.07451
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Spacers/Washer Steel",
+   "size": [
+    0.009521,
+    0.009523,
+    0.000794
+   ],
+   "triangles": 516,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Semi-Polished",
+     "color": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Spacers/Washer Steel/SWasher .375 OD x .015625",
+   "size": [
+    0.009521,
+    0.009523,
+    0.000397
+   ],
+   "triangles": 516,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Semi-Polished",
+     "color": [
+      0.745098,
+      0.737255,
+      0.729412
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Spacers/Washer Steel/SWasher .375 OD x .031250",
+   "size": [
+    0.009521,
+    0.009523,
+    0.000794
+   ],
+   "triangles": 516,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Semi-Polished",
+     "color": [
+      0.745098,
+      0.737255,
+      0.729412
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Spacers/Washer Steel/SWasher .375 OD x .062500",
+   "size": [
+    0.009521,
+    0.009523,
+    0.001588
+   ],
+   "triangles": 516,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Semi-Polished",
+     "color": [
+      0.745098,
+      0.737255,
+      0.729412
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Spacers/Washer Teflon",
+   "size": [
+    0.009521,
+    0.009523,
+    0.001016
+   ],
+   "triangles": 516,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Smooth_-_White",
+     "color": [
+      0.921569,
+      0.921569,
+      0.921569
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Spacers/Washer Teflon/TWasher .375 OD x .03125",
+   "size": [
+    0.009521,
+    0.009523,
+    0.000794
+   ],
+   "triangles": 516,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Smooth_-_White",
+     "color": [
+      0.921569,
+      0.921569,
+      0.921569
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Spacers/Washer Teflon/TWasher .375 OD x .04000",
+   "size": [
+    0.009521,
+    0.009523,
+    0.001016
+   ],
+   "triangles": 516,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Smooth_-_White",
+     "color": [
+      0.921569,
+      0.921569,
+      0.921569
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Spacers/Washer Teflon/TWasher .375 OD x .06250",
+   "size": [
+    0.009521,
+    0.009523,
+    0.001588
+   ],
+   "triangles": 516,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Smooth_-_White",
+     "color": [
+      0.921569,
+      0.921569,
+      0.921569
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Spacers/Washer Teflon/TWasher .500 OD x .04000",
+   "size": [
+    0.012696,
+    0.012698,
+    0.001016
+   ],
+   "triangles": 564,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Smooth_-_White",
+     "color": [
+      0.921569,
+      0.921569,
+      0.921569
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Sprockets/3P 10T Sprocket",
+   "size": [
+    0.013323,
+    0.0125,
+    0.013376
+   ],
+   "triangles": 6908,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Smooth_-_Dark_Sea_Green",
+     "color": [
+      0.180392,
+      0.541176,
+      0.341176
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Sprockets/3P 12T Sprocket",
+   "size": [
+    0.019268,
+    0.0125,
+    0.019233
+   ],
+   "triangles": 7442,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Smooth_-_Dark_Sea_Green",
+     "color": [
+      0.180392,
+      0.541176,
+      0.341176
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Sprockets/3P 24T Sprocket",
+   "size": [
+    0.030016,
+    0.0125,
+    0.030016
+   ],
+   "triangles": 11324,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Smooth_-_Dark_Sea_Green",
+     "color": [
+      0.180392,
+      0.541176,
+      0.341176
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Sprockets/3P 40T Sprocket",
+   "size": [
+    0.049017,
+    0.0125,
+    0.049017
+   ],
+   "triangles": 18236,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Smooth_-_Dark_Sea_Green",
+     "color": [
+      0.180392,
+      0.541176,
+      0.341176
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Motion/Sprockets/3P 48T Sprocket",
+   "size": [
+    0.058594,
+    0.0125,
+    0.058594
+   ],
+   "triangles": 18526,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Smooth_-_Dark_Sea_Green",
+     "color": [
+      0.180392,
+      0.541176,
+      0.341176
+     ]
+    }
+   ]
+  }
+ ]
+}

@@ -1,4 +1,5 @@
 using UnityEditor;
+using UnityEngine;
 
 namespace Protobot.Editor
 {
@@ -9,7 +10,7 @@ namespace Protobot.Editor
     /// </summary>
     public class PartModelImportGuard : AssetPostprocessor
     {
-        const string PartModelsFolder = "Assets/Protobot/Parts/Models/";
+        public const string PartModelsFolder = "Assets/Protobot/Parts/Models/";
 
         void OnPreprocessModel()
         {
@@ -18,23 +19,42 @@ namespace Protobot.Editor
 
             var importer = (ModelImporter)assetImporter;
 
-            // Keep the size exactly as authored. The parts are OBJ files exported from Fusion,
-            // which are always in centimeters and carry no unit info, so convert cm -> m here.
-            var isObj = assetPath.EndsWith(".obj", System.StringComparison.OrdinalIgnoreCase);
-            importer.globalScale = isObj ? 0.01f : 1f;
-            importer.useFileScale = !isObj;
-            importer.bakeAxisConversion = false;
+            // The FBX files are written in metres by Tools/Blender/convert_parts.py, which also checks
+            // every part against the size Fusion measured. Keep that size exactly.
+            importer.globalScale = 1f;
+            importer.useFileScale = true;
+            importer.bakeAxisConversion = true;
 
             // Compression rounds vertex positions, which would shift hole positions.
             importer.meshCompression = ModelImporterMeshCompression.Off;
             importer.optimizeMeshVertices = true;
             importer.optimizeMeshPolygons = true;
+            importer.importNormals = ModelImporterNormals.Import;
 
             // Parts are static meshes: no rigs, animations or cameras/lights from the file.
             importer.animationType = ModelImporterAnimationType.None;
             importer.importAnimation = false;
             importer.importCameras = false;
             importer.importLights = false;
+            importer.materialImportMode = ModelImporterMaterialImportMode.ImportViaMaterialDescription;
+            importer.materialLocation = ModelImporterMaterialLocation.InPrefab;
+        }
+
+        // Screen-height thresholds for the LOD levels written by convert_parts.py (_LOD0/_LOD1/_LOD2).
+        // The graphics preset's Model Detail scales these through QualitySettings.lodBias.
+        static readonly float[] LodTransitions = { 0.15f, 0.04f, 0.002f };
+
+        void OnPostprocessModel(GameObject root)
+        {
+            if (!assetPath.StartsWith(PartModelsFolder) || !root.TryGetComponent(out LODGroup group))
+                return;
+
+            var lods = group.GetLODs();
+            for (var i = 0; i < lods.Length; i++)
+                lods[i].screenRelativeTransitionHeight = i == lods.Length - 1 ? LodTransitions[^1] : LodTransitions[Mathf.Min(i, LodTransitions.Length - 2)];
+            group.SetLODs(lods);
+            group.fadeMode = LODFadeMode.CrossFade;
+            group.animateCrossFading = true;
         }
     }
 }

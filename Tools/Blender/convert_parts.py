@@ -79,6 +79,21 @@ def optimise(obj):
     return before, after
 
 
+def obj_extents_cm(path):
+    """Bounding size straight from the OBJ's vertex lines (in the file's centimetres)."""
+    lo = [math.inf] * 3
+    hi = [-math.inf] * 3
+    with open(path, encoding="utf-8", errors="replace") as f:
+        for line in f:
+            if line.startswith("v "):
+                p = line.split()
+                for i in range(3):
+                    v = float(p[i + 1])
+                    lo[i] = min(lo[i], v)
+                    hi[i] = max(hi[i], v)
+    return [hi[i] - lo[i] for i in range(3)]
+
+
 def world_size(objects):
     lo = [math.inf] * 3
     hi = [-math.inf] * 3
@@ -109,12 +124,19 @@ def convert(rel_obj, expected_cm):
         tris_before += b
         tris_after += a
 
+    # Hard check: the converted part must match the exported mesh exactly (only units may change).
     size = world_size(objects)
-    expected = [c / 100 for c in expected_cm] if expected_cm else None
-    if expected:
-        diff = max(abs(a - b) for a, b in zip(sorted(size), sorted(expected)))
-        if diff > SIZE_TOLERANCE_M:
-            return {"ok": False, "reason": f"size {size} != fusion {expected}", "size_m": size}
+    source = [s / 100 for s in obj_extents_cm(src)]
+    diff = max(abs(a - b) for a, b in zip(sorted(size), sorted(source)))
+    if diff > SIZE_TOLERANCE_M:
+        return {"ok": False, "reason": f"size {size} != source mesh {source}", "size_m": size}
+    # Loose check against Fusion's B-rep box. That box runs large on curved parts and also counts
+    # hidden construction geometry (some wheels report double their size), so only a part that is
+    # bigger than Fusion says, or wildly smaller, is treated as a unit/scale mistake.
+    if expected_cm:
+        ratio = max(size) / (max(expected_cm) / 100)
+        if not 0.3 < ratio < 1.1:
+            return {"ok": False, "reason": f"size {size} vs fusion {expected_cm} cm (ratio {ratio:.2f})", "size_m": size}
 
     dst = os.path.join(FBX_ROOT, os.path.splitext(rel_obj)[0] + ".fbx")
     os.makedirs(os.path.dirname(dst), exist_ok=True)
@@ -139,7 +161,7 @@ def add_lods(objects, total_tris):
     viewing, which Unity turns into a LOD Group automatically. Small parts only get what they need.
     LOD0 is never changed, so the exact geometry is always what's shown up close.
     """
-    targets = [t for t in LOD_TARGETS if t < total_tris * 0.7]
+    targets = [t for t in lod_targets(total_tris) if t < total_tris * 0.7]
     counts = [total_tris]
     for obj in objects:
         obj.name = obj.name + "_LOD0"
@@ -164,8 +186,11 @@ def add_lods(objects, total_tris):
     return counts
 
 
-# Triangle budgets for LOD1 and LOD2 of a whole part.
-LOD_TARGETS = [6000, 1500]
+def lod_targets(total_tris):
+    """Triangle budgets for LOD1 and LOD2: a share of the full part, within sensible limits."""
+    lod1 = min(max(total_tris * 0.15, 6000), 40000)
+    lod2 = min(max(total_tris * 0.03, 1500), 8000)
+    return [int(lod1), int(lod2)]
 
 
 def main():

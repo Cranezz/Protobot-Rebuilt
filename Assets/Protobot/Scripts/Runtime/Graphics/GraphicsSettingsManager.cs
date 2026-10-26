@@ -173,6 +173,13 @@ namespace Protobot.GraphicsQuality
         static void ApplyQualitySettings(GraphicsSettingsData s)
         {
             QualitySettings.globalTextureMipmapLimit = (int)s.textures;
+            QualitySettings.lodBias = s.modelDetail switch
+            {
+                ModelDetail.Low => 0.5f,
+                ModelDetail.Medium => 1f,
+                ModelDetail.High => 1.75f,
+                _ => 3f,
+            };
             QualitySettings.anisotropicFiltering = s.anisotropicFiltering ? AnisotropicFiltering.ForceEnable : AnisotropicFiltering.Disable;
         }
 
@@ -224,6 +231,10 @@ namespace Protobot.GraphicsQuality
                 var settings = JsonUtility.FromJson<GraphicsSettingsData>(File.ReadAllText(FilePath));
                 if (settings == null || settings.version > GraphicsSettingsData.CurrentVersion)
                     return null;
+
+                // Version 1 files predate Model Detail: fill it in from the saved preset.
+                if (settings.version < 2 && settings.preset != GraphicsPreset.Custom)
+                    settings.SetQualityFromPreset(settings.preset);
 
                 settings.version = GraphicsSettingsData.CurrentVersion;
                 return settings;

@@ -44,6 +44,18 @@ namespace Protobot.GraphicsQuality
         High = 2,
     }
 
+    /// <summary>
+    /// How long parts keep their full-detail mesh before switching to simpler versions (LODs).
+    /// Sizes and snapping never change, only how finely the parts are drawn.
+    /// </summary>
+    public enum ModelDetail
+    {
+        Low,
+        Medium,
+        High,
+        Ultra,
+    }
+
     /// <summary>The value is how many mipmap levels get skipped (0 = full resolution textures).</summary>
     public enum TextureQuality
     {
