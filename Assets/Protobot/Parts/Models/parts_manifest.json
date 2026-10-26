@@ -11751,6 +11751,1606 @@
      ]
     }
    ]
+  },
+  {
+   "path": "Structure/Hardware/Screw Steel - Hex/SScrew Hex Smooth .625",
+   "size": [
+    0.007917,
+    0.007925,
+    0.018085
+   ],
+   "triangles": 2042,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Screws",
+     "color": [
+      0.854902,
+      0.854902,
+      0.854902
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Hardware/Screw Steel - Hex/SScrew Hex Smooth .750",
+   "size": [
+    0.007917,
+    0.007925,
+    0.02126
+   ],
+   "triangles": 2042,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Screws",
+     "color": [
+      0.854902,
+      0.854902,
+      0.854902
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Hardware/Screw Steel - Hex/SScrew Hex Smooth .875",
+   "size": [
+    0.007925,
+    0.007925,
+    0.024435
+   ],
+   "triangles": 1828,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Screws",
+     "color": [
+      0.854902,
+      0.854902,
+      0.854902
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Hardware/Screw Steel - Hex/SScrew Hex Smooth 1.000",
+   "size": [
+    0.007922,
+    0.00792,
+    0.02761
+   ],
+   "triangles": 1794,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Screws",
+     "color": [
+      0.854902,
+      0.854902,
+      0.854902
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Hardware/Screw Steel - Hex/SScrew Hex Smooth 1.125",
+   "size": [
+    0.007915,
+    0.007925,
+    0.030785
+   ],
+   "triangles": 1706,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Screws",
+     "color": [
+      0.854902,
+      0.854902,
+      0.854902
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Hardware/Screw Steel - Hex/SScrew Hex Smooth 1.250",
+   "size": [
+    0.007922,
+    0.007919,
+    0.03396
+   ],
+   "triangles": 1612,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Screws",
+     "color": [
+      0.854902,
+      0.854902,
+      0.854902
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Hardware/Screw Steel - Hex/SScrew Hex Smooth 1.500",
+   "size": [
+    0.007922,
+    0.007918,
+    0.04031
+   ],
+   "triangles": 1344,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Screws",
+     "color": [
+      0.854902,
+      0.854902,
+      0.854902
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Hardware/Screw Steel - Hex/SScrew Hex Smooth 1.750",
+   "size": [
+    0.007921,
+    0.007917,
+    0.04666
+   ],
+   "triangles": 1334,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Screws",
+     "color": [
+      0.854902,
+      0.854902,
+      0.854902
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Hardware/Screw Steel - Hex/SScrew Hex Smooth 2.000",
+   "size": [
+    0.007925,
+    0.007925,
+    0.05301
+   ],
+   "triangles": 1238,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Screws",
+     "color": [
+      0.854902,
+      0.854902,
+      0.854902
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Hardware/Screw Steel - Hex/SScrew Hex Smooth 2.250",
+   "size": [
+    0.007906,
+    0.007925,
+    0.05936
+   ],
+   "triangles": 1152,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Screws",
+     "color": [
+      0.854902,
+      0.854902,
+      0.854902
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Hardware/Screw Steel - Hex/SScrew Hex Smooth 2.500",
+   "size": [
+    0.007925,
+    0.007925,
+    0.06571
+   ],
+   "triangles": 1018,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Screws",
+     "color": [
+      0.854902,
+      0.854902,
+      0.854902
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Hardware/Screw Steel - Hex/SScrew Hex Threaded .250",
+   "size": [
+    0.007917,
+    0.007925,
+    0.00856
+   ],
+   "triangles": 6168,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Screws",
+     "color": [
+      0.854902,
+      0.854902,
+      0.854902
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Hardware/Screw Steel - Hex/SScrew Hex Threaded .375",
+   "size": [
+    0.007917,
+    0.007925,
+    0.011735
+   ],
+   "triangles": 10260,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Screws",
+     "color": [
+      0.854902,
+      0.854902,
+      0.854902
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Hardware/Screw Steel - Hex/SScrew Hex Threaded .500",
+   "size": [
+    0.007917,
+    0.007925,
+    0.01491
+   ],
+   "triangles": 10268,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Screws",
+     "color": [
+      0.854902,
+      0.854902,
+      0.854902
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Hardware/Screw Steel - Hex/SScrew Hex Threaded .625",
+   "size": [
+    0.007917,
+    0.007925,
+    0.018085
+   ],
+   "triangles": 10264,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Screws",
+     "color": [
+      0.854902,
+      0.854902,
+      0.854902
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Hardware/Screw Steel - Hex/SScrew Hex Threaded .750",
+   "size": [
+    0.007917,
+    0.007925,
+    0.02126
+   ],
+   "triangles": 18456,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Screws",
+     "color": [
+      0.854902,
+      0.854902,
+      0.854902
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Hardware/Screw Steel - Hex/SScrew Hex Threaded .875",
+   "size": [
+    0.007925,
+    0.007925,
+    0.024435
+   ],
+   "triangles": 18338,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Screws",
+     "color": [
+      0.854902,
+      0.854902,
+      0.854902
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Hardware/Screw Steel - Hex/SScrew Hex Threaded 1.000",
+   "size": [
+    0.007922,
+    0.00792,
+    0.02761
+   ],
+   "triangles": 18206,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Screws",
+     "color": [
+      0.854902,
+      0.854902,
+      0.854902
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Hardware/Screw Steel - Hex/SScrew Hex Threaded 1.125",
+   "size": [
+    0.007915,
+    0.007925,
+    0.030785
+   ],
+   "triangles": 18104,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Screws",
+     "color": [
+      0.854902,
+      0.854902,
+      0.854902
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Hardware/Screw Steel - Hex/SScrew Hex Threaded 1.250",
+   "size": [
+    0.007922,
+    0.007919,
+    0.03396
+   ],
+   "triangles": 18006,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Screws",
+     "color": [
+      0.854902,
+      0.854902,
+      0.854902
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Hardware/Screw Steel - Hex/SScrew Hex Threaded 1.500",
+   "size": [
+    0.007922,
+    0.007918,
+    0.04031
+   ],
+   "triangles": 17820,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Screws",
+     "color": [
+      0.854902,
+      0.854902,
+      0.854902
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Hardware/Screw Steel - Hex/SScrew Hex Threaded 1.750",
+   "size": [
+    0.007921,
+    0.007917,
+    0.04666
+   ],
+   "triangles": 17746,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Screws",
+     "color": [
+      0.854902,
+      0.854902,
+      0.854902
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Hardware/Screw Steel - Hex/SScrew Hex Threaded 2.000",
+   "size": [
+    0.007925,
+    0.007925,
+    0.05301
+   ],
+   "triangles": 25844,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Screws",
+     "color": [
+      0.854902,
+      0.854902,
+      0.854902
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Hardware/Screw Steel - Hex/SScrew Hex Threaded 2.250",
+   "size": [
+    0.007906,
+    0.007925,
+    0.05936
+   ],
+   "triangles": 25742,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Screws",
+     "color": [
+      0.854902,
+      0.854902,
+      0.854902
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Hardware/Screw Steel - Hex/SScrew Hex Threaded 2.500",
+   "size": [
+    0.00792,
+    0.007914,
+    0.06571
+   ],
+   "triangles": 33848,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Screws",
+     "color": [
+      0.854902,
+      0.854902,
+      0.854902
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Hardware/Screw Steel - Star",
+   "size": [
+    0.007917,
+    0.007925,
+    0.00856
+   ],
+   "triangles": 2472,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Hardware/Screw Steel - Star/SScrew Star Smooth .250",
+   "size": [
+    0.007917,
+    0.007925,
+    0.00856
+   ],
+   "triangles": 2472,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Hardware/Screw Steel - Star/SScrew Star Smooth .290",
+   "size": [
+    0.007917,
+    0.007925,
+    0.009576
+   ],
+   "triangles": 2574,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Hardware/Screw Steel - Star/SScrew Star Smooth .375",
+   "size": [
+    0.007917,
+    0.007925,
+    0.011735
+   ],
+   "triangles": 2574,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Hardware/Screw Steel - Star/SScrew Star Smooth .500",
+   "size": [
+    0.007917,
+    0.007925,
+    0.01491
+   ],
+   "triangles": 2574,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Hardware/Screw Steel - Star/SScrew Star Smooth .625",
+   "size": [
+    0.007917,
+    0.007925,
+    0.018085
+   ],
+   "triangles": 2574,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Hardware/Screw Steel - Star/SScrew Star Smooth .750",
+   "size": [
+    0.007917,
+    0.007925,
+    0.02126
+   ],
+   "triangles": 2574,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Hardware/Screw Steel - Star/SScrew Star Smooth .875",
+   "size": [
+    0.007925,
+    0.007925,
+    0.024435
+   ],
+   "triangles": 2340,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Hardware/Screw Steel - Star/SScrew Star Smooth 1.000",
+   "size": [
+    0.007922,
+    0.00792,
+    0.02761
+   ],
+   "triangles": 2252,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Hardware/Screw Steel - Star/SScrew Star Smooth 1.250",
+   "size": [
+    0.007922,
+    0.007919,
+    0.03396
+   ],
+   "triangles": 2090,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Hardware/Screw Steel - Star/SScrew Star Smooth 1.500",
+   "size": [
+    0.007922,
+    0.007918,
+    0.04031
+   ],
+   "triangles": 1814,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Hardware/Screw Steel - Star/SScrew Star Smooth 1.750",
+   "size": [
+    0.007921,
+    0.007917,
+    0.04666
+   ],
+   "triangles": 1820,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Hardware/Screw Steel - Star/SScrew Star Smooth 2.000",
+   "size": [
+    0.007925,
+    0.007925,
+    0.05301
+   ],
+   "triangles": 1728,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Hardware/Screw Steel - Star/SScrew Star Smooth 2.250",
+   "size": [
+    0.007906,
+    0.007925,
+    0.05936
+   ],
+   "triangles": 1632,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Hardware/Screw Steel - Star/SScrew Star Smooth 2.500",
+   "size": [
+    0.007925,
+    0.007925,
+    0.06571
+   ],
+   "triangles": 1500,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Hardware/Screw Steel - Star/SScrew Star Threaded .250",
+   "size": [
+    0.007917,
+    0.007925,
+    0.00856
+   ],
+   "triangles": 6694,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Hardware/Screw Steel - Star/SScrew Star Threaded .290",
+   "size": [
+    0.007917,
+    0.007925,
+    0.009576
+   ],
+   "triangles": 6698,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Hardware/Screw Steel - Star/SScrew Star Threaded .375",
+   "size": [
+    0.007917,
+    0.007925,
+    0.011735
+   ],
+   "triangles": 10798,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Hardware/Screw Steel - Star/SScrew Star Threaded .500",
+   "size": [
+    0.007917,
+    0.007925,
+    0.01491
+   ],
+   "triangles": 10806,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Hardware/Screw Steel - Star/SScrew Star Threaded .625",
+   "size": [
+    0.007917,
+    0.007925,
+    0.018085
+   ],
+   "triangles": 10802,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Hardware/Screw Steel - Star/SScrew Star Threaded .750",
+   "size": [
+    0.007917,
+    0.007925,
+    0.02126
+   ],
+   "triangles": 18982,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Hardware/Screw Steel - Star/SScrew Star Threaded .875",
+   "size": [
+    0.007925,
+    0.007925,
+    0.024435
+   ],
+   "triangles": 18850,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Hardware/Screw Steel - Star/SScrew Star Threaded 1.000",
+   "size": [
+    0.007922,
+    0.00792,
+    0.02761
+   ],
+   "triangles": 18678,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Hardware/Screw Steel - Star/SScrew Star Threaded 1.250",
+   "size": [
+    0.007922,
+    0.007919,
+    0.03396
+   ],
+   "triangles": 18496,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Hardware/Screw Steel - Star/SScrew Star Threaded 1.500",
+   "size": [
+    0.007922,
+    0.007918,
+    0.04031
+   ],
+   "triangles": 18290,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Hardware/Screw Steel - Star/SScrew Star Threaded 1.750",
+   "size": [
+    0.007921,
+    0.007917,
+    0.04666
+   ],
+   "triangles": 18244,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Hardware/Screw Steel - Star/SScrew Star Threaded 2.000",
+   "size": [
+    0.007925,
+    0.007925,
+    0.05301
+   ],
+   "triangles": 26338,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Hardware/Screw Steel - Star/SScrew Star Threaded 2.250",
+   "size": [
+    0.007906,
+    0.007925,
+    0.05936
+   ],
+   "triangles": 34418,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Hardware/Screw Steel - Star/SScrew Star Threaded 2.500",
+   "size": [
+    0.00792,
+    0.007914,
+    0.06571
+   ],
+   "triangles": 34334,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Hardware/Thumbscrew",
+   "size": [
+    0.010827,
+    0.010827,
+    0.019558
+   ],
+   "triangles": 10598,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Smooth_-_Black",
+     "color": [
+      0.019608,
+      0.019608,
+      0.019608
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Hardware/VEX IQ Pin",
+   "size": [
+    0.006166,
+    0.012278,
+    0.006345
+   ],
+   "triangles": 1960,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "118,35,47",
+     "color": [
+      0.098039,
+      0.098039,
+      0.098039
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Plate/Aluminum/Alu Plate 5x25",
+   "size": [
+    0.0635,
+    0.3175,
+    0.001588
+   ],
+   "triangles": 17120,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Aluminum_90",
+     "color": [
+      1.0,
+      1.0,
+      1.0
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Plate/Steel/Steel Plate 5x25",
+   "size": [
+    0.0635,
+    0.3175,
+    0.001191
+   ],
+   "triangles": 17120,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Reference Files/Angle 1x1",
+   "size": [
+    0.0127,
+    0.4445,
+    0.0127
+   ],
+   "triangles": 9692,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Alu",
+     "color": [
+      1.0,
+      1.0,
+      1.0
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Reference Files/Angle 2x2",
+   "size": [
+    0.026591,
+    0.4445,
+    0.026591
+   ],
+   "triangles": 25412,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Reference Files/Angle 3x3",
+   "size": [
+    0.039291,
+    0.4445,
+    0.039291
+   ],
+   "triangles": 41468,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Reference Files/C Channel 1x2x1",
+   "size": [
+    0.0254,
+    0.4445,
+    0.014288
+   ],
+   "triangles": 22748,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Alu",
+     "color": [
+      1.0,
+      1.0,
+      1.0
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Reference Files/C Channel 1x3x1 & 1x5x1",
+   "size": [
+    0.0635,
+    0.4445,
+    0.014288
+   ],
+   "triangles": 30984,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Alu",
+     "color": [
+      1.0,
+      1.0,
+      1.0
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Reference Files/Plate",
+   "size": [
+    0.0635,
+    0.3175,
+    0.001588
+   ],
+   "triangles": 17120,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Alu",
+     "color": [
+      1.0,
+      1.0,
+      1.0
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Segmented Angle/Segmented Angle 1x1x25",
+   "size": [
+    0.3175,
+    0.018491,
+    0.018491
+   ],
+   "triangles": 4308,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Segmented Angle/Segmented Angle 1x1x35",
+   "size": [
+    0.4445,
+    0.018491,
+    0.018491
+   ],
+   "triangles": 6030,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Slotted Angle/Slotted Angle, Inverse",
+   "size": [
+    0.01778,
+    0.381,
+    0.01778
+   ],
+   "triangles": 4984,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Slotted Angle/Slotted Angle",
+   "size": [
+    0.01778,
+    0.381,
+    0.01778
+   ],
+   "triangles": 5000,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "VEX_Steel",
+     "color": [
+      0.764706,
+      0.803922,
+      0.894118
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Standoff",
+   "size": [
+    0.007332,
+    0.00635,
+    0.00635
+   ],
+   "triangles": 1380,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Standoffs",
+     "color": [
+      0.752941,
+      0.752941,
+      0.752941
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Standoff/Standoff .25",
+   "size": [
+    0.007332,
+    0.00635,
+    0.00635
+   ],
+   "triangles": 1380,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Standoffs",
+     "color": [
+      0.752941,
+      0.752941,
+      0.752941
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Standoff/Standoff .50",
+   "size": [
+    0.007332,
+    0.00635,
+    0.0127
+   ],
+   "triangles": 1584,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Standoffs",
+     "color": [
+      0.752941,
+      0.752941,
+      0.752941
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Standoff/Standoff .75",
+   "size": [
+    0.007332,
+    0.00635,
+    0.01905
+   ],
+   "triangles": 1584,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Standoffs",
+     "color": [
+      0.752941,
+      0.752941,
+      0.752941
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Standoff/Standoff .875",
+   "size": [
+    0.007332,
+    0.00635,
+    0.022225
+   ],
+   "triangles": 1584,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Standoffs",
+     "color": [
+      0.752941,
+      0.752941,
+      0.752941
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Standoff/Standoff 1.00",
+   "size": [
+    0.007332,
+    0.00635,
+    0.0254
+   ],
+   "triangles": 1552,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Standoffs",
+     "color": [
+      0.752941,
+      0.752941,
+      0.752941
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Standoff/Standoff 1.50",
+   "size": [
+    0.007332,
+    0.00635,
+    0.0381
+   ],
+   "triangles": 1488,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Standoffs",
+     "color": [
+      0.752941,
+      0.752941,
+      0.752941
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Standoff/Standoff 2.00",
+   "size": [
+    0.007332,
+    0.006351,
+    0.0508
+   ],
+   "triangles": 1076,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Standoffs",
+     "color": [
+      0.752941,
+      0.752941,
+      0.752941
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Standoff/Standoff 2.50",
+   "size": [
+    0.007332,
+    0.00635,
+    0.0635
+   ],
+   "triangles": 940,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Standoffs",
+     "color": [
+      0.752941,
+      0.752941,
+      0.752941
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Standoff/Standoff 3.00",
+   "size": [
+    0.007332,
+    0.00635,
+    0.0762
+   ],
+   "triangles": 856,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Standoffs",
+     "color": [
+      0.752941,
+      0.752941,
+      0.752941
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Standoff/Standoff 4.00",
+   "size": [
+    0.007332,
+    0.006353,
+    0.1016
+   ],
+   "triangles": 724,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Standoffs",
+     "color": [
+      0.752941,
+      0.752941,
+      0.752941
+     ]
+    }
+   ]
+  },
+  {
+   "path": "Structure/Standoff/Standoff 6.00",
+   "size": [
+    0.007332,
+    0.00635,
+    0.1524
+   ],
+   "triangles": 664,
+   "bodies": 1,
+   "materials": [
+    {
+     "name": "Standoffs",
+     "color": [
+      0.752941,
+      0.752941,
+      0.752941
+     ]
+    }
+   ]
   }
  ]
 }

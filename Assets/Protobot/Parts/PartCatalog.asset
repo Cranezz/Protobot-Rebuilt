@@ -4831,3 +4831,803 @@ MonoBehaviour:
     triangles: 2042
     massKg: 0.0005
     cuttable: 0
+  - id: Structure/Hardware/Screw Steel - Hex/SScrew Hex Smooth .625
+    displayName: SScrew Hex Smooth .625
+    binId: screws
+    model: {fileID: 919132149155446097, guid: 8e96beffe7fad1b489a5048cf3c59c77, type: 3}
+    prefab: {fileID: 5837065255339827652, guid: 5b1ed2b95313f274facd4e9f61837815, type: 3}
+    thumbnail: {fileID: 21300000, guid: e7bf065e5ed2a6f48b4624a42a3fb177, type: 3}
+    size: {x: 0.007917, y: 0.007925, z: 0.018085}
+    triangles: 2042
+    massKg: 0.0005
+    cuttable: 0
+  - id: Structure/Hardware/Screw Steel - Hex/SScrew Hex Smooth .750
+    displayName: SScrew Hex Smooth .750
+    binId: screws
+    model: {fileID: 919132149155446097, guid: 99f194a8ff16f654d99e26e11891b391, type: 3}
+    prefab: {fileID: 3234838682258052670, guid: ae4169e1285722c428596fe60b8998ad, type: 3}
+    thumbnail: {fileID: 21300000, guid: 605d36f8e2475bc41b2cca88752366e7, type: 3}
+    size: {x: 0.007917, y: 0.007925, z: 0.02126}
+    triangles: 2042
+    massKg: 0.0005
+    cuttable: 0
+  - id: Structure/Hardware/Screw Steel - Hex/SScrew Hex Smooth .875
+    displayName: SScrew Hex Smooth .875
+    binId: screws
+    model: {fileID: 919132149155446097, guid: da01be92dfe7f434088a982d916d5f4e, type: 3}
+    prefab: {fileID: 815858778578262608, guid: cffb7b5e4c24ff94fa523edc8214e3d3, type: 3}
+    thumbnail: {fileID: 21300000, guid: 8dd952239666096418f1ddb12f57af9e, type: 3}
+    size: {x: 0.007925, y: 0.007925, z: 0.024435}
+    triangles: 1828
+    massKg: 0.0005
+    cuttable: 0
+  - id: Structure/Hardware/Screw Steel - Hex/SScrew Hex Smooth 1.000
+    displayName: SScrew Hex Smooth 1.000
+    binId: screws
+    model: {fileID: 919132149155446097, guid: 50e1ed344906b03488a7a89ed03c0f76, type: 3}
+    prefab: {fileID: 5361357538197267978, guid: 406ef55c6009fc34a81224a024ee7cfd, type: 3}
+    thumbnail: {fileID: 21300000, guid: bc3140c0669607d438b517e173fae243, type: 3}
+    size: {x: 0.007922, y: 0.00792, z: 0.02761}
+    triangles: 1794
+    massKg: 0.0005
+    cuttable: 0
+  - id: Structure/Hardware/Screw Steel - Hex/SScrew Hex Smooth 1.125
+    displayName: SScrew Hex Smooth 1.125
+    binId: screws
+    model: {fileID: 919132149155446097, guid: e154da93df84c864aa574da933c6179c, type: 3}
+    prefab: {fileID: 3667397860306052036, guid: 65b559ba851de47469b91551d70dc503, type: 3}
+    thumbnail: {fileID: 21300000, guid: 46d40007b58138d40973f58c19bcf215, type: 3}
+    size: {x: 0.007915, y: 0.007925, z: 0.030785}
+    triangles: 1706
+    massKg: 0.00052779453
+    cuttable: 0
+  - id: Structure/Hardware/Screw Steel - Hex/SScrew Hex Smooth 1.250
+    displayName: SScrew Hex Smooth 1.250
+    binId: screws
+    model: {fileID: 919132149155446097, guid: 838ba20c61e93e14688216a5db340602, type: 3}
+    prefab: {fileID: 3796967361984537068, guid: caa2177fa935c89469af9b200b2d4462, type: 3}
+    thumbnail: {fileID: 21300000, guid: ca1f061fcbd6cc248a904d7588bc4baa, type: 3}
+    size: {x: 0.007922, y: 0.007919, z: 0.03396}
+    triangles: 1612
+    massKg: 0.00057722017
+    cuttable: 0
+  - id: Structure/Hardware/Screw Steel - Hex/SScrew Hex Smooth 1.500
+    displayName: SScrew Hex Smooth 1.500
+    binId: screws
+    model: {fileID: 919132149155446097, guid: 4a6e14d4e8460844f8f7d53859254f77, type: 3}
+    prefab: {fileID: 1708824131081966451, guid: facf2651be8c1164185efab992f41204, type: 3}
+    thumbnail: {fileID: 21300000, guid: b96ea7e8b27af81478913eb9bca2cfdf, type: 3}
+    size: {x: 0.007922, y: 0.007918, z: 0.04031}
+    triangles: 1344
+    massKg: 0.00067590317
+    cuttable: 0
+  - id: Structure/Hardware/Screw Steel - Hex/SScrew Hex Smooth 1.750
+    displayName: SScrew Hex Smooth 1.750
+    binId: screws
+    model: {fileID: 919132149155446097, guid: 4210fde9c56fcdd43b3efc9cd77d748f, type: 3}
+    prefab: {fileID: 9217922267756751586, guid: f355452a49c6f344d927a42eb680f288, type: 3}
+    thumbnail: {fileID: 21300000, guid: 26e200817b5af444985d82a9286e48df, type: 3}
+    size: {x: 0.007921, y: 0.007917, z: 0.04666}
+    triangles: 1334
+    massKg: 0.00077462016
+    cuttable: 0
+  - id: Structure/Hardware/Screw Steel - Hex/SScrew Hex Smooth 2.000
+    displayName: SScrew Hex Smooth 2.000
+    binId: screws
+    model: {fileID: 919132149155446097, guid: d719c093c9b017f4dbcf3ac52cc61f53, type: 3}
+    prefab: {fileID: 8753803341465668942, guid: 894675342cccce74081c539963ba642d, type: 3}
+    thumbnail: {fileID: 21300000, guid: 06c98718d618b6844bb6c809cf87aa73, type: 3}
+    size: {x: 0.007925, y: 0.007925, z: 0.05301}
+    triangles: 1238
+    massKg: 0.0008731732
+    cuttable: 0
+  - id: Structure/Hardware/Screw Steel - Hex/SScrew Hex Smooth 2.250
+    displayName: SScrew Hex Smooth 2.250
+    binId: screws
+    model: {fileID: 919132149155446097, guid: 92c3a97f0db199344965e4d03dba8af0, type: 3}
+    prefab: {fileID: 1723004455034152023, guid: e08eeb78a76c54a45a358f7c851c0fa2, type: 3}
+    thumbnail: {fileID: 21300000, guid: c8fcf142327c0874591c3c47bb6dfc91, type: 3}
+    size: {x: 0.007906, y: 0.007925, z: 0.05936}
+    triangles: 1152
+    massKg: 0.0009715428
+    cuttable: 0
+  - id: Structure/Hardware/Screw Steel - Hex/SScrew Hex Smooth 2.500
+    displayName: SScrew Hex Smooth 2.500
+    binId: screws
+    model: {fileID: 919132149155446097, guid: a411796079d0d6141a95ab3697b0e021, type: 3}
+    prefab: {fileID: 1677678846716820261, guid: db8824c641983fe4bb2c350b830cb11f, type: 3}
+    thumbnail: {fileID: 21300000, guid: ae7010c28376f0942bc0c5f70b25275d, type: 3}
+    size: {x: 0.007925, y: 0.007925, z: 0.06571}
+    triangles: 1018
+    massKg: 0.0010698169
+    cuttable: 0
+  - id: Structure/Hardware/Screw Steel - Hex/SScrew Hex Threaded .250
+    displayName: SScrew Hex Threaded .250
+    binId: screws
+    model: {fileID: 919132149155446097, guid: 0f91e46c46731b647930e4f78c6d4295, type: 3}
+    prefab: {fileID: 4648108151195242248, guid: c23b6207fdf44914fbf69ab415dfdd53, type: 3}
+    thumbnail: {fileID: 21300000, guid: 39b11b2bc908c624188837dddbd06442, type: 3}
+    size: {x: 0.007917, y: 0.007925, z: 0.00856}
+    triangles: 6168
+    massKg: 0.0005
+    cuttable: 0
+  - id: Structure/Hardware/Screw Steel - Hex/SScrew Hex Threaded .375
+    displayName: SScrew Hex Threaded .375
+    binId: screws
+    model: {fileID: 919132149155446097, guid: eda8ed1b2356d854990cbb3b4ba96a2e, type: 3}
+    prefab: {fileID: 499208254726502421, guid: c14880a14d62eda49aa24c5c148fd46f, type: 3}
+    thumbnail: {fileID: 21300000, guid: 7ce099c87abb90d439ef671581c7d4e1, type: 3}
+    size: {x: 0.007917, y: 0.007925, z: 0.011735}
+    triangles: 10260
+    massKg: 0.0005
+    cuttable: 0
+  - id: Structure/Hardware/Screw Steel - Hex/SScrew Hex Threaded .500
+    displayName: SScrew Hex Threaded .500
+    binId: screws
+    model: {fileID: 919132149155446097, guid: 7124091cc15ad0e4cb17c4d3f6613930, type: 3}
+    prefab: {fileID: 4992085083772129705, guid: 349d52ac38859ea43bd84b2d022ef809, type: 3}
+    thumbnail: {fileID: 21300000, guid: 62aa61089d27d614da3ceacef9650a4c, type: 3}
+    size: {x: 0.007917, y: 0.007925, z: 0.01491}
+    triangles: 10268
+    massKg: 0.0005
+    cuttable: 0
+  - id: Structure/Hardware/Screw Steel - Hex/SScrew Hex Threaded .625
+    displayName: SScrew Hex Threaded .625
+    binId: screws
+    model: {fileID: 919132149155446097, guid: d0b31c06032ab60448d77cf6abd801b7, type: 3}
+    prefab: {fileID: 2529306913786940770, guid: 0d9880a7de274234a882dc9e471ec930, type: 3}
+    thumbnail: {fileID: 21300000, guid: 8f27ec3d78513804999a5ee57504148e, type: 3}
+    size: {x: 0.007917, y: 0.007925, z: 0.018085}
+    triangles: 10264
+    massKg: 0.0005
+    cuttable: 0
+  - id: Structure/Hardware/Screw Steel - Hex/SScrew Hex Threaded .750
+    displayName: SScrew Hex Threaded .750
+    binId: screws
+    model: {fileID: 919132149155446097, guid: a5a11ae283ddd7c4e89b2eed04689af5, type: 3}
+    prefab: {fileID: 6728557114771016019, guid: cf69beeb082d398479ad282e6d3b41f1, type: 3}
+    thumbnail: {fileID: 21300000, guid: 6503bb5676e1938479d1c67c2c9a3dc9, type: 3}
+    size: {x: 0.007917, y: 0.007925, z: 0.02126}
+    triangles: 18456
+    massKg: 0.0005
+    cuttable: 0
+  - id: Structure/Hardware/Screw Steel - Hex/SScrew Hex Threaded .875
+    displayName: SScrew Hex Threaded .875
+    binId: screws
+    model: {fileID: 919132149155446097, guid: f04a8c3656349374ab13b9f87f9cc818, type: 3}
+    prefab: {fileID: 4715256884247786223, guid: 73819ba15dfe23c41b713c7fadb0851c, type: 3}
+    thumbnail: {fileID: 21300000, guid: d162eb5c9829c584e8338c9f87ea8f53, type: 3}
+    size: {x: 0.007925, y: 0.007925, z: 0.024435}
+    triangles: 18338
+    massKg: 0.0005
+    cuttable: 0
+  - id: Structure/Hardware/Screw Steel - Hex/SScrew Hex Threaded 1.000
+    displayName: SScrew Hex Threaded 1.000
+    binId: screws
+    model: {fileID: 919132149155446097, guid: 35504c94d72343d42ae5fc06edf8713b, type: 3}
+    prefab: {fileID: 3748220588055123075, guid: 31ff028af9b3e86498ce9b1111835359, type: 3}
+    thumbnail: {fileID: 21300000, guid: b50d8cd174df42841a40d3633105a0fe, type: 3}
+    size: {x: 0.007922, y: 0.00792, z: 0.02761}
+    triangles: 18206
+    massKg: 0.0005
+    cuttable: 0
+  - id: Structure/Hardware/Screw Steel - Hex/SScrew Hex Threaded 1.125
+    displayName: SScrew Hex Threaded 1.125
+    binId: screws
+    model: {fileID: 919132149155446097, guid: 27b75aa60815ceb45be9959ab66a4ec2, type: 3}
+    prefab: {fileID: 1991127333754948667, guid: 06dc3b070ee803f48a5b5fc520d7a790, type: 3}
+    thumbnail: {fileID: 21300000, guid: effef9cd1fc11a14981132c0ec7ddf2a, type: 3}
+    size: {x: 0.007915, y: 0.007925, z: 0.030785}
+    triangles: 18104
+    massKg: 0.0005
+    cuttable: 0
+  - id: Structure/Hardware/Screw Steel - Hex/SScrew Hex Threaded 1.250
+    displayName: SScrew Hex Threaded 1.250
+    binId: screws
+    model: {fileID: 919132149155446097, guid: 34713d62e8a6e87448259891c3fbf851, type: 3}
+    prefab: {fileID: 9089020410708326300, guid: ee680b5e1c3c45c40976840a766e5257, type: 3}
+    thumbnail: {fileID: 21300000, guid: 7650cb89e0f582d4ea406beb752f34fd, type: 3}
+    size: {x: 0.007922, y: 0.007919, z: 0.03396}
+    triangles: 18006
+    massKg: 0.0005
+    cuttable: 0
+  - id: Structure/Hardware/Screw Steel - Hex/SScrew Hex Threaded 1.500
+    displayName: SScrew Hex Threaded 1.500
+    binId: screws
+    model: {fileID: 919132149155446097, guid: e0fc08dfdc9aa604c8a62fe68baeb611, type: 3}
+    prefab: {fileID: 615984936635458754, guid: 77a7ed8e2c4c02443bdd04393d5281f9, type: 3}
+    thumbnail: {fileID: 21300000, guid: be30bede03f8f764ea1699ae388ac6e5, type: 3}
+    size: {x: 0.007922, y: 0.007918, z: 0.04031}
+    triangles: 17820
+    massKg: 0.0005440785
+    cuttable: 0
+  - id: Structure/Hardware/Screw Steel - Hex/SScrew Hex Threaded 1.750
+    displayName: SScrew Hex Threaded 1.750
+    binId: screws
+    model: {fileID: 919132149155446097, guid: 0a0d520f0ea4dc843b1fd14601946479, type: 3}
+    prefab: {fileID: 2788983582118747050, guid: 020d5745147414244a4835ee85fd1ca7, type: 3}
+    thumbnail: {fileID: 21300000, guid: a8de715199f83b842ad0ed73aef7f627, type: 3}
+    size: {x: 0.007921, y: 0.007917, z: 0.04666}
+    triangles: 17746
+    massKg: 0.00062038895
+    cuttable: 0
+  - id: Structure/Hardware/Screw Steel - Hex/SScrew Hex Threaded 2.000
+    displayName: SScrew Hex Threaded 2.000
+    binId: screws
+    model: {fileID: 919132149155446097, guid: c6761857efbc03e40830263af157d2b5, type: 3}
+    prefab: {fileID: 4212737610871684155, guid: 65f078c6f54702941b022abe7486189d, type: 3}
+    thumbnail: {fileID: 21300000, guid: 189b07a719f3d214a828858d8024336c, type: 3}
+    size: {x: 0.007925, y: 0.007925, z: 0.05301}
+    triangles: 25844
+    massKg: 0.00069783675
+    cuttable: 0
+  - id: Structure/Hardware/Screw Steel - Hex/SScrew Hex Threaded 2.250
+    displayName: SScrew Hex Threaded 2.250
+    binId: screws
+    model: {fileID: 919132149155446097, guid: 25800e55764207e489adcc10137d9ece, type: 3}
+    prefab: {fileID: 7150822476982031325, guid: 9e6f1b29fbd1b824e99fccb68878c895, type: 3}
+    thumbnail: {fileID: 21300000, guid: 7dc6cb8a7f157c74f8068a9ce7f6ed79, type: 3}
+    size: {x: 0.007906, y: 0.007925, z: 0.05936}
+    triangles: 25742
+    massKg: 0.00077418884
+    cuttable: 0
+  - id: Structure/Hardware/Screw Steel - Hex/SScrew Hex Threaded 2.500
+    displayName: SScrew Hex Threaded 2.500
+    binId: screws
+    model: {fileID: 919132149155446097, guid: 756e2fb0adc09394cbacf720ddd079a6, type: 3}
+    prefab: {fileID: 4890690435871107257, guid: 6fa219c4fdb6463449c1fcb0a275df02, type: 3}
+    thumbnail: {fileID: 21300000, guid: 832b99e0ad910c542b03d252c07d1984, type: 3}
+    size: {x: 0.00792, y: 0.007914, z: 0.06571}
+    triangles: 33848
+    massKg: 0.0008520972
+    cuttable: 0
+  - id: Structure/Hardware/Screw Steel - Star
+    displayName: Screw Steel - Star
+    binId: screws
+    model: {fileID: 919132149155446097, guid: 1f1af792c83de7d47ad9365c8ea93e59, type: 3}
+    prefab: {fileID: 2772050694758991283, guid: 8f21b3aa4fac54e49b5149e179e4dc33, type: 3}
+    thumbnail: {fileID: 21300000, guid: ffae134584db25d48b1db5088269d3bf, type: 3}
+    size: {x: 0.007917, y: 0.007925, z: 0.00856}
+    triangles: 2472
+    massKg: 0.0011961386
+    cuttable: 0
+  - id: Structure/Hardware/Screw Steel - Star/SScrew Star Smooth .250
+    displayName: SScrew Star Smooth .250
+    binId: screws
+    model: {fileID: 919132149155446097, guid: ee980869631c11b4a971827b5165dcc5, type: 3}
+    prefab: {fileID: 3118730961963985402, guid: 5e604b9a2ee386d4dac963c62b5f0706, type: 3}
+    thumbnail: {fileID: 21300000, guid: 12148c0278c5d8249869e0b800023ce4, type: 3}
+    size: {x: 0.007917, y: 0.007925, z: 0.00856}
+    triangles: 2472
+    massKg: 0.0011961386
+    cuttable: 0
+  - id: Structure/Hardware/Screw Steel - Star/SScrew Star Smooth .290
+    displayName: SScrew Star Smooth .290
+    binId: screws
+    model: {fileID: 919132149155446097, guid: 67bf9c18bf8cab84085a751079ce3282, type: 3}
+    prefab: {fileID: 8135283438656977608, guid: cf3caed9cd849e245bd8e83d43dc4d19, type: 3}
+    thumbnail: {fileID: 21300000, guid: 8092d71b09c069e4ba412fb1e27fb6a7, type: 3}
+    size: {x: 0.007917, y: 0.007925, z: 0.009576}
+    triangles: 2574
+    massKg: 0.0013043984
+    cuttable: 0
+  - id: Structure/Hardware/Screw Steel - Star/SScrew Star Smooth .375
+    displayName: SScrew Star Smooth .375
+    binId: screws
+    model: {fileID: 919132149155446097, guid: 3fff275a1388d2249b4d75c50c34e9d7, type: 3}
+    prefab: {fileID: 4997282595681094010, guid: e97e219d3c3ebeb45b374ae65c07d5e2, type: 3}
+    thumbnail: {fileID: 21300000, guid: 6b364dd898e8cf041832ff3cc0ec33f8, type: 3}
+    size: {x: 0.007917, y: 0.007925, z: 0.011735}
+    triangles: 2574
+    massKg: 0.001534864
+    cuttable: 0
+  - id: Structure/Hardware/Screw Steel - Star/SScrew Star Smooth .500
+    displayName: SScrew Star Smooth .500
+    binId: screws
+    model: {fileID: 919132149155446097, guid: f3e420cac7a487a4db5622bec421dc0b, type: 3}
+    prefab: {fileID: 6247073009656112695, guid: e239084c1240c6b498f45f497e0c092e, type: 3}
+    thumbnail: {fileID: 21300000, guid: c772a67384511de4f9a95e4712e13434, type: 3}
+    size: {x: 0.007917, y: 0.007925, z: 0.01491}
+    triangles: 2574
+    massKg: 0.0018736472
+    cuttable: 0
+  - id: Structure/Hardware/Screw Steel - Star/SScrew Star Smooth .625
+    displayName: SScrew Star Smooth .625
+    binId: screws
+    model: {fileID: 919132149155446097, guid: aae8723612009e843a450c28aee11cc1, type: 3}
+    prefab: {fileID: 1343636714359983774, guid: 4fdb94816b52f6946801087e2b2ecde3, type: 3}
+    thumbnail: {fileID: 21300000, guid: 12a18d3d30efe694d9fb87fa0a130b07, type: 3}
+    size: {x: 0.007917, y: 0.007925, z: 0.018085}
+    triangles: 2574
+    massKg: 0.0022125312
+    cuttable: 0
+  - id: Structure/Hardware/Screw Steel - Star/SScrew Star Smooth .750
+    displayName: SScrew Star Smooth .750
+    binId: screws
+    model: {fileID: 919132149155446097, guid: 62837f639e751f445b75e974f45e9f9d, type: 3}
+    prefab: {fileID: 8484542305107080993, guid: 610d5e8b88e46c043843153b21d3fc2d, type: 3}
+    thumbnail: {fileID: 21300000, guid: 7146774c6a3219146bd7df27d776bc59, type: 3}
+    size: {x: 0.007917, y: 0.007925, z: 0.02126}
+    triangles: 2574
+    massKg: 0.002551311
+    cuttable: 0
+  - id: Structure/Hardware/Screw Steel - Star/SScrew Star Smooth .875
+    displayName: SScrew Star Smooth .875
+    binId: screws
+    model: {fileID: 919132149155446097, guid: 3ceaddb3bb71dcb488d24f32f8296e19, type: 3}
+    prefab: {fileID: 5538031874723983681, guid: 4e34e02db5e335c4ca59c0823dc97b43, type: 3}
+    thumbnail: {fileID: 21300000, guid: 6c246c356b3aa414080d51c00f43f215, type: 3}
+    size: {x: 0.007925, y: 0.007925, z: 0.024435}
+    triangles: 2340
+    massKg: 0.0028894036
+    cuttable: 0
+  - id: Structure/Hardware/Screw Steel - Star/SScrew Star Smooth 1.000
+    displayName: SScrew Star Smooth 1.000
+    binId: screws
+    model: {fileID: 919132149155446097, guid: d45c275aa4475df4091916ad49e43117, type: 3}
+    prefab: {fileID: 3272998819133655432, guid: 46d9948a0658cf342af34e37f7ff6973, type: 3}
+    thumbnail: {fileID: 21300000, guid: 097a7b62f3dbba849aad3625dd9143bf, type: 3}
+    size: {x: 0.007922, y: 0.00792, z: 0.02761}
+    triangles: 2252
+    massKg: 0.0032274611
+    cuttable: 0
+  - id: Structure/Hardware/Screw Steel - Star/SScrew Star Smooth 1.250
+    displayName: SScrew Star Smooth 1.250
+    binId: screws
+    model: {fileID: 919132149155446097, guid: 1cd84e3e14d55024bad98c1a5a10e603, type: 3}
+    prefab: {fileID: 1257739076220839088, guid: 740aed977b9e6e541831bc3ec2e91371, type: 3}
+    thumbnail: {fileID: 21300000, guid: 6355129dce276fc4686b46c776293ff2, type: 3}
+    size: {x: 0.007922, y: 0.007919, z: 0.03396}
+    triangles: 2090
+    massKg: 0.0039025715
+    cuttable: 0
+  - id: Structure/Hardware/Screw Steel - Star/SScrew Star Smooth 1.500
+    displayName: SScrew Star Smooth 1.500
+    binId: screws
+    model: {fileID: 919132149155446097, guid: aeec73af70d7dd541ba22ba331d1eb98, type: 3}
+    prefab: {fileID: 3259443846056785883, guid: 1992cc72d415e5444b970aa822ada269, type: 3}
+    thumbnail: {fileID: 21300000, guid: bdb5bf5a574377d48a6ca7242bcca021, type: 3}
+    size: {x: 0.007922, y: 0.007918, z: 0.04031}
+    triangles: 1814
+    massKg: 0.0045762025
+    cuttable: 0
+  - id: Structure/Hardware/Screw Steel - Star/SScrew Star Smooth 1.750
+    displayName: SScrew Star Smooth 1.750
+    binId: screws
+    model: {fileID: 919132149155446097, guid: 8a990af7f827d1346aeccbba4ae79aa5, type: 3}
+    prefab: {fileID: 7428643828751977533, guid: 218869e6e7f087841ad4bb1a2eb49d0e, type: 3}
+    thumbnail: {fileID: 21300000, guid: 2641fe9240089cb418cbb8036e3e340d, type: 3}
+    size: {x: 0.007921, y: 0.007917, z: 0.04666}
+    triangles: 1820
+    massKg: 0.0052500498
+    cuttable: 0
+  - id: Structure/Hardware/Screw Steel - Star/SScrew Star Smooth 2.000
+    displayName: SScrew Star Smooth 2.000
+    binId: screws
+    model: {fileID: 919132149155446097, guid: 6c1cbfb913ba23b4f9d76b10d3d4be13, type: 3}
+    prefab: {fileID: 6928799089558008619, guid: ad31320f6bf90d3459c58ef3f314e80b, type: 3}
+    thumbnail: {fileID: 21300000, guid: 25c3fb939ce74184786ffa177896df5f, type: 3}
+    size: {x: 0.007925, y: 0.007925, z: 0.05301}
+    triangles: 1728
+    massKg: 0.0059227725
+    cuttable: 0
+  - id: Structure/Hardware/Screw Steel - Star/SScrew Star Smooth 2.250
+    displayName: SScrew Star Smooth 2.250
+    binId: screws
+    model: {fileID: 919132149155446097, guid: e2179deb977015a4a8ef100370741e45, type: 3}
+    prefab: {fileID: 6629629082984582124, guid: 9a59eec7648b19743997512a381be4ae, type: 3}
+    thumbnail: {fileID: 21300000, guid: 9bf94af8bdaa8fe45acd7b84e5211bb3, type: 3}
+    size: {x: 0.007906, y: 0.007925, z: 0.05936}
+    triangles: 1632
+    massKg: 0.006594261
+    cuttable: 0
+  - id: Structure/Hardware/Screw Steel - Star/SScrew Star Smooth 2.500
+    displayName: SScrew Star Smooth 2.500
+    binId: screws
+    model: {fileID: 919132149155446097, guid: 3feac27acd200e741bd73fff2cdfa941, type: 3}
+    prefab: {fileID: 5526027958766313686, guid: 4892c3dfcb6690b4194f111ca8015a90, type: 3}
+    thumbnail: {fileID: 21300000, guid: d2a615ae71a626848aa3a32841cba517, type: 3}
+    size: {x: 0.007925, y: 0.007925, z: 0.06571}
+    triangles: 1500
+    massKg: 0.0072650816
+    cuttable: 0
+  - id: Structure/Hardware/Screw Steel - Star/SScrew Star Threaded .250
+    displayName: SScrew Star Threaded .250
+    binId: screws
+    model: {fileID: 919132149155446097, guid: 73bff8260ff3e6d48b0fd1c386d30012, type: 3}
+    prefab: {fileID: 6134243439106968330, guid: 3aea212bf5539dd488068c509f5791f3, type: 3}
+    thumbnail: {fileID: 21300000, guid: fe48fbfe3df99c245a743ffbdd2c345f, type: 3}
+    size: {x: 0.007917, y: 0.007925, z: 0.00856}
+    triangles: 6694
+    massKg: 0.0010549538
+    cuttable: 0
+  - id: Structure/Hardware/Screw Steel - Star/SScrew Star Threaded .290
+    displayName: SScrew Star Threaded .290
+    binId: screws
+    model: {fileID: 919132149155446097, guid: 9d587029d3d03884683ea80e78b0c03d, type: 3}
+    prefab: {fileID: 6359725925981259905, guid: f7ca8a830147fd34a8ce280fc26130a3, type: 3}
+    thumbnail: {fileID: 21300000, guid: 0d75882dc8f97954684bc4cdb1266ce2, type: 3}
+    size: {x: 0.007917, y: 0.007925, z: 0.009576}
+    triangles: 6698
+    massKg: 0.0011390552
+    cuttable: 0
+  - id: Structure/Hardware/Screw Steel - Star/SScrew Star Threaded .375
+    displayName: SScrew Star Threaded .375
+    binId: screws
+    model: {fileID: 919132149155446097, guid: b500fa1ad8ef44944a008dba4473521d, type: 3}
+    prefab: {fileID: 3359235739075313343, guid: 07c1a6311d93a3142bcbfb4705bce09b, type: 3}
+    thumbnail: {fileID: 21300000, guid: 7454efc3c9dd49548b10f9da5961de0a, type: 3}
+    size: {x: 0.007917, y: 0.007925, z: 0.011735}
+    triangles: 10798
+    massKg: 0.0013188558
+    cuttable: 0
+  - id: Structure/Hardware/Screw Steel - Star/SScrew Star Threaded .500
+    displayName: SScrew Star Threaded .500
+    binId: screws
+    model: {fileID: 919132149155446097, guid: 207542aca5faf6243ad7183b31297b51, type: 3}
+    prefab: {fileID: 3709664009559749126, guid: 49102f775cb0ded48938e56c0a1727f5, type: 3}
+    thumbnail: {fileID: 21300000, guid: 26ccd5b4c8496674297434fbd1f62dfc, type: 3}
+    size: {x: 0.007917, y: 0.007925, z: 0.01491}
+    triangles: 10806
+    massKg: 0.0015819059
+    cuttable: 0
+  - id: Structure/Hardware/Screw Steel - Star/SScrew Star Threaded .625
+    displayName: SScrew Star Threaded .625
+    binId: screws
+    model: {fileID: 919132149155446097, guid: 594e6c95bed2f924d9760cc7d28ca513, type: 3}
+    prefab: {fileID: 1453739704905046373, guid: 605f23bf043ba5d4fad644f7b6fe8d1f, type: 3}
+    thumbnail: {fileID: 21300000, guid: d7124c1bf522c57458b5af3fed836fa2, type: 3}
+    size: {x: 0.007917, y: 0.007925, z: 0.018085}
+    triangles: 10802
+    massKg: 0.0018444833
+    cuttable: 0
+  - id: Structure/Hardware/Screw Steel - Star/SScrew Star Threaded .750
+    displayName: SScrew Star Threaded .750
+    binId: screws
+    model: {fileID: 919132149155446097, guid: f23d1cc5f24305a4bac9ebdf319583f0, type: 3}
+    prefab: {fileID: 8952144618685268244, guid: a903c7291a4878f44a1b656242d02369, type: 3}
+    thumbnail: {fileID: 21300000, guid: 55e84e90d0da70b4f9dbe6a3b498f1cb, type: 3}
+    size: {x: 0.007917, y: 0.007925, z: 0.02126}
+    triangles: 18982
+    massKg: 0.0021096868
+    cuttable: 0
+  - id: Structure/Hardware/Screw Steel - Star/SScrew Star Threaded .875
+    displayName: SScrew Star Threaded .875
+    binId: screws
+    model: {fileID: 919132149155446097, guid: dec9d7f493333504886c256c1a0b3206, type: 3}
+    prefab: {fileID: 4483224935218617547, guid: a579c3208ff746c4e8f2d6b805b17cbf, type: 3}
+    thumbnail: {fileID: 21300000, guid: e5ec10ab52b4d784197d1bb59254ccf4, type: 3}
+    size: {x: 0.007925, y: 0.007925, z: 0.024435}
+    triangles: 18850
+    massKg: 0.0023726856
+    cuttable: 0
+  - id: Structure/Hardware/Screw Steel - Star/SScrew Star Threaded 1.000
+    displayName: SScrew Star Threaded 1.000
+    binId: screws
+    model: {fileID: 919132149155446097, guid: 4fe7905cfef52dd4bbc211ab0b0f4386, type: 3}
+    prefab: {fileID: 3665001468297225000, guid: 9e114158144b3ab4bb32625497143aca, type: 3}
+    thumbnail: {fileID: 21300000, guid: 6630b0808c04e2f4c94254fc8d0c52e3, type: 3}
+    size: {x: 0.007922, y: 0.00792, z: 0.02761}
+    triangles: 18678
+    massKg: 0.0026353716
+    cuttable: 0
+  - id: Structure/Hardware/Screw Steel - Star/SScrew Star Threaded 1.250
+    displayName: SScrew Star Threaded 1.250
+    binId: screws
+    model: {fileID: 919132149155446097, guid: d0cabb3dc71dbd54db7939b106a2b771, type: 3}
+    prefab: {fileID: 7892317952907291042, guid: 0067860483f29ff4ab9f57d565b4f5ef, type: 3}
+    thumbnail: {fileID: 21300000, guid: 7bda8835880af3d458447c3e19cee751, type: 3}
+    size: {x: 0.007922, y: 0.007919, z: 0.03396}
+    triangles: 18496
+    massKg: 0.0031600683
+    cuttable: 0
+  - id: Structure/Hardware/Screw Steel - Star/SScrew Star Threaded 1.500
+    displayName: SScrew Star Threaded 1.500
+    binId: screws
+    model: {fileID: 919132149155446097, guid: 8430a851104e9054188f2c29b5090c3b, type: 3}
+    prefab: {fileID: 1608120082174357752, guid: 85f491c7177dfc545b0ad1f87e5d1cec, type: 3}
+    thumbnail: {fileID: 21300000, guid: e6780bc1508614348a2206768bf9ce6b, type: 3}
+    size: {x: 0.007922, y: 0.007918, z: 0.04031}
+    triangles: 18290
+    massKg: 0.0036833123
+    cuttable: 0
+  - id: Structure/Hardware/Screw Steel - Star/SScrew Star Threaded 1.750
+    displayName: SScrew Star Threaded 1.750
+    binId: screws
+    model: {fileID: 919132149155446097, guid: a0b345d281a34f143b3f540958a5f2c8, type: 3}
+    prefab: {fileID: 7640151163170272874, guid: c9ded4b8e0e268a4e9b30c45010fb1b2, type: 3}
+    thumbnail: {fileID: 21300000, guid: 6bab8cce7ccd8b143a2920d086813234, type: 3}
+    size: {x: 0.007921, y: 0.007917, z: 0.04666}
+    triangles: 18244
+    massKg: 0.0042047915
+    cuttable: 0
+  - id: Structure/Hardware/Screw Steel - Star/SScrew Star Threaded 2.000
+    displayName: SScrew Star Threaded 2.000
+    binId: screws
+    model: {fileID: 919132149155446097, guid: 93af716074e683a4fb1f5f5731ed9b62, type: 3}
+    prefab: {fileID: 4092577533270324590, guid: b503f1197933098448f3298b0f7ec77e, type: 3}
+    thumbnail: {fileID: 21300000, guid: d81ab75b55acd254f8dd1ebee5254a72, type: 3}
+    size: {x: 0.007925, y: 0.007925, z: 0.05301}
+    triangles: 26338
+    massKg: 0.004735174
+    cuttable: 0
+  - id: Structure/Hardware/Screw Steel - Star/SScrew Star Threaded 2.250
+    displayName: SScrew Star Threaded 2.250
+    binId: screws
+    model: {fileID: 919132149155446097, guid: 52bf8d5f85318e14c8f41d3f3323fac7, type: 3}
+    prefab: {fileID: 545620274269459150, guid: 320d5a79a30dde34aa14f7587a955989, type: 3}
+    thumbnail: {fileID: 21300000, guid: 8e507432fa8d2a948982273b7960e87b, type: 3}
+    size: {x: 0.007906, y: 0.007925, z: 0.05936}
+    triangles: 34418
+    massKg: 0.005266197
+    cuttable: 0
+  - id: Structure/Hardware/Screw Steel - Star/SScrew Star Threaded 2.500
+    displayName: SScrew Star Threaded 2.500
+    binId: screws
+    model: {fileID: 919132149155446097, guid: bd71e1c0d6aeb844d8d9bd2effe5bd40, type: 3}
+    prefab: {fileID: 8121958813776791523, guid: 46853e8f704d1544b9718efb4b65fe14, type: 3}
+    thumbnail: {fileID: 21300000, guid: fc45a91703dbcbb41aa90873b016b04d, type: 3}
+    size: {x: 0.00792, y: 0.007914, z: 0.06571}
+    triangles: 34334
+    massKg: 0.005790534
+    cuttable: 0
+  - id: Structure/Hardware/Thumbscrew
+    displayName: Thumbscrew
+    binId: screws
+    model: {fileID: 919132149155446097, guid: 92364f03ea1a8d5489bd3e8ea5b06ef3, type: 3}
+    prefab: {fileID: 8166341312329881736, guid: 8d3e4af6c68fff74db6b584592e2e64e, type: 3}
+    thumbnail: {fileID: 21300000, guid: 21be89c37dca56b42a4121d8e8c83fb7, type: 3}
+    size: {x: 0.010827, y: 0.010827, z: 0.019558}
+    triangles: 10598
+    massKg: 0.0007572045
+    cuttable: 0
+  - id: Structure/Hardware/VEX IQ Pin
+    displayName: VEX IQ Pin
+    binId: misc
+    model: {fileID: 919132149155446097, guid: da1767c591c651940b66b7a57298b522, type: 3}
+    prefab: {fileID: 4241803303849359821, guid: ced699c07c4c5d34085535cf4d8509e6, type: 3}
+    thumbnail: {fileID: 21300000, guid: 472f247bf3bc5364b8d16c865f5661dc, type: 3}
+    size: {x: 0.006166, y: 0.012278, z: 0.006345}
+    triangles: 1960
+    massKg: 0.0005
+    cuttable: 0
+  - id: Structure/Plate/Aluminum/Alu Plate 5x25
+    displayName: Alu Plate 5x25
+    binId: plates
+    model: {fileID: 919132149155446097, guid: ed2672805045051458c03cf6c8c686b1, type: 3}
+    prefab: {fileID: 3774236737468807642, guid: 589e2e16bfe043446919490c63fa12ad, type: 3}
+    thumbnail: {fileID: 21300000, guid: c740fce39d3502d4bac48e474c31def4, type: 3}
+    size: {x: 0.0635, y: 0.3175, z: 0.001588}
+    triangles: 17120
+    massKg: 0.069490194
+    cuttable: 1
+  - id: Structure/Plate/Steel/Steel Plate 5x25
+    displayName: Steel Plate 5x25
+    binId: plates
+    model: {fileID: 919132149155446097, guid: fb830ef0331e62d48a1687c0c40874d1, type: 3}
+    prefab: {fileID: 1035410053586033024, guid: 22353abbf3183a144a2a775d229766e5, type: 3}
+    thumbnail: {fileID: 21300000, guid: f50cb48b42d3a0f45a75cff14e68b0d4, type: 3}
+    size: {x: 0.0635, y: 0.3175, z: 0.001191}
+    triangles: 17120
+    massKg: 0.15152785
+    cuttable: 1
+  - id: Structure/Reference Files/Angle 1x1
+    displayName: Angle 1x1
+    binId: angles
+    model: {fileID: 919132149155446097, guid: e9b346e44608c3a43a2620d64c6c2a74, type: 3}
+    prefab: {fileID: 5227400801957162552, guid: b5a1ff9517de9be45907255e8684d9e1, type: 3}
+    thumbnail: {fileID: 21300000, guid: 96677d7762ba0114aa7c604605d9ae7e, type: 3}
+    size: {x: 0.0127, y: 0.4445, z: 0.0127}
+    triangles: 9692
+    massKg: 0.01583189
+    cuttable: 1
+  - id: Structure/Reference Files/Angle 2x2
+    displayName: Angle 2x2
+    binId: angles
+    model: {fileID: 919132149155446097, guid: a5e4a26f58530e748b3b0f64f8a1137e, type: 3}
+    prefab: {fileID: 2099781440175640331, guid: 5f0fff5ed7c2eb74181bde6cc390e9e0, type: 3}
+    thumbnail: {fileID: 21300000, guid: 814b7ef80b306c84aab4cb9da9270dae, type: 3}
+    size: {x: 0.026591, y: 0.4445, z: 0.026591}
+    triangles: 25412
+    massKg: 0.17131159
+    cuttable: 1
+  - id: Structure/Reference Files/Angle 3x3
+    displayName: Angle 3x3
+    binId: angles
+    model: {fileID: 919132149155446097, guid: 40754f41b942e05478c0e21bd7521ffb, type: 3}
+    prefab: {fileID: 534259305967345512, guid: b026c98608bc798448e2d398b531262d, type: 3}
+    thumbnail: {fileID: 21300000, guid: 4a84b23e0e7428e4a89e829b2b031329, type: 3}
+    size: {x: 0.039291, y: 0.4445, z: 0.039291}
+    triangles: 41468
+    massKg: 0.24956936
+    cuttable: 1
+  - id: Structure/Reference Files/C Channel 1x2x1
+    displayName: C Channel 1x2x1
+    binId: c_channels
+    model: {fileID: 919132149155446097, guid: 6a8a90af443f25742b5e2226b2312918, type: 3}
+    prefab: {fileID: 4343785624176536937, guid: 2268fd055f5d70440b4cda1aecc65069, type: 3}
+    thumbnail: {fileID: 21300000, guid: 9772232d9d8b07849aeb386af7c3d5ea, type: 3}
+    size: {x: 0.0254, y: 0.4445, z: 0.014288}
+    triangles: 22748
+    massKg: 0.033103976
+    cuttable: 1
+  - id: Structure/Reference Files/C Channel 1x3x1 & 1x5x1
+    displayName: C Channel 1x3x1 & 1x5x1
+    binId: c_channels
+    model: {fileID: 919132149155446097, guid: b22fea2902667db49a6ebb98d8bceb48, type: 3}
+    prefab: {fileID: 924612290404081107, guid: 3f33a646833116e498bb2a1a24ec6795, type: 3}
+    thumbnail: {fileID: 21300000, guid: adc9dfe0a9634c844af425d94c17a63a, type: 3}
+    size: {x: 0.0635, y: 0.4445, z: 0.014288}
+    triangles: 30984
+    massKg: 0.061281655
+    cuttable: 1
+  - id: Structure/Reference Files/Plate
+    displayName: Plate
+    binId: plates
+    model: {fileID: 919132149155446097, guid: 33e77de1b0581054198b7515decf67d9, type: 3}
+    prefab: {fileID: 1307379022843412852, guid: 7cfc95f4cd10d41479373427ac26646c, type: 3}
+    thumbnail: {fileID: 21300000, guid: dbfb1cf1974ba8241a5686e61cef8612, type: 3}
+    size: {x: 0.0635, y: 0.3175, z: 0.001588}
+    triangles: 17120
+    massKg: 0.029597675
+    cuttable: 1
+  - id: Structure/Segmented Angle/Segmented Angle 1x1x25
+    displayName: Segmented Angle 1x1x25
+    binId: angles
+    model: {fileID: 919132149155446097, guid: b533bffd81cf7e8438ec3f8e64a0e573, type: 3}
+    prefab: {fileID: 8236437465158112652, guid: 3aac9775cb97dce49b3c2d2bfb2b1539, type: 3}
+    thumbnail: {fileID: 21300000, guid: 63f534ca2ba898646afc02063914f439, type: 3}
+    size: {x: 0.3175, y: 0.018491, z: 0.018491}
+    triangles: 4308
+    massKg: 0.077168755
+    cuttable: 1
+  - id: Structure/Segmented Angle/Segmented Angle 1x1x35
+    displayName: Segmented Angle 1x1x35
+    binId: angles
+    model: {fileID: 919132149155446097, guid: e8b3230b71e055c4e99bb48f6a5c5ef6, type: 3}
+    prefab: {fileID: 4968866927052194907, guid: cd102361becde8841adfb1238e4ed6aa, type: 3}
+    thumbnail: {fileID: 21300000, guid: d2f1b1ffeda5d3540a84575f7360411f, type: 3}
+    size: {x: 0.4445, y: 0.018491, z: 0.018491}
+    triangles: 6030
+    massKg: 0.10803071
+    cuttable: 1
+  - id: Structure/Slotted Angle/Slotted Angle, Inverse
+    displayName: Slotted Angle, Inverse
+    binId: angles
+    model: {fileID: 919132149155446097, guid: 12b7809508cc9774ca35871749eecf8c, type: 3}
+    prefab: {fileID: 2705712035658521460, guid: ed3418c4fdbc15a468542f9c64fb1aed, type: 3}
+    thumbnail: {fileID: 21300000, guid: 7116c18be00dfa343a875645e6a0e07a, type: 3}
+    size: {x: 0.01778, y: 0.381, z: 0.01778}
+    triangles: 4984
+    massKg: 0.089833766
+    cuttable: 1
+  - id: Structure/Slotted Angle/Slotted Angle
+    displayName: Slotted Angle
+    binId: angles
+    model: {fileID: 919132149155446097, guid: 0e47ad58f889055449d6451e53b36b42, type: 3}
+    prefab: {fileID: 6237247759607147012, guid: 90666ace1fc4eb64285733c2bab494cf, type: 3}
+    thumbnail: {fileID: 21300000, guid: b130b508b13de964488e15b65207c515, type: 3}
+    size: {x: 0.01778, y: 0.381, z: 0.01778}
+    triangles: 5000
+    massKg: 0.08983392
+    cuttable: 1
+  - id: Structure/Standoff
+    displayName: Standoff
+    binId: standoffs
+    model: {fileID: 919132149155446097, guid: 8e2133b86ce2e874095d5e360992b71e, type: 3}
+    prefab: {fileID: 565655771581373218, guid: 31578fab1beb6414f9141d7154c7b803, type: 3}
+    thumbnail: {fileID: 21300000, guid: bd6b8d8a8c25aef488f05520effd3081, type: 3}
+    size: {x: 0.007332, y: 0.00635, z: 0.00635}
+    triangles: 1380
+    massKg: 0.0005
+    cuttable: 0
+  - id: Structure/Standoff/Standoff .25
+    displayName: Standoff .25
+    binId: standoffs
+    model: {fileID: 919132149155446097, guid: 90e1e9c02bea18c4183c565c89f00a24, type: 3}
+    prefab: {fileID: 1514335330359226583, guid: 6b842b545b85b0c41b65e7480ffd0a74, type: 3}
+    thumbnail: {fileID: 21300000, guid: 94fe8fa6f565ccb4fb0217de5f48aefb, type: 3}
+    size: {x: 0.007332, y: 0.00635, z: 0.00635}
+    triangles: 1380
+    massKg: 0.0005
+    cuttable: 0
+  - id: Structure/Standoff/Standoff .50
+    displayName: Standoff .50
+    binId: standoffs
+    model: {fileID: 919132149155446097, guid: e7074f390ca836749b864667262ada7b, type: 3}
+    prefab: {fileID: 1240294587171871372, guid: 0ea89500860aa87498fd9a2687c6eacc, type: 3}
+    thumbnail: {fileID: 21300000, guid: e0230bb15c11a1d43b6dec23d2e3f915, type: 3}
+    size: {x: 0.007332, y: 0.00635, z: 0.0127}
+    triangles: 1584
+    massKg: 0.0005
+    cuttable: 0
+  - id: Structure/Standoff/Standoff .75
+    displayName: Standoff .75
+    binId: standoffs
+    model: {fileID: 919132149155446097, guid: c1d4d9b39bc9f3b4d97d06ebf6724c22, type: 3}
+    prefab: {fileID: 3801034445068708466, guid: 6e9dea02369b8e5468ac501e8410adf5, type: 3}
+    thumbnail: {fileID: 21300000, guid: f458cc1c763301a48a32a78b500a310d, type: 3}
+    size: {x: 0.007332, y: 0.00635, z: 0.01905}
+    triangles: 1584
+    massKg: 0.0005
+    cuttable: 0
+  - id: Structure/Standoff/Standoff .875
+    displayName: Standoff .875
+    binId: standoffs
+    model: {fileID: 919132149155446097, guid: 958555bf083af7b4bbec695fa11c7a9d, type: 3}
+    prefab: {fileID: 4483007034822831284, guid: cdefd3fe59aac8f439cbe20743d60d04, type: 3}
+    thumbnail: {fileID: 21300000, guid: 718df44fbc1879f44839da53e756b36e, type: 3}
+    size: {x: 0.007332, y: 0.00635, z: 0.022225}
+    triangles: 1584
+    massKg: 0.0005384953
+    cuttable: 0
+  - id: Structure/Standoff/Standoff 1.00
+    displayName: Standoff 1.00
+    binId: standoffs
+    model: {fileID: 919132149155446097, guid: ac2eb7cf7aa9f60418a4b6f0862b2357, type: 3}
+    prefab: {fileID: 26418123235617798, guid: 3c13e5b2b54d020488992777f50020ae, type: 3}
+    thumbnail: {fileID: 21300000, guid: d787ce2668988404491071ab9fd23d8f, type: 3}
+    size: {x: 0.007332, y: 0.00635, z: 0.0254}
+    triangles: 1552
+    massKg: 0.00061586575
+    cuttable: 0
+  - id: Structure/Standoff/Standoff 1.50
+    displayName: Standoff 1.50
+    binId: standoffs
+    model: {fileID: 919132149155446097, guid: 1eb20716f8718fe43ac615d0db30f2ca, type: 3}
+    prefab: {fileID: 4204105225828740334, guid: 47962f9c4dc46344480971fbfe96f09d, type: 3}
+    thumbnail: {fileID: 21300000, guid: dddbf3fcdcb44dc489659c05e6d01597, type: 3}
+    size: {x: 0.007332, y: 0.00635, z: 0.0381}
+    triangles: 1488
+    massKg: 0.0011260589
+    cuttable: 0
+  - id: Structure/Standoff/Standoff 2.00
+    displayName: Standoff 2.00
+    binId: standoffs
+    model: {fileID: 919132149155446097, guid: e8f61ab389f18164897bd601e460448a, type: 3}
+    prefab: {fileID: 6367823234393837895, guid: b0920f99865654b4db0d4a533fc9cd7b, type: 3}
+    thumbnail: {fileID: 21300000, guid: 75b40257317f94243a8b3236927a3db5, type: 3}
+    size: {x: 0.007332, y: 0.006351, z: 0.0508}
+    triangles: 1076
+    massKg: 0.0016368949
+    cuttable: 0
+  - id: Structure/Standoff/Standoff 2.50
+    displayName: Standoff 2.50
+    binId: standoffs
+    model: {fileID: 919132149155446097, guid: 47800197b3dedb341a3145dca85c8b40, type: 3}
+    prefab: {fileID: 3212151468784857667, guid: bcc9f0dbfdd9ba747804faff4fe7208a, type: 3}
+    thumbnail: {fileID: 21300000, guid: b7f6c85c5b613c647955661409a7fb4c, type: 3}
+    size: {x: 0.007332, y: 0.00635, z: 0.0635}
+    triangles: 940
+    massKg: 0.002147434
+    cuttable: 0
+  - id: Structure/Standoff/Standoff 3.00
+    displayName: Standoff 3.00
+    binId: standoffs
+    model: {fileID: 919132149155446097, guid: 5484c775cd98b9e47aa0f94b54a6b936, type: 3}
+    prefab: {fileID: 7258734966879681288, guid: 4b567f404ad70424397bb7e06a15c3fc, type: 3}
+    thumbnail: {fileID: 21300000, guid: 6b07a441cf7ca2a429827eadafb81073, type: 3}
+    size: {x: 0.007332, y: 0.00635, z: 0.0762}
+    triangles: 856
+    massKg: 0.0026577855
+    cuttable: 0
+  - id: Structure/Standoff/Standoff 4.00
+    displayName: Standoff 4.00
+    binId: standoffs
+    model: {fileID: 919132149155446097, guid: 532fea54541d74b48aad6e41aa7eb6b1, type: 3}
+    prefab: {fileID: 6948963872603988979, guid: 7bb53389df6ab5b4a8b8dff7813cc2c6, type: 3}
+    thumbnail: {fileID: 21300000, guid: 7e6a8b7211dfb0f4cbd58d6d5f165019, type: 3}
+    size: {x: 0.007332, y: 0.006353, z: 0.1016}
+    triangles: 724
+    massKg: 0.0036787218
+    cuttable: 0
+  - id: Structure/Standoff/Standoff 6.00
+    displayName: Standoff 6.00
+    binId: standoffs
+    model: {fileID: 919132149155446097, guid: 6cc19059e8935b348b113d2065ed0621, type: 3}
+    prefab: {fileID: 1579570522233240278, guid: ecc641a9c61861c4c8863380787937fe, type: 3}
+    thumbnail: {fileID: 21300000, guid: 3df1f306ce0a4cd4a86706c64c6b9a6a, type: 3}
+    size: {x: 0.007332, y: 0.00635, z: 0.1524}
+    triangles: 664
+    massKg: 0.0057194214
+    cuttable: 0
