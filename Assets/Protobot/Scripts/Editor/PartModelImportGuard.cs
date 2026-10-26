@@ -18,9 +18,11 @@ namespace Protobot.Editor
 
             var importer = (ModelImporter)assetImporter;
 
-            // Keep the size exactly as authored in the source file.
-            importer.globalScale = 1f;
-            importer.useFileScale = true;
+            // Keep the size exactly as authored. The parts are OBJ files exported from Fusion,
+            // which are always in centimeters and carry no unit info, so convert cm -> m here.
+            var isObj = assetPath.EndsWith(".obj", System.StringComparison.OrdinalIgnoreCase);
+            importer.globalScale = isObj ? 0.01f : 1f;
+            importer.useFileScale = !isObj;
             importer.bakeAxisConversion = false;
 
             // Compression rounds vertex positions, which would shift hole positions.
