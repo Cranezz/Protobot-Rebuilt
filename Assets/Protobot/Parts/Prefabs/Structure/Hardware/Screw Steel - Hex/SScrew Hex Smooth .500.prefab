@@ -73,6 +73,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: dbe13576f00960c44beaf0ddba50e538, type: 3}
       insertIndex: -1
       addedObject: {fileID: 9186358884479718095}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: dbe13576f00960c44beaf0ddba50e538, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7420092754896133075}
     - targetCorrespondingSourceObject: {fileID: 8329350212030676554, guid: dbe13576f00960c44beaf0ddba50e538, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2777881918402992192}
@@ -137,6 +140,24 @@ MonoBehaviour:
   cursor: 2
   title: 1/2" Hex Screw
   hint: "0.587 \xD7 5/16 \xD7 5/16 in  \xB7  1.9 g"
+--- !u!114 &7420092754896133075
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4443455465620259020}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bd0e105a4920a434cb329977df26d6c6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.Fastener
+  role: 2
+  seat: {x: 0, y: 9.313226e-10, z: -0.012699998}
+  axis: {x: 0, y: 0, z: 1}
+  length: 0.012699998
+  diameter: 0.0041656117
+  headDiameter: 0.007924807
 --- !u!1 &4826997912639947735 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 8329350212030676554, guid: dbe13576f00960c44beaf0ddba50e538, type: 3}

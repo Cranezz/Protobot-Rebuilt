@@ -84,6 +84,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 2cc1eb5a3514c9841b2843ec42c12eca, type: 3}
       insertIndex: -1
       addedObject: {fileID: 8984220743883097398}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 2cc1eb5a3514c9841b2843ec42c12eca, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7701104593458318099}
   m_SourcePrefab: {fileID: 100100000, guid: 2cc1eb5a3514c9841b2843ec42c12eca, type: 3}
 --- !u!1 &5242518451363080448 stripped
 GameObject:
@@ -165,3 +168,16 @@ MonoBehaviour:
   cursor: 2
   title: Lead Screw Segment
   hint: "1.235 \xD7 0.579 \xD7 0.579 in  \xB7  3.4 g"
+--- !u!114 &7701104593458318099
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5242518451363080448}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c95fd2c384164a4d8b073d0d272505f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.PartHoles
+  holes: []

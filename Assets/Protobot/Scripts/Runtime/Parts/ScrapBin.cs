@@ -30,9 +30,14 @@ namespace Protobot.Parts
             Sounds.PlayAt(Sounds.Trash, body.worldCenterOfMass, 0.7f);
             if (hud == null)
                 hud = FindFirstObjectByType<Hud>();
+            // A whole assembly goes in one piece.
+            var assembly = body.GetComponent<Building.Assembly>();
             if (hud != null)
-                hud.ShowToast($"Threw away {part.name}", 2f);
-            Destroy(part.gameObject);
+                hud.ShowToast(assembly != null ? $"Threw away an assembly of {assembly.Parts().Count} parts" : $"Threw away {part.name}", 2f);
+            if (assembly != null)
+                foreach (var member in assembly.Parts())
+                    gone.Add(member);
+            Destroy(assembly != null ? assembly.gameObject : part.gameObject);
         }
 
         void LateUpdate() => gone.RemoveWhere(p => p == null);

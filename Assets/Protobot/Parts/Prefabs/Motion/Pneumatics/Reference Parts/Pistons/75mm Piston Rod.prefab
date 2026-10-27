@@ -73,6 +73,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 2c0c8c8b81c654244a4c21fc5a5e8848, type: 3}
       insertIndex: -1
       addedObject: {fileID: 5444342826046611306}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 2c0c8c8b81c654244a4c21fc5a5e8848, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6727278464074702400}
     - targetCorrespondingSourceObject: {fileID: 8329350212030676554, guid: 2c0c8c8b81c654244a4c21fc5a5e8848, type: 3}
       insertIndex: -1
       addedObject: {fileID: 5918957895104012464}
@@ -137,6 +140,19 @@ MonoBehaviour:
   cursor: 2
   title: 75mm Piston (rod)
   hint: "5.522 \xD7 0.157 \xD7 0.157 in  \xB7  4.6 g"
+--- !u!114 &6727278464074702400
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1506747856663689531}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c95fd2c384164a4d8b073d0d272505f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.PartHoles
+  holes: []
 --- !u!1 &7764110116103764512 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 8329350212030676554, guid: 2c0c8c8b81c654244a4c21fc5a5e8848, type: 3}

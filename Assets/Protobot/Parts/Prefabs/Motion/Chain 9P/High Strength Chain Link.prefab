@@ -81,6 +81,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: d8c35235ccd1e8947b1b670a11497077, type: 3}
       insertIndex: -1
       addedObject: {fileID: 5217192402313137721}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: d8c35235ccd1e8947b1b670a11497077, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4766933710526144325}
     - targetCorrespondingSourceObject: {fileID: 8310570232088225184, guid: d8c35235ccd1e8947b1b670a11497077, type: 3}
       insertIndex: -1
       addedObject: {fileID: 111325267616863222}
@@ -145,6 +148,33 @@ MonoBehaviour:
   cursor: 2
   title: High Strength Chain Link
   hint: "0.621 \xD7 0.559 \xD7 0.236 in  \xB7  0.5 g"
+--- !u!114 &4766933710526144325
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1121383636986871520}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c95fd2c384164a4d8b073d0d272505f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.PartHoles
+  holes:
+  - center: {x: 0.009806629, y: 0.0000028003851, z: -0.010374347}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.002993928
+    depth: 0.0014489024
+    square: 0
+    through: 1
+    kind: 0
+  - center: {x: 0.009806629, y: 0.0000028003851, z: 0.0023745631}
+    axis: {x: 0, y: 0, z: -1}
+    size: 0.002993928
+    depth: 0.0014484735
+    square: 0
+    through: 1
+    kind: 0
 --- !u!1 &8078206694956033553 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 8310570232088225184, guid: d8c35235ccd1e8947b1b670a11497077, type: 3}

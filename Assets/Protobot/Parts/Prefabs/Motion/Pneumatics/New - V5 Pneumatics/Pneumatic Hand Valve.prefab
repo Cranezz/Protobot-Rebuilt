@@ -77,6 +77,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 9024585b1d4a62b448eeb83a61f54efe, type: 3}
       insertIndex: -1
       addedObject: {fileID: 7465191851682052916}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 9024585b1d4a62b448eeb83a61f54efe, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4754890342503167743}
     - targetCorrespondingSourceObject: {fileID: -7175497441153661879, guid: 9024585b1d4a62b448eeb83a61f54efe, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2981238724323395878}
@@ -141,6 +144,54 @@ MonoBehaviour:
   cursor: 2
   title: Pneumatic Hand Valve
   hint: "1.825 \xD7 1.617 \xD7 0.7 in  \xB7  12.5 g"
+--- !u!114 &4754890342503167743
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6953757973109969042}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c95fd2c384164a4d8b073d0d272505f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.PartHoles
+  holes:
+  - center: {x: 0, y: 0.0006016746, z: 0.0001099996}
+    axis: {x: 1, y: 0, z: 0}
+    size: 0.0042818976
+    depth: 0.046354998
+    square: 0
+    through: 1
+    kind: 0
+  - center: {x: -0.0075774994, y: 0.008401674, z: -0.008051801}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.004161257
+    depth: 0.0016764001
+    square: 0
+    through: 1
+    kind: 0
+  - center: {x: 0.0076225004, y: 0.008401674, z: -0.008051801}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.004209928
+    depth: 0.0016763998
+    square: 0
+    through: 1
+    kind: 0
+  - center: {x: -0.0075774994, y: 0.008401674, z: 0.0080518}
+    axis: {x: 0, y: 0, z: -1}
+    size: 0.004161257
+    depth: 0.0016764007
+    square: 0
+    through: 1
+    kind: 0
+  - center: {x: 0.0076225004, y: 0.008401674, z: 0.0080518}
+    axis: {x: 0, y: 0, z: -1}
+    size: 0.004209928
+    depth: 0.0016764007
+    square: 0
+    through: 1
+    kind: 0
 --- !u!1 &8082374467013077386 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -7175497441153661879, guid: 9024585b1d4a62b448eeb83a61f54efe, type: 3}

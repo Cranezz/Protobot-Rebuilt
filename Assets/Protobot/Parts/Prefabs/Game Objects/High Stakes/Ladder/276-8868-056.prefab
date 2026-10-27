@@ -81,6 +81,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: c7c845e212ed134408db1cfcfd1dff5c, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2421042349984249441}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: c7c845e212ed134408db1cfcfd1dff5c, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1532560453438718229}
     - targetCorrespondingSourceObject: {fileID: 4445948748397649984, guid: c7c845e212ed134408db1cfcfd1dff5c, type: 3}
       insertIndex: -1
       addedObject: {fileID: 7672051232716319401}
@@ -172,3 +175,16 @@ MonoBehaviour:
   cursor: 2
   title: Ladder 276-8868-056
   hint: "2.73 \xD7 2.408 \xD7 2.385 in  \xB7  33.3 g"
+--- !u!114 &1532560453438718229
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9200458318147414307}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c95fd2c384164a4d8b073d0d272505f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.PartHoles
+  holes: []

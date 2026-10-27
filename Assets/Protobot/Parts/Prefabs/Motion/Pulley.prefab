@@ -81,6 +81,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 0de6320ca1dbc2745a44f6e6397f5a64, type: 3}
       insertIndex: -1
       addedObject: {fileID: 3588259226563426224}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 0de6320ca1dbc2745a44f6e6397f5a64, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 29705839735705561}
     - targetCorrespondingSourceObject: {fileID: 1935095692681779123, guid: 0de6320ca1dbc2745a44f6e6397f5a64, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1110134185163021366}
@@ -172,3 +175,37 @@ MonoBehaviour:
   cursor: 2
   title: Pulley
   hint: "1 1/8 \xD7 1 1/8 \xD7 3/8 in  \xB7  2.4 g"
+--- !u!114 &29705839735705561
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5950687199731123840}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c95fd2c384164a4d8b073d0d272505f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.PartHoles
+  holes:
+  - center: {x: -0.0048875, y: -0.0029163656, z: -0.004887498}
+    axis: {x: 0, y: 1, z: 0}
+    size: 0.007375147
+    depth: 0.0010922687
+    square: 0
+    through: 0
+    kind: 0
+  - center: {x: 0.000112499925, y: 0.00066499924, z: 0.00011250179}
+    axis: {x: 0, y: 1, z: 0}
+    size: 0.004062165
+    depth: 0.008254998
+    square: 0
+    through: 1
+    kind: 0
+  - center: {x: 0.0023124998, y: -0.0014984235, z: 0.0023125017}
+    axis: {x: 0, y: 1, z: 0}
+    size: 0.0018054065
+    depth: 0.003928153
+    square: 0
+    through: 0
+    kind: 0

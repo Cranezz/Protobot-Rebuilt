@@ -513,6 +513,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: f7e6e66b896739f45b110f461bbc990c, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2263669420025370827}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: f7e6e66b896739f45b110f461bbc990c, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5233052158208326729}
     - targetCorrespondingSourceObject: {fileID: 4445948748397649984, guid: f7e6e66b896739f45b110f461bbc990c, type: 3}
       insertIndex: -1
       addedObject: {fileID: 8673977049581034756}
@@ -712,6 +715,26 @@ MonoBehaviour:
   cursor: 2
   title: 4" Omni Wheel (half)
   hint: "4.149 \xD7 4.149 \xD7 0.527 in  \xB7  50.3 g"
+--- !u!114 &5233052158208326729
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 211162592134752579}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c95fd2c384164a4d8b073d0d272505f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.PartHoles
+  holes:
+  - center: {x: 0.000113542075, y: 0.00011410832, z: 0.0040495163}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0064
+    depth: 0.00565126
+    square: 1
+    through: 1
+    kind: 2
 --- !u!1 &961652365620964035 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 249706961602854609, guid: f7e6e66b896739f45b110f461bbc990c, type: 3}

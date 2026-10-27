@@ -77,6 +77,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 7b6f33bd6e3207b4dacc6c19f6c9d280, type: 3}
       insertIndex: -1
       addedObject: {fileID: 6628980000395875809}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 7b6f33bd6e3207b4dacc6c19f6c9d280, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 398551259221365742}
     - targetCorrespondingSourceObject: {fileID: -7175497441153661879, guid: 7b6f33bd6e3207b4dacc6c19f6c9d280, type: 3}
       insertIndex: -1
       addedObject: {fileID: 5793615060022289834}
@@ -141,6 +144,19 @@ MonoBehaviour:
   cursor: 2
   title: SBT0832_276-8016-001
   hint: "2.587 \xD7 5/16 \xD7 5/16 in  \xB7  7.3 g"
+--- !u!114 &398551259221365742
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7589200671911447702}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c95fd2c384164a4d8b073d0d272505f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.PartHoles
+  holes: []
 --- !u!1 &8788962709085549966 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -7175497441153661879, guid: 7b6f33bd6e3207b4dacc6c19f6c9d280, type: 3}

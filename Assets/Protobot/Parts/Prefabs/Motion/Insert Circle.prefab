@@ -76,6 +76,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 16d4a3d4737650f4298744e1b5a89c4f, type: 3}
       insertIndex: -1
       addedObject: {fileID: 3764058147211032778}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 16d4a3d4737650f4298744e1b5a89c4f, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6263302434245732972}
   m_SourcePrefab: {fileID: 100100000, guid: 16d4a3d4737650f4298744e1b5a89c4f, type: 3}
 --- !u!1 &4180286148126687398 stripped
 GameObject:
@@ -157,3 +160,23 @@ MonoBehaviour:
   cursor: 2
   title: Insert Circle
   hint: "0.395 \xD7 0.395 \xD7 0.2 in  \xB7  0.5 g"
+--- !u!114 &6263302434245732972
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4180286148126687398}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c95fd2c384164a4d8b073d0d272505f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.PartHoles
+  holes:
+  - center: {x: -0.000015509795, y: -0.000012529563, z: -0.0025399998}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0041367062
+    depth: 0.0050799996
+    square: 0
+    through: 1
+    kind: 0

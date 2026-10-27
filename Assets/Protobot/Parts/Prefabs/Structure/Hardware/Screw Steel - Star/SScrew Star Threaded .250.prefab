@@ -77,6 +77,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 73bff8260ff3e6d48b0fd1c386d30012, type: 3}
       insertIndex: -1
       addedObject: {fileID: 4375076292907752777}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 73bff8260ff3e6d48b0fd1c386d30012, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1069574942306179657}
     - targetCorrespondingSourceObject: {fileID: -7175497441153661879, guid: 73bff8260ff3e6d48b0fd1c386d30012, type: 3}
       insertIndex: -1
       addedObject: {fileID: 3565935086605200710}
@@ -168,3 +171,21 @@ MonoBehaviour:
   cursor: 2
   title: 1/4" Star Screw, threads shown
   hint: "0.337 \xD7 5/16 \xD7 5/16 in  \xB7  1.1 g"
+--- !u!114 &1069574942306179657
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6134243439106968330}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bd0e105a4920a434cb329977df26d6c6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.Fastener
+  role: 2
+  seat: {x: 0, y: 4.656613e-10, z: -0.0063499985}
+  axis: {x: 0, y: 0, z: 1}
+  length: 0.0063499985
+  diameter: 0.004165612
+  headDiameter: 0.007924807

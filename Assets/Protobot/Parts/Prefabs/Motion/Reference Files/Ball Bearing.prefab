@@ -80,6 +80,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: aa5b0b9f112a6ac47b217f608858424d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1310578419309328677}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: aa5b0b9f112a6ac47b217f608858424d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8631777731977870362}
   m_SourcePrefab: {fileID: 100100000, guid: aa5b0b9f112a6ac47b217f608858424d, type: 3}
 --- !u!1 &7988908668675570810 stripped
 GameObject:
@@ -161,3 +164,23 @@ MonoBehaviour:
   cursor: 2
   title: Ball Bearing
   hint: "0.969 \xD7 0.969 \xD7 0.28 in  \xB7  19 g"
+--- !u!114 &8631777731977870362
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7988908668675570810}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c95fd2c384164a4d8b073d0d272505f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.PartHoles
+  holes:
+  - center: {x: 0.0035559998, y: -0.00010629844, z: -0.00010629844}
+    axis: {x: 1, y: 0, z: 0}
+    size: 0.0076596914
+    depth: 0.0071119997
+    square: 0
+    through: 1
+    kind: 3

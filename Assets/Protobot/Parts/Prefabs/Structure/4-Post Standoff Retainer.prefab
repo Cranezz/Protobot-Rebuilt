@@ -81,6 +81,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 2c35133ebda94ce489b248a9227c0c83, type: 3}
       insertIndex: -1
       addedObject: {fileID: 7537158441312362855}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 2c35133ebda94ce489b248a9227c0c83, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5807928019145650795}
     - targetCorrespondingSourceObject: {fileID: 4445948748397649984, guid: 2c35133ebda94ce489b248a9227c0c83, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2643788396651528955}
@@ -172,3 +175,30 @@ MonoBehaviour:
   cursor: 2
   title: 4-Post Standoff Retainer
   hint: "0.678 \xD7 0.678 \xD7 0.37 in  \xB7  1.1 g"
+--- !u!114 &5807928019145650795
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8096430973989307530}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c95fd2c384164a4d8b073d0d272505f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.PartHoles
+  holes:
+  - center: {x: -0.000004999849, y: -0.0000049989176, z: 0.0007953462}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0042580427
+    depth: 0.001540693
+    square: 0
+    through: 1
+    kind: 0
+  - center: {x: -0.000004999849, y: -0.0000049989176, z: 0.0038859197}
+    axis: {x: 0, y: 0, z: -1}
+    size: 0.0069190892
+    depth: 0.004674161
+    square: 0
+    through: 0
+    kind: 0

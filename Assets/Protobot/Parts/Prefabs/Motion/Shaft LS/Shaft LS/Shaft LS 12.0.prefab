@@ -76,6 +76,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: d867f18ae8ac5d341aa4378e37091332, type: 3}
       insertIndex: -1
       addedObject: {fileID: 8015126053431456719}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: d867f18ae8ac5d341aa4378e37091332, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 449452018366131879}
   m_SourcePrefab: {fileID: 100100000, guid: d867f18ae8ac5d341aa4378e37091332, type: 3}
 --- !u!1 &1433943815679777228 stripped
 GameObject:
@@ -167,3 +170,16 @@ MonoBehaviour:
   cursor: 2
   title: 12" Shaft
   hint: "12 \xD7 1/8 \xD7 1/8 in  \xB7  24 g"
+--- !u!114 &449452018366131879
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1433943815679777228}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c95fd2c384164a4d8b073d0d272505f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.PartHoles
+  holes: []

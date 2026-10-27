@@ -81,6 +81,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 92364f03ea1a8d5489bd3e8ea5b06ef3, type: 3}
       insertIndex: -1
       addedObject: {fileID: 5169461265937331848}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 92364f03ea1a8d5489bd3e8ea5b06ef3, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7330908056076970450}
     - targetCorrespondingSourceObject: {fileID: 8310570232088225184, guid: 92364f03ea1a8d5489bd3e8ea5b06ef3, type: 3}
       insertIndex: -1
       addedObject: {fileID: 9061549994397608802}
@@ -172,3 +175,16 @@ MonoBehaviour:
   cursor: 2
   title: Thumbscrew
   hint: "0.77 \xD7 0.426 \xD7 0.426 in  \xB7  0.8 g"
+--- !u!114 &7330908056076970450
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8166341312329881736}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c95fd2c384164a4d8b073d0d272505f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.PartHoles
+  holes: []

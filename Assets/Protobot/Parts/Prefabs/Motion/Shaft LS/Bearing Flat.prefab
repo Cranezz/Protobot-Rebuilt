@@ -73,6 +73,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 46fc61133056bf84095cfdad5b4c1e0c, type: 3}
       insertIndex: -1
       addedObject: {fileID: 4538879605908882286}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 46fc61133056bf84095cfdad5b4c1e0c, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4633839124129901767}
     - targetCorrespondingSourceObject: {fileID: 6342991350794063318, guid: 46fc61133056bf84095cfdad5b4c1e0c, type: 3}
       insertIndex: -1
       addedObject: {fileID: 7736423168339190573}
@@ -164,3 +167,51 @@ MonoBehaviour:
   cursor: 2
   title: Bearing Flat
   hint: "1.4 \xD7 0.4 \xD7 0.277 in  \xB7  1.7 g"
+--- !u!114 &4633839124129901767
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5738487408479519498}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c95fd2c384164a4d8b073d0d272505f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.PartHoles
+  holes:
+  - center: {x: -0.0000800104, y: -0.012779999, z: -0.0000000013969839}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.00430562
+    depth: 0.006349999
+    square: 0
+    through: 1
+    kind: 3
+  - center: {x: -0.0000800104, y: 0.000020001069, z: -0.0000000013969839}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.00430562
+    depth: 0.006349999
+    square: 0
+    through: 1
+    kind: 3
+  - center: {x: -0.0000800104, y: 0.012620001, z: -0.0000000013969839}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.004185663
+    depth: 0.006349999
+    square: 0
+    through: 1
+    kind: 3
+  - center: {x: 0.00011998959, y: -0.0069799987, z: 0.0021519}
+    axis: {x: 0, y: 0, z: -1}
+    size: 0.0067999996
+    depth: 0.002017801
+    square: 1
+    through: 0
+    kind: 0
+  - center: {x: 0.00011998959, y: 0.007020001, z: 0.0021519004}
+    axis: {x: 0, y: 0, z: -1}
+    size: 0.0067999996
+    depth: 0.0020178
+    square: 1
+    through: 0
+    kind: 0

@@ -91,17 +91,22 @@ namespace Protobot.Parts
         public static void AfterEdit(GameObject part, float volumeBefore)
         {
             var volumeAfter = Volume(part);
-            if (part.TryGetComponent(out Rigidbody body))
+            part.TryGetComponent(out Rigidbody body);
+            if (part.TryGetComponent(out PartBody partBody))
             {
+                // Also when the part is in an assembly (no body of its own): the assembly's mass follows.
                 if (volumeBefore > 0f)
-                    body.mass = Mathf.Max(0.0005f, body.mass * volumeAfter / volumeBefore);
-                body.WakeUp();
+                    partBody.SetMass(Mathf.Max(0.0005f, partBody.Mass * volumeAfter / volumeBefore));
+                if (Building.Assembly.Of(partBody) is { } assembly)
+                    assembly.Recompute();
             }
+            if (body != null)
+                body.WakeUp();
             if (part.TryGetComponent(out HoverTarget hover))
             {
                 hover.RefreshRenderers();
                 var size = LocalBounds(part).size;
-                var mass = body != null ? body.mass : 0f;
+                var mass = partBody != null ? partBody.Mass : body != null ? body.mass : 0f;
                 hover.SetHint($"{PartEntry.FormatSize(size)}  ·  {PartEntry.FormatMass(mass)}");
             }
         }

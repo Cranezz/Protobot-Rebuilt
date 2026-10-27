@@ -81,6 +81,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: bf6a2023165623145adaaa852ff9e483, type: 3}
       insertIndex: -1
       addedObject: {fileID: 5280649146860118344}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: bf6a2023165623145adaaa852ff9e483, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4774815840943947495}
     - targetCorrespondingSourceObject: {fileID: 4445948748397649984, guid: bf6a2023165623145adaaa852ff9e483, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1936032469284251528}
@@ -172,3 +175,23 @@ MonoBehaviour:
   cursor: 2
   title: Perimeter Parts 276-7596-003
   hint: "1.281 \xD7 0.885 \xD7 0.885 in  \xB7  3.9 g"
+--- !u!114 &4774815840943947495
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3981529470618998427}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c95fd2c384164a4d8b073d0d272505f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.PartHoles
+  holes:
+  - center: {x: -0.00004466984, y: -0.0015625004, z: -0.00004466891}
+    axis: {x: 0, y: -1, z: 0}
+    size: 0.016034104
+    depth: 0.030524995
+    square: 0
+    through: 0
+    kind: 0

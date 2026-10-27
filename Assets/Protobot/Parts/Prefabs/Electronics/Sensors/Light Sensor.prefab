@@ -129,6 +129,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 65ce07f9365f18a4c90b9149c092193b, type: 3}
       insertIndex: -1
       addedObject: {fileID: 7514119895129887235}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 65ce07f9365f18a4c90b9149c092193b, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8314395616567208182}
     - targetCorrespondingSourceObject: {fileID: 4445948748397649984, guid: 65ce07f9365f18a4c90b9149c092193b, type: 3}
       insertIndex: -1
       addedObject: {fileID: 3093347343017477373}
@@ -313,6 +316,54 @@ MonoBehaviour:
   cursor: 2
   title: Light Sensor
   hint: "1.934 \xD7 1.024 \xD7 0.433 in  \xB7  11.4 g"
+--- !u!114 &8314395616567208182
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3589783602233955929}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c95fd2c384164a4d8b073d0d272505f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.PartHoles
+  holes:
+  - center: {x: 3.3469405e-10, y: 0.0021500038, z: -0.01045}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.005850186
+    depth: 0.0011000009
+    square: 0
+    through: 0
+    kind: 0
+  - center: {x: 3.3469405e-10, y: -0.020049995, z: -0.0020327552}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.004445298
+    depth: 0.00393449
+    square: 0
+    through: 1
+    kind: 0
+  - center: {x: 3.3469405e-10, y: -0.010849996, z: -0.0010999999}
+    axis: {x: 0, y: 0, z: -1}
+    size: 0.0036389132
+    depth: 0.0022000016
+    square: 0
+    through: 0
+    kind: 0
+  - center: {x: -0.009199999, y: 0.015150003, z: -0.0010999988}
+    axis: {x: 0, y: 0, z: -1}
+    size: 0.003666798
+    depth: 0.0021999995
+    square: 0
+    through: 0
+    kind: 0
+  - center: {x: 0.0092, y: 0.015150003, z: -0.0010999988}
+    axis: {x: 0, y: 0, z: -1}
+    size: 0.003666798
+    depth: 0.0021999995
+    square: 0
+    through: 0
+    kind: 0
 --- !u!1 &8309922332125368791 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 5639305726347934431, guid: 65ce07f9365f18a4c90b9149c092193b, type: 3}

@@ -81,6 +81,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: ae55d5d82c563e0468b6ef8e86b14f5d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 3207029588050465140}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: ae55d5d82c563e0468b6ef8e86b14f5d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2047887251703153263}
     - targetCorrespondingSourceObject: {fileID: 4445948748397649984, guid: ae55d5d82c563e0468b6ef8e86b14f5d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 5637057025300095231}
@@ -145,6 +148,19 @@ MonoBehaviour:
   cursor: 2
   title: Rubber Link
   hint: "1.23 \xD7 0.41 \xD7 0.41 in  \xB7  10 g"
+--- !u!114 &2047887251703153263
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1410463286466719019}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c95fd2c384164a4d8b073d0d272505f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.PartHoles
+  holes: []
 --- !u!1 &2513219593335255098 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 4445948748397649984, guid: ae55d5d82c563e0468b6ef8e86b14f5d, type: 3}

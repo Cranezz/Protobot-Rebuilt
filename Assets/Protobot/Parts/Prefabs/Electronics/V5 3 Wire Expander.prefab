@@ -429,6 +429,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 38fd962ba161b7a43aeb8b6e18735307, type: 3}
       insertIndex: -1
       addedObject: {fileID: 4940835531459692224}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 38fd962ba161b7a43aeb8b6e18735307, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4932939464956005286}
     - targetCorrespondingSourceObject: {fileID: 4445948748397649984, guid: 38fd962ba161b7a43aeb8b6e18735307, type: 3}
       insertIndex: -1
       addedObject: {fileID: 7478645683665170108}
@@ -634,6 +637,47 @@ MonoBehaviour:
   cursor: 2
   title: V5 3 Wire Expander
   hint: "3.002 \xD7 1.054 \xD7 0.862 in  \xB7  40.1 g"
+--- !u!114 &4932939464956005286
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2100261209835874826}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c95fd2c384164a4d8b073d0d272505f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.PartHoles
+  holes:
+  - center: {x: -0.0049808994, y: -0.03285822, z: -0.008149999}
+    axis: {x: 0, y: 1, z: 0}
+    size: 0.011399999
+    depth: 0.010552352
+    square: 1
+    through: 0
+    kind: 0
+  - center: {x: 0.000019100567, y: -0.009734397, z: -0.010705}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.004161257
+    depth: 0.012089997
+    square: 0
+    through: 1
+    kind: 0
+  - center: {x: 0.000019100567, y: 0.002865603, z: -0.015949998}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.005106461
+    depth: 0.001600001
+    square: 0
+    through: 0
+    kind: 0
+  - center: {x: 0.000019100567, y: -0.009734397, z: 0.00051035476}
+    axis: {x: 0, y: 0, z: -1}
+    size: 0.004161257
+    depth: 0.00647929
+    square: 0
+    through: 1
+    kind: 0
 --- !u!1 &2112141268114010112 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -8310516894849210533, guid: 38fd962ba161b7a43aeb8b6e18735307, type: 3}

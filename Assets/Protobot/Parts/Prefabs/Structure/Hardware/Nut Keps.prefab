@@ -88,6 +88,12 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: f74fa3107095154488581a4c0a6c4711, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1967871116061424669}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: f74fa3107095154488581a4c0a6c4711, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5264974112876846266}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: f74fa3107095154488581a4c0a6c4711, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8525414903747100230}
     - targetCorrespondingSourceObject: {fileID: 1487460747418248249, guid: f74fa3107095154488581a4c0a6c4711, type: 3}
       insertIndex: -1
       addedObject: {fileID: 5603854212862649024}
@@ -199,3 +205,41 @@ MonoBehaviour:
   cursor: 2
   title: Keps Nut
   hint: "0.393 \xD7 0.393 \xD7 0.148 in  \xB7  1.5 g"
+--- !u!114 &5264974112876846266
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4196316848442603080}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c95fd2c384164a4d8b073d0d272505f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.PartHoles
+  holes:
+  - center: {x: -0.01556659, y: -0.0015366997, z: -0.0031011393}
+    axis: {x: 0, y: 1, z: 0}
+    size: 0.0042580427
+    depth: 0.0030733994
+    square: 0
+    through: 1
+    kind: 1
+--- !u!114 &8525414903747100230
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4196316848442603080}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bd0e105a4920a434cb329977df26d6c6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.Fastener
+  role: 4
+  seat: {x: -0.01556659, y: -0.0030733994, z: -0.0031011393}
+  axis: {x: 0, y: 1, z: 0}
+  length: 0.0030733994
+  diameter: 0.0042580427
+  headDiameter: 0

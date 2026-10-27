@@ -73,6 +73,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: ef46c80f96586ee4cb7304d3be491c4a, type: 3}
       insertIndex: -1
       addedObject: {fileID: 6344888007050624602}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: ef46c80f96586ee4cb7304d3be491c4a, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3656024656736850454}
     - targetCorrespondingSourceObject: {fileID: 7471719701255174056, guid: ef46c80f96586ee4cb7304d3be491c4a, type: 3}
       insertIndex: -1
       addedObject: {fileID: 3091167553617462975}
@@ -137,6 +140,47 @@ MonoBehaviour:
   cursor: 2
   title: 90 Degree Angle
   hint: "0.91 \xD7 0.91 \xD7 0.844 in  \xB7  3.1 g"
+--- !u!114 &3656024656736850454
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3334070279607283678}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c95fd2c384164a4d8b073d0d272505f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.PartHoles
+  holes:
+  - center: {x: -0.006318799, y: -0.00081887655, z: 0.00041410018}
+    axis: {x: 0, y: 1, z: 0}
+    size: 0.005
+    depth: 0.0015747994
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.0062812003, y: -0.00081887655, z: 0.00041410018}
+    axis: {x: 0, y: 1, z: 0}
+    size: 0.0052829357
+    depth: 0.0015747994
+    square: 0
+    through: 1
+    kind: 0
+  - center: {x: -0.006318799, y: -0.018106276, z: -0.0169985}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.005
+    depth: 0.0015747994
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.0062812003, y: -0.018106276, z: -0.0169985}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0052636196
+    depth: 0.0015747994
+    square: 0
+    through: 1
+    kind: 0
 --- !u!1 &4987024017521829159 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 7471719701255174056, guid: ef46c80f96586ee4cb7304d3be491c4a, type: 3}

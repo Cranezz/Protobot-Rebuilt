@@ -77,6 +77,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: b817c5a50b9395447830012a2938ee31, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1563776120693948823}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: b817c5a50b9395447830012a2938ee31, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3506169615510828180}
     - targetCorrespondingSourceObject: {fileID: -7175497441153661879, guid: b817c5a50b9395447830012a2938ee31, type: 3}
       insertIndex: -1
       addedObject: {fileID: 4927160305007496945}
@@ -141,6 +144,26 @@ MonoBehaviour:
   cursor: 2
   title: Shaft Collar (star screw)
   hint: "0.62 \xD7 0.433 \xD7 5/16 in  \xB7  4.9 g"
+--- !u!114 &3506169615510828180
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5613408932359270350}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c95fd2c384164a4d8b073d0d272505f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.PartHoles
+  holes:
+  - center: {x: 0.00009999989, y: 0.000012600329, z: -0.000049798444}
+    axis: {x: 0, y: 1, z: 0}
+    size: 0.004185663
+    depth: 0.0063499985
+    square: 0
+    through: 1
+    kind: 2
 --- !u!1 &6722818055522850518 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -7175497441153661879, guid: b817c5a50b9395447830012a2938ee31, type: 3}

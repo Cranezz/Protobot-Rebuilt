@@ -249,6 +249,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: aedc844edf0786c43b8fe2164cb33c90, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1177972215151130837}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: aedc844edf0786c43b8fe2164cb33c90, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 356560483958949420}
     - targetCorrespondingSourceObject: {fileID: 4445948748397649984, guid: aedc844edf0786c43b8fe2164cb33c90, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1957323617505823958}
@@ -517,6 +520,61 @@ MonoBehaviour:
   cursor: 2
   title: 2" Anti-Static Omni Wheel
   hint: "1.989 \xD7 1.989 \xD7 5/8 in  \xB7  21.5 g"
+--- !u!114 &356560483958949420
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6172544173099439556}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c95fd2c384164a4d8b073d0d272505f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.PartHoles
+  holes:
+  - center: {x: -0.0042624995, y: -0.00006211616, z: -0.00006211616}
+    axis: {x: 1, y: 0, z: 0}
+    size: 0.007752219
+    depth: 0.0073499996
+    square: 0
+    through: 1
+    kind: 0
+  - center: {x: -0.0018504066, y: -0.00006211616, z: -0.017862115}
+    axis: {x: 1, y: 0, z: 0}
+    size: 0.0022
+    depth: 0.001974186
+    square: 1
+    through: 0
+    kind: 2
+  - center: {x: -0.0018504066, y: -0.017862115, z: -0.00006211616}
+    axis: {x: 1, y: 0, z: 0}
+    size: 0.0022
+    depth: 0.001974186
+    square: 1
+    through: 0
+    kind: 2
+  - center: {x: -0.0018053444, y: 0.017937884, z: -0.00006211616}
+    axis: {x: 1, y: 0, z: 0}
+    size: 0.0023999999
+    depth: 0.0020643105
+    square: 1
+    through: 0
+    kind: 2
+  - center: {x: -0.0018053444, y: -0.00006211616, z: 0.017937884}
+    axis: {x: 1, y: 0, z: 0}
+    size: 0.0023999999
+    depth: 0.0020643105
+    square: 1
+    through: 0
+    kind: 2
+  - center: {x: 0.0042624995, y: -0.00006211616, z: -0.00006211616}
+    axis: {x: -1, y: 0, z: 0}
+    size: 0.007752219
+    depth: 0.0073499996
+    square: 0
+    through: 1
+    kind: 0
 --- !u!1 &6938381194413950215 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 4116911310342040978, guid: aedc844edf0786c43b8fe2164cb33c90, type: 3}

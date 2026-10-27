@@ -84,6 +84,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 15c36dd22d731a1418683faad9056f0a, type: 3}
       insertIndex: -1
       addedObject: {fileID: 5189759623786356862}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 15c36dd22d731a1418683faad9056f0a, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5615310273317957456}
   m_SourcePrefab: {fileID: 100100000, guid: 15c36dd22d731a1418683faad9056f0a, type: 3}
 --- !u!1 &3859812281942198535 stripped
 GameObject:
@@ -199,3 +202,1731 @@ MonoBehaviour:
   cursor: 2
   title: 1x5x1 Steel C-Channel (35)
   hint: "17 1/2 \xD7 2 1/2 \xD7 0.547 in  \xB7  314.6 g"
+--- !u!114 &5615310273317957456
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3859812281942198535}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c95fd2c384164a4d8b073d0d272505f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.PartHoles
+  holes:
+  - center: {x: -0.031154688, y: 0.0064, z: -0.007490628}
+    axis: {x: 1, y: 0, z: 0}
+    size: 0.0047999998
+    depth: 0.0011906183
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.031154688, y: 0.019, z: -0.007490628}
+    axis: {x: 1, y: 0, z: 0}
+    size: 0.0045999996
+    depth: 0.0011906177
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.031154688, y: 0.031799998, z: -0.007490628}
+    axis: {x: 1, y: 0, z: 0}
+    size: 0.0045999996
+    depth: 0.0011906177
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.031154688, y: 0.0444, z: -0.007490628}
+    axis: {x: 1, y: 0, z: 0}
+    size: 0.0047999998
+    depth: 0.0011906177
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.031154688, y: 0.0572, z: -0.007490628}
+    axis: {x: 1, y: 0, z: 0}
+    size: 0.0047999998
+    depth: 0.0011906177
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.031154688, y: 0.0698, z: -0.007490628}
+    axis: {x: 1, y: 0, z: 0}
+    size: 0.0045999996
+    depth: 0.0011906177
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.031154688, y: 0.0826, z: -0.007490628}
+    axis: {x: 1, y: 0, z: 0}
+    size: 0.0045999996
+    depth: 0.0011906177
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.031154688, y: 0.095199995, z: -0.007490628}
+    axis: {x: 1, y: 0, z: 0}
+    size: 0.0047999998
+    depth: 0.0011906177
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.031154688, y: 0.107999995, z: -0.007490628}
+    axis: {x: 1, y: 0, z: 0}
+    size: 0.0047999998
+    depth: 0.0011906179
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.031154688, y: 0.1206, z: -0.007490628}
+    axis: {x: 1, y: 0, z: 0}
+    size: 0.0045999996
+    depth: 0.0011906183
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.031154688, y: 0.1334, z: -0.007490628}
+    axis: {x: 1, y: 0, z: 0}
+    size: 0.0045999996
+    depth: 0.0011906183
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.031154688, y: 0.146, z: -0.007490628}
+    axis: {x: 1, y: 0, z: 0}
+    size: 0.0047999998
+    depth: 0.0011906183
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.031154688, y: 0.15879999, z: -0.007490628}
+    axis: {x: 1, y: 0, z: 0}
+    size: 0.0047999998
+    depth: 0.0011906183
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.031154688, y: 0.1714, z: -0.007490628}
+    axis: {x: 1, y: 0, z: 0}
+    size: 0.0045999996
+    depth: 0.0011906183
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.031154688, y: 0.18419999, z: -0.007490628}
+    axis: {x: 1, y: 0, z: 0}
+    size: 0.0045999996
+    depth: 0.0011906183
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.031154688, y: 0.1968, z: -0.007490628}
+    axis: {x: 1, y: 0, z: 0}
+    size: 0.0047999998
+    depth: 0.0011906183
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.031154688, y: 0.2096, z: -0.007490628}
+    axis: {x: 1, y: 0, z: 0}
+    size: 0.0047999998
+    depth: 0.0011906183
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.031154688, y: 0.22219999, z: -0.007490628}
+    axis: {x: 1, y: 0, z: 0}
+    size: 0.0045999996
+    depth: 0.0011906183
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.031154688, y: 0.235, z: -0.007490628}
+    axis: {x: 1, y: 0, z: 0}
+    size: 0.0045999996
+    depth: 0.0011906183
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.031154688, y: 0.24759999, z: -0.007490628}
+    axis: {x: 1, y: 0, z: 0}
+    size: 0.0047999998
+    depth: 0.0011906183
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.031154688, y: 0.2604, z: -0.007490628}
+    axis: {x: 1, y: 0, z: 0}
+    size: 0.0047999998
+    depth: 0.0011906184
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.031154688, y: 0.273, z: -0.007490628}
+    axis: {x: 1, y: 0, z: 0}
+    size: 0.0045999996
+    depth: 0.0011906183
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.031154688, y: 0.28579998, z: -0.007490628}
+    axis: {x: 1, y: 0, z: 0}
+    size: 0.0045999996
+    depth: 0.0011906183
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.031154688, y: 0.29839998, z: -0.007490628}
+    axis: {x: 1, y: 0, z: 0}
+    size: 0.0047999998
+    depth: 0.0011906183
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.031154688, y: 0.3112, z: -0.007490628}
+    axis: {x: 1, y: 0, z: 0}
+    size: 0.0047999998
+    depth: 0.0011906183
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.031154688, y: 0.3238, z: -0.007490628}
+    axis: {x: 1, y: 0, z: 0}
+    size: 0.0045999996
+    depth: 0.0011906183
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.031154688, y: 0.3366, z: -0.007490628}
+    axis: {x: 1, y: 0, z: 0}
+    size: 0.0045999996
+    depth: 0.0011906183
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.031154688, y: 0.34919998, z: -0.007490628}
+    axis: {x: 1, y: 0, z: 0}
+    size: 0.0047999998
+    depth: 0.0011906183
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.031154688, y: 0.362, z: -0.007490628}
+    axis: {x: 1, y: 0, z: 0}
+    size: 0.0047999998
+    depth: 0.0011906183
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.031154688, y: 0.3746, z: -0.007490628}
+    axis: {x: 1, y: 0, z: 0}
+    size: 0.0045999996
+    depth: 0.0011906183
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.031154688, y: 0.3874, z: -0.007490628}
+    axis: {x: 1, y: 0, z: 0}
+    size: 0.0045999996
+    depth: 0.0011906183
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.031154688, y: 0.39999998, z: -0.007490628}
+    axis: {x: 1, y: 0, z: 0}
+    size: 0.0047999998
+    depth: 0.0011906183
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.031154688, y: 0.41279998, z: -0.007490628}
+    axis: {x: 1, y: 0, z: 0}
+    size: 0.0047999998
+    depth: 0.0011906183
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.031154688, y: 0.4254, z: -0.007490628}
+    axis: {x: 1, y: 0, z: 0}
+    size: 0.0045999996
+    depth: 0.0011906183
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.031154688, y: 0.4382, z: -0.007490628}
+    axis: {x: 1, y: 0, z: 0}
+    size: 0.0045999996
+    depth: 0.0011906183
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.031154685, y: 0.0064, z: -0.007490628}
+    axis: {x: -1, y: 0, z: 0}
+    size: 0.0047999998
+    depth: 0.001190627
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.031154685, y: 0.019, z: -0.007490628}
+    axis: {x: -1, y: 0, z: 0}
+    size: 0.0045999996
+    depth: 0.001190627
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.031154685, y: 0.031799998, z: -0.007490628}
+    axis: {x: -1, y: 0, z: 0}
+    size: 0.0045999996
+    depth: 0.001190627
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.031154685, y: 0.0444, z: -0.007490628}
+    axis: {x: -1, y: 0, z: 0}
+    size: 0.0047999998
+    depth: 0.001190627
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.031154685, y: 0.0572, z: -0.007490628}
+    axis: {x: -1, y: 0, z: 0}
+    size: 0.0047999998
+    depth: 0.001190627
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.031154685, y: 0.0698, z: -0.007490628}
+    axis: {x: -1, y: 0, z: 0}
+    size: 0.0045999996
+    depth: 0.001190627
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.031154685, y: 0.0826, z: -0.007490628}
+    axis: {x: -1, y: 0, z: 0}
+    size: 0.0045999996
+    depth: 0.001190627
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.031154685, y: 0.095199995, z: -0.007490628}
+    axis: {x: -1, y: 0, z: 0}
+    size: 0.0047999998
+    depth: 0.001190627
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.031154685, y: 0.107999995, z: -0.007490628}
+    axis: {x: -1, y: 0, z: 0}
+    size: 0.0047999998
+    depth: 0.001190627
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.031154685, y: 0.1206, z: -0.007490628}
+    axis: {x: -1, y: 0, z: 0}
+    size: 0.0045999996
+    depth: 0.001190627
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.031154685, y: 0.1334, z: -0.007490628}
+    axis: {x: -1, y: 0, z: 0}
+    size: 0.0045999996
+    depth: 0.001190627
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.031154685, y: 0.146, z: -0.007490628}
+    axis: {x: -1, y: 0, z: 0}
+    size: 0.0047999998
+    depth: 0.001190627
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.031154685, y: 0.15879999, z: -0.007490628}
+    axis: {x: -1, y: 0, z: 0}
+    size: 0.0047999998
+    depth: 0.001190627
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.031154685, y: 0.1714, z: -0.007490628}
+    axis: {x: -1, y: 0, z: 0}
+    size: 0.0045999996
+    depth: 0.001190627
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.031154685, y: 0.18419999, z: -0.007490628}
+    axis: {x: -1, y: 0, z: 0}
+    size: 0.0045999996
+    depth: 0.001190627
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.031154685, y: 0.1968, z: -0.007490628}
+    axis: {x: -1, y: 0, z: 0}
+    size: 0.0047999998
+    depth: 0.001190627
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.031154685, y: 0.2096, z: -0.007490628}
+    axis: {x: -1, y: 0, z: 0}
+    size: 0.0047999998
+    depth: 0.001190627
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.031154685, y: 0.22219999, z: -0.007490628}
+    axis: {x: -1, y: 0, z: 0}
+    size: 0.0045999996
+    depth: 0.001190627
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.031154685, y: 0.235, z: -0.007490628}
+    axis: {x: -1, y: 0, z: 0}
+    size: 0.0045999996
+    depth: 0.001190627
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.031154685, y: 0.24759999, z: -0.007490628}
+    axis: {x: -1, y: 0, z: 0}
+    size: 0.0047999998
+    depth: 0.001190627
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.031154685, y: 0.2604, z: -0.007490628}
+    axis: {x: -1, y: 0, z: 0}
+    size: 0.0047999998
+    depth: 0.001190627
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.031154685, y: 0.273, z: -0.007490628}
+    axis: {x: -1, y: 0, z: 0}
+    size: 0.0045999996
+    depth: 0.001190627
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.031154685, y: 0.28579998, z: -0.007490628}
+    axis: {x: -1, y: 0, z: 0}
+    size: 0.0045999996
+    depth: 0.001190627
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.031154685, y: 0.29839998, z: -0.007490628}
+    axis: {x: -1, y: 0, z: 0}
+    size: 0.0047999998
+    depth: 0.001190627
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.031154685, y: 0.3112, z: -0.007490628}
+    axis: {x: -1, y: 0, z: 0}
+    size: 0.0047999998
+    depth: 0.001190627
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.031154685, y: 0.3238, z: -0.007490628}
+    axis: {x: -1, y: 0, z: 0}
+    size: 0.0045999996
+    depth: 0.001190627
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.031154685, y: 0.3366, z: -0.007490628}
+    axis: {x: -1, y: 0, z: 0}
+    size: 0.0045999996
+    depth: 0.001190627
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.031154685, y: 0.34919998, z: -0.007490628}
+    axis: {x: -1, y: 0, z: 0}
+    size: 0.0047999998
+    depth: 0.001190627
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.031154685, y: 0.362, z: -0.007490628}
+    axis: {x: -1, y: 0, z: 0}
+    size: 0.0047999998
+    depth: 0.001190627
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.031154685, y: 0.3746, z: -0.007490628}
+    axis: {x: -1, y: 0, z: 0}
+    size: 0.0045999996
+    depth: 0.001190627
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.031154685, y: 0.3874, z: -0.007490628}
+    axis: {x: -1, y: 0, z: 0}
+    size: 0.0045999996
+    depth: 0.001190627
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.031154685, y: 0.39999998, z: -0.007490628}
+    axis: {x: -1, y: 0, z: 0}
+    size: 0.0047999998
+    depth: 0.001190627
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.031154685, y: 0.41279998, z: -0.007490628}
+    axis: {x: -1, y: 0, z: 0}
+    size: 0.0047999998
+    depth: 0.0011906268
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.031154685, y: 0.4254, z: -0.007490628}
+    axis: {x: -1, y: 0, z: 0}
+    size: 0.0045999996
+    depth: 0.0011906264
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.031154685, y: 0.4382, z: -0.007490628}
+    axis: {x: -1, y: 0, z: 0}
+    size: 0.0045999996
+    depth: 0.0011906264
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.025349997, y: 0.0064, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0047999998
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.012749998, y: 0.0064, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0045999996
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.00005000191, y: 0.0064, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0045999996
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.012650002, y: 0.0064, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0047999998
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.02545, y: 0.0064, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0047999998
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.025349997, y: 0.019, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0045999996
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.012749998, y: 0.019, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0044
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.00005000191, y: 0.019, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0044
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.012650002, y: 0.019, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0045999996
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.02545, y: 0.019, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0045999996
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.025349997, y: 0.031799998, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0045999996
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.012749998, y: 0.031799998, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0044
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.00005000191, y: 0.031799998, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0044
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.012650002, y: 0.031799998, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0045999996
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.02545, y: 0.031799998, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0045999996
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.025349997, y: 0.0444, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0047999998
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.012749998, y: 0.0444, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0045999996
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.00005000191, y: 0.0444, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0045999996
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.012650002, y: 0.0444, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0047999998
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.02545, y: 0.0444, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0047999998
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.025349997, y: 0.0572, z: -0.0005953135}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0047999998
+    depth: 0.0011906289
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.012749998, y: 0.0572, z: -0.0005953135}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0045999996
+    depth: 0.0011906289
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.00005000191, y: 0.0572, z: -0.0005953135}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0045999996
+    depth: 0.0011906289
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.012650002, y: 0.0572, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0047999998
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.02545, y: 0.0572, z: -0.0005953135}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0047999998
+    depth: 0.0011906289
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.025349997, y: 0.0698, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0045999996
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.012749998, y: 0.0698, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0044
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.00005000191, y: 0.0698, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0044
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.012650002, y: 0.0698, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0045999996
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.02545, y: 0.0698, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0045999996
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.025349997, y: 0.0826, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0045999996
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.012749998, y: 0.0826, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0044
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.00005000191, y: 0.0826, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0044
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.012650002, y: 0.0826, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0045999996
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.02545, y: 0.0826, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0045999996
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.025349997, y: 0.095199995, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0047999998
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.012749998, y: 0.095199995, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0045999996
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.00005000191, y: 0.095199995, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0045999996
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.012650002, y: 0.095199995, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0047999998
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.02545, y: 0.095199995, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0047999998
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.025349997, y: 0.107999995, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0047999998
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.012749998, y: 0.107999995, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0045999996
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.00005000191, y: 0.107999995, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0045999996
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.012650002, y: 0.107999995, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0047999998
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.02545, y: 0.107999995, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0047999998
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.025349997, y: 0.1206, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0045999996
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.012749998, y: 0.1206, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0044
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.00005000191, y: 0.1206, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0044
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.012650002, y: 0.1206, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0045999996
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.02545, y: 0.1206, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0045999996
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.025349997, y: 0.1334, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0045999996
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.012749998, y: 0.1334, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0044
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.00005000191, y: 0.1334, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0044
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.012650002, y: 0.1334, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0045999996
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.02545, y: 0.1334, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0045999996
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.025349997, y: 0.146, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0047999998
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.012749998, y: 0.146, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0045999996
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.00005000191, y: 0.146, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0045999996
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.012650002, y: 0.146, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0047999998
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.02545, y: 0.146, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0047999998
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.025349997, y: 0.15879999, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0047999998
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.012749998, y: 0.15879999, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0045999996
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.00005000191, y: 0.15879999, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0045999996
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.012650002, y: 0.15879999, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0047999998
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.02545, y: 0.15879999, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0047999998
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.025349997, y: 0.1714, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0045999996
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.012749998, y: 0.1714, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0044
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.00005000191, y: 0.1714, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0044
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.012650002, y: 0.1714, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0045999996
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.02545, y: 0.1714, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0045999996
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.025349997, y: 0.18419999, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0045999996
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.012749998, y: 0.18419999, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0044
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.00005000191, y: 0.18419999, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0044
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.012650002, y: 0.18419999, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0045999996
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.02545, y: 0.18419999, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0045999996
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.025349997, y: 0.1968, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0047999998
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.012749998, y: 0.1968, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0045999996
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.00005000191, y: 0.1968, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0045999996
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.012650002, y: 0.1968, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0047999998
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.02545, y: 0.1968, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0047999998
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.025349997, y: 0.2096, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0047999998
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.012749998, y: 0.2096, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0045999996
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.00005000191, y: 0.2096, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0045999996
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.012650002, y: 0.2096, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0047999998
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.02545, y: 0.2096, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0047999998
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.025349997, y: 0.22219999, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0045999996
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.012749998, y: 0.22219999, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0044
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.00005000191, y: 0.22219999, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0044
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.012650002, y: 0.22219999, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0045999996
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.02545, y: 0.22219999, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0045999996
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.025349997, y: 0.235, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0045999996
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.012749998, y: 0.235, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0044
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.00005000191, y: 0.235, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0044
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.012650002, y: 0.235, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0045999996
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.02545, y: 0.235, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0045999996
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.025349997, y: 0.24759999, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0047999998
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.012749998, y: 0.24759999, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0045999996
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.00005000191, y: 0.24759999, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0045999996
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.012650002, y: 0.24759999, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0047999998
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.02545, y: 0.24759999, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0047999998
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.025349997, y: 0.2604, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0047999998
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.012749998, y: 0.2604, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0045999996
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.00005000191, y: 0.2604, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0045999996
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.012650002, y: 0.2604, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0047999998
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.02545, y: 0.2604, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0047999998
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.025349997, y: 0.273, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0045999996
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.012749998, y: 0.273, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0044
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.00005000191, y: 0.273, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0044
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.012650002, y: 0.273, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0045999996
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.02545, y: 0.273, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0045999996
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.025349997, y: 0.28579998, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0045999996
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.012749998, y: 0.28579998, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0044
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.00005000191, y: 0.28579998, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0044
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.012650002, y: 0.28579998, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0045999996
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.02545, y: 0.28579998, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0045999996
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.025349997, y: 0.29839998, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0047999998
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.012749998, y: 0.29839998, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0045999996
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.00005000191, y: 0.29839998, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0045999996
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.012650002, y: 0.29839998, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0047999998
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.02545, y: 0.29839998, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0047999998
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.025349997, y: 0.3112, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0047999998
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.012749998, y: 0.3112, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0045999996
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.00005000191, y: 0.3112, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0045999996
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.012650002, y: 0.3112, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0047999998
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.02545, y: 0.3112, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0047999998
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.025349997, y: 0.3238, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0045999996
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.012749998, y: 0.3238, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0044
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.00005000191, y: 0.3238, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0044
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.012650002, y: 0.3238, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0045999996
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.02545, y: 0.3238, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0045999996
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.025349997, y: 0.3366, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0045999996
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.012749998, y: 0.3366, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0044
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.00005000191, y: 0.3366, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0044
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.012650002, y: 0.3366, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0045999996
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.02545, y: 0.3366, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0045999996
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.025349997, y: 0.34919998, z: -0.0005953135}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0047999998
+    depth: 0.0011906289
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.012749998, y: 0.34919998, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0045999996
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.00005000191, y: 0.34919998, z: -0.0005953135}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0045999996
+    depth: 0.0011906289
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.012650002, y: 0.34919998, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0047999998
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.02545, y: 0.34919998, z: -0.0005953135}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0047999998
+    depth: 0.0011906289
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.025349997, y: 0.362, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0047999998
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.012749998, y: 0.362, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0045999996
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.00005000191, y: 0.362, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0045999996
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.012650002, y: 0.362, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0047999998
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.02545, y: 0.362, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0047999998
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.025349997, y: 0.3746, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0045999996
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.012749998, y: 0.3746, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0044
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.00005000191, y: 0.3746, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0044
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.012650002, y: 0.3746, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0045999996
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.02545, y: 0.3746, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0045999996
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.025349997, y: 0.3874, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0045999996
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.012749998, y: 0.3874, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0044
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.00005000191, y: 0.3874, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0044
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.012650002, y: 0.3874, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0045999996
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.02545, y: 0.3874, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0045999996
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.025349997, y: 0.39999998, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0047999998
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.012749998, y: 0.39999998, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0045999996
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.00005000191, y: 0.39999998, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0045999996
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.012650002, y: 0.39999998, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0047999998
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.02545, y: 0.39999998, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0047999998
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.025349997, y: 0.41279998, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0047999998
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.012749998, y: 0.41279998, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0045999996
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.00005000191, y: 0.41279998, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0045999996
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.012650002, y: 0.41279998, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0047999998
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.02545, y: 0.41279998, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0047999998
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.025349997, y: 0.4254, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0045999996
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.012749998, y: 0.4254, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0044
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.00005000191, y: 0.4254, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0044
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.012650002, y: 0.4254, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0045999996
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.02545, y: 0.4254, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0045999996
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.025349997, y: 0.4382, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0045999996
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.012749998, y: 0.4382, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0044
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.00005000191, y: 0.4382, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0044
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.012650002, y: 0.4382, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0045999996
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.02545, y: 0.4382, z: -0.00059531303}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0045999996
+    depth: 0.0011906298
+    square: 1
+    through: 1
+    kind: 0

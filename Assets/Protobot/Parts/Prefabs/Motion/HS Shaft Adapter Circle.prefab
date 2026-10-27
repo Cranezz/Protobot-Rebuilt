@@ -73,6 +73,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 3f5f3cca50aa9d040b002bf79c259c20, type: 3}
       insertIndex: -1
       addedObject: {fileID: 8184975422991984114}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 3f5f3cca50aa9d040b002bf79c259c20, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7165957767252943553}
     - targetCorrespondingSourceObject: {fileID: 8329350212030676554, guid: 3f5f3cca50aa9d040b002bf79c259c20, type: 3}
       insertIndex: -1
       addedObject: {fileID: 4842400006491404571}
@@ -137,6 +140,26 @@ MonoBehaviour:
   cursor: 2
   title: HS Shaft Adapter Circle
   hint: "1/2 \xD7 1/4 \xD7 1/4 in  \xB7  2.6 g"
+--- !u!114 &7165957767252943553
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 974552715925328299}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c95fd2c384164a4d8b073d0d272505f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.PartHoles
+  holes:
+  - center: {x: -0.00017500004, y: 0.0062905317, z: -0.00017499957}
+    axis: {x: 0, y: 1, z: 0}
+    size: 0.0051462003
+    depth: 0.012581064
+    square: 0
+    through: 1
+    kind: 0
 --- !u!1 &8273372803088749232 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 8329350212030676554, guid: 3f5f3cca50aa9d040b002bf79c259c20, type: 3}

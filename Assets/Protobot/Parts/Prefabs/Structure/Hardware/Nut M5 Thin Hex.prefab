@@ -77,6 +77,12 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: cd80b760d980644468be68af5a6c48a5, type: 3}
       insertIndex: -1
       addedObject: {fileID: 8455850744334433346}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: cd80b760d980644468be68af5a6c48a5, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8281763194928156646}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: cd80b760d980644468be68af5a6c48a5, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6313595172529452664}
     - targetCorrespondingSourceObject: {fileID: 1487460747418248249, guid: cd80b760d980644468be68af5a6c48a5, type: 3}
       insertIndex: -1
       addedObject: {fileID: 700249512841842758}
@@ -141,6 +147,51 @@ MonoBehaviour:
   cursor: 2
   title: M5 Thin Hex Nut
   hint: "0.364 \xD7 0.315 \xD7 0.106 in  \xB7  0.8 g"
+--- !u!114 &8281763194928156646
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2943766194333023371}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c95fd2c384164a4d8b073d0d272505f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.PartHoles
+  holes:
+  - center: {x: -2.910383e-10, y: -0.00001879943, z: -0.0010930236}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0042
+    depth: 0.0005139534
+    square: 1
+    through: 1
+    kind: 1
+  - center: {x: -2.910383e-10, y: 0.00018120056, z: 0.0010526294}
+    axis: {x: 0, y: 0, z: -1}
+    size: 0.004558428
+    depth: 0.0005947418
+    square: 0
+    through: 1
+    kind: 1
+--- !u!114 &6313595172529452664
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2943766194333023371}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bd0e105a4920a434cb329977df26d6c6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.Fastener
+  role: 4
+  seat: {x: -2.910383e-10, y: 0.00018120056, z: 0.0013500003}
+  axis: {x: 0, y: 0, z: -1}
+  length: 0.0005947418
+  diameter: 0.004558428
+  headDiameter: 0
 --- !u!1 &3512728248498480611 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1487460747418248249, guid: cd80b760d980644468be68af5a6c48a5, type: 3}

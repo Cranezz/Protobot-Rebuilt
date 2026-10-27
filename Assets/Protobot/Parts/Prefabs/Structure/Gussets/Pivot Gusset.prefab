@@ -73,6 +73,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 4d2c3c0df39867b4aa4daee7343af9b7, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1853511724684790117}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 4d2c3c0df39867b4aa4daee7343af9b7, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6886177501023215369}
     - targetCorrespondingSourceObject: {fileID: 6342991350794063318, guid: 4d2c3c0df39867b4aa4daee7343af9b7, type: 3}
       insertIndex: -1
       addedObject: {fileID: 929254921380248357}
@@ -164,3 +167,44 @@ MonoBehaviour:
   cursor: 2
   title: Pivot Gusset
   hint: "1.45 \xD7 1.45 \xD7 0.032 in  \xB7  5.3 g"
+--- !u!114 &6886177501023215369
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8163824991760095158}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c95fd2c384164a4d8b073d0d272505f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.PartHoles
+  holes:
+  - center: {x: -0.009966559, y: -0.00040640074, z: -0.007321097}
+    axis: {x: 0, y: 1, z: 0}
+    size: 0.0044
+    depth: 0.00081279984
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.009966559, y: -0.00040640074, z: 0.0054789027}
+    axis: {x: 0, y: 1, z: 0}
+    size: 0.0044
+    depth: 0.00081279984
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.00096655905, y: -0.00040640074, z: -0.003521097}
+    axis: {x: 0, y: 1, z: 0}
+    size: 0.0047999998
+    depth: 0.00081279984
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.002833441, y: -0.00040640074, z: 0.0054789027}
+    axis: {x: 0, y: 1, z: 0}
+    size: 0.0044
+    depth: 0.00081279984
+    square: 1
+    through: 1
+    kind: 0

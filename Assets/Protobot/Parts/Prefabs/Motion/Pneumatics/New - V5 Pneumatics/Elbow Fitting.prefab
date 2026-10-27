@@ -132,6 +132,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: fbef62f7050c18846bb40bdd07f3ca9c, type: 3}
       insertIndex: -1
       addedObject: {fileID: 5910432221493667104}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: fbef62f7050c18846bb40bdd07f3ca9c, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6619000176617286290}
     - targetCorrespondingSourceObject: {fileID: 4445948748397649984, guid: fbef62f7050c18846bb40bdd07f3ca9c, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1544361667841166632}
@@ -256,6 +259,26 @@ MonoBehaviour:
   cursor: 2
   title: Elbow Fitting
   hint: "1.106 \xD7 0.916 \xD7 0.453 in  \xB7  3.1 g"
+--- !u!114 &6619000176617286290
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5067305280088627837}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c95fd2c384164a4d8b073d0d272505f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.PartHoles
+  holes:
+  - center: {x: 0.00004196998, y: -0.015304647, z: -0.022499997}
+    axis: {x: 0, y: 1, z: 0}
+    size: 0.0042818976
+    depth: 0.004541819
+    square: 0
+    through: 1
+    kind: 0
 --- !u!1 &7821654939147381648 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -6476212384906687300, guid: fbef62f7050c18846bb40bdd07f3ca9c, type: 3}

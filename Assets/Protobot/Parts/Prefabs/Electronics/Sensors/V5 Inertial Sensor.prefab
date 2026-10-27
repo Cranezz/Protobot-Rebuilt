@@ -105,6 +105,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 5f0b136714864394a882089f05d7a632, type: 3}
       insertIndex: -1
       addedObject: {fileID: 5124986138893880443}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 5f0b136714864394a882089f05d7a632, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1637529191839715583}
     - targetCorrespondingSourceObject: {fileID: 4445948748397649984, guid: 5f0b136714864394a882089f05d7a632, type: 3}
       insertIndex: -1
       addedObject: {fileID: 6118895229211480278}
@@ -256,3 +259,30 @@ MonoBehaviour:
   cursor: 2
   title: Inertial Sensor
   hint: "1.551 \xD7 0.866 \xD7 0.852 in  \xB7  12.4 g"
+--- !u!114 &1637529191839715583
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8777382829095896585}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c95fd2c384164a4d8b073d0d272505f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.PartHoles
+  holes:
+  - center: {x: 0.0000013101526, y: 0.010117799, z: -0.0063499976}
+    axis: {x: 0, y: -1, z: 0}
+    size: 0.0117999995
+    depth: 0.010961778
+    square: 1
+    through: 0
+    kind: 0
+  - center: {x: 0.0000013101526, y: -0.012698686, z: -0.00040584477}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.004445298
+    depth: 0.011088305
+    square: 0
+    through: 1
+    kind: 0

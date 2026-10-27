@@ -73,6 +73,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: a90afa82bd728c047a999df81bde9d8f, type: 3}
       insertIndex: -1
       addedObject: {fileID: 9116183530971141600}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: a90afa82bd728c047a999df81bde9d8f, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1499993728825767340}
     - targetCorrespondingSourceObject: {fileID: 8329350212030676554, guid: a90afa82bd728c047a999df81bde9d8f, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1320551149137528933}
@@ -137,6 +140,54 @@ MonoBehaviour:
   cursor: 2
   title: Legacy Double Acting Piston (body)
   hint: "4.675 \xD7 0.472 \xD7 0.472 in  \xB7  20.7 g"
+--- !u!114 &1499993728825767340
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1074311559206770868}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c95fd2c384164a4d8b073d0d272505f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.PartHoles
+  holes:
+  - center: {x: -2.0372681e-10, y: -0.04288606, z: -0.0000000029976945}
+    axis: {x: 0, y: 1, z: 0}
+    size: 0.004037012
+    depth: 0.029797869
+    square: 0
+    through: 1
+    kind: 0
+  - center: {x: -2.0372681e-10, y: -0.041784994, z: -0.002133978}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.004776657
+    depth: 0.0077320496
+    square: 0
+    through: 0
+    kind: 0
+  - center: {x: -2.0372681e-10, y: 0.041815005, z: -0.0029999998}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.004819117
+    depth: 0.006000006
+    square: 0
+    through: 0
+    kind: 0
+  - center: {x: -2.0372681e-10, y: 0.055015005, z: -0.004195003}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.004819117
+    depth: 0.0036099995
+    square: 0
+    through: 1
+    kind: 0
+  - center: {x: -2.0372681e-10, y: 0.055015005, z: 0.004195004}
+    axis: {x: 0, y: 0, z: -1}
+    size: 0.004819117
+    depth: 0.0036099995
+    square: 0
+    through: 1
+    kind: 0
 --- !u!1 &8196017616854784943 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 8329350212030676554, guid: a90afa82bd728c047a999df81bde9d8f, type: 3}

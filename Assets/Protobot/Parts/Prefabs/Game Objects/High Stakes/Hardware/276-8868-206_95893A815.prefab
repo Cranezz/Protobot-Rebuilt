@@ -81,6 +81,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 0a74b1e9d6a64b544b74db19a70f01d4, type: 3}
       insertIndex: -1
       addedObject: {fileID: 4940339203097346375}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 0a74b1e9d6a64b544b74db19a70f01d4, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6428549045504037171}
     - targetCorrespondingSourceObject: {fileID: 4445948748397649984, guid: 0a74b1e9d6a64b544b74db19a70f01d4, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1253532397279814290}
@@ -172,3 +175,16 @@ MonoBehaviour:
   cursor: 2
   title: Hardware 276-8868-206 95893A815
   hint: "1/2 \xD7 5/16 \xD7 5/16 in  \xB7  0.5 g"
+--- !u!114 &6428549045504037171
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4367292893536319805}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c95fd2c384164a4d8b073d0d272505f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.PartHoles
+  holes: []

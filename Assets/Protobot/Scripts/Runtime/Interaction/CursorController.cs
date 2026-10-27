@@ -60,6 +60,8 @@ namespace Protobot.Interaction
 
         /// <summary>Set while the player carries something, so the cursor shows a closed hand.</summary>
         public HoverTarget Holding { get; set; }
+        /// <summary>While holding: what the tool says a click will do (e.g. "Click: place it here"); null for the default.</summary>
+        public string HoldingHint { get; set; }
 
         /// <summary>The equipped tool's say over the reticle and tooltip.</summary>
         public ICursorOverride Override { get; set; }
@@ -94,7 +96,7 @@ namespace Protobot.Interaction
                 Show(new CursorView
                 {
                     reticle = null, reticleColor = UsableTint, large = true,
-                    title = Holding.Title, hint = "Click to drop  ·  Scroll: closer / further", available = true,
+                    title = Holding.Title, hint = HoldingHint ?? "Click to drop  ·  Scroll: closer / further", available = true,
                 });
                 return;
             }

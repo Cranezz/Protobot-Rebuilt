@@ -84,6 +84,12 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e6a8b447e57f6a64aa8a9dac7ea08883, type: 3}
       insertIndex: -1
       addedObject: {fileID: 884890053654743919}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e6a8b447e57f6a64aa8a9dac7ea08883, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7596527247787972571}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e6a8b447e57f6a64aa8a9dac7ea08883, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1661705624382129161}
   m_SourcePrefab: {fileID: 100100000, guid: e6a8b447e57f6a64aa8a9dac7ea08883, type: 3}
 --- !u!1 &7748141055086845099 stripped
 GameObject:
@@ -165,3 +171,41 @@ MonoBehaviour:
   cursor: 2
   title: Nylon Flange Thread-Forming Nut
   hint: "0.46 \xD7 0.46 \xD7 0.23 in  \xB7  0.5 g"
+--- !u!114 &7596527247787972571
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7748141055086845099}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c95fd2c384164a4d8b073d0d272505f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.PartHoles
+  holes:
+  - center: {x: 0.0001556401, y: -0.000047349444, z: -0.0030443994}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.003960595
+    depth: 0.0055952016
+    square: 0
+    through: 1
+    kind: 1
+--- !u!114 &1661705624382129161
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7748141055086845099}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bd0e105a4920a434cb329977df26d6c6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.Fastener
+  role: 4
+  seat: {x: 0.0001556401, y: -0.000047349444, z: -0.0058420002}
+  axis: {x: 0, y: 0, z: 1}
+  length: 0.0055952016
+  diameter: 0.003960595
+  headDiameter: 0

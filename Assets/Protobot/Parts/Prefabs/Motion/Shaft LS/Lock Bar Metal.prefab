@@ -73,6 +73,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: b85f6d7bdd986d249bae1f72caa082a7, type: 3}
       insertIndex: -1
       addedObject: {fileID: 8870009231975414584}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: b85f6d7bdd986d249bae1f72caa082a7, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6618160209549597824}
     - targetCorrespondingSourceObject: {fileID: 6342991350794063318, guid: b85f6d7bdd986d249bae1f72caa082a7, type: 3}
       insertIndex: -1
       addedObject: {fileID: 982345564164043557}
@@ -137,6 +140,54 @@ MonoBehaviour:
   cursor: 2
   title: Metal Lock Bar
   hint: "1.4 \xD7 0.495 \xD7 0.046 in  \xB7  0.5 g"
+--- !u!114 &6618160209549597824
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 554674808571501352}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c95fd2c384164a4d8b073d0d272505f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.PartHoles
+  holes:
+  - center: {x: 0.005, y: 0.0061999997, z: -0.0005841999}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.004445298
+    depth: 0.0011683998
+    square: 0
+    through: 1
+    kind: 0
+  - center: {x: 0.030599998, y: 0.0061999997, z: -0.0005841999}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.004445298
+    depth: 0.0011683998
+    square: 0
+    through: 1
+    kind: 0
+  - center: {x: 0.012, y: 0.0064, z: -0.0005841999}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0032
+    depth: 0.0011683998
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.0176, y: 0.0064, z: -0.0005841999}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0032
+    depth: 0.0011683998
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.023599999, y: 0.0064, z: -0.0005841999}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0032
+    depth: 0.0011683998
+    square: 1
+    through: 1
+    kind: 0
 --- !u!1 &6013753678332865455 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 6342991350794063318, guid: b85f6d7bdd986d249bae1f72caa082a7, type: 3}

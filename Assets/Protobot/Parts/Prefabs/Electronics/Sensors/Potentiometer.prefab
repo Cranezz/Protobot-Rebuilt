@@ -105,6 +105,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: fe451d5a28d7c1749b486999ac81bef1, type: 3}
       insertIndex: -1
       addedObject: {fileID: 4067342215351336720}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: fe451d5a28d7c1749b486999ac81bef1, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5445390768430809482}
     - targetCorrespondingSourceObject: {fileID: 4445948748397649984, guid: fe451d5a28d7c1749b486999ac81bef1, type: 3}
       insertIndex: -1
       addedObject: {fileID: 6136931270594710987}
@@ -175,6 +178,33 @@ MonoBehaviour:
   cursor: 2
   title: Potentiometer
   hint: "1 1/2 \xD7 1.495 \xD7 0.329 in  \xB7  7.8 g"
+--- !u!114 &5445390768430809482
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5223661059473809269}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c95fd2c384164a4d8b073d0d272505f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.PartHoles
+  holes:
+  - center: {x: 0.019206898, y: -0.0032999988, z: -0.017350825}
+    axis: {x: 0, y: 1, z: 0}
+    size: 0.006478115
+    depth: 0.001900001
+    square: 0
+    through: 0
+    kind: 0
+  - center: {x: 0.019006899, y: 0.0031250017, z: -0.017350825}
+    axis: {x: 0, y: -1, z: 0}
+    size: 0.00903831
+    depth: 0.0019500011
+    square: 0
+    through: 0
+    kind: 0
 --- !u!1 &7106850613397417624 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -6476212384906687300, guid: fe451d5a28d7c1749b486999ac81bef1, type: 3}

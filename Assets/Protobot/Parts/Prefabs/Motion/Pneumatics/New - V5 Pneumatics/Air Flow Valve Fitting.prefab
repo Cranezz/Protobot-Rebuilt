@@ -156,6 +156,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: dd845358e801d41469b14eef74336e2e, type: 3}
       insertIndex: -1
       addedObject: {fileID: 3301465310368815213}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: dd845358e801d41469b14eef74336e2e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8961479177401013787}
     - targetCorrespondingSourceObject: {fileID: 4445948748397649984, guid: dd845358e801d41469b14eef74336e2e, type: 3}
       insertIndex: -1
       addedObject: {fileID: 3736611697803150883}
@@ -290,6 +293,26 @@ MonoBehaviour:
   cursor: 2
   title: Air Flow Valve Fitting
   hint: "1.079 \xD7 0.991 \xD7 0.441 in  \xB7  2.5 g"
+--- !u!114 &8961479177401013787
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5364645038132752000}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c95fd2c384164a4d8b073d0d272505f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.PartHoles
+  holes:
+  - center: {x: -0.01780295, y: 0.0000000014551915, z: -0.011799997}
+    axis: {x: 1, y: 0, z: 0}
+    size: 0.0039999997
+    depth: 0.004545221
+    square: 1
+    through: 1
+    kind: 0
 --- !u!1 &6504226718113751337 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -7137710277361028360, guid: dd845358e801d41469b14eef74336e2e, type: 3}

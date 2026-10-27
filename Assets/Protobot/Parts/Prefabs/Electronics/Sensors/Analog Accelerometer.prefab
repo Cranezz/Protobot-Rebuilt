@@ -73,6 +73,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: d618d2d2580c428458a75f1bc947b9b7, type: 3}
       insertIndex: -1
       addedObject: {fileID: 586236260373075520}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: d618d2d2580c428458a75f1bc947b9b7, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 536441056659146743}
     - targetCorrespondingSourceObject: {fileID: -2396389340915409318, guid: d618d2d2580c428458a75f1bc947b9b7, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1639994108988051542}
@@ -164,3 +167,30 @@ MonoBehaviour:
   cursor: 2
   title: Analog Accelerometer
   hint: "1.2 \xD7 1 \xD7 0.565 in  \xB7  14.1 g"
+--- !u!114 &536441056659146743
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8002162866813628249}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c95fd2c384164a4d8b073d0d272505f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.PartHoles
+  holes:
+  - center: {x: 0.008759999, y: -0.006299998, z: 0.0019276999}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.004161257
+    depth: 0.005486399
+    square: 0
+    through: 1
+    kind: 0
+  - center: {x: 0.008759999, y: 0.0063000014, z: 0.0019276999}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.004185663
+    depth: 0.005486399
+    square: 0
+    through: 1
+    kind: 0

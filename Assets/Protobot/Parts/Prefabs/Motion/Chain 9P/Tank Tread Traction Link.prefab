@@ -81,6 +81,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 2a164643901d1da42a9d71cdb672f632, type: 3}
       insertIndex: -1
       addedObject: {fileID: 5440846324310737850}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 2a164643901d1da42a9d71cdb672f632, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 189281468183201078}
     - targetCorrespondingSourceObject: {fileID: 8310570232088225184, guid: 2a164643901d1da42a9d71cdb672f632, type: 3}
       insertIndex: -1
       addedObject: {fileID: 3157267855703631912}
@@ -145,6 +148,33 @@ MonoBehaviour:
   cursor: 2
   title: Tank Tread Traction Link
   hint: "1.496 \xD7 0.667 \xD7 0.449 in  \xB7  1.8 g"
+--- !u!114 &189281468183201078
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4301518779880166611}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c95fd2c384164a4d8b073d0d272505f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.PartHoles
+  holes:
+  - center: {x: 0.00495, y: -0.006361913, z: -0.004699999}
+    axis: {x: 0, y: 1, z: 0}
+    size: 0.0030612159
+    depth: 0.0014761705
+    square: 0
+    through: 1
+    kind: 0
+  - center: {x: 0.00495, y: 0.006361912, z: -0.004699999}
+    axis: {x: 0, y: -1, z: 0}
+    size: 0.0030612159
+    depth: 0.0014761724
+    square: 0
+    through: 1
+    kind: 0
 --- !u!1 &4910729831960611874 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 8310570232088225184, guid: 2a164643901d1da42a9d71cdb672f632, type: 3}

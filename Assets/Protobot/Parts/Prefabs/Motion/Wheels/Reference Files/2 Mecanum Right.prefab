@@ -480,6 +480,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 9024373d8ef6b584f828943db81b60d1, type: 3}
       insertIndex: -1
       addedObject: {fileID: 4247559715626631605}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 9024373d8ef6b584f828943db81b60d1, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4630814542109096118}
     - targetCorrespondingSourceObject: {fileID: -6476212384906687300, guid: 9024373d8ef6b584f828943db81b60d1, type: 3}
       insertIndex: -1
       addedObject: {fileID: 583445049945585040}
@@ -988,6 +991,33 @@ MonoBehaviour:
   cursor: 2
   title: 2" Mecanum Wheel (right)
   hint: "2.016 \xD7 2 \xD7 1 1/2 in  \xB7  64 g"
+--- !u!114 &4630814542109096118
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2966689753205642530}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c95fd2c384164a4d8b073d0d272505f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.PartHoles
+  holes:
+  - center: {x: -0.0000035893172, y: -0.012899987, z: 0.0000006422779}
+    axis: {x: 0, y: 1, z: 0}
+    size: 0.0061999997
+    depth: 0.0073001413
+    square: 1
+    through: 1
+    kind: 2
+  - center: {x: -0.0000035893172, y: 0.012899991, z: 0.0000006422779}
+    axis: {x: 0, y: -1, z: 0}
+    size: 0.0061999997
+    depth: 0.007300143
+    square: 1
+    through: 1
+    kind: 2
 --- !u!1 &3139127047751233023 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -8179999109812828788, guid: 9024373d8ef6b584f828943db81b60d1, type: 3}

@@ -73,6 +73,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 958d0dcc6090a7641a4190ee090ebac0, type: 3}
       insertIndex: -1
       addedObject: {fileID: 8163119756901637115}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 958d0dcc6090a7641a4190ee090ebac0, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7705809412460403752}
     - targetCorrespondingSourceObject: {fileID: 8329350212030676554, guid: 958d0dcc6090a7641a4190ee090ebac0, type: 3}
       insertIndex: -1
       addedObject: {fileID: 469943692979243362}
@@ -164,3 +167,51 @@ MonoBehaviour:
   cursor: 2
   title: 60 Degree Bent
   hint: "2.365 \xD7 1.397 \xD7 1 in  \xB7  6.1 g"
+--- !u!114 &7705809412460403752
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4919717470179343972}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c95fd2c384164a4d8b073d0d272505f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.PartHoles
+  holes:
+  - center: {x: -0.013170689, y: -0.0007874014, z: -0.006299998}
+    axis: {x: 0, y: 1, z: 0}
+    size: 0.006
+    depth: 0.0015747998
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.00677069, y: -0.0007874014, z: 0.00010000169}
+    axis: {x: 0, y: 1, z: 0}
+    size: 0.006
+    depth: 0.0015747998
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.00057069014, y: -0.0007874014, z: -0.006299998}
+    axis: {x: 0, y: 1, z: 0}
+    size: 0.0061999997
+    depth: 0.0015747998
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.0058293096, y: -0.0007874014, z: 0.00010000169}
+    axis: {x: 0, y: 1, z: 0}
+    size: 0.0061999997
+    depth: 0.0015747998
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.012229309, y: -0.0007874014, z: -0.006299998}
+    axis: {x: 0, y: 1, z: 0}
+    size: 0.0061999997
+    depth: 0.0015747998
+    square: 1
+    through: 1
+    kind: 0

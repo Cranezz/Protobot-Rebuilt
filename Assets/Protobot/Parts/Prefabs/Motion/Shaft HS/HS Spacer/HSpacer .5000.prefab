@@ -80,6 +80,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: b466f5b0d7e239d4c8de231be94c9665, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2241773838178377678}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: b466f5b0d7e239d4c8de231be94c9665, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8840587750739862985}
   m_SourcePrefab: {fileID: 100100000, guid: b466f5b0d7e239d4c8de231be94c9665, type: 3}
 --- !u!1 &2163565337398650158 stripped
 GameObject:
@@ -161,3 +164,23 @@ MonoBehaviour:
   cursor: 2
   title: 1/2" HS Spacer
   hint: "1/2 \xD7 0.394 \xD7 0.394 in  \xB7  0.6 g"
+--- !u!114 &8840587750739862985
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2163565337398650158}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c95fd2c384164a4d8b073d0d272505f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.PartHoles
+  holes:
+  - center: {x: -1.4551915e-11, y: -0.00019900955, z: -0.00635}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0066
+    depth: 0.012699998
+    square: 1
+    through: 1
+    kind: 0

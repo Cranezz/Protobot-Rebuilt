@@ -129,6 +129,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: b0880ff53ffc273489d045622b48d9e2, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2791507753740963260}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: b0880ff53ffc273489d045622b48d9e2, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1187683010405002273}
     - targetCorrespondingSourceObject: {fileID: 4445948748397649984, guid: b0880ff53ffc273489d045622b48d9e2, type: 3}
       insertIndex: -1
       addedObject: {fileID: 4882060655810409911}
@@ -313,6 +316,75 @@ MonoBehaviour:
   cursor: 2
   title: Ultrasonic Range Finder
   hint: "3.199 \xD7 1.193 \xD7 0.807 in  \xB7  32.8 g"
+--- !u!114 &1187683010405002273
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4218234560102573102}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c95fd2c384164a4d8b073d0d272505f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.PartHoles
+  holes:
+  - center: {x: -0.011425, y: -0.00009999768, z: -0.01604114}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.014407948
+    depth: 0.00091772253
+    square: 0
+    through: 1
+    kind: 0
+  - center: {x: 0.011375, y: -0.00009999768, z: -0.01603743}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.014379641
+    depth: 0.0009251396
+    square: 0
+    through: 1
+    kind: 0
+  - center: {x: -0.028624998, y: -0.0070999977, z: 0.003000001}
+    axis: {x: 0, y: 0, z: -1}
+    size: 0.010072324
+    depth: 0.0020000031
+    square: 0
+    through: 0
+    kind: 0
+  - center: {x: 0.028575, y: -0.0070999977, z: 0.003000001}
+    axis: {x: 0, y: 0, z: -1}
+    size: 0.010031792
+    depth: 0.0020000031
+    square: 0
+    through: 0
+    kind: 0
+  - center: {x: -0.024224998, y: 0.00010000232, z: 0.002032251}
+    axis: {x: 0, y: 0, z: -1}
+    size: 0.0045135166
+    depth: 0.003935503
+    square: 0
+    through: 1
+    kind: 0
+  - center: {x: 0.024175, y: 0.00010000232, z: 0.0029000011}
+    axis: {x: 0, y: 0, z: -1}
+    size: 0.004536028
+    depth: 0.0022000028
+    square: 0
+    through: 0
+    kind: 0
+  - center: {x: -0.028624998, y: 0.007300002, z: 0.0030000014}
+    axis: {x: 0, y: 0, z: -1}
+    size: 0.010132819
+    depth: 0.0020000022
+    square: 0
+    through: 0
+    kind: 0
+  - center: {x: 0.028575, y: 0.007300002, z: 0.0030000014}
+    axis: {x: 0, y: 0, z: -1}
+    size: 0.010082432
+    depth: 0.0020000022
+    square: 0
+    through: 0
+    kind: 0
 --- !u!1 &8649605656400552864 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 5639305726347934431, guid: b0880ff53ffc273489d045622b48d9e2, type: 3}

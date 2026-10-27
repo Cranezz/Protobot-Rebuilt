@@ -81,6 +81,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 158b717517a77b545aa2c07295a4c8c6, type: 3}
       insertIndex: -1
       addedObject: {fileID: 3431128045271826541}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 158b717517a77b545aa2c07295a4c8c6, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 9104701628508918540}
     - targetCorrespondingSourceObject: {fileID: 4445948748397649984, guid: 158b717517a77b545aa2c07295a4c8c6, type: 3}
       insertIndex: -1
       addedObject: {fileID: 8050546784907245046}
@@ -145,6 +148,40 @@ MonoBehaviour:
   cursor: 2
   title: Ladder 276-8868-057
   hint: "2.151 \xD7 1.991 \xD7 1.555 in  \xB7  15.8 g"
+--- !u!114 &9104701628508918540
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1701829757724137155}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c95fd2c384164a4d8b073d0d272505f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.PartHoles
+  holes:
+  - center: {x: 0.00008374009, y: -0.014134688, z: -0.01335}
+    axis: {x: 0, y: 1, z: 0}
+    size: 0.004445298
+    depth: 0.007186017
+    square: 0
+    through: 1
+    kind: 0
+  - center: {x: 0.00008374009, y: -0.014201689, z: -0.00615}
+    axis: {x: 0, y: 1, z: 0}
+    size: 0.004445298
+    depth: 0.0070520174
+    square: 0
+    through: 1
+    kind: 0
+  - center: {x: 0.00008374009, y: 0.015531058, z: -0.01335}
+    axis: {x: 0, y: -1, z: 0}
+    size: 0.004445298
+    depth: 0.009650493
+    square: 0
+    through: 1
+    kind: 0
 --- !u!1 &2804715764526779346 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 4445948748397649984, guid: 158b717517a77b545aa2c07295a4c8c6, type: 3}

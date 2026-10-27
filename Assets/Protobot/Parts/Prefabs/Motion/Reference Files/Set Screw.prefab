@@ -77,6 +77,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 41943c2b83f31eb4793e879730a80ce6, type: 3}
       insertIndex: -1
       addedObject: {fileID: 8251711754586605495}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 41943c2b83f31eb4793e879730a80ce6, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7886919120587977101}
     - targetCorrespondingSourceObject: {fileID: 98481274190007889, guid: 41943c2b83f31eb4793e879730a80ce6, type: 3}
       insertIndex: -1
       addedObject: {fileID: 420512703615946408}
@@ -168,3 +171,16 @@ MonoBehaviour:
   cursor: 2
   title: Set Screw
   hint: "0.164 \xD7 0.164 \xD7 0.13 in  \xB7  0.5 g"
+--- !u!114 &7886919120587977101
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6728379606652171013}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c95fd2c384164a4d8b073d0d272505f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.PartHoles
+  holes: []

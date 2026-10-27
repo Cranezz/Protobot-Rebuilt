@@ -81,6 +81,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 71cec7cc621f4fa44a52365e38faac4d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 4156720900909829942}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 71cec7cc621f4fa44a52365e38faac4d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 50857933047744677}
     - targetCorrespondingSourceObject: {fileID: 8310570232088225184, guid: 71cec7cc621f4fa44a52365e38faac4d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 3233165758096652715}
@@ -172,3 +175,23 @@ MonoBehaviour:
   cursor: 2
   title: 9P 15T Drive Wheel
   hint: "2 \xD7 1.995 \xD7 1 in  \xB7  14.9 g"
+--- !u!114 &50857933047744677
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5553140459687300220}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c95fd2c384164a4d8b073d0d272505f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.PartHoles
+  holes:
+  - center: {x: 0.0000649501, y: -0.0127, z: 0.00016285073}
+    axis: {x: 0, y: 1, z: 0}
+    size: 0.003610813
+    depth: 0.025399996
+    square: 0
+    through: 1
+    kind: 0

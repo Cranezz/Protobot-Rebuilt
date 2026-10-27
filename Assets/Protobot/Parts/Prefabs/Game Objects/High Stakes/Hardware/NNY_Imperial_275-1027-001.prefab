@@ -81,6 +81,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 1851193392a4622409cda60ce8f6a116, type: 3}
       insertIndex: -1
       addedObject: {fileID: 5388029586040084373}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 1851193392a4622409cda60ce8f6a116, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5243677548756925503}
     - targetCorrespondingSourceObject: {fileID: 4445948748397649984, guid: 1851193392a4622409cda60ce8f6a116, type: 3}
       insertIndex: -1
       addedObject: {fileID: 817425679677460557}
@@ -172,3 +175,23 @@ MonoBehaviour:
   cursor: 2
   title: NNY_Imperial_275-1027-001
   hint: "0.396 \xD7 0.344 \xD7 0.234 in  \xB7  2.3 g"
+--- !u!114 &5243677548756925503
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2370277620960597639}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c95fd2c384164a4d8b073d0d272505f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.PartHoles
+  holes:
+  - center: {x: -0.00002551965, y: 0.000034370372, z: -0.0029765656}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0041367062
+    depth: 0.0059531266
+    square: 0
+    through: 1
+    kind: 0

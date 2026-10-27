@@ -81,6 +81,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 083f58f28edd84c48be9741ed698b1ad, type: 3}
       insertIndex: -1
       addedObject: {fileID: 3911179330718740261}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 083f58f28edd84c48be9741ed698b1ad, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 179364635375772494}
     - targetCorrespondingSourceObject: {fileID: 4445948748397649984, guid: 083f58f28edd84c48be9741ed698b1ad, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1400928849928193263}
@@ -145,6 +148,33 @@ MonoBehaviour:
   cursor: 2
   title: Brain Mount (short)
   hint: "1.976 \xD7 0.73 \xD7 0.37 in  \xB7  5.7 g"
+--- !u!114 &179364635375772494
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6083311127913508420}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c95fd2c384164a4d8b073d0d272505f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.PartHoles
+  holes:
+  - center: {x: 0.006261, y: -0.019099997, z: 0.0000000023283064}
+    axis: {x: 0, y: 0, z: -1}
+    size: 0.004161257
+    depth: 0.0045719994
+    square: 0
+    through: 1
+    kind: 0
+  - center: {x: 0.006261, y: 0.019100003, z: 0.0000000023283064}
+    axis: {x: 0, y: 0, z: -1}
+    size: 0.004185663
+    depth: 0.0045719994
+    square: 0
+    through: 1
+    kind: 0
 --- !u!1 &7286265886446433109 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 4445948748397649984, guid: 083f58f28edd84c48be9741ed698b1ad, type: 3}

@@ -73,6 +73,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: bde63b3cd8e6b68469bd05b839daa166, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1530678107553461917}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: bde63b3cd8e6b68469bd05b839daa166, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3493341495694622884}
     - targetCorrespondingSourceObject: {fileID: 6342991350794063318, guid: bde63b3cd8e6b68469bd05b839daa166, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2945905706431556298}
@@ -164,3 +167,51 @@ MonoBehaviour:
   cursor: 2
   title: Plus Gusset
   hint: "1.4 \xD7 1.4 \xD7 0.032 in  \xB7  3.8 g"
+--- !u!114 &3493341495694622884
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7656404953520602514}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c95fd2c384164a4d8b073d0d272505f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.PartHoles
+  holes:
+  - center: {x: -0.0033856798, y: -0.00040640295, z: 0.022040488}
+    axis: {x: 0, y: 1, z: 0}
+    size: 0.0044
+    depth: 0.00081279984
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.00941432, y: -0.00040640295, z: 0.0092404885}
+    axis: {x: 0, y: 1, z: 0}
+    size: 0.0044
+    depth: 0.00081279984
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.00941432, y: -0.00040640295, z: 0.022040488}
+    axis: {x: 0, y: 1, z: 0}
+    size: 0.0044
+    depth: 0.00081279984
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.00941432, y: -0.00040640295, z: 0.034640487}
+    axis: {x: 0, y: 1, z: 0}
+    size: 0.0045999996
+    depth: 0.00081279984
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.02201432, y: -0.00040640295, z: 0.022040488}
+    axis: {x: 0, y: 1, z: 0}
+    size: 0.0045999996
+    depth: 0.00081279984
+    square: 1
+    through: 1
+    kind: 0

@@ -73,6 +73,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 4af77f7fcd9685145a55eadeedbe8581, type: 3}
       insertIndex: -1
       addedObject: {fileID: 8012747572628378259}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 4af77f7fcd9685145a55eadeedbe8581, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5661107469156585758}
     - targetCorrespondingSourceObject: {fileID: 8329350212030676554, guid: 4af77f7fcd9685145a55eadeedbe8581, type: 3}
       insertIndex: -1
       addedObject: {fileID: 7829701864059411939}
@@ -137,6 +140,19 @@ MonoBehaviour:
   cursor: 2
   title: Battery (simple)
   hint: "6.942 \xD7 1.828 \xD7 1.197 in  \xB7  231.5 g"
+--- !u!114 &5661107469156585758
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2268108877531587229}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c95fd2c384164a4d8b073d0d272505f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.PartHoles
+  holes: []
 --- !u!1 &6930849830672179590 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 8329350212030676554, guid: 4af77f7fcd9685145a55eadeedbe8581, type: 3}

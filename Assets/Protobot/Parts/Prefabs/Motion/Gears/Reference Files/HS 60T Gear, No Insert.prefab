@@ -93,6 +93,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: ff36ecc5eb103da4cbca5f263e8a9cdc, type: 3}
       insertIndex: -1
       addedObject: {fileID: 5260852232986057818}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: ff36ecc5eb103da4cbca5f263e8a9cdc, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7641154246933654074}
     - targetCorrespondingSourceObject: {fileID: 4445948748397649984, guid: ff36ecc5eb103da4cbca5f263e8a9cdc, type: 3}
       insertIndex: -1
       addedObject: {fileID: 4709306520571955307}
@@ -214,3 +217,128 @@ MonoBehaviour:
   cursor: 2
   title: HS 60T Gear
   hint: "2.581 \xD7 2.581 \xD7 1/2 in  \xB7  21.4 g"
+--- !u!114 &7641154246933654074
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7200961802748706497}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c95fd2c384164a4d8b073d0d272505f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.PartHoles
+  holes:
+  - center: {x: -0.031382497, y: -0.0000000023283064, z: -0.0033824958}
+    axis: {x: 0, y: 1, z: 0}
+    size: 0.0019673964
+    depth: 0.012699998
+    square: 0
+    through: 1
+    kind: 0
+  - center: {x: -0.031382497, y: -0.0000000018626451, z: 0.00001750415}
+    axis: {x: 0, y: 1, z: 0}
+    size: 0.0019149228
+    depth: 0.012699999
+    square: 0
+    through: 1
+    kind: 0
+  - center: {x: -0.031382497, y: -0.0000000023283064, z: 0.003417504}
+    axis: {x: 0, y: 1, z: 0}
+    size: 0.0019673964
+    depth: 0.012699998
+    square: 0
+    through: 1
+    kind: 0
+  - center: {x: -0.0259825, y: -0.0000000018626451, z: 0.00001750415}
+    axis: {x: 0, y: 1, z: 0}
+    size: 0.0047999998
+    depth: 0.012699999
+    square: 1
+    through: 1
+    kind: 2
+  - center: {x: -0.012782499, y: -0.0000000027939677, z: -0.0127824955}
+    axis: {x: 0, y: 1, z: 0}
+    size: 0.0041367062
+    depth: 0.012699997
+    square: 0
+    through: 1
+    kind: 0
+  - center: {x: -0.012782499, y: -0.0000000018626451, z: 0.00001750415}
+    axis: {x: 0, y: 1, z: 0}
+    size: 0.004161257
+    depth: 0.012699999
+    square: 0
+    through: 1
+    kind: 0
+  - center: {x: -0.012782499, y: -0.0000000027939677, z: 0.012617504}
+    axis: {x: 0, y: 1, z: 0}
+    size: 0.004161257
+    depth: 0.012699997
+    square: 0
+    through: 1
+    kind: 0
+  - center: {x: -0.00018249957, y: -0.0000000023283064, z: -0.00018249585}
+    axis: {x: 0, y: 1, z: 0}
+    size: 0.0067999996
+    depth: 0.012699998
+    square: 1
+    through: 1
+    kind: 2
+  - center: {x: 0.000017500424, y: -0.0000000018626451, z: -0.025982495}
+    axis: {x: 0, y: 1, z: 0}
+    size: 0.0047999998
+    depth: 0.012699999
+    square: 1
+    through: 1
+    kind: 2
+  - center: {x: 0.000017500424, y: -0.0000000027939677, z: -0.0127824955}
+    axis: {x: 0, y: 1, z: 0}
+    size: 0.004161257
+    depth: 0.012699997
+    square: 0
+    through: 1
+    kind: 0
+  - center: {x: 0.000017500424, y: -0.0000000027939677, z: 0.012817504}
+    axis: {x: 0, y: 1, z: 0}
+    size: 0.0041367062
+    depth: 0.012699997
+    square: 0
+    through: 1
+    kind: 0
+  - center: {x: 0.000017500424, y: -0.0000000018626451, z: 0.026017504}
+    axis: {x: 0, y: 1, z: 0}
+    size: 0.0047999998
+    depth: 0.012699999
+    square: 1
+    through: 1
+    kind: 2
+  - center: {x: 0.0126175005, y: -0.0000000027939677, z: -0.0127824955}
+    axis: {x: 0, y: 1, z: 0}
+    size: 0.004161257
+    depth: 0.012699997
+    square: 0
+    through: 1
+    kind: 0
+  - center: {x: 0.0126175005, y: -0.0000000027939677, z: 0.012617504}
+    axis: {x: 0, y: 1, z: 0}
+    size: 0.004161257
+    depth: 0.012699997
+    square: 0
+    through: 1
+    kind: 0
+  - center: {x: 0.0128175, y: -0.0000000018626451, z: 0.00001750415}
+    axis: {x: 0, y: 1, z: 0}
+    size: 0.0041367062
+    depth: 0.012699999
+    square: 0
+    through: 1
+    kind: 0
+  - center: {x: 0.0260175, y: -0.0000000018626451, z: 0.00001750415}
+    axis: {x: 0, y: 1, z: 0}
+    size: 0.0047999998
+    depth: 0.012699999
+    square: 1
+    through: 1
+    kind: 2

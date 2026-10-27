@@ -81,6 +81,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 7229af2e6a40f5e4e8205a3394487a4a, type: 3}
       insertIndex: -1
       addedObject: {fileID: 8338466054105620062}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 7229af2e6a40f5e4e8205a3394487a4a, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6512778052843539833}
     - targetCorrespondingSourceObject: {fileID: 4445948748397649984, guid: 7229af2e6a40f5e4e8205a3394487a4a, type: 3}
       insertIndex: -1
       addedObject: {fileID: 6896458426779772657}
@@ -145,6 +148,33 @@ MonoBehaviour:
   cursor: 2
   title: 4-Post Hex Nut Retainer
   hint: "0.68 \xD7 0.68 \xD7 0.373 in  \xB7  1.1 g"
+--- !u!114 &6512778052843539833
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1781510093971897766}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c95fd2c384164a4d8b073d0d272505f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.PartHoles
+  holes:
+  - center: {x: -0.000036390076, y: -0.000036389145, z: 0.0008506074}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0042580427
+    depth: 0.0016512154
+    square: 0
+    through: 1
+    kind: 0
+  - center: {x: -0.000036390076, y: 0.00016361085, z: 0.003947326}
+    axis: {x: 0, y: 0, z: -1}
+    size: 0.009238938
+    depth: 0.004705348
+    square: 0
+    through: 0
+    kind: 0
 --- !u!1 &3011631585552179383 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 4445948748397649984, guid: 7229af2e6a40f5e4e8205a3394487a4a, type: 3}

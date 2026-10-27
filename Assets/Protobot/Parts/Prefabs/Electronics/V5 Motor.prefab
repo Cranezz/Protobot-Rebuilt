@@ -264,6 +264,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 0165a9b23ac19804cb9ada05a6076d2e, type: 3}
       insertIndex: -1
       addedObject: {fileID: 3221353524911112261}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 0165a9b23ac19804cb9ada05a6076d2e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3473622594546021642}
     - targetCorrespondingSourceObject: {fileID: 4445948748397649984, guid: 0165a9b23ac19804cb9ada05a6076d2e, type: 3}
       insertIndex: -1
       addedObject: {fileID: 6739857674230307491}
@@ -633,6 +636,33 @@ MonoBehaviour:
   cursor: 2
   title: 11W Motor
   hint: "2.848 \xD7 2.256 \xD7 1.299 in  \xB7  88.9 g"
+--- !u!114 &3473622594546021642
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4667647282337154818}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c95fd2c384164a4d8b073d0d272505f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.PartHoles
+  holes:
+  - center: {x: 0.022800013, y: 0.011100006, z: 0.0030999698}
+    axis: {x: -1, y: 0, z: 0}
+    size: 0.0095999995
+    depth: 0.0105000315
+    square: 1
+    through: 0
+    kind: 2
+  - center: {x: 0.012749968, y: -0.033249993, z: -0.00010003013}
+    axis: {x: 0, y: 1, z: 0}
+    size: 0.0102825
+    depth: 0.001500003
+    square: 0
+    through: 1
+    kind: 1
 --- !u!1 &5833986677029636267 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -7137710277361028360, guid: 0165a9b23ac19804cb9ada05a6076d2e, type: 3}

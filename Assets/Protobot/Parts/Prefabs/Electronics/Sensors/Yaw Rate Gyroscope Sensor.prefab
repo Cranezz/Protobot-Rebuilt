@@ -73,6 +73,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: c6a4a054c1bbc26498931fd798cf00f2, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2922929659264131860}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: c6a4a054c1bbc26498931fd798cf00f2, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7563609562820420554}
     - targetCorrespondingSourceObject: {fileID: -2396389340915409318, guid: c6a4a054c1bbc26498931fd798cf00f2, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2514256502906441834}
@@ -164,3 +167,30 @@ MonoBehaviour:
   cursor: 2
   title: Yaw Rate Gyroscope Sensor
   hint: "1.2 \xD7 1 \xD7 0.565 in  \xB7  7.2 g"
+--- !u!114 &7563609562820420554
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8652088099562229052}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c95fd2c384164a4d8b073d0d272505f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.PartHoles
+  holes:
+  - center: {x: 0.008759999, y: -0.006299998, z: 0.0019276999}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.004161257
+    depth: 0.005486399
+    square: 0
+    through: 1
+    kind: 0
+  - center: {x: 0.008759999, y: 0.0063000014, z: 0.0019276999}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.004185663
+    depth: 0.005486399
+    square: 0
+    through: 1
+    kind: 0

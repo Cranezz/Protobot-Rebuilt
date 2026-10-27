@@ -81,6 +81,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 66184f87c01e3f74eaa00925b75f40ab, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2755035128732956261}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 66184f87c01e3f74eaa00925b75f40ab, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 540515813581902364}
     - targetCorrespondingSourceObject: {fileID: 4445948748397649984, guid: 66184f87c01e3f74eaa00925b75f40ab, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1622701733694628982}
@@ -145,6 +148,47 @@ MonoBehaviour:
   cursor: 2
   title: Perimeter Parts 276-7596-008
   hint: "4.792 \xD7 4.792 \xD7 1.079 in  \xB7  66.6 g"
+--- !u!114 &540515813581902364
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1899759698949814961}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c95fd2c384164a4d8b073d0d272505f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.PartHoles
+  holes:
+  - center: {x: 0.000013667886, y: -0.077586316, z: -0.020375}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.009161439
+    depth: 0.0058499947
+    square: 0
+    through: 0
+    kind: 0
+  - center: {x: -0.07758633, y: 0.0000136827875, z: -0.020374998}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.009161439
+    depth: 0.0058500003
+    square: 0
+    through: 0
+    kind: 0
+  - center: {x: 0.000013667886, y: -0.07778632, z: -0.008787027}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0042818976
+    depth: 0.017425943
+    square: 0
+    through: 1
+    kind: 0
+  - center: {x: -0.077786334, y: 0.0000136827875, z: -0.008787024}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0042818976
+    depth: 0.017425949
+    square: 0
+    through: 1
+    kind: 0
 --- !u!1 &3111717292809463712 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 4445948748397649984, guid: 66184f87c01e3f74eaa00925b75f40ab, type: 3}

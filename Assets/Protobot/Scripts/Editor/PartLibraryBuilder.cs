@@ -36,6 +36,7 @@ namespace Protobot.Editor
             AssignMaterials(manifest, materials);
             var catalog = BuildCatalog(manifest);
             PartPrefabBuilder.BuildAll(catalog, false);
+            PartHoleBuilder.ScanAll();  // rebuilt prefabs need their holes and fastener measurements again
             SetupBins();
             Debug.Log($"[Parts] {catalog.parts.Count} parts, {materials.Count} materials.");
         }

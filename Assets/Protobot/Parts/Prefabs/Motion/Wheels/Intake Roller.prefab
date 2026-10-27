@@ -84,6 +84,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 7a00db48462c6704286a6c861ba8c64b, type: 3}
       insertIndex: -1
       addedObject: {fileID: 7088315476736106136}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 7a00db48462c6704286a6c861ba8c64b, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8297018010486632680}
   m_SourcePrefab: {fileID: 100100000, guid: 7a00db48462c6704286a6c861ba8c64b, type: 3}
 --- !u!1 &990805407831705122 stripped
 GameObject:
@@ -179,3 +182,23 @@ MonoBehaviour:
   cursor: 2
   title: Intake Roller
   hint: "1 1/2 \xD7 1 1/2 \xD7 1/2 in  \xB7  7.5 g"
+--- !u!114 &8297018010486632680
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 990805407831705122}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c95fd2c384164a4d8b073d0d272505f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.PartHoles
+  holes:
+  - center: {x: -0.0000488198, y: 0.0009755916, z: -0.000048817936}
+    axis: {x: 0, y: -1, z: 0}
+    size: 0.0036
+    depth: 0.010748818
+    square: 1
+    through: 1
+    kind: 2

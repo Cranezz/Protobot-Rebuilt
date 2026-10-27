@@ -77,6 +77,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e40af9f21bb8b6143b66e5540d5adfec, type: 3}
       insertIndex: -1
       addedObject: {fileID: 3493886059824287155}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e40af9f21bb8b6143b66e5540d5adfec, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6122038259933866033}
     - targetCorrespondingSourceObject: {fileID: -4705851281496998710, guid: e40af9f21bb8b6143b66e5540d5adfec, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1756417641815099293}
@@ -168,3 +171,16 @@ MonoBehaviour:
   cursor: 2
   title: Legacy Pneumatic Air Reservoir
   hint: "7 7/8 \xD7 1.565 \xD7 1.565 in  \xB7  1.66 kg"
+--- !u!114 &6122038259933866033
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3215095360775557928}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c95fd2c384164a4d8b073d0d272505f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.PartHoles
+  holes: []

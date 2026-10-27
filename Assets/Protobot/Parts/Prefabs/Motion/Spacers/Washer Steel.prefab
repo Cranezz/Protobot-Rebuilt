@@ -76,6 +76,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 79567cec1d09af449a9eb7712bdc3d00, type: 3}
       insertIndex: -1
       addedObject: {fileID: 4205007967715463650}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 79567cec1d09af449a9eb7712bdc3d00, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8357296594838618511}
   m_SourcePrefab: {fileID: 100100000, guid: 79567cec1d09af449a9eb7712bdc3d00, type: 3}
 --- !u!1 &3669126952903715287 stripped
 GameObject:
@@ -157,3 +160,23 @@ MonoBehaviour:
   cursor: 2
   title: Washer Steel
   hint: "3/8 \xD7 3/8 \xD7 0.031 in  \xB7  0.5 g"
+--- !u!114 &8357296594838618511
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3669126952903715287}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c95fd2c384164a4d8b073d0d272505f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.PartHoles
+  holes:
+  - center: {x: -0.00016249971, y: -0.00016150925, z: -0.0003968753}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.004329213
+    depth: 0.0007937499
+    square: 0
+    through: 1
+    kind: 0

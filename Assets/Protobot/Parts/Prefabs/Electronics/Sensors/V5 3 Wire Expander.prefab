@@ -429,6 +429,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: ec538ca7a005b3d4d89cf775391dd739, type: 3}
       insertIndex: -1
       addedObject: {fileID: 98953713025067849}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: ec538ca7a005b3d4d89cf775391dd739, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1776786983258337742}
     - targetCorrespondingSourceObject: {fileID: 4445948748397649984, guid: ec538ca7a005b3d4d89cf775391dd739, type: 3}
       insertIndex: -1
       addedObject: {fileID: 8889276967115680425}
@@ -634,6 +637,47 @@ MonoBehaviour:
   cursor: 2
   title: V5 3 Wire Expander
   hint: "3.002 \xD7 1.054 \xD7 0.864 in  \xB7  40.1 g"
+--- !u!114 &1776786983258337742
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 646735548399256430}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c95fd2c384164a4d8b073d0d272505f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.PartHoles
+  holes:
+  - center: {x: -0.0049808994, y: -0.037122328, z: -0.007999996}
+    axis: {x: 0, y: 1, z: 0}
+    size: 0.0116
+    depth: 0.002024138
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.000019100567, y: -0.009734397, z: -0.010754997}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.004161257
+    depth: 0.012089997
+    square: 0
+    through: 1
+    kind: 0
+  - center: {x: 0.000019100567, y: 0.002865603, z: -0.015974997}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.005106461
+    depth: 0.0016499981
+    square: 0
+    through: 0
+    kind: 0
+  - center: {x: 0.000019100567, y: -0.009734397, z: 0.00051035476}
+    axis: {x: 0, y: 0, z: -1}
+    size: 0.004161257
+    depth: 0.00647929
+    square: 0
+    through: 1
+    kind: 0
 --- !u!1 &1873097079850369759 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 2145490789075270880, guid: ec538ca7a005b3d4d89cf775391dd739, type: 3}

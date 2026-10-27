@@ -73,6 +73,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 99520c18796267247ac5067f948bf5f7, type: 3}
       insertIndex: -1
       addedObject: {fileID: 7714173487625532930}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 99520c18796267247ac5067f948bf5f7, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5602000613688202294}
     - targetCorrespondingSourceObject: {fileID: 6265358468823026077, guid: 99520c18796267247ac5067f948bf5f7, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2475942354808176486}
@@ -164,3 +167,37 @@ MonoBehaviour:
   cursor: 2
   title: 2-Hole Hinge (bottom)
   hint: "1 \xD7 0.868 \xD7 0.237 in  \xB7  6.3 g"
+--- !u!114 &5602000613688202294
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6474616161458972763}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c95fd2c384164a4d8b073d0d272505f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.PartHoles
+  holes:
+  - center: {x: -0.01548405, y: -0.016312495, z: -0.0030163904}
+    axis: {x: 0, y: 1, z: 0}
+    size: 0.003127056
+    depth: 0.015874999
+    square: 0
+    through: 1
+    kind: 0
+  - center: {x: -0.0032840502, y: -0.025349993, z: -0.00070519047}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0047999998
+    depth: 0.0014223997
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.0032840502, y: -0.012749994, z: -0.00070519024}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0045999996
+    depth: 0.0014224001
+    square: 1
+    through: 1
+    kind: 0

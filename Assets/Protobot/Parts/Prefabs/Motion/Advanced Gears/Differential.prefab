@@ -117,6 +117,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: b79913b043302ba46b863179ad276a67, type: 3}
       insertIndex: -1
       addedObject: {fileID: 732772402402576403}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: b79913b043302ba46b863179ad276a67, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8626099610101043868}
     - targetCorrespondingSourceObject: {fileID: 4445948748397649984, guid: b79913b043302ba46b863179ad276a67, type: 3}
       insertIndex: -1
       addedObject: {fileID: 7527691528195423544}
@@ -190,6 +193,47 @@ MonoBehaviour:
   cursor: 2
   title: Differential
   hint: "1.853 \xD7 1.582 \xD7 1.582 in  \xB7  14.5 g"
+--- !u!114 &8626099610101043868
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4627499334419566257}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c95fd2c384164a4d8b073d0d272505f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.PartHoles
+  holes:
+  - center: {x: -0.01869325, y: 0.0021749996, z: -0.00069324777}
+    axis: {x: 0, y: -1, z: 0}
+    size: 0.0019149228
+    depth: 0.007849999
+    square: 0
+    through: 1
+    kind: 0
+  - center: {x: -0.01869325, y: 0.0021749996, z: 0.0031067522}
+    axis: {x: 0, y: -1, z: 0}
+    size: 0.0021170268
+    depth: 0.007849999
+    square: 0
+    through: 1
+    kind: 0
+  - center: {x: -0.00009324966, y: 0.0026999991, z: -0.0000932478}
+    axis: {x: 0, y: -1, z: 0}
+    size: 0.0041120094
+    depth: 0.009
+    square: 0
+    through: 1
+    kind: 0
+  - center: {x: 0.00010675033, y: -0.020877758, z: 0.013593249}
+    axis: {x: 0, y: 0, z: -1}
+    size: 0.0036389132
+    depth: 0.0107999975
+    square: 0
+    through: 1
+    kind: 0
 --- !u!1 &7703012251477000028 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -6476212384906687300, guid: b79913b043302ba46b863179ad276a67, type: 3}

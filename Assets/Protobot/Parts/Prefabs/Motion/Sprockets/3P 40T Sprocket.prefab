@@ -81,6 +81,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: a8e59c29db54070418f63f6b07d0b22b, type: 3}
       insertIndex: -1
       addedObject: {fileID: 3766405531409701780}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: a8e59c29db54070418f63f6b07d0b22b, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3255052515506696255}
     - targetCorrespondingSourceObject: {fileID: 8310570232088225184, guid: a8e59c29db54070418f63f6b07d0b22b, type: 3}
       insertIndex: -1
       addedObject: {fileID: 6800185010369499300}
@@ -172,3 +175,51 @@ MonoBehaviour:
   cursor: 2
   title: Normal 40T Sprocket
   hint: "1.93 \xD7 1.93 \xD7 0.492 in  \xB7  4.8 g"
+--- !u!114 &3255052515506696255
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9082923519358133366}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c95fd2c384164a4d8b073d0d272505f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.PartHoles
+  holes:
+  - center: {x: -0.00950835, y: 0.0017499996, z: -0.008308346}
+    axis: {x: 0, y: 1, z: 0}
+    size: 0.0042340537
+    depth: 0.006999999
+    square: 0
+    through: 1
+    kind: 0
+  - center: {x: -0.00830835, y: 0.0017499996, z: 0.009491653}
+    axis: {x: 0, y: 1, z: 0}
+    size: 0.004209928
+    depth: 0.006999999
+    square: 0
+    through: 1
+    kind: 0
+  - center: {x: 0.00829165, y: 0.0017499994, z: -0.009508346}
+    axis: {x: 0, y: 1, z: 0}
+    size: 0.004161257
+    depth: 0.0069999984
+    square: 0
+    through: 1
+    kind: 0
+  - center: {x: 0.009491649, y: 0.0017499996, z: 0.008291653}
+    axis: {x: 0, y: 1, z: 0}
+    size: 0.004161257
+    depth: 0.006999999
+    square: 0
+    through: 1
+    kind: 0
+  - center: {x: 0.00009164978, y: -0.0010000002, z: 0.00009165351}
+    axis: {x: 0, y: 1, z: 0}
+    size: 0.003666798
+    depth: 0.012499999
+    square: 0
+    through: 1
+    kind: 0

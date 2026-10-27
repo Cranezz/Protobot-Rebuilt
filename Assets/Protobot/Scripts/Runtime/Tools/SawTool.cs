@@ -178,9 +178,9 @@ namespace Protobot.Tools
                 view.reticleColor = new Color(1f, 1f, 1f, 0.5f);
                 return true;
             }
-            if (part.GetComponent<StockProfile>() == null)
+            if (part.GetComponent<StockProfile>() == null || Building.Assembly.Of(part) != null)
             {
-                view.hint = "The saw cuts metal stock and shafts";
+                view.hint = part.GetComponent<StockProfile>() == null ? "The saw cuts metal stock and shafts" : "Take it off the assembly to cut it";
                 view.available = false;
                 view.reticleColor = new Color(1f, 1f, 1f, 0.5f);
                 return true;
@@ -204,7 +204,8 @@ namespace Protobot.Tools
             if (target == null || !Cursor.CurrentInReach)
                 return null;
             var part = target.GetComponentInParent<PartBody>();
-            return part != null && part.GetComponent<StockProfile>() != null ? part : null;
+            // Parts joined into an assembly are taken off before they're cut.
+            return part != null && part.GetComponent<StockProfile>() != null && Building.Assembly.Of(part) == null ? part : null;
         }
 
         CutPlan Plan(PartBody part, Vector3 worldPoint, bool free)

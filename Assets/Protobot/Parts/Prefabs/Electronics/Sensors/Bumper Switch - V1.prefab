@@ -129,6 +129,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: f44b927f0802ee044aa1167a72ee9a37, type: 3}
       insertIndex: -1
       addedObject: {fileID: 111136835724362782}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: f44b927f0802ee044aa1167a72ee9a37, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7027261051711449912}
     - targetCorrespondingSourceObject: {fileID: 4445948748397649984, guid: f44b927f0802ee044aa1167a72ee9a37, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1528406544857525183}
@@ -205,6 +208,75 @@ MonoBehaviour:
   cursor: 2
   title: Cortex Bumper Switch
   hint: "2.087 \xD7 1.342 \xD7 0.904 in  \xB7  27 g"
+--- !u!114 &7027261051711449912
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1174959210362361218}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c95fd2c384164a4d8b073d0d272505f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.PartHoles
+  holes:
+  - center: {x: -0.0099, y: -0.010495358, z: 0.0028999979}
+    axis: {x: 0, y: 0, z: -1}
+    size: 0.0044908924
+    depth: 0.002199998
+    square: 0
+    through: 0
+    kind: 0
+  - center: {x: 0.0101, y: -0.010495358, z: 0.0028999979}
+    axis: {x: 0, y: 0, z: -1}
+    size: 0.0044908924
+    depth: 0.002199998
+    square: 0
+    through: 0
+    kind: 0
+  - center: {x: -0.0099, y: 0.010504642, z: 0.0028999988}
+    axis: {x: 0, y: 0, z: -1}
+    size: 0.0045135166
+    depth: 0.0021999963
+    square: 0
+    through: 0
+    kind: 0
+  - center: {x: 0.0101, y: 0.010504642, z: 0.0028999988}
+    axis: {x: 0, y: 0, z: -1}
+    size: 0.0045135166
+    depth: 0.0021999963
+    square: 0
+    through: 0
+    kind: 0
+  - center: {x: -0.010100001, y: -0.010495358, z: -0.0022500013}
+    axis: {x: 0, y: 0, z: -1}
+    size: 0.0025532304
+    depth: 0.008499997
+    square: 0
+    through: 0
+    kind: 0
+  - center: {x: 0.009899999, y: -0.010495358, z: -0.0022500013}
+    axis: {x: 0, y: 0, z: -1}
+    size: 0.0025532304
+    depth: 0.008499997
+    square: 0
+    through: 0
+    kind: 0
+  - center: {x: -0.010100001, y: 0.010504642, z: -0.0022500004}
+    axis: {x: 0, y: 0, z: -1}
+    size: 0.0024721548
+    depth: 0.008499995
+    square: 0
+    through: 0
+    kind: 0
+  - center: {x: 0.009899999, y: 0.010504642, z: -0.0022500004}
+    axis: {x: 0, y: 0, z: -1}
+    size: 0.0024721548
+    depth: 0.008499995
+    square: 0
+    through: 0
+    kind: 0
 --- !u!1 &2394802469652678803 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 4445948748397649984, guid: f44b927f0802ee044aa1167a72ee9a37, type: 3}

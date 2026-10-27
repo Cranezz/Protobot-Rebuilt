@@ -81,6 +81,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 43a577b27c928c14b80d986805516d55, type: 3}
       insertIndex: -1
       addedObject: {fileID: 9120561472294420566}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 43a577b27c928c14b80d986805516d55, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 342200308289030967}
     - targetCorrespondingSourceObject: {fileID: 4445948748397649984, guid: 43a577b27c928c14b80d986805516d55, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1655530358081469678}
@@ -145,6 +148,33 @@ MonoBehaviour:
   cursor: 2
   title: Drop Off Cam
   hint: "3.592 \xD7 2.655 \xD7 0.6 in  \xB7  14.6 g"
+--- !u!114 &342200308289030967
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6628412426431072858}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c95fd2c384164a4d8b073d0d272505f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.PartHoles
+  holes:
+  - center: {x: 0.00015638882, y: -0.00508, z: 0.0001307789}
+    axis: {x: 0, y: 1, z: 0}
+    size: 0.0032
+    depth: 0.0050799996
+    square: 1
+    through: 1
+    kind: 2
+  - center: {x: 0.00015638882, y: 0.00508, z: 0.0001307789}
+    axis: {x: 0, y: -1, z: 0}
+    size: 0.0032
+    depth: 0.0050799996
+    square: 1
+    through: 1
+    kind: 2
 --- !u!1 &7678249232765884235 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 4445948748397649984, guid: 43a577b27c928c14b80d986805516d55, type: 3}

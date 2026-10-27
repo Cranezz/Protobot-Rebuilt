@@ -80,6 +80,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e8b3230b71e055c4e99bb48f6a5c5ef6, type: 3}
       insertIndex: -1
       addedObject: {fileID: 5751283112081459159}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e8b3230b71e055c4e99bb48f6a5c5ef6, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5490766708213607036}
   m_SourcePrefab: {fileID: 100100000, guid: e8b3230b71e055c4e99bb48f6a5c5ef6, type: 3}
 --- !u!1 &4968866927052194907 stripped
 GameObject:
@@ -184,3 +187,16 @@ MonoBehaviour:
   cursor: 2
   title: 1x1 Segmented Angle (35)
   hint: "17 1/2 \xD7 0.728 \xD7 0.728 in  \xB7  108 g"
+--- !u!114 &5490766708213607036
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4968866927052194907}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c95fd2c384164a4d8b073d0d272505f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.PartHoles
+  holes: []

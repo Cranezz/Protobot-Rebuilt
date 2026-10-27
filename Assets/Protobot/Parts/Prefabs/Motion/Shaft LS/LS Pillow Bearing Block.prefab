@@ -77,6 +77,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: fedda7d72bc9b864d8875ca63de14952, type: 3}
       insertIndex: -1
       addedObject: {fileID: 755649390371611093}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: fedda7d72bc9b864d8875ca63de14952, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1927294404771108939}
     - targetCorrespondingSourceObject: {fileID: -7175497441153661879, guid: fedda7d72bc9b864d8875ca63de14952, type: 3}
       insertIndex: -1
       addedObject: {fileID: 329878689305692938}
@@ -141,6 +144,40 @@ MonoBehaviour:
   cursor: 2
   title: Block Bearing
   hint: "1.4 \xD7 0.527 \xD7 0.4 in  \xB7  1.6 g"
+--- !u!114 &1927294404771108939
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2890384476283037347}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c95fd2c384164a4d8b073d0d272505f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.PartHoles
+  holes:
+  - center: {x: -0.0050850003, y: 0.0178, z: -0.006299997}
+    axis: {x: 1, y: 0, z: 0}
+    size: 0.0042340537
+    depth: 0.0063500004
+    square: 0
+    through: 1
+    kind: 3
+  - center: {x: -0.00516, y: 0.005, z: -0.0016124975}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0043760166
+    depth: 0.0031749997
+    square: 0
+    through: 1
+    kind: 3
+  - center: {x: -0.00516, y: 0.030599998, z: -0.0016124975}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.004422325
+    depth: 0.0031749997
+    square: 0
+    through: 1
+    kind: 3
 --- !u!1 &4086558817727651771 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -7175497441153661879, guid: fedda7d72bc9b864d8875ca63de14952, type: 3}

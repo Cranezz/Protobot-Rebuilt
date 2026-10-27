@@ -77,6 +77,12 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: bcd3e58175442fb48a1e998f771b468e, type: 3}
       insertIndex: -1
       addedObject: {fileID: 7028818659460187994}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: bcd3e58175442fb48a1e998f771b468e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3227781659656765569}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: bcd3e58175442fb48a1e998f771b468e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5172444715287780333}
     - targetCorrespondingSourceObject: {fileID: -7175497441153661879, guid: bcd3e58175442fb48a1e998f771b468e, type: 3}
       insertIndex: -1
       addedObject: {fileID: 6171158560482430582}
@@ -141,6 +147,44 @@ MonoBehaviour:
   cursor: 2
   title: Nylon Thread-Forming Nut
   hint: "0.397 \xD7 0.344 \xD7 0.14 in  \xB7  0.5 g"
+--- !u!114 &3227781659656765569
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8034888035851445544}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c95fd2c384164a4d8b073d0d272505f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.PartHoles
+  holes:
+  - center: {x: 0.000034369907, y: -0.00004098985, z: -0.00019050029}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.004161257
+    depth: 0.0035559994
+    square: 0
+    through: 1
+    kind: 1
+--- !u!114 &5172444715287780333
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8034888035851445544}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bd0e105a4920a434cb329977df26d6c6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.Fastener
+  role: 4
+  seat: {x: 0.000034369907, y: -0.00004098985, z: -0.0019685}
+  axis: {x: 0, y: 0, z: 1}
+  length: 0.0035559994
+  diameter: 0.004161257
+  headDiameter: 0
 --- !u!1 &9163491331353664560 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -7175497441153661879, guid: bcd3e58175442fb48a1e998f771b468e, type: 3}

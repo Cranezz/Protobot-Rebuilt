@@ -76,6 +76,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 53e5624e775b69942aa47cab9aa40d03, type: 3}
       insertIndex: -1
       addedObject: {fileID: 8375208538612287062}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 53e5624e775b69942aa47cab9aa40d03, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5228259043011664444}
   m_SourcePrefab: {fileID: 100100000, guid: 53e5624e775b69942aa47cab9aa40d03, type: 3}
 --- !u!1 &5981549778012773788 stripped
 GameObject:
@@ -157,3 +160,23 @@ MonoBehaviour:
   cursor: 2
   title: 0.03" Teflon Washer (3/8" OD)
   hint: "3/8 \xD7 3/8 \xD7 0.031 in  \xB7  0.5 g"
+--- !u!114 &5228259043011664444
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5981549778012773788}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c95fd2c384164a4d8b073d0d272505f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.PartHoles
+  holes:
+  - center: {x: -0.00016249971, y: -0.00016150925, z: -0.0003968753}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.004329213
+    depth: 0.0007937499
+    square: 0
+    through: 1
+    kind: 0

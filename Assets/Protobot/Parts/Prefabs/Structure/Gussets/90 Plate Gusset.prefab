@@ -73,6 +73,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: b088168263620ed46b87dd0ba6f3df14, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1674070779133264192}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: b088168263620ed46b87dd0ba6f3df14, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8170302872717545251}
     - targetCorrespondingSourceObject: {fileID: 7471719701255174056, guid: b088168263620ed46b87dd0ba6f3df14, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2481035048818844283}
@@ -164,3 +167,65 @@ MonoBehaviour:
   cursor: 2
   title: 90 Degree Plate
   hint: "1.988 \xD7 1.988 \xD7 1/16 in  \xB7  3.7 g"
+--- !u!114 &8170302872717545251
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7795265707566090207}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c95fd2c384164a4d8b073d0d272505f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.PartHoles
+  holes:
+  - center: {x: 0.000062801, y: -0.00078740035, z: -0.039157994}
+    axis: {x: 0, y: 1, z: 0}
+    size: 0.005106461
+    depth: 0.0015747998
+    square: 0
+    through: 1
+    kind: 0
+  - center: {x: 0.000062801, y: -0.00078740035, z: -0.026357995}
+    axis: {x: 0, y: 1, z: 0}
+    size: 0.005
+    depth: 0.0015747998
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.000062801, y: -0.00078740035, z: -0.013557997}
+    axis: {x: 0, y: 1, z: 0}
+    size: 0.005
+    depth: 0.0015747998
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.0028628008, y: -0.00078740035, z: -0.0027579966}
+    axis: {x: 0, y: 1, z: 0}
+    size: 0.004209928
+    depth: 0.0015747998
+    square: 0
+    through: 1
+    kind: 0
+  - center: {x: 0.0134628005, y: -0.00078740035, z: 0.00004200345}
+    axis: {x: 0, y: 1, z: 0}
+    size: 0.0052829357
+    depth: 0.0015747998
+    square: 0
+    through: 1
+    kind: 0
+  - center: {x: 0.026262801, y: -0.00078740035, z: 0.00004200345}
+    axis: {x: 0, y: 1, z: 0}
+    size: 0.0052829357
+    depth: 0.0015747998
+    square: 0
+    through: 1
+    kind: 0
+  - center: {x: 0.0390628, y: -0.00078740035, z: 0.00004200345}
+    axis: {x: 0, y: 1, z: 0}
+    size: 0.0052636196
+    depth: 0.0015747998
+    square: 0
+    through: 1
+    kind: 0

@@ -77,6 +77,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: f7484da7d8e8c544cb5eb0ea23f00f16, type: 3}
       insertIndex: -1
       addedObject: {fileID: 227991471022575522}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: f7484da7d8e8c544cb5eb0ea23f00f16, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6622601486335696106}
     - targetCorrespondingSourceObject: {fileID: -7175497441153661879, guid: f7484da7d8e8c544cb5eb0ea23f00f16, type: 3}
       insertIndex: -1
       addedObject: {fileID: 606962280396683811}
@@ -141,6 +144,24 @@ MonoBehaviour:
   cursor: 2
   title: Screw Shoulder Robosource
   hint: "0.377 \xD7 5/16 \xD7 5/16 in  \xB7  1.4 g"
+--- !u!114 &6622601486335696106
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5173201667749094158}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bd0e105a4920a434cb329977df26d6c6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.Fastener
+  role: 3
+  seat: {x: 0, y: 4.656613e-10, z: -0.0073659983}
+  axis: {x: 0, y: 0, z: 1}
+  length: 0.0073659983
+  diameter: 0.0041656108
+  headDiameter: 0.007924807
 --- !u!1 &6296046898409527830 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -7175497441153661879, guid: f7484da7d8e8c544cb5eb0ea23f00f16, type: 3}

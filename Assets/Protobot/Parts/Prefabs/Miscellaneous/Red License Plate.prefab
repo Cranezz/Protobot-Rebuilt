@@ -81,6 +81,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 1e6749b0e8774d2429196977efd6944d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1419500952887993321}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 1e6749b0e8774d2429196977efd6944d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2863950192156733320}
     - targetCorrespondingSourceObject: {fileID: 4445948748397649984, guid: 1e6749b0e8774d2429196977efd6944d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 5968419961507109292}
@@ -172,3 +175,72 @@ MonoBehaviour:
   cursor: 2
   title: Red License Plate
   hint: "4.488 \xD7 2.488 \xD7 0.24 in  \xB7  17.7 g"
+--- !u!114 &2863950192156733320
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8991000658331646805}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c95fd2c384164a4d8b073d0d272505f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.PartHoles
+  holes:
+  - center: {x: -0.025399998, y: 0.000035996083, z: -0.05079999}
+    axis: {x: 0, y: 1, z: 0}
+    size: 0.0042580427
+    depth: 0.0045719994
+    square: 0
+    through: 1
+    kind: 0
+  - center: {x: -0.025399998, y: 0.000035996083, z: -0.03819999}
+    axis: {x: 0, y: 1, z: 0}
+    size: 0.0042340537
+    depth: 0.0045719994
+    square: 0
+    through: 1
+    kind: 0
+  - center: {x: -0.025399998, y: 0.000035996083, z: 0.03820001}
+    axis: {x: 0, y: 1, z: 0}
+    size: 0.0042340537
+    depth: 0.0045719994
+    square: 0
+    through: 1
+    kind: 0
+  - center: {x: -0.025399998, y: 0.000035996083, z: 0.050800007}
+    axis: {x: 0, y: 1, z: 0}
+    size: 0.0042580427
+    depth: 0.0045719994
+    square: 0
+    through: 1
+    kind: 0
+  - center: {x: 0.0254, y: 0.000035996083, z: -0.05079999}
+    axis: {x: 0, y: 1, z: 0}
+    size: 0.0042580427
+    depth: 0.0045719994
+    square: 0
+    through: 1
+    kind: 0
+  - center: {x: 0.0254, y: 0.000035996083, z: -0.03819999}
+    axis: {x: 0, y: 1, z: 0}
+    size: 0.0042340537
+    depth: 0.0045719994
+    square: 0
+    through: 1
+    kind: 0
+  - center: {x: 0.0254, y: 0.000035996083, z: 0.03800001}
+    axis: {x: 0, y: 1, z: 0}
+    size: 0.0042580427
+    depth: 0.0045719994
+    square: 0
+    through: 1
+    kind: 0
+  - center: {x: 0.0254, y: 0.000035996083, z: 0.050800007}
+    axis: {x: 0, y: 1, z: 0}
+    size: 0.0042580427
+    depth: 0.0045719994
+    square: 0
+    through: 1
+    kind: 0

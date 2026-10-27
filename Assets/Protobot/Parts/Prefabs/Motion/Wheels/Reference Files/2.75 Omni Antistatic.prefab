@@ -732,6 +732,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 61a44cf03b02eda43b94265b3d3e6869, type: 3}
       insertIndex: -1
       addedObject: {fileID: 6988619271032160185}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 61a44cf03b02eda43b94265b3d3e6869, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4509828233032861324}
     - targetCorrespondingSourceObject: {fileID: 4445948748397649984, guid: 61a44cf03b02eda43b94265b3d3e6869, type: 3}
       insertIndex: -1
       addedObject: {fileID: 6657971422665594684}
@@ -1041,6 +1044,138 @@ MonoBehaviour:
   cursor: 2
   title: 2.75" Anti-Static Omni Wheel
   hint: "2.752 \xD7 2.751 \xD7 0.976 in  \xB7  47.7 g"
+--- !u!114 &4509828233032861324
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 886430795177457795}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c95fd2c384164a4d8b073d0d272505f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.PartHoles
+  holes:
+  - center: {x: -0.01694224, y: -0.003569784, z: 0.012451344}
+    axis: {x: 0, y: 1, z: 0}
+    size: 0.0021646065
+    depth: 0.005660272
+    square: 0
+    through: 0
+    kind: 0
+  - center: {x: -0.01274224, y: -0.000049920753, z: -0.012748655}
+    axis: {x: 0, y: 1, z: 0}
+    size: 0.0042580427
+    depth: 0.012699999
+    square: 0
+    through: 1
+    kind: 0
+  - center: {x: -0.01274224, y: -0.000049921684, z: 0.000051344643}
+    axis: {x: 0, y: 1, z: 0}
+    size: 0.0042340537
+    depth: 0.012699997
+    square: 0
+    through: 1
+    kind: 0
+  - center: {x: -0.01274224, y: -0.000049920753, z: 0.012651345}
+    axis: {x: 0, y: 1, z: 0}
+    size: 0.004161257
+    depth: 0.012699999
+    square: 0
+    through: 1
+    kind: 0
+  - center: {x: 0.000057759593, y: -0.000082160346, z: 0.000051344643}
+    axis: {x: 0, y: 1, z: 0}
+    size: 0.0067999996
+    depth: 0.01263552
+    square: 1
+    through: 1
+    kind: 2
+  - center: {x: 0.000057759593, y: -0.000049920753, z: -0.012748655}
+    axis: {x: 0, y: 1, z: 0}
+    size: 0.0042580427
+    depth: 0.012699999
+    square: 0
+    through: 1
+    kind: 0
+  - center: {x: 0.000057759593, y: -0.000049920753, z: 0.012651345}
+    axis: {x: 0, y: 1, z: 0}
+    size: 0.004185663
+    depth: 0.012699999
+    square: 0
+    through: 1
+    kind: 0
+  - center: {x: 0.01265776, y: -0.000049920753, z: -0.012748655}
+    axis: {x: 0, y: 1, z: 0}
+    size: 0.004161257
+    depth: 0.012699999
+    square: 0
+    through: 1
+    kind: 0
+  - center: {x: 0.01265776, y: -0.000049921684, z: 0.000051344643}
+    axis: {x: 0, y: 1, z: 0}
+    size: 0.004161257
+    depth: 0.012699997
+    square: 0
+    through: 1
+    kind: 0
+  - center: {x: 0.01265776, y: -0.000049920753, z: 0.012651345}
+    axis: {x: 0, y: 1, z: 0}
+    size: 0.0039999997
+    depth: 0.012699999
+    square: 1
+    through: 1
+    kind: 2
+  - center: {x: 0.012457759, y: -0.003582348, z: -0.017148655}
+    axis: {x: 0, y: 1, z: 0}
+    size: 0.0021646065
+    depth: 0.005635144
+    square: 0
+    through: 0
+    kind: 0
+  - center: {x: 0.01265776, y: -0.0035587177, z: 0.017651344}
+    axis: {x: 0, y: 1, z: 0}
+    size: 0.0025928179
+    depth: 0.005682405
+    square: 0
+    through: 0
+    kind: 0
+  - center: {x: 0.01705776, y: -0.0035633328, z: 0.012451344}
+    axis: {x: 0, y: 1, z: 0}
+    size: 0.0021170268
+    depth: 0.0056731747
+    square: 0
+    through: 0
+    kind: 0
+  - center: {x: -0.01694224, y: 0.0035648164, z: -0.012748655}
+    axis: {x: 0, y: -1, z: 0}
+    size: 0.0021170268
+    depth: 0.005654185
+    square: 0
+    through: 0
+    kind: 0
+  - center: {x: 0.01265776, y: 0.0035513313, z: -0.017548654}
+    axis: {x: 0, y: -1, z: 0}
+    size: 0.0026318098
+    depth: 0.0056811552
+    square: 0
+    through: 0
+    kind: 0
+  - center: {x: 0.012457759, y: 0.0035682968, z: 0.017051345}
+    axis: {x: 0, y: -1, z: 0}
+    size: 0.0021170268
+    depth: 0.0056472244
+    square: 0
+    through: 0
+    kind: 0
+  - center: {x: 0.01705776, y: 0.0035638413, z: -0.012748655}
+    axis: {x: 0, y: -1, z: 0}
+    size: 0.0021170268
+    depth: 0.0056561353
+    square: 0
+    through: 0
+    kind: 0
 --- !u!1 &1078220595764756574 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -8179999109812828788, guid: 61a44cf03b02eda43b94265b3d3e6869, type: 3}

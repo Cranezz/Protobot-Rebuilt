@@ -369,6 +369,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: c2847cbcd61d9ed46b7c63472178486c, type: 3}
       insertIndex: -1
       addedObject: {fileID: 6916996262841898349}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: c2847cbcd61d9ed46b7c63472178486c, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2844733676679858692}
     - targetCorrespondingSourceObject: {fileID: 9017371950456620357, guid: c2847cbcd61d9ed46b7c63472178486c, type: 3}
       insertIndex: -1
       addedObject: {fileID: 7613087247244183263}
@@ -937,6 +940,26 @@ MonoBehaviour:
   cursor: 2
   title: 24T Bevel Gear
   hint: "1.059 \xD7 1.059 \xD7 0.434 in  \xB7  1.8 g"
+--- !u!114 &2844733676679858692
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5834081336635955858}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c95fd2c384164a4d8b073d0d272505f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.PartHoles
+  holes:
+  - center: {x: 0.0001516905, y: -0.0006616204, z: 0.00015169237}
+    axis: {x: 0, y: 1, z: 0}
+    size: 0.0032
+    depth: 0.010799998
+    square: 1
+    through: 1
+    kind: 2
 --- !u!1 &5867568953245718290 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 962205858181378257, guid: c2847cbcd61d9ed46b7c63472178486c, type: 3}

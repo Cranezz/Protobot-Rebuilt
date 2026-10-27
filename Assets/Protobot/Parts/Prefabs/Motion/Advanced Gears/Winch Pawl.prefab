@@ -73,6 +73,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 31e0ea674d0dd5c409305331a434421d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 7271280938297989742}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 31e0ea674d0dd5c409305331a434421d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6875456114617004246}
     - targetCorrespondingSourceObject: {fileID: 2358492892965789101, guid: 31e0ea674d0dd5c409305331a434421d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 4396125062248514063}
@@ -164,3 +167,23 @@ MonoBehaviour:
   cursor: 2
   title: Winch Pawl
   hint: "0.661 \xD7 0.623 \xD7 0.39 in  \xB7  1 g"
+--- !u!114 &6875456114617004246
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6954045730671801642}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c95fd2c384164a4d8b073d0d272505f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.PartHoles
+  holes:
+  - center: {x: -0.000010000236, y: -0.0049529993, z: 0.000057931145}
+    axis: {x: 0, y: 1, z: 0}
+    size: 0.0033999998
+    depth: 0.009905999
+    square: 1
+    through: 1
+    kind: 2

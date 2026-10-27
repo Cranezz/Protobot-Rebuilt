@@ -93,6 +93,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 60b3dc38dcbaa3a4589b57175fe3bd0d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 6698341903236714347}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 60b3dc38dcbaa3a4589b57175fe3bd0d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3823097774774616764}
     - targetCorrespondingSourceObject: {fileID: 4445948748397649984, guid: 60b3dc38dcbaa3a4589b57175fe3bd0d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 4945013611578601544}
@@ -214,3 +217,30 @@ MonoBehaviour:
   cursor: 2
   title: Tall Flap
   hint: "1 9/16 \xD7 1.496 \xD7 0.667 in  \xB7  4.2 g"
+--- !u!114 &3823097774774616764
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7852112465720129511}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c95fd2c384164a4d8b073d0d272505f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.PartHoles
+  holes:
+  - center: {x: 0.02016633, y: 0.007994894, z: 0.009345563}
+    axis: {x: 0, y: 1, z: 0}
+    size: 0.0031594615
+    depth: 0.0014990875
+    square: 0
+    through: 1
+    kind: 0
+  - center: {x: 0.02016633, y: 0.020695867, z: 0.009345563}
+    axis: {x: 0, y: -1, z: 0}
+    size: 0.0031594615
+    depth: 0.0014989646
+    square: 0
+    through: 1
+    kind: 0

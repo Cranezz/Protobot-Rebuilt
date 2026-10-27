@@ -81,6 +81,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: d19d4cac8c5936745af98f8d137350e5, type: 3}
       insertIndex: -1
       addedObject: {fileID: 7795391650563210731}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: d19d4cac8c5936745af98f8d137350e5, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 9013295300454588448}
     - targetCorrespondingSourceObject: {fileID: 4445948748397649984, guid: d19d4cac8c5936745af98f8d137350e5, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1754893536654952060}
@@ -172,3 +175,51 @@ MonoBehaviour:
   cursor: 2
   title: HS Block Bearing
   hint: "1.496 \xD7 0.527 \xD7 1/2 in  \xB7  2.6 g"
+--- !u!114 &9013295300454588448
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3754750162098736713}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c95fd2c384164a4d8b073d0d272505f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.PartHoles
+  holes:
+  - center: {x: 1.3096724e-10, y: -0.0000064787455, z: 0.00005000038}
+    axis: {x: 0, y: 1, z: 0}
+    size: 0.00781764
+    depth: 0.012487042
+    square: 0
+    through: 1
+    kind: 3
+  - center: {x: -0.012599999, y: -0.00014999961, z: 0.0020999997}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.009194733
+    depth: 0.004499999
+    square: 0
+    through: 0
+    kind: 3
+  - center: {x: 0.0126, y: -0.00014999961, z: 0.0020999997}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.009194733
+    depth: 0.004499999
+    square: 0
+    through: 0
+    kind: 3
+  - center: {x: -0.012599999, y: 0.00005000038, z: 0.00535}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.004161257
+    depth: 0.0020000003
+    square: 0
+    through: 1
+    kind: 3
+  - center: {x: 0.0126, y: 0.00005000038, z: 0.00535}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.004161257
+    depth: 0.0020000003
+    square: 0
+    through: 1
+    kind: 3

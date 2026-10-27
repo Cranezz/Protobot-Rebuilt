@@ -73,6 +73,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 22b6205b4e9d94547b9c9ae5072b7328, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1973423146325529186}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 22b6205b4e9d94547b9c9ae5072b7328, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6008164946028589953}
     - targetCorrespondingSourceObject: {fileID: 8329350212030676554, guid: 22b6205b4e9d94547b9c9ae5072b7328, type: 3}
       insertIndex: -1
       addedObject: {fileID: 6961083916434069206}
@@ -164,3 +167,51 @@ MonoBehaviour:
   cursor: 2
   title: 45 Degree Bent
   hint: "2.781 \xD7 1.196 \xD7 1 in  \xB7  6.4 g"
+--- !u!114 &6008164946028589953
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8235428217138679421}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c95fd2c384164a4d8b073d0d272505f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.PartHoles
+  holes:
+  - center: {x: -0.01396448, y: -0.00078740047, z: -0.006299998}
+    axis: {x: 0, y: 1, z: 0}
+    size: 0.006
+    depth: 0.0015747998
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.0075644804, y: -0.00078740047, z: 0.00010000169}
+    axis: {x: 0, y: 1, z: 0}
+    size: 0.006
+    depth: 0.0015747998
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: -0.0013644806, y: -0.00078740047, z: -0.006299998}
+    axis: {x: 0, y: 1, z: 0}
+    size: 0.0061999997
+    depth: 0.0015747998
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.005035519, y: -0.00078740047, z: 0.00010000169}
+    axis: {x: 0, y: 1, z: 0}
+    size: 0.0061999997
+    depth: 0.0015747998
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.011435519, y: -0.00078740047, z: -0.006299998}
+    axis: {x: 0, y: 1, z: 0}
+    size: 0.0061999997
+    depth: 0.0015747998
+    square: 1
+    through: 1
+    kind: 0

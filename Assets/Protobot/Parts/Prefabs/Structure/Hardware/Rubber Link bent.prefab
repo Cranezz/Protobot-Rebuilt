@@ -81,6 +81,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 58a15919bd81dae40874f6712dc6472d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 6548077995785836994}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 58a15919bd81dae40874f6712dc6472d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3175136001955144556}
     - targetCorrespondingSourceObject: {fileID: 4445948748397649984, guid: 58a15919bd81dae40874f6712dc6472d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1937606398323319402}
@@ -145,6 +148,19 @@ MonoBehaviour:
   cursor: 2
   title: Rubber Link bent
   hint: "1.227 \xD7 0.468 \xD7 0.41 in  \xB7  10 g"
+--- !u!114 &3175136001955144556
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 13540315765938194}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c95fd2c384164a4d8b073d0d272505f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.PartHoles
+  holes: []
 --- !u!1 &3549502661008590083 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 4445948748397649984, guid: 58a15919bd81dae40874f6712dc6472d, type: 3}

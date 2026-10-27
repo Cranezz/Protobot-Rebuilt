@@ -73,6 +73,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 6628693515459ec4e8bfc2ebd76df56a, type: 3}
       insertIndex: -1
       addedObject: {fileID: 262011321880252948}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 6628693515459ec4e8bfc2ebd76df56a, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8924333515716799543}
     - targetCorrespondingSourceObject: {fileID: 8329350212030676554, guid: 6628693515459ec4e8bfc2ebd76df56a, type: 3}
       insertIndex: -1
       addedObject: {fileID: 6621926123269140488}
@@ -164,3 +167,37 @@ MonoBehaviour:
   cursor: 2
   title: HS Lock Bar (3 hole)
   hint: "1 1/2 \xD7 1/2 \xD7 0.056 in  \xB7  4.2 g"
+--- !u!114 &8924333515716799543
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7629058382573382726}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c95fd2c384164a4d8b073d0d272505f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.PartHoles
+  holes:
+  - center: {x: 0.0064, y: 0.031799998, z: -0.0007111981}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0047999998
+    depth: 0.0014223999
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.0064, y: 0.0446, z: -0.0007111981}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0064
+    depth: 0.0014223999
+    square: 1
+    through: 1
+    kind: 0
+  - center: {x: 0.0064, y: 0.057199996, z: -0.0007111981}
+    axis: {x: 0, y: 0, z: 1}
+    size: 0.0045999996
+    depth: 0.0014223999
+    square: 1
+    through: 1
+    kind: 0
