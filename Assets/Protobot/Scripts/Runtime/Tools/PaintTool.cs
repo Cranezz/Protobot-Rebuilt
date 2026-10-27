@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Protobot.Audio;
 using Protobot.Interaction;
 using Protobot.Menus;
 using Protobot.Parts;
@@ -9,8 +10,9 @@ namespace Protobot.Tools
 {
     /// <summary>
     /// Spray paint gun. Aim at a part and left click to paint the whole part; Shift + click strips the paint
-    /// back to the original finish. Right click opens the colour picker (colour square, RGB, hex and the last
-    /// 20 colours used). The paint cup on the gun shows the loaded colour.
+    /// back to the original finish. Right click on a part opens its colours (a preview of the part and one
+    /// swatch per material, each editable); right click anywhere else picks the gun's colour (colour square,
+    /// RGB, hex, team colours and the last 20 used). The paint cup on the gun shows the loaded colour.
     /// </summary>
     public class PaintTool : PlayerTool
     {
@@ -28,7 +30,7 @@ namespace Protobot.Tools
         public Color CurrentColor => color;
         public static IReadOnlyList<Color> Recent => recent;
 
-        public override string ControlsHint => "Left click: paint part   ·   Shift + click: remove paint   ·   Right click: colours";
+        public override string ControlsHint => "Left click: paint part   ·   Shift + click: remove paint   ·   Right click a part: edit its colors   ·   Right click empty space: spray color";
 
         public override void OnEquip()
         {
@@ -40,11 +42,31 @@ namespace Protobot.Tools
         public override void SecondaryTap() => OpenPicker();
         public override void SecondaryHold() => OpenPicker();
 
-        void OpenPicker() => picker.Open(color, recent, c =>
+        void OpenPicker()
         {
-            color = c;
-            ShowColorOnGun();
-        });
+            // On a part: that part's colours. Anywhere else: the colour loaded in the gun.
+            var target = Cursor.Current;
+            var part = target != null && Cursor.CurrentInReach ? target.GetComponentInParent<PartBody>() : null;
+            if (part != null && part.TryGetComponent(out HoverTarget hover))
+            {
+                picker.OpenForPart(hover, PartShape.DetailRenderers(part.gameObject), recent, painted =>
+                {
+                    PartModifications.On(part.gameObject).RecordPaint(painted);
+                    foreach (var pair in painted.Paints)
+                        Remember(pair.Value);
+                    Spray(part.transform.position, painted.Paint ?? color);
+                    PlaySound(Sounds.Spray, 0.45f);
+                    Hud.ShowToast($"Repainted {part.name}", 1.5f);
+                });
+                return;
+            }
+            picker.Open(color, recent, c =>
+            {
+                color = c;
+                ShowColorOnGun();
+                Remember(c);
+            });
+        }
 
         public override void PrimaryDown()
         {
@@ -53,17 +75,18 @@ namespace Protobot.Tools
                 return;
             var part = target.GetComponentInParent<PartBody>();
             if (part == null || !part.TryGetComponent(out HoverTarget hover))
+            {
+                Hud.ShowError("Spray paint works on parts");
                 return;
+            }
 
             var strip = Keyboard.current.shiftKey.isPressed;
             hover.SetPaint(strip ? null : color);
-            var mods = PartModifications.On(part.gameObject);
-            mods.painted = !strip;
-            mods.paint = color;
+            PartModifications.On(part.gameObject).RecordPaint(hover);
             if (!strip)
                 Remember(color);
             Spray(Cursor.CurrentHit.point, strip ? new Color(0.85f, 0.85f, 0.85f) : color);
-            PlaySound(ToolSounds.Spray, 0.45f);
+            PlaySound(Sounds.Spray, 0.45f);
         }
 
         public override bool DescribeTarget(HoverTarget target, bool inReach, ref CursorView view)
@@ -89,11 +112,11 @@ namespace Protobot.Tools
             }
             else if (painted != null && Approximately(painted.Value, color))
             {
-                view.hint = "Already this colour   ·   Shift + click: strip paint";
+                view.hint = "Already this color   ·   Shift + click: strip paint";
             }
             else
             {
-                view.hint = painted != null ? "Click to repaint   ·   Right click: colours" : "Click to paint   ·   Right click: colours";
+                view.hint = painted != null ? "Click to repaint   ·   Right click: this part's colors" : "Click to paint   ·   Right click: this part's colors";
             }
             return true;
         }

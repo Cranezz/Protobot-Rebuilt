@@ -100,6 +100,8 @@ MonoBehaviour:
   origin: {x: 0, y: -0.30479994, z: -0.000000023050234}
   start: -0.30479994
   end: 0.30479994
+  fullStart: -0.30479994
+  fullEnd: 0.30479994
   points:
   - {x: 0.0031531178, y: 0.0021387}
   - {x: 0.0020830804, y: 0.0031739008}
@@ -110,6 +112,8 @@ MonoBehaviour:
   - {x: 0.0021387183, y: -0.0031531}
   - {x: 0.003173919, y: -0.0020830622}
   pieceSizes: 08000000
+  cutPoints: []
+  cutNormals: []
   physicsMaterial: {fileID: 13400000, guid: 3122d1684761a0f468db748b5e9a9624, type: 2}
 --- !u!54 &4840758192063196499
 Rigidbody:
@@ -164,6 +168,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
-  title: Shaft HS 24.0 in
-  hint: "609.6 \xD7 6.4 \xD7 6.4 mm  \xB7  183.2 g"
-  highlightBrightness: 1.3
+  title: 24" HS Shaft
+  hint: "24 \xD7 1/4 \xD7 1/4 in  \xB7  183.2 g"

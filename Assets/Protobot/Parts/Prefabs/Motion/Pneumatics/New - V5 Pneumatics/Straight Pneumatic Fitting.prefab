@@ -98,6 +98,9 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 3ab3332045a911d4695e89fb5b32a3ae, type: 3}
       insertIndex: -1
+      addedObject: {fileID: 2917007867171131795}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 3ab3332045a911d4695e89fb5b32a3ae, type: 3}
+      insertIndex: -1
       addedObject: {fileID: 1770659695092569875}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 3ab3332045a911d4695e89fb5b32a3ae, type: 3}
       insertIndex: -1
@@ -108,9 +111,6 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 4445948748397649984, guid: 3ab3332045a911d4695e89fb5b32a3ae, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1172525736517774665}
-    - targetCorrespondingSourceObject: {fileID: -6476212384906687300, guid: 3ab3332045a911d4695e89fb5b32a3ae, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 6370310495510547536}
     - targetCorrespondingSourceObject: {fileID: 4116911310342040978, guid: 3ab3332045a911d4695e89fb5b32a3ae, type: 3}
       insertIndex: -1
       addedObject: {fileID: 4776417629356118658}
@@ -120,6 +120,26 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 3ab3332045a911d4695e89fb5b32a3ae, type: 3}
   m_PrefabInstance: {fileID: 89242887675739135}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &2917007867171131795
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1007790638884275886}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cebff8659e05f5844b962a356ef52f1b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.RingColliders
+  rings:
+  - centre: {x: 0, y: 0.0000000013969839, z: -0.015395403}
+    axis: {x: 0, y: 0, z: 1}
+    inner: 0.0019999938
+    outer: 0.0050000055
+    from: -0.0025954046
+    to: 0.0025954046
+    material: {fileID: 13400000, guid: 7b41823d24d681e45af2872a54c4ecbe, type: 2}
 --- !u!54 &1770659695092569875
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -174,35 +194,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: Straight Pneumatic Fitting
-  hint: "22 \xD7 11.5 \xD7 10 mm  \xB7  1.3 g"
-  highlightBrightness: 1.3
---- !u!1 &2820048086024501059 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: -6476212384906687300, guid: 3ab3332045a911d4695e89fb5b32a3ae, type: 3}
-  m_PrefabInstance: {fileID: 89242887675739135}
-  m_PrefabAsset: {fileID: 0}
---- !u!64 &6370310495510547536
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2820048086024501059}
-  m_Material: {fileID: 13400000, guid: 7b41823d24d681e45af2872a54c4ecbe, type: 2}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 1
-  m_CookingOptions: 30
-  m_Mesh: {fileID: -8073514604124154958, guid: 3ab3332045a911d4695e89fb5b32a3ae, type: 3}
+  hint: "0.866 \xD7 0.453 \xD7 0.394 in  \xB7  1.3 g"
 --- !u!1 &4044013562608080493 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 4116911310342040978, guid: 3ab3332045a911d4695e89fb5b32a3ae, type: 3}

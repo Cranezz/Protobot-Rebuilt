@@ -163,6 +163,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
-  title: 50mm Stroke Pneumatic Cylinder Rod
-  hint: "115.3 \xD7 4 \xD7 4 mm  \xB7  3.7 g"
-  highlightBrightness: 1.3
+  title: 50mm Piston (rod)
+  hint: "4.537 \xD7 0.157 \xD7 0.157 in  \xB7  3.7 g"

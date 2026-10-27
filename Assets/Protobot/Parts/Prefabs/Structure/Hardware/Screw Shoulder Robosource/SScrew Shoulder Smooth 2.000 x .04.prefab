@@ -163,6 +163,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
-  title: SScrew Shoulder Smooth 2.000 x .04
-  hint: "53 \xD7 7.9 \xD7 7.9 mm  \xB7  5.9 g"
-  highlightBrightness: 1.3
+  title: 2.00" Shoulder Screw (0.04" shoulder)
+  hint: "2.087 \xD7 5/16 \xD7 5/16 in  \xB7  5.9 g"

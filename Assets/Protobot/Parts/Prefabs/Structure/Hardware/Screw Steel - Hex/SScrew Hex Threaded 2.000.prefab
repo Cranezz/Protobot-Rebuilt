@@ -170,6 +170,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
-  title: SScrew Hex Threaded 2.000
-  hint: "53 \xD7 7.9 \xD7 7.9 mm  \xB7  4.8 g"
-  highlightBrightness: 1.3
+  title: 2.00" Hex Screw, threads shown
+  hint: "2.087 \xD7 5/16 \xD7 5/16 in  \xB7  4.8 g"

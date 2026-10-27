@@ -108,7 +108,7 @@ namespace Protobot.Editor
                 catalog.parts.Add(new PartEntry
                 {
                     id = part.path,
-                    displayName = Path.GetFileName(part.path),
+                    displayName = PartNaming.DisplayName(part.path),
                     binId = binId,
                     model = AssetDatabase.LoadAssetAtPath<GameObject>(ModelPath(part)),
                     size = new Vector3(part.size[0], part.size[1], part.size[2]),

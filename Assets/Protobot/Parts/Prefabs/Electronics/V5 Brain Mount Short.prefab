@@ -143,9 +143,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
-  title: V5 Brain Mount Short
-  hint: "50.2 \xD7 18.5 \xD7 9.4 mm  \xB7  5.7 g"
-  highlightBrightness: 1.3
+  title: Brain Mount (short)
+  hint: "1.976 \xD7 0.73 \xD7 0.37 in  \xB7  5.7 g"
 --- !u!1 &7286265886446433109 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 4445948748397649984, guid: 083f58f28edd84c48be9741ed698b1ad, type: 3}

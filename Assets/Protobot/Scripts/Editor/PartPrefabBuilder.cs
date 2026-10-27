@@ -140,6 +140,16 @@ namespace Protobot.Editor
                     if (useProfile)
                         continue;
 
+                    // Round parts with a hole (spacers, collars, gears, tyres) get ring colliders that keep the hole open.
+                    if (TryRing(detailedMesh, instance.transform.worldToLocalMatrix * detailed.transform.localToWorldMatrix, out var ring))
+                    {
+                        ring.material = physicsMaterials[finish];
+                        if (!instance.TryGetComponent(out RingColliders rings))
+                            rings = instance.AddComponent<RingColliders>();
+                        rings.Add(ring);
+                        continue;
+                    }
+
                     // Collider from the simplest LOD that still has a real shape (tiny bodies can be
                     // decimated down to a few vertices, which can't form a convex hull).
                     var simple = detailed;
@@ -265,6 +275,103 @@ namespace Protobot.Editor
             var profile = root.AddComponent<StockProfile>();
             profile.Configure(axis, u, w, bounds.center, -half, half, pieces, materials[FinishOf(firstMaterials)]);
             return true;
+        }
+
+        /// <summary>
+        /// Is this body a ring: round across one axis with an empty middle (a hole straight through)? If so,
+        /// returns its centre, axis, inner and outer radius and extent in part space.
+        /// </summary>
+        static bool TryRing(Mesh mesh, Matrix4x4 toPart, out RingColliders.Ring ring)
+        {
+            ring = default;
+            var source = mesh.vertices;
+            if (source.Length < 24)
+                return false;
+            var verts = new Vector3[source.Length];
+            for (var i = 0; i < source.Length; i++)
+                verts[i] = toPart.MultiplyPoint3x4(source[i]);
+            var bounds = new Bounds(verts[0], Vector3.zero);
+            foreach (var p in verts)
+                bounds.Encapsulate(p);
+            var size = bounds.size;
+            var tris = mesh.triangles;
+
+            for (var axis = 0; axis < 3; axis++)
+            {
+                int a = (axis + 1) % 3, b = (axis + 2) % 3;
+                // Round across the other two directions.
+                if (Mathf.Abs(size[a] - size[b]) > 0.06f * Mathf.Max(size[a], size[b]) || size[a] < 0.004f)
+                    continue;
+                var centre = bounds.center;
+                float inner = float.MaxValue, outer = 0f;
+                foreach (var p in verts)
+                {
+                    var d = p - centre;
+                    d[axis] = 0f;
+                    var r = d.magnitude;
+                    inner = Mathf.Min(inner, r);
+                    outer = Mathf.Max(outer, r);
+                }
+                if (inner < 0.2f * outer || outer - inner < 0.0008f)
+                    continue;
+                // Round all the way round (a square outline would poke out of a circle collider): the furthest
+                // vertex in every direction is near the outer radius. Gear teeth still pass; a square's flats don't.
+                const int Directions = 16;
+                var reach = new float[Directions];
+                foreach (var p in verts)
+                {
+                    var d = p - centre;
+                    d[axis] = 0f;
+                    var angle = Mathf.Atan2(d[b], d[a]);
+                    var bin = Mathf.Clamp((int)((angle + Mathf.PI) / (2f * Mathf.PI) * Directions), 0, Directions - 1);
+                    reach[bin] = Mathf.Max(reach[bin], d.magnitude);
+                }
+                var round = true;
+                foreach (var r in reach)
+                    round &= r >= 0.8f * outer;
+                if (!round)
+                    continue;
+                // The middle must really be empty: a line along the axis through the centre misses the mesh.
+                var direction = Vector3.zero;
+                direction[axis] = 1f;
+                var start = centre - direction * (size[axis] / 2f + 0.001f);
+                if (RayHitsMesh(verts, tris, start, direction, size[axis] + 0.002f))
+                    continue;
+                ring = new RingColliders.Ring
+                {
+                    centre = centre, axis = direction, inner = inner, outer = outer,
+                    from = -size[axis] / 2f, to = size[axis] / 2f,
+                };
+                return true;
+            }
+            return false;
+        }
+
+        static bool RayHitsMesh(Vector3[] verts, int[] tris, Vector3 origin, Vector3 direction, float length)
+        {
+            for (var i = 0; i < tris.Length; i += 3)
+            {
+                Vector3 p0 = verts[tris[i]], p1 = verts[tris[i + 1]], p2 = verts[tris[i + 2]];
+                var e1 = p1 - p0;
+                var e2 = p2 - p0;
+                var h = Vector3.Cross(direction, e2);
+                var det = Vector3.Dot(e1, h);
+                if (Mathf.Abs(det) < 1e-14f)
+                    continue;
+                var inv = 1f / det;
+                var s = origin - p0;
+                var u = Vector3.Dot(s, h) * inv;
+                if (u < 0f || u > 1f)
+                    continue;
+                var q = Vector3.Cross(s, e1);
+                var v = Vector3.Dot(direction, q) * inv;
+                if (v < 0f || u + v > 1f)
+                    continue;
+                var t = Vector3.Dot(e2, q) * inv;
+                if (t >= 0f && t <= length)
+                    return true;
+            }
+            return false;
         }
 
         /// <summary>

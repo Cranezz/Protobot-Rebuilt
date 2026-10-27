@@ -108,6 +108,8 @@ MonoBehaviour:
   origin: {x: 0.025399998, y: 0.22224997, z: -0.006945297}
   start: -0.22224997
   end: 0.22224997
+  fullStart: -0.22224997
+  fullEnd: 0.22224997
   points:
   - {x: 0.004960946, y: 0.0063499995}
   - {x: -0.006945302, y: 0.0063499995}
@@ -127,6 +129,8 @@ MonoBehaviour:
   - {x: 0.004960946, y: 0.0051593725}
   - {x: 0.0055385614, y: 0.0049098395}
   pieceSizes: 06000000050000000300000003000000
+  cutPoints: []
+  cutNormals: []
   physicsMaterial: {fileID: 13400000, guid: 3122d1684761a0f468db748b5e9a9624, type: 2}
 --- !u!54 &2505624735198293555
 Rigidbody:
@@ -181,6 +185,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
-  title: Steel Half C 1x5x1x35
-  hint: "444.5 \xD7 13.9 \xD7 12.7 mm  \xB7  88.5 g"
-  highlightBrightness: 1.3
+  title: 1x5x1 Steel Half C-Channel (35)
+  hint: "17 1/2 \xD7 0.547 \xD7 1/2 in  \xB7  88.5 g"

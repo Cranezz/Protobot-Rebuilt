@@ -108,6 +108,8 @@ MonoBehaviour:
   origin: {x: -0.0005953163, y: 0.22225001, z: -0.019645296}
   start: -0.22225001
   end: 0.22225001
+  fullStart: -0.22225001
+  fullEnd: 0.22225001
   points:
   - {x: 0.019519644, y: -0.018347561}
   - {x: 0.019645324, y: -0.017660933}
@@ -128,6 +130,8 @@ MonoBehaviour:
   - {x: 0.017668338, y: -0.018453708}
   - {x: 0.018347574, y: -0.019519625}
   pieceSizes: 05000000050000000500000003000000
+  cutPoints: []
+  cutNormals: []
   physicsMaterial: {fileID: 13400000, guid: 3122d1684761a0f468db748b5e9a9624, type: 2}
 --- !u!54 &7126663325731162680
 Rigidbody:
@@ -182,6 +186,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
-  title: Steel Angle 3x3x35
-  hint: "444.5 \xD7 39.3 \xD7 39.3 mm  \xB7  249.6 g"
-  highlightBrightness: 1.3
+  title: 3x3 Steel Angle (35)
+  hint: "17 1/2 \xD7 1.547 \xD7 1.547 in  \xB7  249.6 g"

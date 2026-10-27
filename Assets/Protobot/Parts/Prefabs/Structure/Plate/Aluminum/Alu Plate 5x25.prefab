@@ -108,12 +108,16 @@ MonoBehaviour:
   origin: {x: -0.031749997, y: 0.15874998, z: -0.0007937379}
   start: -0.15874998
   end: 0.15874998
+  fullStart: -0.15874998
+  fullEnd: 0.15874998
   points:
   - {x: 0.0007937415, y: 0.031749997}
   - {x: -0.0007937584, y: 0.031749997}
   - {x: -0.0007937584, y: -0.031749997}
   - {x: 0.0007937415, y: -0.031749997}
   pieceSizes: 04000000
+  cutPoints: []
+  cutNormals: []
   physicsMaterial: {fileID: 13400000, guid: 7c1438b7c2246e3449cb98af75fde723, type: 2}
 --- !u!54 &5339594550443197678
 Rigidbody:
@@ -168,6 +172,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
-  title: Alu Plate 5x25
-  hint: "317.5 \xD7 63.5 \xD7 1.6 mm  \xB7  69.5 g"
-  highlightBrightness: 1.3
+  title: Aluminum Plate (5x25)
+  hint: "12 1/2 \xD7 2 1/2 \xD7 1/16 in  \xB7  69.5 g"

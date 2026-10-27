@@ -108,6 +108,8 @@ MonoBehaviour:
   origin: {x: 0, y: 0.22224997, z: -0.007143732}
   start: -0.22224997
   end: 0.22224997
+  fullStart: -0.22224997
+  fullEnd: 0.22224997
   points:
   - {x: 0.0065222997, y: -0.03097265}
   - {x: 0.006992473, y: -0.030195449}
@@ -140,6 +142,8 @@ MonoBehaviour:
   - {x: 0.0053438954, y: 0.029908862}
   - {x: 0.005556261, y: 0.02936875}
   pieceSizes: 07000000060000000500000003000000030000000300000003000000
+  cutPoints: []
+  cutNormals: []
   physicsMaterial: {fileID: 13400000, guid: 7c1438b7c2246e3449cb98af75fde723, type: 2}
 --- !u!54 &2396126078970370048
 Rigidbody:
@@ -194,6 +198,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
-  title: C Channel 1x3x1 & 1x5x1
-  hint: "444.5 \xD7 63.5 \xD7 14.3 mm  \xB7  143.9 g"
-  highlightBrightness: 1.3
+  title: 1x3x1 & 1x5x1 C-Channel
+  hint: "17 1/2 \xD7 2 1/2 \xD7 9/16 in  \xB7  143.9 g"

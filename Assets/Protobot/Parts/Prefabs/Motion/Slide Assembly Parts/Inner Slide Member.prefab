@@ -167,5 +167,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: Inner Slide Member
-  hint: "304.8 \xD7 18.3 \xD7 10.4 mm  \xB7  89.7 g"
-  highlightBrightness: 1.3
+  hint: "12 \xD7 0.722 \xD7 0.408 in  \xB7  89.7 g"

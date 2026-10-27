@@ -170,6 +170,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
-  title: 276-8868-056
-  hint: "69.4 \xD7 61.2 \xD7 60.6 mm  \xB7  33.3 g"
-  highlightBrightness: 1.3
+  title: Ladder 276-8868-056
+  hint: "2.73 \xD7 2.408 \xD7 2.385 in  \xB7  33.3 g"

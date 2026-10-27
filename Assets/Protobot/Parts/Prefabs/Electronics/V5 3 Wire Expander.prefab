@@ -633,8 +633,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: V5 3 Wire Expander
-  hint: "76.3 \xD7 26.8 \xD7 21.9 mm  \xB7  40.1 g"
-  highlightBrightness: 1.3
+  hint: "3.002 \xD7 1.054 \xD7 0.862 in  \xB7  40.1 g"
 --- !u!1 &2112141268114010112 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -8310516894849210533, guid: 38fd962ba161b7a43aeb8b6e18735307, type: 3}

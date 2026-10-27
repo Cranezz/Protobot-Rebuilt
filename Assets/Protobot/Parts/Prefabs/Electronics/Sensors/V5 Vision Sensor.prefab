@@ -341,7 +341,7 @@ PrefabInstance:
       addedObject: {fileID: 1008951690792071859}
     - targetCorrespondingSourceObject: {fileID: -2911314351558048551, guid: d9738a2c8d6645d418b77ab7c3ab8066, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 7743612556750782230}
+      addedObject: {fileID: 3155711024238081145}
     - targetCorrespondingSourceObject: {fileID: -6692640117217328094, guid: d9738a2c8d6645d418b77ab7c3ab8066, type: 3}
       insertIndex: -1
       addedObject: {fileID: 5548911019753557440}
@@ -440,9 +440,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
-  title: V5 Vision Sensor
-  hint: "63.4 \xD7 55 \xD7 22.7 mm  \xB7  51.3 g"
-  highlightBrightness: 1.3
+  title: Vision Sensor
+  hint: "2.496 \xD7 2.164 \xD7 0.892 in  \xB7  51.3 g"
 --- !u!1 &2255920109029128803 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -7137710277361028360, guid: d9738a2c8d6645d418b77ab7c3ab8066, type: 3}
@@ -880,7 +879,7 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: -2911314351558048551, guid: d9738a2c8d6645d418b77ab7c3ab8066, type: 3}
   m_PrefabInstance: {fileID: 270041374008199323}
   m_PrefabAsset: {fileID: 0}
---- !u!64 &7743612556750782230
+--- !u!64 &3155711024238081145
 MeshCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

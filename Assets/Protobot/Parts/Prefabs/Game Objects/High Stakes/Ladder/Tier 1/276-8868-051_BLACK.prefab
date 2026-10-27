@@ -143,9 +143,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
-  title: 276-8868-051_BLACK
-  hint: "166.3 \xD7 104 \xD7 95.3 mm  \xB7  125.7 g"
-  highlightBrightness: 1.3
+  title: Ladder Tier 1 276-8868-051 BLACK
+  hint: "6.547 \xD7 4.095 \xD7 3 3/4 in  \xB7  125.7 g"
 --- !u!1 &3471441905009215533 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 4445948748397649984, guid: 97fa4253368b5094ea308e1f2c8f74dc, type: 3}

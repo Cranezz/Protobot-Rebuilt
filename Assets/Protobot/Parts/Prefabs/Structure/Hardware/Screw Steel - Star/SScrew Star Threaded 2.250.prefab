@@ -143,9 +143,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
-  title: SScrew Star Threaded 2.250
-  hint: "59.4 \xD7 7.9 \xD7 7.9 mm  \xB7  5.3 g"
-  highlightBrightness: 1.3
+  title: 2.25" Star Screw, threads shown
+  hint: "2.337 \xD7 5/16 \xD7 5/16 in  \xB7  5.3 g"
 --- !u!1 &3954206355963613151 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 4445948748397649984, guid: 52bf8d5f85318e14c8f41d3f3323fac7, type: 3}

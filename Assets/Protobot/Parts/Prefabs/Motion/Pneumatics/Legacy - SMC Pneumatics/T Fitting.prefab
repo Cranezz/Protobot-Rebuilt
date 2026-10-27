@@ -167,5 +167,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: T Fitting
-  hint: "36 \xD7 26.5 \xD7 10.6 mm  \xB7  3.8 g"
-  highlightBrightness: 1.3
+  hint: "1.417 \xD7 1.043 \xD7 0.417 in  \xB7  3.8 g"

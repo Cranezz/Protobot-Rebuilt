@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using Protobot.Core;
+using Protobot.Interaction;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -12,8 +13,9 @@ namespace Protobot.Menus
 {
     /// <summary>
     /// Paint colour picker: a saturation/brightness square with a hue bar beside it (like an image editor),
-    /// RGB sliders with exact values, a hex code box, old vs new swatches, and the last 20 colours used
-    /// (5 columns × 4 rows). Every control stays in sync with the others.
+    /// RGB sliders with exact values, a hex code box, old vs new swatches, team colours and the last 20
+    /// colours used (5 columns × 4 rows). Every control stays in sync with the others. In part mode
+    /// (<see cref="OpenForPart"/>) it also shows the part and its colours, and edits them one at a time.
     /// </summary>
     public class ColorPickerMenu : MonoBehaviour
     {
@@ -59,6 +61,7 @@ namespace Protobot.Menus
 
         public void Open(Color start, IReadOnlyList<Color> recentColors, Action<Color> chosen)
         {
+            LeavePartMode();
             onChosen = chosen;
             recent = recentColors;
             oldSwatch.color = start;
@@ -70,6 +73,7 @@ namespace Protobot.Menus
 
         void Close()
         {
+            LeavePartMode();
             root.SetActive(false);
             MenuState.Close(this);
             EventSystem.current?.SetSelectedGameObject(null);
@@ -77,7 +81,11 @@ namespace Protobot.Menus
 
         void Update()
         {
-            if (IsOpen && Keyboard.current.escapeKey.wasPressedThisFrame && MenuState.ChangedFrame != Time.frameCount)
+            if (!IsOpen)
+                return;
+            if (partMode)
+                stage.Tick(Time.unscaledDeltaTime, !turningPreview);
+            if (Keyboard.current.escapeKey.wasPressedThisFrame && MenuState.ChangedFrame != Time.frameCount)
                 Close();
         }
 
@@ -124,6 +132,7 @@ namespace Protobot.Menus
             }
             hex.SetTextWithoutNotify("#" + ColorUtility.ToHtmlStringRGB(current));
             syncing = false;
+            OnPickerChanged();
         }
 
         float drawnHue = -1f;
@@ -160,18 +169,23 @@ namespace Protobot.Menus
             root = dim.gameObject;
             var panel = UiFactory.Panel(dim.transform, "Panel", theme, theme.panel, true).rectTransform;
             panel.Place(new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(860f, 740f));
+            panelRect = panel;
+            // The picker itself keeps to the right-hand 860 px; the part's colours (part mode) go on the left.
+            var picker = UiFactory.Rect("Picker", panel);
+            picker.Place(new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), Vector2.zero, new Vector2(860f, 740f));
 
             var stripes = UiFactory.Hazard(panel, "Stripes", theme);
             stripes.rectTransform.anchorMin = new Vector2(0f, 1f);
             stripes.rectTransform.anchorMax = new Vector2(1f, 1f);
             stripes.rectTransform.offsetMin = new Vector2(14f, -24f);
             stripes.rectTransform.offsetMax = new Vector2(-14f, -12f);
-            var title = UiFactory.Text(panel, "Title", theme, "PAINT COLOUR", 44f, theme.text, true);
+            pickerTitle = UiFactory.Text(picker, "Title", theme, "PAINT COLOR", 44f, theme.text, true);
+            var title = pickerTitle;
             title.rectTransform.Place(new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(32f, -30f), new Vector2(500f, 56f));
 
             // Saturation / brightness square.
             squareTexture = new Texture2D(SquareResolution, SquareResolution, TextureFormat.RGBA32, false) { wrapMode = TextureWrapMode.Clamp };
-            var squareRect = UiFactory.Rect("Square", panel).Place(new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(32f, -104f), new Vector2(340f, 340f));
+            var squareRect = UiFactory.Rect("Square", picker).Place(new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(32f, -104f), new Vector2(340f, 340f));
             square = squareRect.gameObject.AddComponent<RawImage>();
             square.texture = squareTexture;
             DragArea.Add(squareRect, p => SetHsv(hue, p.x, p.y));
@@ -183,18 +197,18 @@ namespace Protobot.Menus
             for (var i = 0; i < 128; i++)
                 hueTexture.SetPixel(0, i, Color.HSVToRGB(i / 127f, 1f, 1f));
             hueTexture.Apply();
-            var hueRect = UiFactory.Rect("Hue", panel).Place(new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(390f, -104f), new Vector2(40f, 340f));
+            var hueRect = UiFactory.Rect("Hue", picker).Place(new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(390f, -104f), new Vector2(40f, 340f));
             hueRect.gameObject.AddComponent<RawImage>().texture = hueTexture;
             DragArea.Add(hueRect, p => SetHsv(p.y, saturation, value));
             hueHandle = UiFactory.Image(hueRect, "Handle", Color.white, theme.roundedOutline).rectTransform;
             hueHandle.sizeDelta = new Vector2(52f, 14f);
 
             // Old / new swatches.
-            var swatchLabel = UiFactory.Text(panel, "SwatchLabel", theme, "OLD  /  NEW", 18f, theme.textDim, true);
+            var swatchLabel = UiFactory.Text(picker, "SwatchLabel", theme, "OLD  /  NEW", 18f, theme.textDim, true);
             swatchLabel.rectTransform.Place(new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(460f, -100f), new Vector2(360f, 24f));
-            oldSwatch = UiFactory.Image(panel, "Old", Color.white, theme.rounded);
+            oldSwatch = UiFactory.Image(picker, "Old", Color.white, theme.rounded);
             oldSwatch.rectTransform.Place(new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(460f, -128f), new Vector2(175f, 56f));
-            newSwatch = UiFactory.Image(panel, "New", Color.white, theme.rounded);
+            newSwatch = UiFactory.Image(picker, "New", Color.white, theme.rounded);
             newSwatch.rectTransform.Place(new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(643f, -128f), new Vector2(175f, 56f));
 
             // RGB sliders and hex.
@@ -203,9 +217,9 @@ namespace Protobot.Menus
             {
                 var channel = i;
                 var y = -206f - i * 52f;
-                var label = UiFactory.Text(panel, names[i], theme, names[i], 24f, theme.text, true);
+                var label = UiFactory.Text(picker, names[i], theme, names[i], 24f, theme.text, true);
                 label.rectTransform.Place(new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(460f, y - 6f), new Vector2(30f, 36f));
-                var sliderRect = UiFactory.Rect(names[i] + "Slider", panel).Place(new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(490f, y), new Vector2(230f, 44f));
+                var sliderRect = UiFactory.Rect(names[i] + "Slider", picker).Place(new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(490f, y), new Vector2(230f, 44f));
                 rgb[i] = UiFactory.Slider(sliderRect, "Slider", theme, 0f, 255f, 0f, v =>
                 {
                     var c = current;
@@ -214,7 +228,7 @@ namespace Protobot.Menus
                 });
                 ((RectTransform)rgb[i].transform).Fill();
                 rgb[i].wholeNumbers = true;
-                rgbFields[i] = UiFactory.InputField(panel, names[i] + "Field", theme, "", 22f);
+                rgbFields[i] = UiFactory.InputField(picker, names[i] + "Field", theme, "", 22f);
                 ((RectTransform)rgbFields[i].transform).Place(new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(732f, y), new Vector2(86f, 44f));
                 rgbFields[i].contentType = TMP_InputField.ContentType.IntegerNumber;
                 rgbFields[i].onEndEdit.AddListener(text =>
@@ -226,9 +240,9 @@ namespace Protobot.Menus
                     SetColor(c, true);
                 });
             }
-            var hexLabel = UiFactory.Text(panel, "HexLabel", theme, "HEX", 24f, theme.text, true);
+            var hexLabel = UiFactory.Text(picker, "HexLabel", theme, "HEX", 24f, theme.text, true);
             hexLabel.rectTransform.Place(new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(460f, -368f), new Vector2(60f, 36f));
-            hex = UiFactory.InputField(panel, "Hex", theme, "#RRGGBB", 24f);
+            hex = UiFactory.InputField(picker, "Hex", theme, "#RRGGBB", 24f);
             ((RectTransform)hex.transform).Place(new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(530f, -362f), new Vector2(288f, 48f));
             hex.characterLimit = 7;
             hex.onEndEdit.AddListener(text =>
@@ -243,12 +257,12 @@ namespace Protobot.Menus
             });
 
             // Common team colours, one click away.
-            var presetLabel = UiFactory.Text(panel, "PresetLabel", theme, "TEAM COLOURS", 18f, theme.textDim, true);
+            var presetLabel = UiFactory.Text(picker, "PresetLabel", theme, "TEAM COLORS", 18f, theme.textDim, true);
             presetLabel.rectTransform.Place(new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(460f, -432f), new Vector2(300f, 24f));
             for (var i = 0; i < Presets.Length; i++)
             {
                 var preset = Presets[i];
-                var swatch = UiFactory.Image(panel, "Preset" + i, preset, theme.rounded, true);
+                var swatch = UiFactory.Image(picker, "Preset" + i, preset, theme.rounded, true);
                 swatch.rectTransform.Place(new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(460f + (i % 6) * 60f, -462f - (i / 6) * 56f), new Vector2(50f, 48f));
                 var button = swatch.gameObject.AddComponent<Button>();
                 button.transition = Selectable.Transition.None;
@@ -256,14 +270,14 @@ namespace Protobot.Menus
             }
 
             // Recent colours: 5 × 4.
-            var recentLabel = UiFactory.Text(panel, "RecentLabel", theme, "RECENT", 18f, theme.textDim, true);
+            var recentLabel = UiFactory.Text(picker, "RecentLabel", theme, "RECENT", 18f, theme.textDim, true);
             recentLabel.rectTransform.Place(new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(32f, -460f), new Vector2(200f, 24f));
             for (var i = 0; i < 20; i++)
             {
                 var col = i % 5;
                 var row = i / 5;
                 var index = i;
-                var swatch = UiFactory.Image(panel, "Recent" + i, Color.white, theme.rounded, true);
+                var swatch = UiFactory.Image(picker, "Recent" + i, Color.white, theme.rounded, true);
                 swatch.rectTransform.Place(new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(32f + col * 52f, -490f - row * 52f), new Vector2(44f, 44f));
                 var button = swatch.gameObject.AddComponent<Button>();
                 button.transition = Selectable.Transition.None;
@@ -276,15 +290,216 @@ namespace Protobot.Menus
                 recentButtons.Add(button);
             }
 
-            var use = UiFactory.Button(panel, "Use", theme, "USE COLOUR", () =>
+            var use = UiFactory.Button(panel, "Use", theme, "USE COLOR", () =>
             {
-                onChosen?.Invoke(current);
+                if (partMode)
+                    ApplyToPart();
+                else
+                    onChosen?.Invoke(current);
                 Close();
             }, true, 26f);
+            useLabel = use.GetComponentInChildren<TextMeshProUGUI>();
             ((RectTransform)use.transform).Place(new Vector2(1f, 0f), new Vector2(1f, 0f), new Vector2(-32f, 32f), new Vector2(240f, 62f));
             var cancel = UiFactory.Button(panel, "Cancel", theme, "CANCEL", Close, false, 24f);
             ((RectTransform)cancel.transform).Place(new Vector2(1f, 0f), new Vector2(1f, 0f), new Vector2(-288f, 32f), new Vector2(170f, 62f));
+            BuildPartArea(panel);
         }
+
+        // ---------------------------------------------------------------- part mode
+
+        const int MaxPartColors = 8;
+
+        RectTransform panelRect;
+        TextMeshProUGUI pickerTitle;
+        TextMeshProUGUI useLabel;
+        GameObject partArea;
+        TextMeshProUGUI partName;
+        RawImage preview;
+        readonly List<(Image back, Image chip, TextMeshProUGUI label)> partSwatches = new();
+        bool partMode;
+        bool selecting;
+        bool turningPreview;
+        HoverTarget part;
+        List<Material> partMaterials = new();
+        readonly Dictionary<Material, Color> working = new();
+        Action<HoverTarget> partApplied;
+        int selected;
+        PartPreviewStage stage;
+
+        /// <summary>
+        /// Opens on a part: a turning preview of it and one swatch per material it's made of (e.g. a wheel's
+        /// tyre and hub). Click a swatch to edit that colour with the picker; the preview shows it straight
+        /// away. Apply paints the real part; cancel leaves it as it was.
+        /// </summary>
+        public void OpenForPart(HoverTarget target, IEnumerable<MeshRenderer> detail, IReadOnlyList<Color> recentColors, Action<HoverTarget> applied)
+        {
+            part = target;
+            partApplied = applied;
+            recent = recentColors;
+            partMode = true;
+            partMaterials = target.Materials;
+            if (partMaterials.Count > MaxPartColors)
+                partMaterials.RemoveRange(MaxPartColors, partMaterials.Count - MaxPartColors);
+            working.Clear();
+            foreach (var pair in target.Paints)
+                working[pair.Key] = pair.Value;
+
+            panelRect.sizeDelta = new Vector2(1300f, 740f);
+            partArea.SetActive(true);
+            partName.text = target.Title;
+            pickerTitle.text = "EDIT COLOR";
+            useLabel.text = "APPLY";
+            for (var i = 0; i < partSwatches.Count; i++)
+            {
+                var used = i < partMaterials.Count;
+                partSwatches[i].back.gameObject.SetActive(used);
+                if (used)
+                    partSwatches[i].label.text = NiceName(partMaterials[i].name);
+            }
+
+            stage ??= new PartPreviewStage(theme.card);
+            stage.Show(target.gameObject, Parts.PartShape.DetailRenderers(target.gameObject));
+            preview.texture = stage.Texture;
+            stage.Paint(working);
+
+            root.SetActive(true);
+            MenuState.Open(this);
+            RefreshRecent();
+            Select(0);
+        }
+
+        void Select(int index)
+        {
+            selected = Mathf.Clamp(index, 0, partMaterials.Count - 1);
+            var color = part.ColorOf(partMaterials[selected]);
+            if (working.TryGetValue(partMaterials[selected], out var painted))
+                color = painted;
+            oldSwatch.color = color;
+            selecting = true;
+            SetColor(color, true);
+            selecting = false;
+            RefreshPartSwatches();
+        }
+
+        /// <summary>The picker changed colour: in part mode that's the selected material's new paint.</summary>
+        void OnPickerChanged()
+        {
+            if (!partMode || selecting || partMaterials.Count == 0)
+                return;
+            working[partMaterials[selected]] = current;
+            RefreshPartSwatches();
+            stage.Paint(working);
+        }
+
+        void ResetSelected()
+        {
+            if (!partMode || partMaterials.Count == 0)
+                return;
+            working.Remove(partMaterials[selected]);
+            stage.Paint(working);
+            Select(selected);
+        }
+
+        void RefreshPartSwatches()
+        {
+            for (var i = 0; i < partMaterials.Count && i < partSwatches.Count; i++)
+            {
+                var material = partMaterials[i];
+                partSwatches[i].chip.color = working.TryGetValue(material, out var c) ? c : part.ColorOf(material);
+                partSwatches[i].back.color = i == selected ? theme.accent : theme.panelInset;
+                partSwatches[i].label.color = i == selected ? theme.accentText : theme.text;
+            }
+        }
+
+        void ApplyToPart()
+        {
+            if (part == null)
+                return;
+            foreach (var material in partMaterials)
+                part.SetPaint(material, working.TryGetValue(material, out var c) ? c : null);
+            partApplied?.Invoke(part);
+        }
+
+        void LeavePartMode()
+        {
+            if (!partMode)
+                return;
+            partMode = false;
+            stage?.Hide();
+            partArea.SetActive(false);
+            panelRect.sizeDelta = new Vector2(860f, 740f);
+            pickerTitle.text = "PAINT COLOR";
+            useLabel.text = "USE COLOR";
+            part = null;
+        }
+
+        /// <summary>"Rubber_-_Black_-_Version_1.1_1" → "Rubber - Black".</summary>
+        static string NiceName(string material)
+        {
+            var name = material.Replace("_-_", " - ").Replace('_', ' ');
+            var version = name.IndexOf(" - Version", StringComparison.Ordinal);
+            if (version > 0)
+                name = name.Substring(0, version);
+            return name.Trim();
+        }
+
+        void BuildPartArea(RectTransform panel)
+        {
+            var area = UiFactory.Rect("PartArea", panel);
+            area.Place(new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), Vector2.zero, new Vector2(440f, 740f));
+            partArea = area.gameObject;
+
+            var title = UiFactory.Text(area, "Title", theme, "PART COLORS", 44f, theme.text, true);
+            title.rectTransform.Place(new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(32f, -30f), new Vector2(400f, 56f));
+            partName = UiFactory.Text(area, "Part", theme, "", 22f, theme.textDim);
+            partName.rectTransform.Place(new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(32f, -84f), new Vector2(400f, 28f));
+
+            var frame = UiFactory.Image(area, "PreviewFrame", theme.card, theme.rounded);
+            frame.rectTransform.Place(new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(32f, -116f), new Vector2(392f, 326f));
+            var previewRect = UiFactory.Rect("Preview", frame.transform).Fill(4f, 4f, 4f, 4f);
+            preview = previewRect.gameObject.AddComponent<RawImage>();
+            preview.raycastTarget = true;
+            var turn = previewRect.gameObject.AddComponent<DragTurn>();
+            turn.turned = d => stage?.Turn(d * 0.4f);
+            turn.dragging = d => turningPreview = d;
+            var hint = UiFactory.Text(frame.transform, "Hint", theme, "Drag to turn", 16f, new Color(theme.cardText.r, theme.cardText.g, theme.cardText.b, 0.6f), false, TextAlignmentOptions.BottomRight);
+            hint.rectTransform.Fill(8f, 6f, 10f, 6f);
+
+            var label = UiFactory.Text(area, "ColorsLabel", theme, "COLORS  (click one to change it)", 18f, theme.textDim, true);
+            label.rectTransform.Place(new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(32f, -454f), new Vector2(400f, 24f));
+            for (var i = 0; i < MaxPartColors; i++)
+            {
+                var index = i;
+                var back = UiFactory.Image(area, "Color" + i, theme.panelInset, theme.rounded, true);
+                back.rectTransform.Place(new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(32f + (i % 2) * 198f, -482f - (i / 2) * 50f), new Vector2(192f, 44f));
+                var button = back.gameObject.AddComponent<Button>();
+                button.transition = Selectable.Transition.None;
+                button.onClick.AddListener(() =>
+                {
+                    Select(index);
+                    Audio.Sounds.Play(Audio.Sounds.Tick, 0.25f);
+                });
+                var chip = UiFactory.Image(back.transform, "Chip", Color.white, theme.rounded);
+                chip.rectTransform.Place(new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(6f, 0f), new Vector2(32f, 32f));
+                var text = UiFactory.Text(back.transform, "Name", theme, "", 18f, theme.text, false, TextAlignmentOptions.MidlineLeft);
+                text.rectTransform.Fill(46f, 0f, 6f, 0f);
+                partSwatches.Add((back, chip, text));
+            }
+            var reset = UiFactory.Button(area, "Reset", theme, "ORIGINAL COLOR", ResetSelected, false, 20f);
+            ((RectTransform)reset.transform).Place(new Vector2(0f, 0f), new Vector2(0f, 0f), new Vector2(32f, 32f), new Vector2(220f, 52f));
+            partArea.SetActive(false);
+        }
+    }
+
+    /// <summary>Reports how far the pointer is dragged each frame (pixels), and when a drag starts and stops.</summary>
+    public class DragTurn : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
+    {
+        public Action<Vector2> turned;
+        public Action<bool> dragging;
+
+        public void OnBeginDrag(PointerEventData e) => dragging?.Invoke(true);
+        public void OnDrag(PointerEventData e) => turned?.Invoke(e.delta);
+        public void OnEndDrag(PointerEventData e) => dragging?.Invoke(false);
     }
 
     /// <summary>Reports where on a rect the pointer is pressed or dragged, as 0..1 in each direction.</summary>

@@ -353,9 +353,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
-  title: Line Tracker - V2
-  hint: "56.6 \xD7 20.2 \xD7 12.8 mm  \xB7  9.5 g"
-  highlightBrightness: 1.3
+  title: Line Tracker V2
+  hint: "2.23 \xD7 0.795 \xD7 0.503 in  \xB7  9.5 g"
 --- !u!1 &9177345410408653105 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -7137710277361028360, guid: c4fc317ca96fc644f8ff2ec10a11477d, type: 3}

@@ -162,6 +162,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
-  title: 276-8868-203
-  hint: "212.3 \xD7 189 \xD7 2.9 mm  \xB7  76 g"
-  highlightBrightness: 1.3
+  title: Mobile Goal 276-8868-203
+  hint: "8.36 \xD7 7.441 \xD7 0.115 in  \xB7  76 g"

@@ -108,6 +108,8 @@ MonoBehaviour:
   origin: {x: 0, y: 0.22224997, z: -0.006945297}
   start: -0.22224997
   end: 0.22224997
+  fullStart: -0.22224997
+  fullEnd: 0.22224997
   points:
   - {x: 0.006416206, y: -0.031114435}
   - {x: 0.004960946, y: -0.03055937}
@@ -139,6 +141,8 @@ MonoBehaviour:
   - {x: 0.0055385614, y: 0.030309837}
   - {x: 0.0057547055, y: 0.029765619}
   pieceSizes: 05000000070000000500000003000000030000000300000003000000
+  cutPoints: []
+  cutNormals: []
   physicsMaterial: {fileID: 13400000, guid: 3122d1684761a0f468db748b5e9a9624, type: 2}
 --- !u!54 &859488879213021423
 Rigidbody:
@@ -193,6 +197,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
-  title: Steel C Chan 1x5x1x35
-  hint: "444.5 \xD7 63.5 \xD7 13.9 mm  \xB7  314.6 g"
-  highlightBrightness: 1.3
+  title: 1x5x1 Steel C-Channel (35)
+  hint: "17 1/2 \xD7 2 1/2 \xD7 0.547 in  \xB7  314.6 g"

@@ -144,8 +144,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: 6P 40T Sprocket
-  hint: "84.5 \xD7 84.5 \xD7 12.7 mm  \xB7  16.8 g"
-  highlightBrightness: 1.3
+  hint: "3.326 \xD7 3.326 \xD7 1/2 in  \xB7  16.8 g"
 --- !u!1 &3140723742139754007 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 4445948748397649984, guid: 8b698fd6d6eab2f40af44b07ad6835ff, type: 3}

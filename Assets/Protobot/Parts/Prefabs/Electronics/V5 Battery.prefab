@@ -275,9 +275,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
-  title: V5 Battery
-  hint: "162.3 \xD7 46.4 \xD7 30.4 mm  \xB7  149 g"
-  highlightBrightness: 1.3
+  title: Battery
+  hint: "6.391 \xD7 1.829 \xD7 1.197 in  \xB7  149 g"
 --- !u!1 &3025317464841907019 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 4116911310342040978, guid: 123a52c0699a6994584203f666c5e7d2, type: 3}

@@ -74,6 +74,9 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: a6e3ef34f853f5c42b3702d68cd31027, type: 3}
       insertIndex: -1
+      addedObject: {fileID: 8540276784313390473}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: a6e3ef34f853f5c42b3702d68cd31027, type: 3}
+      insertIndex: -1
       addedObject: {fileID: 5464730072195209420}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: a6e3ef34f853f5c42b3702d68cd31027, type: 3}
       insertIndex: -1
@@ -81,42 +84,32 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: a6e3ef34f853f5c42b3702d68cd31027, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1282990041655485224}
-    - targetCorrespondingSourceObject: {fileID: 4445948748397649984, guid: a6e3ef34f853f5c42b3702d68cd31027, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 6067502186774878863}
   m_SourcePrefab: {fileID: 100100000, guid: a6e3ef34f853f5c42b3702d68cd31027, type: 3}
---- !u!1 &6711531888386130391 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 4445948748397649984, guid: a6e3ef34f853f5c42b3702d68cd31027, type: 3}
-  m_PrefabInstance: {fileID: 6960040982299795863}
-  m_PrefabAsset: {fileID: 0}
---- !u!64 &6067502186774878863
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6711531888386130391}
-  m_Material: {fileID: 13400000, guid: 7b41823d24d681e45af2872a54c4ecbe, type: 2}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 1
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 6413805903724522286, guid: a6e3ef34f853f5c42b3702d68cd31027, type: 3}
 --- !u!1 &7806534430355283142 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: a6e3ef34f853f5c42b3702d68cd31027, type: 3}
   m_PrefabInstance: {fileID: 6960040982299795863}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &8540276784313390473
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7806534430355283142}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cebff8659e05f5844b962a356ef52f1b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.RingColliders
+  rings:
+  - centre: {x: -0.0000014202669, y: -1.1641532e-10, z: 0}
+    axis: {x: 0, y: 1, z: 0}
+    inner: 0.0038335798
+    outer: 0.006345649
+    from: -0.0015875001
+    to: 0.0015875001
+    material: {fileID: 13400000, guid: 7b41823d24d681e45af2872a54c4ecbe, type: 2}
 --- !u!54 &5464730072195209420
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -170,6 +163,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
-  title: HS Bushing 0.1250
-  hint: "12.7 \xD7 12.7 \xD7 3.2 mm  \xB7  0.5 g"
-  highlightBrightness: 1.3
+  title: 1/8" HS Bushing
+  hint: "1/2 \xD7 1/2 \xD7 1/8 in  \xB7  0.5 g"

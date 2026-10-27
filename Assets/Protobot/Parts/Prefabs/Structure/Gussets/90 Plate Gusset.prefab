@@ -75,14 +75,14 @@ PrefabInstance:
       addedObject: {fileID: 1674070779133264192}
     - targetCorrespondingSourceObject: {fileID: 7471719701255174056, guid: b088168263620ed46b87dd0ba6f3df14, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 1923330097102936184}
+      addedObject: {fileID: 2481035048818844283}
   m_SourcePrefab: {fileID: 100100000, guid: b088168263620ed46b87dd0ba6f3df14, type: 3}
 --- !u!1 &531372490569927974 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 7471719701255174056, guid: b088168263620ed46b87dd0ba6f3df14, type: 3}
   m_PrefabInstance: {fileID: 6984855482222508686}
   m_PrefabAsset: {fileID: 0}
---- !u!64 &1923330097102936184
+--- !u!64 &2481035048818844283
 MeshCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -162,6 +162,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
-  title: 90 Plate Gusset
-  hint: "50.5 \xD7 50.5 \xD7 1.6 mm  \xB7  3.7 g"
-  highlightBrightness: 1.3
+  title: 90 Degree Plate
+  hint: "1.988 \xD7 1.988 \xD7 1/16 in  \xB7  3.7 g"

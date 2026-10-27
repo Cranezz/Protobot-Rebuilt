@@ -74,6 +74,9 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 015df7b7f7821984882996f379aa0d3d, type: 3}
       insertIndex: -1
+      addedObject: {fileID: 6150689114163187869}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 015df7b7f7821984882996f379aa0d3d, type: 3}
+      insertIndex: -1
       addedObject: {fileID: 2195970642966387047}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 015df7b7f7821984882996f379aa0d3d, type: 3}
       insertIndex: -1
@@ -81,15 +84,32 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 015df7b7f7821984882996f379aa0d3d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 7350139650630133015}
-    - targetCorrespondingSourceObject: {fileID: 4445948748397649984, guid: 015df7b7f7821984882996f379aa0d3d, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 5638674075996683294}
   m_SourcePrefab: {fileID: 100100000, guid: 015df7b7f7821984882996f379aa0d3d, type: 3}
 --- !u!1 &6144469689957519443 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 015df7b7f7821984882996f379aa0d3d, type: 3}
   m_PrefabInstance: {fileID: 6450530641697025282}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &6150689114163187869
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6144469689957519443}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cebff8659e05f5844b962a356ef52f1b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.RingColliders
+  rings:
+  - centre: {x: 4.656613e-10, y: 4.656613e-10, z: -0.0011565005}
+    axis: {x: 0, y: 0, z: 1}
+    inner: 0.002280984
+    outer: 0.0063500055
+    from: -0.0046125
+    to: 0.0046125
+    material: {fileID: 13400000, guid: 7b41823d24d681e45af2872a54c4ecbe, type: 2}
 --- !u!54 &2195970642966387047
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -144,32 +164,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: Ball Bearing Square Insert
-  hint: "12.7 \xD7 12.7 \xD7 9.2 mm  \xB7  0.6 g"
-  highlightBrightness: 1.3
---- !u!1 &7221466638393675074 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 4445948748397649984, guid: 015df7b7f7821984882996f379aa0d3d, type: 3}
-  m_PrefabInstance: {fileID: 6450530641697025282}
-  m_PrefabAsset: {fileID: 0}
---- !u!64 &5638674075996683294
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7221466638393675074}
-  m_Material: {fileID: 13400000, guid: 7b41823d24d681e45af2872a54c4ecbe, type: 2}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 1
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 6413805903724522286, guid: 015df7b7f7821984882996f379aa0d3d, type: 3}
+  hint: "1/2 \xD7 1/2 \xD7 0.363 in  \xB7  0.6 g"

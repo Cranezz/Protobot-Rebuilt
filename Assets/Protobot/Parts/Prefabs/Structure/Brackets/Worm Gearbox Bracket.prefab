@@ -140,8 +140,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: Worm Gearbox Bracket
-  hint: "54.8 \xD7 40.8 \xD7 36.9 mm  \xB7  66.1 g"
-  highlightBrightness: 1.3
+  hint: "2.156 \xD7 1.606 \xD7 1.454 in  \xB7  66.1 g"
 --- !u!1 &3908121473873496463 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1487460747418248249, guid: a2b944fff39b4014fa76830da301d1f9, type: 3}

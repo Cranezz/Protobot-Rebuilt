@@ -167,5 +167,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: THF0832-0250_275-1017-001
-  hint: "38.1 \xD7 7.3 \xD7 6.4 mm  \xB7  2.8 g"
-  highlightBrightness: 1.3
+  hint: "1 1/2 \xD7 0.287 \xD7 1/4 in  \xB7  2.8 g"

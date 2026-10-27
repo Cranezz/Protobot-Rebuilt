@@ -162,6 +162,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
-  title: SScrew Hex Smooth .625
-  hint: "18.1 \xD7 7.9 \xD7 7.9 mm  \xB7  2.3 g"
-  highlightBrightness: 1.3
+  title: 5/8" Hex Screw
+  hint: "0.712 \xD7 5/16 \xD7 5/16 in  \xB7  2.3 g"

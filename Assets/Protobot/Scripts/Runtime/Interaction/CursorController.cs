@@ -46,6 +46,8 @@ namespace Protobot.Interaction
         [SerializeField] float reach = 2.5f;
         [SerializeField] LayerMask raycastMask = ~(1 << 2);  // everything except Ignore Raycast (the player)
 
+        static readonly Color UsableTint = new(1f, 0.82f, 0.2f);
+
         HoverTarget current;
         bool menuMode;
 
@@ -91,8 +93,8 @@ namespace Protobot.Interaction
                 SetHover(null);
                 Show(new CursorView
                 {
-                    reticle = StyleFor(CursorKind.Grabbing).sprite, reticleColor = Color.white, large = true,
-                    title = Holding.Title, hint = "Release to drop  ·  Scroll: closer / further", available = true,
+                    reticle = null, reticleColor = UsableTint, large = true,
+                    title = Holding.Title, hint = "Click to drop  ·  Scroll: closer / further", available = true,
                 });
                 return;
             }
@@ -107,11 +109,12 @@ namespace Protobot.Interaction
             SetHover(target);
             CurrentInReach = target != null && hit.distance <= reach;
 
+            // Always the small dot (an icon would hide small parts); it turns yellow over something usable.
             var kind = CurrentInReach ? target.Cursor : CursorKind.Default;
             var view = new CursorView
             {
-                reticle = kind == CursorKind.Default ? null : StyleFor(kind).sprite,
-                reticleColor = Color.white,
+                reticle = null,
+                reticleColor = kind == CursorKind.Default ? Color.white : UsableTint,
                 large = kind != CursorKind.Default,
                 title = target != null ? target.Title : null,
                 hint = target == null ? null : CurrentInReach ? target.Hint : "Move closer to use",

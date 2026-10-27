@@ -98,7 +98,7 @@ PrefabInstance:
       addedObject: {fileID: 6149606677081260958}
     - targetCorrespondingSourceObject: {fileID: -6476212384906687300, guid: 857341ab69efb0f4a989726d57ae8a49, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 3237813010862273016}
+      addedObject: {fileID: 1804268495547112884}
   m_SourcePrefab: {fileID: 100100000, guid: 857341ab69efb0f4a989726d57ae8a49, type: 3}
 --- !u!1 &5771648970482646783 stripped
 GameObject:
@@ -158,9 +158,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
-  title: HS 84T Gear, No Insert
-  hint: "91 \xD7 91 \xD7 12.7 mm  \xB7  37.7 g"
-  highlightBrightness: 1.3
+  title: HS 84T Gear
+  hint: "3.582 \xD7 3.582 \xD7 1/2 in  \xB7  37.7 g"
 --- !u!1 &7019778308565197806 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 4445948748397649984, guid: 857341ab69efb0f4a989726d57ae8a49, type: 3}
@@ -193,7 +192,7 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: -6476212384906687300, guid: 857341ab69efb0f4a989726d57ae8a49, type: 3}
   m_PrefabInstance: {fileID: 6690218164180009902}
   m_PrefabAsset: {fileID: 0}
---- !u!64 &3237813010862273016
+--- !u!64 &1804268495547112884
 MeshCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

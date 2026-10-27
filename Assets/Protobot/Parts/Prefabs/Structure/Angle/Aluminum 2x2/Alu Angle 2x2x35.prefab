@@ -108,6 +108,8 @@ MonoBehaviour:
   origin: {x: -0.00079374947, y: 0.22224998, z: -0.013493732}
   start: -0.22224998
   end: 0.22224998
+  fullStart: -0.22224998
+  fullEnd: 0.22224998
   points:
   - {x: 0.011906236, y: 0.013493749}
   - {x: 0.011906236, y: -0.0111125}
@@ -128,6 +130,8 @@ MonoBehaviour:
   - {x: 0.011906236, y: -0.0111125}
   - {x: 0.011684825, y: -0.011662382}
   pieceSizes: 07000000050000000300000003000000
+  cutPoints: []
+  cutNormals: []
   physicsMaterial: {fileID: 13400000, guid: 7c1438b7c2246e3449cb98af75fde723, type: 2}
 --- !u!54 &8032302049941124878
 Rigidbody:
@@ -182,6 +186,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
-  title: Alu Angle 2x2x35
-  hint: "444.5 \xD7 27 \xD7 27 mm  \xB7  79.1 g"
-  highlightBrightness: 1.3
+  title: 2x2 Aluminum Angle (35)
+  hint: "17 1/2 \xD7 1 1/16 \xD7 1 1/16 in  \xB7  79.1 g"

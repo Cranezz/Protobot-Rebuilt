@@ -144,8 +144,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: 9P 15T Drive Wheel, Shaved
-  hint: "50.8 \xD7 50.7 \xD7 7.4 mm  \xB7  8.3 g"
-  highlightBrightness: 1.3
+  hint: "2 \xD7 1.995 \xD7 0.293 in  \xB7  8.3 g"
 --- !u!1 &5980159994509181387 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 8310570232088225184, guid: 6fbb4ffb77e93764ebb2bc361f6b51e1, type: 3}

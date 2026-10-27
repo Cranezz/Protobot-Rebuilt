@@ -108,6 +108,8 @@ MonoBehaviour:
   origin: {x: 0.010680699, y: 0.22224997, z: -0.007143732}
   start: -0.22224997
   end: 0.22224997
+  fullStart: -0.22224997
+  fullEnd: 0.22224997
   points:
   - {x: 0.0057585975, y: 0.008146361}
   - {x: 0.0047624875, y: 0.0083693}
@@ -128,6 +130,8 @@ MonoBehaviour:
   - {x: 0.0047624875, y: 0.0067818007}
   - {x: 0.0053425636, y: 0.0065295408}
   pieceSizes: 07000000050000000300000003000000
+  cutPoints: []
+  cutNormals: []
   physicsMaterial: {fileID: 13400000, guid: 7c1438b7c2246e3449cb98af75fde723, type: 2}
 --- !u!54 &4479437583950167623
 Rigidbody:
@@ -182,6 +186,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
-  title: Alu C Half Thick 1x3x1x35
-  hint: "444.5 \xD7 16.7 \xD7 14.3 mm  \xB7  48.1 g"
-  highlightBrightness: 1.3
+  title: 1x3x1 Aluminum Half C-Channel, Thick Cut (35)
+  hint: "17 1/2 \xD7 0.659 \xD7 9/16 in  \xB7  48.1 g"

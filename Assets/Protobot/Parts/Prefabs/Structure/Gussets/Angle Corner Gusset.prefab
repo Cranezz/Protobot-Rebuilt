@@ -139,9 +139,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
-  title: Angle Corner Gusset
-  hint: "52.5 \xD7 52.5 \xD7 23.1 mm  \xB7  15.2 g"
-  highlightBrightness: 1.3
+  title: Angle Corner
+  hint: "2.066 \xD7 2.066 \xD7 0.909 in  \xB7  15.2 g"
 --- !u!1 &7732757972491281678 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -8791339742397801860, guid: dca2ea1c77717ed45861889857bd0fba, type: 3}

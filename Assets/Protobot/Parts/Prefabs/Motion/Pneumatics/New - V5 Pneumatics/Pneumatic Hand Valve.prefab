@@ -140,8 +140,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: Pneumatic Hand Valve
-  hint: "46.4 \xD7 41.1 \xD7 17.8 mm  \xB7  12.5 g"
-  highlightBrightness: 1.3
+  hint: "1.825 \xD7 1.617 \xD7 0.7 in  \xB7  12.5 g"
 --- !u!1 &8082374467013077386 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -7175497441153661879, guid: 9024585b1d4a62b448eeb83a61f54efe, type: 3}

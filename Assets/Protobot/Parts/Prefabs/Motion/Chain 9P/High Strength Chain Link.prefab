@@ -144,8 +144,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: High Strength Chain Link
-  hint: "15.8 \xD7 14.2 \xD7 6 mm  \xB7  0.5 g"
-  highlightBrightness: 1.3
+  hint: "0.621 \xD7 0.559 \xD7 0.236 in  \xB7  0.5 g"
 --- !u!1 &8078206694956033553 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 8310570232088225184, guid: d8c35235ccd1e8947b1b670a11497077, type: 3}

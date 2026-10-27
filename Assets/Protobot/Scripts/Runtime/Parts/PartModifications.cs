@@ -25,12 +25,26 @@ namespace Protobot.Parts
             public float depth;
         }
 
+        [System.Serializable]
+        public struct Paint
+        {
+            public string material;   // which of the part's materials (a part can have several, e.g. tyre and hub)
+            public Color color;
+        }
+
         public List<Cut> cuts = new();
         public List<DrilledHole> holes = new();
-        public bool painted;
-        public Color paint;
+        public List<Paint> paints = new();
 
         public static PartModifications On(GameObject part) =>
             part.TryGetComponent(out PartModifications mods) ? mods : part.AddComponent<PartModifications>();
+
+        /// <summary>Records the part's current paint (after any change).</summary>
+        public void RecordPaint(Interaction.HoverTarget hover)
+        {
+            paints.Clear();
+            foreach (var pair in hover.Paints)
+                paints.Add(new Paint { material = pair.Key.name, color = pair.Value });
+        }
     }
 }

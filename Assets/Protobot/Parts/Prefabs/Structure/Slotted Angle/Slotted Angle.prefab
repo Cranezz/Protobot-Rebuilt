@@ -104,6 +104,8 @@ MonoBehaviour:
   origin: {x: 0.00889, y: 0.19049996, z: -0.008889985}
   start: -0.19049996
   end: 0.19049996
+  fullStart: -0.19049996
+  fullEnd: 0.19049996
   points:
   - {x: -0.004851402, y: -0.00889}
   - {x: -0.004851402, y: -0.0077216}
@@ -130,6 +132,8 @@ MonoBehaviour:
   - {x: 0.007721597, y: -0.0069088005}
   - {x: 0.007612707, y: -0.0073152003}
   pieceSizes: 040000000500000006000000030000000300000003000000
+  cutPoints: []
+  cutNormals: []
   physicsMaterial: {fileID: 13400000, guid: 3122d1684761a0f468db748b5e9a9624, type: 2}
 --- !u!54 &2247922286751995319
 Rigidbody:
@@ -185,5 +189,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: Slotted Angle
-  hint: "381 \xD7 17.8 \xD7 17.8 mm  \xB7  89.8 g"
-  highlightBrightness: 1.3
+  hint: "15 \xD7 0.7 \xD7 0.7 in  \xB7  89.8 g"

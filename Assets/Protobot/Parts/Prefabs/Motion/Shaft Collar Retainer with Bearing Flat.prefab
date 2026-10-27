@@ -144,8 +144,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: Shaft Collar Retainer with Bearing Flat
-  hint: "37.8 \xD7 14.5 \xD7 10 mm  \xB7  1.6 g"
-  highlightBrightness: 1.3
+  hint: "1.487 \xD7 0.571 \xD7 0.395 in  \xB7  1.6 g"
 --- !u!1 &6933017581302239564 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 4445948748397649984, guid: 4569006f86235fc46a38043be48f4396, type: 3}

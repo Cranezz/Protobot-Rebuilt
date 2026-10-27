@@ -140,8 +140,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: Flow Meter
-  hint: "31 \xD7 22.1 \xD7 9.6 mm  \xB7  17.2 g"
-  highlightBrightness: 1.3
+  hint: "1.22 \xD7 0.87 \xD7 0.378 in  \xB7  17.2 g"
 --- !u!1 &6756624670678890805 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1487460747418248249, guid: e8141b3a184b8134098b601e0bba72c0, type: 3}

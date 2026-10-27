@@ -86,6 +86,9 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: b9763683b45990748bddf7f307a97192, type: 3}
       insertIndex: -1
+      addedObject: {fileID: 7961364829643612550}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: b9763683b45990748bddf7f307a97192, type: 3}
+      insertIndex: -1
       addedObject: {fileID: 7519553286031240201}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: b9763683b45990748bddf7f307a97192, type: 3}
       insertIndex: -1
@@ -96,37 +99,7 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 4445948748397649984, guid: b9763683b45990748bddf7f307a97192, type: 3}
       insertIndex: -1
       addedObject: {fileID: 4777483941510673859}
-    - targetCorrespondingSourceObject: {fileID: -6476212384906687300, guid: b9763683b45990748bddf7f307a97192, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 4908640284146088192}
   m_SourcePrefab: {fileID: 100100000, guid: b9763683b45990748bddf7f307a97192, type: 3}
---- !u!1 &755418321277958507 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: -6476212384906687300, guid: b9763683b45990748bddf7f307a97192, type: 3}
-  m_PrefabInstance: {fileID: 3198707817514989015}
-  m_PrefabAsset: {fileID: 0}
---- !u!64 &4908640284146088192
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 755418321277958507}
-  m_Material: {fileID: 13400000, guid: 7b41823d24d681e45af2872a54c4ecbe, type: 2}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 1
-  m_CookingOptions: 30
-  m_Mesh: {fileID: -8073514604124154958, guid: b9763683b45990748bddf7f307a97192, type: 3}
 --- !u!1 &1285558911183312279 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 4445948748397649984, guid: b9763683b45990748bddf7f307a97192, type: 3}
@@ -159,6 +132,26 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: b9763683b45990748bddf7f307a97192, type: 3}
   m_PrefabInstance: {fileID: 3198707817514989015}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &7961364829643612550
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2352424927009949830}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cebff8659e05f5844b962a356ef52f1b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.RingColliders
+  rings:
+  - centre: {x: 0, y: 0.0003550006, z: 0}
+    axis: {x: 0, y: 1, z: 0}
+    inner: 0.041099984
+    outer: 0.050802644
+    from: -0.0111500025
+    to: 0.0111500025
+    material: {fileID: 13400000, guid: 7b41823d24d681e45af2872a54c4ecbe, type: 2}
 --- !u!54 &7519553286031240201
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -212,6 +205,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
-  title: 4 Traction
-  hint: "101.6 \xD7 101.6 \xD7 22.3 mm  \xB7  86.4 g"
-  highlightBrightness: 1.3
+  title: 4" Traction Wheel
+  hint: "4 \xD7 4 \xD7 0.878 in  \xB7  86.4 g"

@@ -86,6 +86,9 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: dbb6f082258bcf345bd8b3c9a8a8fc9c, type: 3}
       insertIndex: -1
+      addedObject: {fileID: 1533652420784978883}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: dbb6f082258bcf345bd8b3c9a8a8fc9c, type: 3}
+      insertIndex: -1
       addedObject: {fileID: 4531960764014732944}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: dbb6f082258bcf345bd8b3c9a8a8fc9c, type: 3}
       insertIndex: -1
@@ -93,18 +96,35 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: dbb6f082258bcf345bd8b3c9a8a8fc9c, type: 3}
       insertIndex: -1
       addedObject: {fileID: 7381594400875685127}
-    - targetCorrespondingSourceObject: {fileID: 4445948748397649984, guid: dbb6f082258bcf345bd8b3c9a8a8fc9c, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 6835397892665467914}
     - targetCorrespondingSourceObject: {fileID: -6476212384906687300, guid: dbb6f082258bcf345bd8b3c9a8a8fc9c, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 7367067375420779107}
+      addedObject: {fileID: 5151464583688979999}
   m_SourcePrefab: {fileID: 100100000, guid: dbb6f082258bcf345bd8b3c9a8a8fc9c, type: 3}
 --- !u!1 &1571758491773946469 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: dbb6f082258bcf345bd8b3c9a8a8fc9c, type: 3}
   m_PrefabInstance: {fileID: 1806343486697305908}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1533652420784978883
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1571758491773946469}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cebff8659e05f5844b962a356ef52f1b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.RingColliders
+  rings:
+  - centre: {x: 0, y: 0, z: 0}
+    axis: {x: 0, y: 1, z: 0}
+    inner: 0.005350835
+    outer: 0.026458336
+    from: -0.006350001
+    to: 0.006350001
+    material: {fileID: 13400000, guid: 7b41823d24d681e45af2872a54c4ecbe, type: 2}
 --- !u!54 &4531960764014732944
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -158,42 +178,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
-  title: HS 48T Gear, No Insert
-  hint: "52.9 \xD7 52.9 \xD7 12.7 mm  \xB7  15.4 g"
-  highlightBrightness: 1.3
---- !u!1 &2639748198284613492 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 4445948748397649984, guid: dbb6f082258bcf345bd8b3c9a8a8fc9c, type: 3}
-  m_PrefabInstance: {fileID: 1806343486697305908}
-  m_PrefabAsset: {fileID: 0}
---- !u!64 &6835397892665467914
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2639748198284613492}
-  m_Material: {fileID: 13400000, guid: 7b41823d24d681e45af2872a54c4ecbe, type: 2}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 1
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 6413805903724522286, guid: dbb6f082258bcf345bd8b3c9a8a8fc9c, type: 3}
+  title: HS 48T Gear
+  hint: "2.081 \xD7 2.081 \xD7 1/2 in  \xB7  15.4 g"
 --- !u!1 &4543768022607215496 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -6476212384906687300, guid: dbb6f082258bcf345bd8b3c9a8a8fc9c, type: 3}
   m_PrefabInstance: {fileID: 1806343486697305908}
   m_PrefabAsset: {fileID: 0}
---- !u!64 &7367067375420779107
+--- !u!64 &5151464583688979999
 MeshCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

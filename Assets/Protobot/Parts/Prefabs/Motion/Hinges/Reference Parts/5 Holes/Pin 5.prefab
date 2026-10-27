@@ -162,6 +162,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
-  title: Pin 5
-  hint: "63.5 \xD7 3.2 \xD7 3.2 mm  \xB7  3.9 g"
-  highlightBrightness: 1.3
+  title: 5-Hole Hinge Pin
+  hint: "2 1/2 \xD7 1/8 \xD7 1/8 in  \xB7  3.9 g"

@@ -162,6 +162,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
-  title: Single Acting Piston Body
-  hint: "141 \xD7 11.9 \xD7 11.9 mm  \xB7  28.4 g"
-  highlightBrightness: 1.3
+  title: Legacy Single Acting Piston (body)
+  hint: "5.55 \xD7 0.47 \xD7 0.47 in  \xB7  28.4 g"

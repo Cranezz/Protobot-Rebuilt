@@ -34,13 +34,26 @@ namespace Protobot.Geometry
         const float Above = 0.0015f;          // rays start 1.5 mm in front of the surface
         const float FaceTolerance = 0.0006f;
 
-        /// <summary>Triangles near a point, for fast repeated ray tests.</summary>
+        /// <summary>
+        /// Triangles near a point, bucketed in a grid of small cells, so each of the many short test rays only
+        /// looks at the few triangles it could possibly hit.
+        /// </summary>
         public class Region
         {
-            public readonly List<(Vector3 a, Vector3 b, Vector3 c)> triangles = new();
+            const float Cell = 0.0015f;
+
+            readonly List<(Vector3 a, Vector3 b, Vector3 c)> triangles = new();
+            readonly Dictionary<(int, int, int), List<int>> grid = new();
+            readonly Vector3 min, max;
+            int[] stamps;
+            int stamp;
+
+            public int TriangleCount => triangles.Count;
 
             public Region(Mesh mesh, Vector3 near, float radius)
             {
+                min = near - Vector3.one * radius;
+                max = near + Vector3.one * radius;
                 var v = mesh.vertices;
                 var r2 = radius * radius;
                 for (var s = 0; s < mesh.subMeshCount; s++)
@@ -52,18 +65,63 @@ namespace Protobot.Geometry
                         var bounds = new Bounds(a, Vector3.zero);
                         bounds.Encapsulate(b);
                         bounds.Encapsulate(c);
-                        if (bounds.SqrDistance(near) <= r2)
-                            triangles.Add((a, b, c));
+                        if (bounds.SqrDistance(near) > r2)
+                            continue;
+                        var index = triangles.Count;
+                        triangles.Add((a, b, c));
+                        // Into every cell its box overlaps (only within the region; long slivers are clipped).
+                        var lo = CellOf(Vector3.Max(bounds.min, min));
+                        var hi = CellOf(Vector3.Min(bounds.max, max));
+                        for (var x = lo.Item1; x <= hi.Item1; x++)
+                            for (var y = lo.Item2; y <= hi.Item2; y++)
+                                for (var z = lo.Item3; z <= hi.Item3; z++)
+                                {
+                                    if (!grid.TryGetValue((x, y, z), out var list))
+                                        grid[(x, y, z)] = list = new List<int>(4);
+                                    list.Add(index);
+                                }
                     }
                 }
+                stamps = new int[triangles.Count];
+            }
+
+            static (int, int, int) CellOf(Vector3 p) =>
+                (Mathf.FloorToInt(p.x / Cell), Mathf.FloorToInt(p.y / Cell), Mathf.FloorToInt(p.z / Cell));
+
+            readonly List<int> candidates = new();
+
+            /// <summary>The triangles near the segment from origin along direction (each once), into <see cref="candidates"/>.</summary>
+            void Gather(Vector3 origin, Vector3 direction, float maxDistance)
+            {
+                candidates.Clear();
+                stamp++;
+                var end = origin + direction * maxDistance;
+                var lo = CellOf(Vector3.Max(Vector3.Min(origin, end), min));
+                var hi = CellOf(Vector3.Min(Vector3.Max(origin, end), max));
+                for (var x = lo.Item1; x <= hi.Item1; x++)
+                    for (var y = lo.Item2; y <= hi.Item2; y++)
+                        for (var z = lo.Item3; z <= hi.Item3; z++)
+                        {
+                            if (!grid.TryGetValue((x, y, z), out var list))
+                                continue;
+                            foreach (var i in list)
+                            {
+                                if (stamps[i] == stamp)
+                                    continue;
+                                stamps[i] = stamp;
+                                candidates.Add(i);
+                            }
+                        }
             }
 
             /// <summary>All hit distances along the ray (both faces count), sorted, up to maxDistance.</summary>
             public List<float> Hits(Vector3 origin, Vector3 direction, float maxDistance)
             {
                 var hits = new List<float>();
-                foreach (var (a, b, c) in triangles)
+                Gather(origin, direction, maxDistance);
+                foreach (var i in candidates)
                 {
+                    var (a, b, c) = triangles[i];
                     if (Intersect(origin, direction, a, b, c, out var t) && t >= 0f && t <= maxDistance)
                         hits.Add(t);
                 }
@@ -74,9 +132,13 @@ namespace Protobot.Geometry
             public bool First(Vector3 origin, Vector3 direction, float maxDistance, out float distance)
             {
                 distance = float.MaxValue;
-                foreach (var (a, b, c) in triangles)
+                Gather(origin, direction, maxDistance);
+                foreach (var i in candidates)
+                {
+                    var (a, b, c) = triangles[i];
                     if (Intersect(origin, direction, a, b, c, out var t) && t >= 0f && t <= maxDistance && t < distance)
                         distance = t;
+                }
                 return distance < float.MaxValue;
             }
 
@@ -214,57 +276,62 @@ namespace Protobot.Geometry
             // Square holes: a circle that clears the corners. Round ones: the best estimate of their radius.
             info.holeRadius = info.round ? (edgeNearest + radius) / 2f + Step * 0.5f : radius + Step * 0.75f;
 
-            // Measure the wall just beside the hole: front face, then the back face.
-            var probe = surfacePoint + a * mean.x + b * mean.y + a * (info.holeRadius + 0.0008f) + n * Above;
-            var hits = region.Hits(probe, -n, 0.03f);
-            if (hits.Count < 2)
+            // Measure the wall just beside the hole (front face, then back face) on every side and keep the
+            // thinnest: near an edge a side can miss the wall, and near a bend it cuts the curve at a slant.
+            float front = 0f, thickness = float.MaxValue;
+            foreach (var side in new[] { a, -a, b, -b })
+            {
+                var probe = surfacePoint + a * mean.x + b * mean.y + side * (info.holeRadius + 0.0008f) + n * Above;
+                var hits = region.Hits(probe, -n, 0.03f);
+                if (hits.Count < 2 || Mathf.Abs(hits[0] - Above) > 0.0015f)
+                    continue;
+                var sideFront = hits[0];
+                var sideBack = hits.Find(t => t > sideFront + 0.0002f);
+                if (sideBack > sideFront && sideBack - sideFront < thickness)
+                {
+                    front = sideFront;
+                    thickness = sideBack - sideFront;
+                }
+            }
+            if (thickness == float.MaxValue)
             {
                 info.problem = "Couldn't find the back of this wall";
                 return info;
             }
-            var front = hits[0];
-            var back = -1f;
-            foreach (var t in hits)
-            {
-                if (t > front + 0.0002f)
-                {
-                    back = t;
-                    break;
-                }
-            }
-            if (back < 0f || back - front > 0.008f)
+            if (thickness > 0.008f)
             {
                 info.problem = "This wall is too thick to drill";
                 return info;
             }
-            info.thickness = back - front;
+            info.thickness = thickness;
             info.center = surfacePoint + a * mean.x + b * mean.y + n * (Above - front);
             info.found = true;
             return info;
         }
 
-        /// <summary>Is there solid wall all the way around a hole of this radius?</summary>
-        public static bool HasMaterialAround(Region region, HoleInfo hole, float radius)
+        /// <summary>
+        /// Where the new hole's wall will be: for each of its <paramref name="segments"/> sides, whether there's metal
+        /// just outside the hole there (near an edge or a bend part of the circle opens into the air).
+        /// </summary>
+        public static bool[] WallSegments(Region region, HoleInfo hole, float radius, int segments = DrillSegments)
         {
             var n = hole.normal;
             Basis(n, out var a, out var b);
-            const int samples = 24;
-            for (var k = 0; k < samples; k++)
+            var result = new bool[segments];
+            for (var k = 0; k < segments; k++)
             {
-                var angle = k * Mathf.PI * 2f / samples;
-                var offset = (a * Mathf.Cos(angle) + b * Mathf.Sin(angle)) * (radius + 0.0006f);
-                var hits = region.Hits(hole.center + offset + n * Above, -n, Above + hole.thickness + 0.002f);
-                if (hits.Count < 2 || Mathf.Abs(hits[0] - Above) > 0.00025f)
-                    return false;
-                var back = hits.Find(t => t > hits[0] + 0.0002f);
-                if (Mathf.Abs(back - (Above + hole.thickness)) > 0.00025f)
-                    return false;
+                var angle = (k + 0.5f) * Mathf.PI * 2f / segments;
+                var offset = (a * Mathf.Cos(angle) + b * Mathf.Sin(angle)) * (radius + 0.0003f);
+                result[k] = region.First(hole.center + offset + n * Above, -n, Above + hole.thickness * 0.5f, out var t)
+                            && Mathf.Abs(t - Above) <= FaceTolerance;
             }
-            return true;
+            return result;
         }
 
+        public const int DrillSegments = 32;
+
         /// <summary>Cuts a round hole of <paramref name="radius"/> through the wall. Returns null if nothing changed.</summary>
-        public static Mesh Drill(Mesh source, HoleInfo hole, float radius, int segments = 32)
+        public static Mesh Drill(Mesh source, HoleInfo hole, float radius, bool[] walls = null, int segments = DrillSegments)
         {
             var n = hole.normal;
             Basis(n, out var a, out var b);
@@ -335,6 +402,8 @@ namespace Protobot.Geometry
             // The new round wall of the hole, facing in towards its centre.
             for (var i = 0; i < segments; i++)
             {
+                if (walls != null && i < walls.Length && !walls[i])
+                    continue;  // no metal on this side (the hole breaks through an edge)
                 var c0 = corners[i];
                 var c1 = corners[(i + 1) % segments];
                 var f0 = hole.center + a * c0.x + b * c0.y;

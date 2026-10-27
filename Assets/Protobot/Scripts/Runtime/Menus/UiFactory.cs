@@ -89,6 +89,32 @@ namespace Protobot.Menus
             return circle;
         }
 
+        static Sprite downArrow;
+
+        /// <summary>A small filled triangle pointing down (drop-down carets); made once at runtime.</summary>
+        public static Sprite DownArrow()
+        {
+            if (downArrow != null)
+                return downArrow;
+            const int w = 32, h = 20;
+            var tex = new Texture2D(w, h, TextureFormat.RGBA32, false) { name = "Down arrow", wrapMode = TextureWrapMode.Clamp };
+            var pixels = new Color32[w * h];
+            for (var y = 0; y < h; y++)
+            {
+                for (var x = 0; x < w; x++)
+                {
+                    // Point at the bottom middle; the triangle widens towards the top.
+                    var halfWidth = (y + 0.5f) / h * (w / 2f);
+                    var alpha = Mathf.Clamp01(halfWidth - Mathf.Abs(x + 0.5f - w / 2f) + 0.5f);
+                    pixels[y * w + x] = new Color32(255, 255, 255, (byte)(alpha * 255f));
+                }
+            }
+            tex.SetPixels32(pixels);
+            tex.Apply();
+            downArrow = Sprite.Create(tex, new Rect(0f, 0f, w, h), new Vector2(0.5f, 0.5f), 100f);
+            return downArrow;
+        }
+
         public static Image Panel(Transform parent, string name, UiTheme theme, Color color, bool shadow = false)
         {
             if (shadow)
@@ -135,6 +161,7 @@ namespace Protobot.Menus
             button.navigation = nav;
             if (onClick != null)
                 button.onClick.AddListener(onClick);
+            button.onClick.AddListener(() => Audio.Sounds.Play(Audio.Sounds.Tick, 0.25f));
 
             var text = Text(image.transform, "Label", theme, label, fontSize, accent ? theme.accentText : theme.text, true, TextAlignmentOptions.Center);
             text.rectTransform.Fill(8f, 0f, 8f, 0f);
@@ -278,6 +305,123 @@ namespace Protobot.Menus
         public void ShowText(string text) => valueText.text = text;
 
         void Step(int direction) => SetIndex((Index + direction + options.Count) % options.Count, true);
+    }
+
+    /// <summary>
+    /// A drop-down list: shows the chosen option; click it to open the list below, click an option to pick
+    /// it (clicking anywhere else closes the list). The list draws above everything else in its menu.
+    /// </summary>
+    public class DropdownMenu : MonoBehaviour
+    {
+        TextMeshProUGUI valueText;
+        List<string> options;
+        Action<int> onChange;
+        GameObject list;
+        readonly List<Image> optionBacks = new();
+        UiTheme theme;
+        public int Index { get; private set; }
+
+        public static DropdownMenu Create(RectTransform area, UiTheme theme, IList<string> options, int index, Action<int> onChange)
+        {
+            var dropdown = area.gameObject.AddComponent<DropdownMenu>();
+            dropdown.theme = theme;
+            dropdown.options = new List<string>(options);
+            dropdown.onChange = onChange;
+
+            var button = UiFactory.Button(area, "Current", theme, "", dropdown.Toggle, false, 22f);
+            ((RectTransform)button.transform).Fill();
+            var label = button.GetComponentInChildren<TextMeshProUGUI>();
+            label.alignment = TextAlignmentOptions.MidlineLeft;
+            label.rectTransform.Fill(16f, 0f, 40f, 0f);
+            dropdown.valueText = label;
+            var caret = UiFactory.Image(button.transform, "Caret", theme.textDim, UiFactory.DownArrow());
+            caret.rectTransform.Place(new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(-14f, 0f), new Vector2(14f, 9f));
+
+            // The open list: its own canvas so it draws over the rows below it and still gets clicks.
+            var listRect = UiFactory.Rect("List", area);
+            listRect.anchorMin = new Vector2(0f, 0f);
+            listRect.anchorMax = new Vector2(1f, 0f);
+            listRect.pivot = new Vector2(0.5f, 1f);
+            listRect.anchoredPosition = new Vector2(0f, -4f);
+            const float rowHeight = 40f;
+            listRect.sizeDelta = new Vector2(0f, options.Count * rowHeight + 8f);
+            var canvas = listRect.gameObject.AddComponent<Canvas>();
+            canvas.overrideSorting = true;
+            canvas.sortingOrder = 40;
+            listRect.gameObject.AddComponent<GraphicRaycaster>();
+            var back = UiFactory.Image(listRect, "Back", theme.panelInset, theme.rounded, true);
+            back.rectTransform.Fill();
+            for (var i = 0; i < options.Count; i++)
+            {
+                var choice = i;
+                var row = UiFactory.Image(listRect, "Option" + i, new Color(1f, 1f, 1f, 0f), theme.rounded, true);
+                row.rectTransform.anchorMin = new Vector2(0f, 1f);
+                row.rectTransform.anchorMax = new Vector2(1f, 1f);
+                row.rectTransform.pivot = new Vector2(0.5f, 1f);
+                row.rectTransform.sizeDelta = new Vector2(-8f, rowHeight);
+                row.rectTransform.anchoredPosition = new Vector2(0f, -4f - i * rowHeight);
+                var rowButton = row.gameObject.AddComponent<Button>();
+                rowButton.transition = Selectable.Transition.None;
+                rowButton.onClick.AddListener(() =>
+                {
+                    dropdown.SetIndex(choice, true);
+                    dropdown.Close();
+                });
+                row.gameObject.AddComponent<HoverTint>().Setup(row, new Color(1f, 1f, 1f, 0.08f));
+                var text = UiFactory.Text(row.transform, "Label", theme, options[i], 22f, theme.text, false, TextAlignmentOptions.MidlineLeft);
+                text.rectTransform.Fill(14f, 0f, 8f, 0f);
+                dropdown.optionBacks.Add(row);
+            }
+            dropdown.list = listRect.gameObject;
+            dropdown.list.SetActive(false);
+            dropdown.SetIndex(index, false);
+            return dropdown;
+        }
+
+        public bool IsOpen => list != null && list.activeSelf;
+
+        public void SetIndex(int index, bool notify)
+        {
+            Index = Mathf.Clamp(index, 0, options.Count - 1);
+            valueText.text = options[Index];
+            for (var i = 0; i < optionBacks.Count; i++)
+                optionBacks[i].GetComponentInChildren<TextMeshProUGUI>().color = i == Index ? theme.accent : theme.text;
+            if (notify)
+                onChange?.Invoke(Index);
+        }
+
+        void Toggle() => list.SetActive(!list.activeSelf);
+
+        public void Close() => list.SetActive(false);
+
+        void Update()
+        {
+            // A click outside the open list closes it.
+            if (!IsOpen || UnityEngine.InputSystem.Mouse.current == null || !UnityEngine.InputSystem.Mouse.current.leftButton.wasPressedThisFrame)
+                return;
+            var pointer = UnityEngine.InputSystem.Mouse.current.position.ReadValue();
+            if (!RectTransformUtility.RectangleContainsScreenPoint((RectTransform)list.transform, pointer)
+                && !RectTransformUtility.RectangleContainsScreenPoint((RectTransform)transform, pointer))
+                Close();
+        }
+    }
+
+    /// <summary>Lightens a graphic while the pointer is over it.</summary>
+    public class HoverTint : MonoBehaviour, UnityEngine.EventSystems.IPointerEnterHandler, UnityEngine.EventSystems.IPointerExitHandler
+    {
+        Graphic graphic;
+        Color normal;
+        Color hover;
+
+        public void Setup(Graphic target, Color hoverColor)
+        {
+            graphic = target;
+            normal = target.color;
+            hover = hoverColor;
+        }
+
+        public void OnPointerEnter(UnityEngine.EventSystems.PointerEventData e) => graphic.color = hover;
+        public void OnPointerExit(UnityEngine.EventSystems.PointerEventData e) => graphic.color = normal;
     }
 
     /// <summary>On/off switch drawn as a small pill.</summary>

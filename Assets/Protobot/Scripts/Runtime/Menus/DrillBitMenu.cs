@@ -104,7 +104,7 @@ namespace Protobot.Menus
                 rows[i].tick.rectTransform.sizeDelta = new Vector2(on ? 70f : 44f, 4f);
             }
             var (name, diameter) = DrillTool.Bits[selected];
-            selectedText.text = $"{name}  =  {diameter * 1000f:0.##} mm";
+            selectedText.text = $"{name}  =  {Units.ToInches(diameter):0.###} in";
         }
 
         void Confirm()
@@ -166,7 +166,7 @@ namespace Protobot.Menus
                 var tick = UiFactory.Image(row, "Tick", theme.textDim);
                 tick.rectTransform.Place(new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(16f, 0f), new Vector2(44f, 4f));
                 var (name, diameter) = DrillTool.Bits[i];
-                var label = UiFactory.Text(row, "Label", theme, $"{name}   {diameter * 1000f:0.##} mm", 24f, theme.text, true, TextAlignmentOptions.MidlineLeft);
+                var label = UiFactory.Text(row, "Label", theme, $"{name}   {Units.ToInches(diameter):0.###} in", 24f, theme.text, true, TextAlignmentOptions.MidlineLeft);
                 label.rectTransform.Fill(100f, 0f, 8f, 0f);
                 var index = i;
                 var button = row.gameObject.AddComponent<Button>();

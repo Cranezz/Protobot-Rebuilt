@@ -139,9 +139,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
-  title: Screw Steel - Star
-  hint: "8.6 \xD7 7.9 \xD7 7.9 mm  \xB7  1.2 g"
-  highlightBrightness: 1.3
+  title: Star Screw
+  hint: "0.337 \xD7 5/16 \xD7 5/16 in  \xB7  1.2 g"
 --- !u!1 &3950404138881186987 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -7175497441153661879, guid: 1f1af792c83de7d47ad9365c8ea93e59, type: 3}

@@ -7,7 +7,8 @@ namespace Protobot.Parts
     /// <summary>
     /// For metal stock and shafts: the part's cross-section (split into convex pieces) and how far it
     /// runs along its length. Builds colliders that follow the real shape, so a C-channel is open on one
-    /// side instead of a solid box, and lets the saw shorten the part. All values are in the part's own space.
+    /// side instead of a solid box. Saw cuts are kept as planes and clip those colliders, so angled and
+    /// lengthwise cuts collide where the metal really is. All values are in the part's own space.
     /// </summary>
     public class StockProfile : MonoBehaviour
     {
@@ -15,16 +16,23 @@ namespace Protobot.Parts
         [SerializeField] Vector3 u = Vector3.right;
         [SerializeField] Vector3 v = Vector3.up;
         [SerializeField] Vector3 origin;
+        [Tooltip("Where the metal currently runs along the axis (shrinks as it's cut).")]
         [SerializeField] float start;
         [SerializeField] float end;
+        [Tooltip("The full length it came in, which the colliders are made from before the cuts clip them.")]
+        [SerializeField] float fullStart;
+        [SerializeField] float fullEnd;
         [SerializeField] List<Vector2> points = new();
         [SerializeField] List<int> pieceSizes = new();
+        [SerializeField] List<Vector3> cutPoints = new();
+        [SerializeField] List<Vector3> cutNormals = new();
         [SerializeField] PhysicsMaterial physicsMaterial;
-
-        GameObject colliderRoot;
 
         /// <summary>Unit direction along the part's length (part space).</summary>
         public Vector3 Axis => axis;
+        /// <summary>Across the cross-section (the profile's own X); <see cref="V"/> is its Y, <see cref="Axis"/> its Z.</summary>
+        public Vector3 U => u;
+        public Vector3 V => v;
         public Vector3 Origin => origin;
         public float Start => start;
         public float End => end;
@@ -38,11 +46,13 @@ namespace Protobot.Parts
             u = sideU;
             v = sideV;
             origin = profileOrigin;
-            start = from;
-            end = to;
+            start = fullStart = from;
+            end = fullEnd = to;
             physicsMaterial = material;
             points.Clear();
             pieceSizes.Clear();
+            cutPoints.Clear();
+            cutNormals.Clear();
             foreach (var piece in pieces)
             {
                 points.AddRange(piece);
@@ -50,11 +60,24 @@ namespace Protobot.Parts
             }
         }
 
-        void Awake() => BuildColliders();
-
-        /// <summary>After a cut: the part now runs from <paramref name="from"/> to <paramref name="to"/> along its axis.</summary>
-        public void SetExtent(float from, float to)
+        void Awake()
         {
+            if (fullEnd <= fullStart)
+            {
+                fullStart = start;
+                fullEnd = end;
+            }
+            BuildColliders();
+        }
+
+        /// <summary>
+        /// After a saw cut: what's left is on the side <paramref name="keepNormal"/> points to, and now runs from
+        /// <paramref name="from"/> to <paramref name="to"/> along the axis.
+        /// </summary>
+        public void AddCut(Vector3 point, Vector3 keepNormal, float from, float to)
+        {
+            cutPoints.Add(point);
+            cutNormals.Add(keepNormal.normalized);
             start = from;
             end = to;
             BuildColliders();
@@ -96,15 +119,24 @@ namespace Protobot.Parts
                 Destroy(child.gameObject);
             }
 
-            colliderRoot = new GameObject(ColliderRootName) { layer = gameObject.layer };
+            var colliderRoot = new GameObject(ColliderRootName) { layer = gameObject.layer };
             colliderRoot.transform.SetParent(transform, false);
             var index = 0;
             foreach (var size in pieceSizes)
             {
                 var piece = points.GetRange(index, size);
                 index += size;
+                var mesh = ConvexPieces.Extrude(piece, origin, u, v, axis, fullStart, fullEnd);
+                for (var i = 0; i < cutPoints.Count && mesh != null; i++)
+                    mesh = MeshSlicer.Slice(mesh, new Plane(cutNormals[i], cutPoints[i]));
+                if (mesh == null)
+                    continue;
+                // A shallow cut can leave a sliver of a piece too thin for a convex collider; it doesn't matter.
+                var s = mesh.bounds.size;
+                if (Mathf.Min(s.x, Mathf.Min(s.y, s.z)) < 0.0001f)
+                    continue;
                 var mc = colliderRoot.AddComponent<MeshCollider>();
-                mc.sharedMesh = ConvexPieces.Extrude(piece, origin, u, v, axis, start, end);
+                mc.sharedMesh = mesh;
                 mc.convex = true;
                 mc.sharedMaterial = physicsMaterial;
             }

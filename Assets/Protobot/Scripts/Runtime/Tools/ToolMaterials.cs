@@ -31,6 +31,34 @@ namespace Protobot.Tools
             }
         }
 
+        static Material cutPlaneBad;
+
+        /// <summary>The cut plane when that cut isn't possible (faint red).</summary>
+        public static Material CutPlaneBad
+        {
+            get
+            {
+                if (cutPlaneBad != null)
+                    return cutPlaneBad;
+                cutPlaneBad = Ghost(new Color(1f, 0.3f, 0.2f, 0.25f));
+                cutPlaneBad.SetFloat("_Cull", (float)CullMode.Off);
+                return cutPlaneBad;
+            }
+        }
+
+        static readonly System.Collections.Generic.Dictionary<Color, Material> unlit = new();
+
+        /// <summary>A flat, unlit colour (for guide lines).</summary>
+        public static Material Unlit(Color color)
+        {
+            if (unlit.TryGetValue(color, out var m) && m != null)
+                return m;
+            m = new Material(Shader.Find("Universal Render Pipeline/Unlit")) { name = "Guide " + color };
+            m.SetColor("_BaseColor", color);
+            unlit[color] = m;
+            return m;
+        }
+
         static Material cutPlane;
 
         /// <summary>Faint yellow sheet showing where the saw blade goes (seen from both sides).</summary>

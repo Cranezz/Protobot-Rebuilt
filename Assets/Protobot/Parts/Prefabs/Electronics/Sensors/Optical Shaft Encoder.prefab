@@ -339,5 +339,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: Optical Shaft Encoder
-  hint: "67.5 \xD7 50.5 \xD7 20.2 mm  \xB7  44.8 g"
-  highlightBrightness: 1.3
+  hint: "2.657 \xD7 1.988 \xD7 0.795 in  \xB7  44.8 g"

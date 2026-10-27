@@ -189,8 +189,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: Potentiometer V2
-  hint: "51 \xD7 18.7 \xD7 17.4 mm  \xB7  10.7 g"
-  highlightBrightness: 1.3
+  hint: "2.009 \xD7 0.735 \xD7 0.683 in  \xB7  10.7 g"
 --- !u!1 &2747823393735379176 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -6476212384906687300, guid: aa93e9c17094d5141a361e32b058c88d, type: 3}

@@ -163,5 +163,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: Wall Alliance Stations_Red
-  hint: "2946.4 \xD7 914.4 \xD7 1 mm  \xB7  273 g"
-  highlightBrightness: 1.3
+  hint: "116 \xD7 36 \xD7 0.039 in  \xB7  273 g"

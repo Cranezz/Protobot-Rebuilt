@@ -75,7 +75,7 @@ PrefabInstance:
       addedObject: {fileID: 6344888007050624602}
     - targetCorrespondingSourceObject: {fileID: 7471719701255174056, guid: ef46c80f96586ee4cb7304d3be491c4a, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 5942704717711163767}
+      addedObject: {fileID: 3091167553617462975}
   m_SourcePrefab: {fileID: 100100000, guid: ef46c80f96586ee4cb7304d3be491c4a, type: 3}
 --- !u!1 &3334070279607283678 stripped
 GameObject:
@@ -135,15 +135,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
-  title: 90 Angle Gusset
-  hint: "23.1 \xD7 23.1 \xD7 21.4 mm  \xB7  3.1 g"
-  highlightBrightness: 1.3
+  title: 90 Degree Angle
+  hint: "0.91 \xD7 0.91 \xD7 0.844 in  \xB7  3.1 g"
 --- !u!1 &4987024017521829159 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 7471719701255174056, guid: ef46c80f96586ee4cb7304d3be491c4a, type: 3}
   m_PrefabInstance: {fileID: 2487559917970444943}
   m_PrefabAsset: {fileID: 0}
---- !u!64 &5942704717711163767
+--- !u!64 &3091167553617462975
 MeshCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

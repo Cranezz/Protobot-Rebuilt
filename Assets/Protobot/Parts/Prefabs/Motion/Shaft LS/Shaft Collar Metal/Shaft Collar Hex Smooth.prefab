@@ -166,6 +166,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
-  title: Shaft Collar Hex Smooth
-  hint: "15.7 \xD7 11 \xD7 7.9 mm  \xB7  4.9 g"
-  highlightBrightness: 1.3
+  title: Shaft Collar (hex screw)
+  hint: "0.62 \xD7 0.433 \xD7 5/16 in  \xB7  4.9 g"

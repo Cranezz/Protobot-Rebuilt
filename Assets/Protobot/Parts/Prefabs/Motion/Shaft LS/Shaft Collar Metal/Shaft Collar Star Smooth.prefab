@@ -139,9 +139,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
-  title: Shaft Collar Star Smooth
-  hint: "15.7 \xD7 11 \xD7 7.9 mm  \xB7  4.9 g"
-  highlightBrightness: 1.3
+  title: Shaft Collar (star screw)
+  hint: "0.62 \xD7 0.433 \xD7 5/16 in  \xB7  4.9 g"
 --- !u!1 &6722818055522850518 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -7175497441153661879, guid: b817c5a50b9395447830012a2938ee31, type: 3}

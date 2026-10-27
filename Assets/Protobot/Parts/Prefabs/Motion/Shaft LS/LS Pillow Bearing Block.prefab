@@ -139,9 +139,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
-  title: LS Pillow Bearing Block
-  hint: "35.6 \xD7 13.4 \xD7 10.2 mm  \xB7  1.6 g"
-  highlightBrightness: 1.3
+  title: Block Bearing
+  hint: "1.4 \xD7 0.527 \xD7 0.4 in  \xB7  1.6 g"
 --- !u!1 &4086558817727651771 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -7175497441153661879, guid: fedda7d72bc9b864d8875ca63de14952, type: 3}

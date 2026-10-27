@@ -70,23 +70,6 @@ namespace Protobot.Tools
 
         void Start() => Equip(tools[0]);
 
-        AudioSource audioSource;
-
-        /// <summary>Sounds from the tool in hand (not positioned: it's right next to the player's ears).</summary>
-        public void PlaySound(AudioClip clip, float volume)
-        {
-            if (clip == null)
-                return;
-            if (audioSource == null)
-            {
-                audioSource = gameObject.AddComponent<AudioSource>();
-                audioSource.playOnAwake = false;
-                audioSource.spatialBlend = 0f;
-            }
-            audioSource.pitch = UnityEngine.Random.Range(0.95f, 1.05f);  // so repeats don't sound identical
-            audioSource.PlayOneShot(clip, volume);
-        }
-
         public void Equip(PlayerTool tool)
         {
             if (tool == current || tool == null)
@@ -98,6 +81,7 @@ namespace Protobot.Tools
                     viewModels[current].SetActive(false);
             }
             current = tool;
+            Audio.Sounds.Play(Audio.Sounds.Tick, 0.3f);
             if (viewModels[current] != null)
             {
                 viewModels[current].SetActive(true);

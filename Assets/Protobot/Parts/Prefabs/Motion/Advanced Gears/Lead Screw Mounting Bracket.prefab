@@ -170,6 +170,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
-  title: Lead Screw Mounting Bracket
-  hint: "43.9 \xD7 32.5 \xD7 30.6 mm  \xB7  8.7 g"
-  highlightBrightness: 1.3
+  title: Lead Screw Bracket
+  hint: "1.729 \xD7 1.279 \xD7 1.205 in  \xB7  8.7 g"

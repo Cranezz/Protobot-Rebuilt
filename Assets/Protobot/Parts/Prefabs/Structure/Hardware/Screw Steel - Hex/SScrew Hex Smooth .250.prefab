@@ -135,9 +135,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
-  title: SScrew Hex Smooth .250
-  hint: "8.6 \xD7 7.9 \xD7 7.9 mm  \xB7  1.2 g"
-  highlightBrightness: 1.3
+  title: 1/4" Hex Screw
+  hint: "0.337 \xD7 5/16 \xD7 5/16 in  \xB7  1.2 g"
 --- !u!1 &5027009566521060354 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 8329350212030676554, guid: 34fa02ff3c23e144d9a2b2b3c33342d8, type: 3}

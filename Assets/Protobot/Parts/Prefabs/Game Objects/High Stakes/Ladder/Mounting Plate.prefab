@@ -144,8 +144,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: Mounting Plate
-  hint: "300 \xD7 300 \xD7 4.8 mm  \xB7  207 g"
-  highlightBrightness: 1.3
+  hint: "11.81 \xD7 11.81 \xD7 3/16 in  \xB7  207 g"
 --- !u!1 &6946567839712045834 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 4445948748397649984, guid: 75d643d83f6c2364197b8882f0a213ee, type: 3}

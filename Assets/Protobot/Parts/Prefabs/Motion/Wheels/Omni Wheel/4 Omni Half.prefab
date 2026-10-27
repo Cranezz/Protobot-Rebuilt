@@ -710,9 +710,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
-  title: 4 Omni Half
-  hint: "105.4 \xD7 105.4 \xD7 13.4 mm  \xB7  50.3 g"
-  highlightBrightness: 1.3
+  title: 4" Omni Wheel (half)
+  hint: "4.149 \xD7 4.149 \xD7 0.527 in  \xB7  50.3 g"
 --- !u!1 &961652365620964035 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 249706961602854609, guid: f7e6e66b896739f45b110f461bbc990c, type: 3}

@@ -139,9 +139,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
-  title: Nut Thin Nylock
-  hint: "9.4 \xD7 8.1 \xD7 4.8 mm  \xB7  1.6 g"
-  highlightBrightness: 1.3
+  title: Thin Nylock Nut
+  hint: "0.369 \xD7 0.32 \xD7 0.189 in  \xB7  1.6 g"
 --- !u!1 &4356161224068430311 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1487460747418248249, guid: f7c134b2bed0f0942acf83643269669d, type: 3}

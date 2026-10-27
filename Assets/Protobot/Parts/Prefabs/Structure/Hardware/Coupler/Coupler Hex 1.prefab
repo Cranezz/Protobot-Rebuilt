@@ -143,9 +143,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
-  title: Coupler Hex 1
-  hint: "25.4 \xD7 4.2 \xD7 4.2 mm  \xB7  2 g"
-  highlightBrightness: 1.3
+  title: 1.00" Hex Coupler
+  hint: "1 \xD7 0.164 \xD7 0.164 in  \xB7  2 g"
 --- !u!1 &4269339017418733205 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 4445948748397649984, guid: 6f537c856464c144fb3feec09b994b55, type: 3}

@@ -1,3 +1,4 @@
+using Protobot.Audio;
 using System;
 using System.Collections.Generic;
 using Protobot.Core;
@@ -81,6 +82,7 @@ namespace Protobot.Menus
 
         public void Open(string binId)
         {
+            Sounds.Play(Sounds.Pickup, 0.35f);
             root.SetActive(true);
             MenuState.Open(this);
             search.SetTextWithoutNotify("");
@@ -263,7 +265,17 @@ namespace Protobot.Menus
             if (part == null)
                 return;
             var spawned = spawner.Spawn(part);
-            hud?.ShowToast(spawned != null ? $"Placed {part.displayName} on the workbench" : $"{part.displayName} has no model yet");
+            if (hud == null)
+                return;
+            if (spawned != null)
+            {
+                hud.ShowSuccess($"Placed {part.displayName} on the workbench");
+                Sounds.PlayAt(Sounds.Pop, spawned.transform.position, 0.5f);
+            }
+            else
+            {
+                hud.ShowError($"{part.displayName} has no model yet");
+            }
         }
 
         // ---------------------------------------------------------------- details
@@ -561,7 +573,7 @@ namespace Protobot.Menus
             nameText.text = part.displayName;
             var d = new[] { part.size.x, part.size.y, part.size.z };
             System.Array.Sort(d);
-            sizeText.text = $"{d[2] * 1000f:0.#} mm";
+            sizeText.text = Units.Inches(d[2]);
             stripe.color = binColor;
             background.color = highlighted ? theme.cardHover : theme.card;
             Rect.localScale = highlighted ? new Vector3(1.03f, 1.03f, 1f) : Vector3.one;

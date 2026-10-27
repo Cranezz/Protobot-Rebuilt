@@ -23,16 +23,19 @@ namespace Protobot.Editor
         /// <summary>
         /// Enters Play mode so it keeps running while the editor window isn't focused (a script driving it
         /// from outside). Setting Application.runInBackground in the editor changes the project's player
-        /// setting, so it's put back when Play mode ends.
+        /// setting, so it's put back when Play mode ends (kept in EditorPrefs, which survive an editor restart).
         /// </summary>
         public static void Play()
         {
-            if (!SessionState.GetBool(RestoreKey, false))
+            if (!EditorPrefs.GetBool(RestoreKey, false))
             {
-                SessionState.SetBool(PreviousKey, PlayerSettings.runInBackground);
-                SessionState.SetBool(RestoreKey, true);
+                EditorPrefs.SetBool(PreviousKey, PlayerSettings.runInBackground);
+                EditorPrefs.SetBool(RestoreKey, true);
             }
+            // Both: the player setting for the game, and the editor's own flag so the transition into Play
+            // mode doesn't stall while the editor window is in the background.
             PlayerSettings.runInBackground = true;
+            Application.runInBackground = true;
             EditorApplication.EnterPlaymode();
         }
 
@@ -43,10 +46,10 @@ namespace Protobot.Editor
         [InitializeOnLoadMethod]
         static void RestoreAfterPlay() => EditorApplication.playModeStateChanged += change =>
         {
-            if (change != PlayModeStateChange.EnteredEditMode || !SessionState.GetBool(RestoreKey, false))
+            if (change != PlayModeStateChange.EnteredEditMode || !EditorPrefs.GetBool(RestoreKey, false))
                 return;
-            SessionState.EraseBool(RestoreKey);
-            var previous = SessionState.GetBool(PreviousKey, false);
+            EditorPrefs.DeleteKey(RestoreKey);
+            var previous = EditorPrefs.GetBool(PreviousKey, false);
             // Unity writes the play session's value back after this event, so restore a moment later.
             EditorApplication.delayCall += () =>
             {

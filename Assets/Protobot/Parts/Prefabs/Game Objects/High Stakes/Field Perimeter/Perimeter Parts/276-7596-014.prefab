@@ -135,9 +135,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
-  title: 276-7596-014
-  hint: "1162.1 \xD7 188 \xD7 2.5 mm  \xB7  628 g"
-  highlightBrightness: 1.3
+  title: Perimeter Parts 276-7596-014
+  hint: "45 3/4 \xD7 7.4 \xD7 0.098 in  \xB7  628 g"
 --- !u!1 &4677239487366783095 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 8329350212030676554, guid: a91e9cbd392f4334f82c2b58e2c5c584, type: 3}

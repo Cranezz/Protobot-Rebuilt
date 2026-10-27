@@ -110,6 +110,8 @@ namespace Protobot.Editor
             SetFields(pause, ("theme", theme));
 
             SetupTools(player, camera, head, cursor, hud, ui, theme);
+            SetupScrapBins();
+            SetupOutline();
 
             var events = GameObject.Find("EventSystem") ?? new GameObject("EventSystem");
             GetOrAdd<EventSystem>(events);
@@ -119,6 +121,89 @@ namespace Protobot.Editor
 
             EditorSceneManager.MarkSceneDirty(player.scene);
             Debug.Log("[Player] Set up: mouse look, WASD, Shift sprint, C crouch, Space jump, hold left click to grab, Esc menu.");
+        }
+
+        // ---------------------------------------------------------------- outline
+
+        const string RendererFolder = "Assets/Protobot/Settings/Rendering/";
+
+        /// <summary>Adds the hover outline (Protobot.Rendering.OutlineFeature) to every URP renderer, once.</summary>
+        static void SetupOutline()
+        {
+            var mask = Shader.Find("Hidden/Protobot/OutlineMask");
+            var composite = Shader.Find("Hidden/Protobot/Outline");
+            foreach (var guid in AssetDatabase.FindAssets("t:UniversalRendererData", new[] { RendererFolder }))
+            {
+                var data = AssetDatabase.LoadAssetAtPath<UniversalRendererData>(AssetDatabase.GUIDToAssetPath(guid));
+                var feature = data.rendererFeatures.Find(f => f is Protobot.Rendering.OutlineFeature) as Protobot.Rendering.OutlineFeature;
+                if (feature == null)
+                {
+                    // The same steps as the renderer's "Add Renderer Feature" button: a sub-asset, listed with its file id.
+                    feature = ScriptableObject.CreateInstance<Protobot.Rendering.OutlineFeature>();
+                    feature.name = "Outline";
+                    AssetDatabase.AddObjectToAsset(feature, data);
+                    AssetDatabase.TryGetGUIDAndLocalFileIdentifier(feature, out _, out long localId);
+                    var so = new SerializedObject(data);
+                    var features = so.FindProperty("m_RendererFeatures");
+                    var map = so.FindProperty("m_RendererFeatureMap");
+                    features.arraySize++;
+                    features.GetArrayElementAtIndex(features.arraySize - 1).objectReferenceValue = feature;
+                    map.arraySize++;
+                    map.GetArrayElementAtIndex(map.arraySize - 1).longValue = localId;
+                    so.ApplyModifiedPropertiesWithoutUndo();
+                }
+                feature.SetShaders(mask, composite);
+                EditorUtility.SetDirty(feature);
+                EditorUtility.SetDirty(data);
+            }
+            AssetDatabase.SaveAssets();
+        }
+
+        // ---------------------------------------------------------------- scrap bins
+
+        const string ScrapBinModel = "Assets/Protobot/Art/Environment/Models/ScrapBin.fbx";
+
+        // The big scrap bin on the floor just left of where picked parts land, its label facing the room.
+        static readonly Vector3 ScrapBinPosition = new(-1.45f, 0f, 2.15f);
+
+        // The workshop's small decorative can (front left, part of Workshop.fbx) works as a bin too.
+        static readonly Vector3 DecorCanPosition = new(-2.92f, 0f, -1.5f);
+
+        static void SetupScrapBins()
+        {
+            var model = AssetDatabase.LoadAssetAtPath<GameObject>(ScrapBinModel);
+            if (model == null)
+            {
+                Debug.LogWarning("[Player] ScrapBin.fbx missing (run Tools/Blender/scrap_bin.py in Blender).");
+                return;
+            }
+            var bin = GameObject.Find("ScrapBin");
+            if (bin == null)
+            {
+                bin = (GameObject)PrefabUtility.InstantiatePrefab(model);
+                bin.name = "ScrapBin";
+            }
+            // Keep the FBX root's own rotation (Blender's Z-up to Unity's Y-up), or the bin lies on its side.
+            bin.transform.SetPositionAndRotation(ScrapBinPosition, Quaternion.Euler(0f, 180f, 0f) * model.transform.localRotation);
+            AddBinTrigger(bin.transform, "Trash Trigger", new Vector3(0f, 0.42f, 0f), 0.24f, 0.62f);
+
+            var decor = GameObject.Find("DecorCanTrigger") ?? new GameObject("DecorCanTrigger");
+            decor.transform.SetPositionAndRotation(DecorCanPosition, Quaternion.identity);
+            AddBinTrigger(decor.transform, "Trash Trigger", new Vector3(0f, 0.5f, 0f), 0.17f, 0.45f);
+        }
+
+        static void AddBinTrigger(Transform parent, string name, Vector3 centre, float radius, float height)
+        {
+            var trigger = parent.Find(name)?.gameObject ?? new GameObject(name);
+            trigger.transform.SetParent(parent, false);
+            trigger.transform.localPosition = Vector3.zero;
+            trigger.transform.rotation = Quaternion.identity; // upright even under a rotated FBX root
+            var capsule = GetOrAdd<CapsuleCollider>(trigger);
+            capsule.isTrigger = true;
+            capsule.center = centre;
+            capsule.radius = radius;
+            capsule.height = Mathf.Max(height, radius * 2f);
+            GetOrAdd<ScrapBin>(trigger);
         }
 
         // ---------------------------------------------------------------- tools

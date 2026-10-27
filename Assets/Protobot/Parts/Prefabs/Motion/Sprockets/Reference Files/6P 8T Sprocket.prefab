@@ -70,6 +70,9 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: b908c07d936259f48b9905675fc121e7, type: 3}
       insertIndex: -1
+      addedObject: {fileID: 3690221162929958943}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: b908c07d936259f48b9905675fc121e7, type: 3}
+      insertIndex: -1
       addedObject: {fileID: 5800153021364921624}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: b908c07d936259f48b9905675fc121e7, type: 3}
       insertIndex: -1
@@ -77,42 +80,32 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: b908c07d936259f48b9905675fc121e7, type: 3}
       insertIndex: -1
       addedObject: {fileID: 4962594552834782549}
-    - targetCorrespondingSourceObject: {fileID: -7175497441153661879, guid: b908c07d936259f48b9905675fc121e7, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 6073127579554528150}
   m_SourcePrefab: {fileID: 100100000, guid: b908c07d936259f48b9905675fc121e7, type: 3}
---- !u!1 &1083936829606103945 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: -7175497441153661879, guid: b908c07d936259f48b9905675fc121e7, type: 3}
-  m_PrefabInstance: {fileID: 1396513725341323200}
-  m_PrefabAsset: {fileID: 0}
---- !u!64 &6073127579554528150
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1083936829606103945}
-  m_Material: {fileID: 13400000, guid: 7b41823d24d681e45af2872a54c4ecbe, type: 2}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 1
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 5204967558659232906, guid: b908c07d936259f48b9905675fc121e7, type: 3}
 --- !u!1 &2278821430489543313 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: b908c07d936259f48b9905675fc121e7, type: 3}
   m_PrefabInstance: {fileID: 1396513725341323200}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &3690221162929958943
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2278821430489543313}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cebff8659e05f5844b962a356ef52f1b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.RingColliders
+  rings:
+  - centre: {x: 0, y: 0, z: 0}
+    axis: {x: 0, y: 1, z: 0}
+    inner: 0.0038865397
+    outer: 0.009939786
+    from: -0.0063499995
+    to: 0.0063499995
+    material: {fileID: 13400000, guid: 7b41823d24d681e45af2872a54c4ecbe, type: 2}
 --- !u!54 &5800153021364921624
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -167,5 +160,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: 6P 8T Sprocket
-  hint: "19.9 \xD7 19.9 \xD7 12.7 mm  \xB7  1.5 g"
-  highlightBrightness: 1.3
+  hint: "0.783 \xD7 0.783 \xD7 1/2 in  \xB7  1.5 g"

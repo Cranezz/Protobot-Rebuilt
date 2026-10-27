@@ -1,4 +1,5 @@
 using System.Globalization;
+using Protobot.Audio;
 using Protobot.Core;
 using Protobot.Parts;
 using Protobot.Tools;
@@ -11,9 +12,11 @@ using UnityEngine.UI;
 namespace Protobot.Menus
 {
     /// <summary>
-    /// Precise cut menu (hold right click with the saw on a part). The saw stays frozen on the part while
-    /// you set exact numbers: where to cut (mm from the part's end, optionally snapped to half holes), the
-    /// cut angle and tilt (typed angles over 360° wrap around), and which side to keep. The preview updates live.
+    /// Precise cut menu (hold right click with the saw on a part). The saw stays frozen on the part while you
+    /// set exact numbers: where to cut (inches from the part's end, typed as "3 1/2", "3.5" or "7/8", snapped
+    /// to the chosen step), the cut's angle about the part's X, Y and Z axes (shown on the part in red, green
+    /// and blue; up to 90° each, typed angles over 360° wrap around), and which side to keep. The preview and
+    /// the summary line update live.
     /// </summary>
     public class SawMenu : MonoBehaviour
     {
@@ -24,13 +27,12 @@ namespace Protobot.Menus
         StockProfile profile;
         GameObject root;
         TextMeshProUGUI partName;
+        TextMeshProUGUI summary;
         Slider position;
         TMP_InputField positionField;
-        Slider angle;
-        TMP_InputField angleField;
-        Slider tilt;
-        TMP_InputField tiltField;
-        ToggleSwitch snap;
+        readonly Slider[] angleSliders = new Slider[3];
+        readonly TMP_InputField[] angleFields = new TMP_InputField[3];
+        DropdownMenu snap;
         OptionSelector side;
         bool updating;
 
@@ -50,18 +52,16 @@ namespace Protobot.Menus
             profile = target.GetComponent<StockProfile>();
             partName.text = target.name;
             position.minValue = 0f;
-            position.maxValue = profile.Length * 1000f;
+            position.maxValue = Units.ToInches(profile.Length);
             root.SetActive(true);
             MenuState.Open(this);
 
-            var (a, b, flip) = saw.Angles;
             updating = true;
-            SetPosition((saw.LockedT - profile.Start) * 1000f, false);
-            angle.SetValueWithoutNotify(a);
-            angleField.SetTextWithoutNotify($"{a:0.#}");
-            tilt.SetValueWithoutNotify(b);
-            tiltField.SetTextWithoutNotify($"{b:0.#}");
-            side.SetIndex(flip ? 1 : 0, false);
+            snap.SetIndex(SawTool.SnapChoice, false);
+            SetPosition(Units.ToInches(saw.LockedT - profile.Start), false);
+            for (var i = 0; i < 3; i++)
+                ShowAngle(i, saw.Angles[i]);
+            side.SetIndex(saw.Flip ? 1 : 0, false);
             updating = false;
             Push();
         }
@@ -75,22 +75,48 @@ namespace Protobot.Menus
 
         void Update()
         {
-            if (IsOpen && Keyboard.current.escapeKey.wasPressedThisFrame && MenuState.ChangedFrame != Time.frameCount)
+            if (!IsOpen)
+                return;
+            if (Keyboard.current.escapeKey.wasPressedThisFrame && MenuState.ChangedFrame != Time.frameCount)
             {
+                if (snap.IsOpen)
+                {
+                    snap.Close();
+                    return;
+                }
                 saw.CancelMenu();
                 Close();
+                return;
             }
+            var plan = saw.CurrentPlan;
+            summary.text = plan.valid
+                ? $"Keeps {SawTool.Describe(plan.keptLength, part)}   ·   cuts off {SawTool.Describe(plan.removedLength, part)}"
+                : plan.problem;
+            summary.color = plan.valid ? theme.textDim : new Color(1f, 0.55f, 0.45f);
         }
 
-        void SetPosition(float mm, bool push)
+        void SetPosition(float inches, bool push)
         {
-            if (snap.On)
-                mm = Mathf.Round(mm / (SawTool.HolePitch * 500f)) * (SawTool.HolePitch * 500f);
-            mm = Mathf.Clamp(mm, 0f, profile.Length * 1000f);
-            position.SetValueWithoutNotify(mm);
-            positionField.SetTextWithoutNotify($"{mm:0.#}");
+            var step = SawTool.SnapChoices[snap.Index].inches;
+            if (step > 0f)
+                inches = Mathf.Round(inches / step) * step;
+            inches = Mathf.Clamp(inches, 0f, Units.ToInches(profile.Length));
+            position.SetValueWithoutNotify(inches);
+            positionField.SetTextWithoutNotify(Units.Inches(Units.FromInches(inches), false));
             if (push)
                 Push();
+        }
+
+        void SetAngle(int axis, float degrees)
+        {
+            ShowAngle(axis, Mathf.Clamp(WrapAngle(degrees), -SawTool.MaxAngle, SawTool.MaxAngle));
+            Push();
+        }
+
+        void ShowAngle(int axis, float degrees)
+        {
+            angleSliders[axis].SetValueWithoutNotify(degrees);
+            angleFields[axis].SetTextWithoutNotify(degrees.ToString("0.#", CultureInfo.InvariantCulture));
         }
 
         /// <summary>Sends the menu's numbers to the saw, which updates the preview.</summary>
@@ -98,7 +124,8 @@ namespace Protobot.Menus
         {
             if (updating || saw == null)
                 return;
-            saw.SetMenuValues(profile.Start + position.value / 1000f, angle.value, tilt.value, side.Index == 1);
+            var angles = new Vector3(angleSliders[0].value, angleSliders[1].value, angleSliders[2].value);
+            saw.SetMenuValues(profile.Start + Units.FromInches(position.value), angles, side.Index == 1);
         }
 
         static float WrapAngle(float degrees)
@@ -106,17 +133,17 @@ namespace Protobot.Menus
             degrees %= 360f;
             if (degrees > 180f) degrees -= 360f;
             if (degrees < -180f) degrees += 360f;
-            return Mathf.Clamp(degrees, -75f, 75f);
+            return degrees;
         }
 
-        static bool TryParse(string text, out float value) =>
-            float.TryParse(text.Replace("°", "").Replace("mm", "").Trim(), NumberStyles.Float, CultureInfo.InvariantCulture, out value);
+        static bool TryParseAngle(string text, out float value) =>
+            float.TryParse(text.Replace("°", "").Trim(), NumberStyles.Float, CultureInfo.InvariantCulture, out value);
 
         void Build()
         {
             root = UiFactory.Rect("Root", transform).Fill().gameObject;
             var panel = UiFactory.Panel(root.transform, "Panel", theme, theme.panel, true).rectTransform;
-            panel.Place(new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(-60f, 0f), new Vector2(560f, 640f));
+            panel.Place(new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(-60f, 0f), new Vector2(580f, 720f));
 
             var stripes = UiFactory.Hazard(panel, "Stripes", theme);
             stripes.rectTransform.anchorMin = new Vector2(0f, 1f);
@@ -124,27 +151,59 @@ namespace Protobot.Menus
             stripes.rectTransform.offsetMin = new Vector2(14f, -24f);
             stripes.rectTransform.offsetMax = new Vector2(-14f, -12f);
             var title = UiFactory.Text(panel, "Title", theme, "PRECISE CUT", 44f, theme.text, true);
-            title.rectTransform.Place(new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(32f, -30f), new Vector2(480f, 56f));
+            title.rectTransform.Place(new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(32f, -30f), new Vector2(500f, 56f));
             partName = UiFactory.Text(panel, "Part", theme, "", 22f, theme.textDim);
-            partName.rectTransform.Place(new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(32f, -84f), new Vector2(490f, 30f));
+            partName.rectTransform.Place(new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(32f, -84f), new Vector2(510f, 30f));
 
-            var list = UiFactory.Rect("Rows", panel).Fill(32f, 110f, 32f, 130f);
+            var list = UiFactory.Rect("Rows", panel).Fill(32f, 110f, 32f, 120f);
             UiFactory.VerticalList(list, 6f);
 
-            (position, positionField) = NumberRow(list, "Position from end (mm)", 0f, 100f, v => SetPosition(v, true),
-                text => { if (TryParse(text, out var v)) SetPosition(v, true); });
-            snap = ToggleSwitch.Create(UiFactory.Row(list, "Snap to 1/4 in", theme), theme, true, _ => SetPosition(position.value, true));
-            (angle, angleField) = NumberRow(list, "Angle (°)", -75f, 75f, v => SetAngle(angle, angleField, v),
-                text => { if (TryParse(text, out var v)) SetAngle(angle, angleField, v); });
-            (tilt, tiltField) = NumberRow(list, "Tilt (°)", -75f, 75f, v => SetAngle(tilt, tiltField, v),
-                text => { if (TryParse(text, out var v)) SetAngle(tilt, tiltField, v); });
+            (position, positionField) = NumberRow(list, "Position from end (in)", 0f, 17.5f, v => SetPosition(v, true), text =>
+            {
+                if (Units.TryParseInches(text, out var v))
+                    SetPosition(v, true);
+                else
+                    SetPosition(position.value, false);
+            });
+            snap = DropdownMenu.Create(UiFactory.Row(list, "Snap", theme), theme, System.Array.ConvertAll(SawTool.SnapChoices, c => c.label),
+                SawTool.SnapChoice, i =>
+                {
+                    SawTool.SnapChoice = i;
+                    SetPosition(position.value, true);
+                    Sounds.Play(Sounds.Tick, 0.3f);
+                });
+
+            string[] names = { "X angle (°)", "Y angle (°)", "Z angle (°)" };
+            Color[] colors = { new(0.95f, 0.35f, 0.3f), new(0.4f, 0.85f, 0.4f), new(0.4f, 0.6f, 1f) };
+            for (var i = 0; i < 3; i++)
+            {
+                var axis = i;
+                (angleSliders[i], angleFields[i]) = NumberRow(list, names[i], -SawTool.MaxAngle, SawTool.MaxAngle, v => SetAngle(axis, v), text =>
+                {
+                    if (TryParseAngle(text, out var v))
+                        SetAngle(axis, v);
+                    else
+                        ShowAngle(axis, angleSliders[axis].value);
+                });
+                angleSliders[i].wholeNumbers = true;
+                // The axis colour, matching the lines drawn on the part.
+                var label = angleSliders[i].transform.parent.parent.Find("Label").GetComponent<TextMeshProUGUI>();
+                label.text = $"<color=#{ColorUtility.ToHtmlStringRGB(colors[i])}>{names[i].Substring(0, 1)}</color>{names[i].Substring(1)}";
+            }
             side = OptionSelector.Create(UiFactory.Row(list, "Keep", theme), theme, new[] { "Near side", "Far side" }, 0, _ => Push());
 
-            var help = UiFactory.Text(list, "Help", theme, "The red see-through piece is what gets cut off.", 20f, theme.textDim);
-            help.gameObject.AddComponent<LayoutElement>().preferredHeight = 40f;
+            summary = UiFactory.Text(list, "Summary", theme, "", 21f, theme.textDim, true);
+            summary.gameObject.AddComponent<LayoutElement>().preferredHeight = 34f;
+            var help = UiFactory.Text(list, "Help", theme, "The red see-through piece is what gets cut off.", 19f, theme.textDim);
+            help.gameObject.AddComponent<LayoutElement>().preferredHeight = 28f;
 
             var cut = UiFactory.Button(panel, "Cut", theme, "CUT", () =>
             {
+                if (!saw.CurrentPlan.valid)
+                {
+                    Sounds.Play(Sounds.Error, 0.5f);
+                    return;
+                }
                 Close();
                 saw.CutFromMenu();
             }, true, 28f);
@@ -155,14 +214,6 @@ namespace Protobot.Menus
                 Close();
             }, false, 24f);
             ((RectTransform)cancel.transform).Place(new Vector2(0f, 0f), new Vector2(0f, 0f), new Vector2(32f, 32f), new Vector2(200f, 64f));
-        }
-
-        void SetAngle(Slider slider, TMP_InputField field, float value)
-        {
-            value = WrapAngle(value);
-            slider.SetValueWithoutNotify(value);
-            field.SetTextWithoutNotify($"{value:0.#}");
-            Push();
         }
 
         (Slider, TMP_InputField) NumberRow(RectTransform list, string label, float min, float max,
@@ -176,7 +227,7 @@ namespace Protobot.Menus
             ((RectTransform)field.transform).anchorMax = new Vector2(1f, 1f);
             ((RectTransform)field.transform).pivot = new Vector2(1f, 0.5f);
             ((RectTransform)field.transform).sizeDelta = new Vector2(96f, 0f);
-            field.contentType = TMP_InputField.ContentType.DecimalNumber;
+            field.contentType = TMP_InputField.ContentType.Standard;  // fractions like "3 1/2"
             field.onEndEdit.AddListener(onType);
             return (slider, field);
         }

@@ -70,6 +70,9 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 8b06a26f824d9194ca5b8e38858c2f47, type: 3}
       insertIndex: -1
+      addedObject: {fileID: 2055910067919611454}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 8b06a26f824d9194ca5b8e38858c2f47, type: 3}
+      insertIndex: -1
       addedObject: {fileID: 6688810774500440378}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 8b06a26f824d9194ca5b8e38858c2f47, type: 3}
       insertIndex: -1
@@ -77,42 +80,32 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 8b06a26f824d9194ca5b8e38858c2f47, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1309775178311386179}
-    - targetCorrespondingSourceObject: {fileID: -7175497441153661879, guid: 8b06a26f824d9194ca5b8e38858c2f47, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 5666519804232614771}
   m_SourcePrefab: {fileID: 100100000, guid: 8b06a26f824d9194ca5b8e38858c2f47, type: 3}
---- !u!1 &355265802065188775 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: -7175497441153661879, guid: 8b06a26f824d9194ca5b8e38858c2f47, type: 3}
-  m_PrefabInstance: {fileID: 1767006743293809646}
-  m_PrefabAsset: {fileID: 0}
---- !u!64 &5666519804232614771
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 355265802065188775}
-  m_Material: {fileID: 13400000, guid: 7b41823d24d681e45af2872a54c4ecbe, type: 2}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 1
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 5204967558659232906, guid: 8b06a26f824d9194ca5b8e38858c2f47, type: 3}
 --- !u!1 &1460506122328895167 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 8b06a26f824d9194ca5b8e38858c2f47, type: 3}
   m_PrefabInstance: {fileID: 1767006743293809646}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &2055910067919611454
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1460506122328895167}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cebff8659e05f5844b962a356ef52f1b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.RingColliders
+  rings:
+  - centre: {x: -0.00523071, y: 0.0056892843, z: -0.0022999996}
+    axis: {x: 0, y: 0, z: 1}
+    inner: 0.0021189097
+    outer: 0.004065986
+    from: -0.0023
+    to: 0.0023
+    material: {fileID: 13400000, guid: 7b41823d24d681e45af2872a54c4ecbe, type: 2}
 --- !u!54 &6688810774500440378
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -167,5 +160,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: Spacer Plastic
-  hint: "8.1 \xD7 8.1 \xD7 4.6 mm  \xB7  0.5 g"
-  highlightBrightness: 1.3
+  hint: "0.32 \xD7 0.32 \xD7 0.181 in  \xB7  0.5 g"

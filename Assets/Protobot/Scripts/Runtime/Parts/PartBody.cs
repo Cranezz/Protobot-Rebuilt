@@ -1,3 +1,4 @@
+using Protobot.Audio;
 using UnityEngine;
 
 namespace Protobot.Parts
@@ -5,14 +6,49 @@ namespace Protobot.Parts
     /// <summary>
     /// On every part prefab: which catalog part this is. The prefab also carries the Rigidbody (real mass),
     /// convex colliders with a physics material for its finish, and a HoverTarget so it can be grabbed.
+    /// Parts make a sound when they hit something: a clink for metal, a knock for plastic and rubber,
+    /// louder the harder and heavier the hit, higher for small parts.
     /// </summary>
     [RequireComponent(typeof(Rigidbody))]
     public class PartBody : MonoBehaviour
     {
         [SerializeField] string partId;
 
+        Rigidbody body;
+        float size;
+        float lastSound = -1f;
+
         public string PartId => partId;
 
         public void Configure(string id) => partId = id;
+
+        void Awake()
+        {
+            body = GetComponent<Rigidbody>();
+            foreach (var r in GetComponentsInChildren<MeshRenderer>())
+                size = Mathf.Max(size, r.bounds.size.magnitude);
+        }
+
+        void OnCollisionEnter(Collision collision)
+        {
+            var speed = collision.relativeVelocity.magnitude;
+            if (speed < 0.3f || Time.time - lastSound < 0.08f || collision.contactCount == 0)
+                return;
+            lastSound = Time.time;
+            var contact = collision.GetContact(0);
+            var metal = IsMetal(contact.thisCollider.sharedMaterial);
+            var weight = Mathf.Lerp(0.3f, 1f, Mathf.Clamp01(body.mass / 0.15f));
+            var volume = Mathf.Clamp(speed / 2.5f, 0.06f, 1f) * weight * 0.7f;
+            var pitch = Mathf.Clamp(0.12f / Mathf.Max(size, 0.02f), 0.55f, 1.8f);
+            Sounds.PlayAt(metal ? Sounds.MetalHit : Sounds.PlasticHit, contact.point, volume, pitch);
+        }
+
+        static bool IsMetal(PhysicsMaterial material)
+        {
+            if (material == null)
+                return false;
+            var n = material.name;
+            return n.StartsWith("Aluminum") || n.StartsWith("Steel") || n.StartsWith("Brass");
+        }
     }
 }

@@ -170,6 +170,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
-  title: 276-7596-003
-  hint: "32.5 \xD7 22.5 \xD7 22.5 mm  \xB7  3.9 g"
-  highlightBrightness: 1.3
+  title: Perimeter Parts 276-7596-003
+  hint: "1.281 \xD7 0.885 \xD7 0.885 in  \xB7  3.9 g"

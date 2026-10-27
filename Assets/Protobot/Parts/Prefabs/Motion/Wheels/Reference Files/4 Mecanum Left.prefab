@@ -896,9 +896,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
-  title: 4 Mecanum Left
-  hint: "103 \xD7 102.8 \xD7 51.6 mm  \xB7  205.8 g"
-  highlightBrightness: 1.3
+  title: 4" Mecanum Wheel (left)
+  hint: "4.053 \xD7 4.049 \xD7 2.03 in  \xB7  205.8 g"
 --- !u!1 &2344889136227557215 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 4312915537905791787, guid: 5b4ba217927578a49aa97826babd4333, type: 3}

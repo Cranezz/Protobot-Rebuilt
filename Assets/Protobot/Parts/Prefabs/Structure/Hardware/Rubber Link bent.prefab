@@ -144,8 +144,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: Rubber Link bent
-  hint: "31.2 \xD7 11.9 \xD7 10.4 mm  \xB7  10 g"
-  highlightBrightness: 1.3
+  hint: "1.227 \xD7 0.468 \xD7 0.41 in  \xB7  10 g"
 --- !u!1 &3549502661008590083 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 4445948748397649984, guid: 58a15919bd81dae40874f6712dc6472d, type: 3}

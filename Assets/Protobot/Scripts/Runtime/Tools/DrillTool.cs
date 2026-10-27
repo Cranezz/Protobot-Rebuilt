@@ -1,4 +1,6 @@
 using System.Collections;
+using Protobot.Audio;
+using Protobot.Core;
 using System.Collections.Generic;
 using Protobot.Geometry;
 using Protobot.Interaction;
@@ -42,7 +44,7 @@ namespace Protobot.Tools
 
         public int BitIndex => bitIndex;
         public float BitDiameter => Bits[bitIndex].diameter;
-        string BitLabel => $"{Bits[bitIndex].name} ({BitDiameter * 1000f:0.##} mm)";
+        string BitLabel => $"{Bits[bitIndex].name} bit ({Units.ToInches(BitDiameter):0.###} in)";
 
         public override string ControlsHint => $"Left click: drill   ·   Wheel: bit {BitLabel}   ·   Right click: choose bit";
 
@@ -98,11 +100,17 @@ namespace Protobot.Tools
 
         public override void PrimaryDown()
         {
-            if (drilling || aimedPart == null)
+            if (drilling)
                 return;
+            if (aimedPart == null)
+            {
+                if (Cursor.Current != null && Cursor.CurrentInReach)
+                    Hud.ShowError("Aim at a hole in a metal part to drill it");
+                return;
+            }
             if (!hole.found || !fits)
             {
-                Hud.ShowToast(problem);
+                Hud.ShowError(problem);
                 return;
             }
             StartCoroutine(DrillRoutine());
@@ -124,7 +132,7 @@ namespace Protobot.Tools
             if (!inReach || aimedPart == null)
                 return true;
             var ok = hole.found && fits;
-            view.hint = ok ? $"Drill a {BitLabel} hole through {hole.thickness * 1000f:0.0} mm" : problem;
+            view.hint = ok ? $"Drill with the {BitLabel}{(BreaksThroughEdge ? " — breaks through the edge" : "")}" : problem;
             view.available = ok;
             view.reticleColor = ok ? new Color(0.6f, 1f, 0.7f) : alreadyDrilled ? Color.white : new Color(1f, 0.6f, 0.45f);
             return true;
@@ -168,6 +176,14 @@ namespace Protobot.Tools
             var local = best.transform.InverseTransformPoint(hit.point);
             if (part == aimedPart && best == aimedRenderer && (local - lastAimLocal).sqrMagnitude < 0.0008f * 0.0008f)
                 return;
+            // Still aiming inside the hole already found: nothing to search for.
+            if (part == aimedPart && best == aimedRenderer && hole.found && bitAtSearch == bitIndex)
+            {
+                var offset = local - hole.center;
+                offset -= hole.normal * Vector3.Dot(offset, hole.normal);
+                if (offset.magnitude < hole.holeRadius * 0.9f)
+                    return;
+            }
 
             nextSearch = Time.unscaledTime + 0.08f;
             if (part != aimedPart || best != aimedRenderer)
@@ -184,9 +200,12 @@ namespace Protobot.Tools
 
             // The hit normal from the collider points out of the surface we aim at.
             var normal = best.transform.InverseTransformDirection(hit.normal).normalized;
-            hole = HoleDrilling.Find(region, local, normal);
+            if (!TryDrilledHole(part, best, local, out hole))
+                hole = HoleDrilling.Find(region, local, normal);
+            bitAtSearch = bitIndex;
             fits = false;
             alreadyDrilled = false;
+            walls = null;
             problem = hole.problem;
             if (hole.found)
             {
@@ -194,21 +213,69 @@ namespace Protobot.Tools
                 if (hole.round && radius <= hole.holeRadius + 0.00015f)
                 {
                     alreadyDrilled = radius >= hole.holeRadius - 0.0004f;
-                    problem = alreadyDrilled
-                        ? "Already a round hole this size — pick a bigger bit to widen it"
-                        : $"Bit is smaller than this hole ({hole.holeRadius * 2000f:0.0} mm)";
+                    problem = !alreadyDrilled
+                        ? $"Bit is smaller than this hole ({Units.Inches(hole.holeRadius * 2f)})"
+                        : bitIndex < Bits.Length - 1
+                            ? "Already a round hole this size — pick a bigger bit to widen it"
+                            : "Already drilled with the biggest bit";
                 }
                 else if (radius < hole.holeRadius)
-                    problem = $"Bit is smaller than this hole — use at least {hole.holeRadius * 2000f:0.0} mm";
-                else if (!HoleDrilling.HasMaterialAround(region, hole, radius))
-                    problem = "Too close to an edge or bend for this bit";
+                {
+                    problem = $"Bit is smaller than this hole — use at least {Units.Inches(hole.holeRadius * 2f)}";
+                }
                 else
+                {
+                    // Near an edge or a bend the hole may break through; it's still allowed.
+                    walls = HoleDrilling.WallSegments(region, hole, radius);
                     fits = true;
+                }
             }
             ShowPreview();
         }
 
+        /// <summary>
+        /// The biggest hole this drill already made under the aim point, from the part's record. A hole that
+        /// breaks through an edge can't be found by searching the mesh (its empty space runs off the part),
+        /// and the record knows the exact size anyway.
+        /// </summary>
+        static bool TryDrilledHole(PartBody part, MeshRenderer renderer, Vector3 local, out HoleInfo found)
+        {
+            found = default;
+            var mods = part.GetComponent<PartModifications>();
+            if (mods == null)
+                return false;
+            foreach (var drilled in mods.holes)
+            {
+                var center = renderer.transform.InverseTransformPoint(part.transform.TransformPoint(drilled.center));
+                var normal = renderer.transform.InverseTransformDirection(part.transform.TransformDirection(drilled.normal)).normalized;
+                var offset = local - center;
+                var along = Vector3.Dot(offset, normal);
+                var radius = drilled.diameter / 2f;
+                if (Mathf.Abs(along) > drilled.depth + 0.001f || (offset - normal * along).magnitude > radius)
+                    continue;
+                if (found.found && radius <= found.holeRadius)
+                    continue;
+                found = new HoleInfo { found = true, round = true, center = center, normal = normal, thickness = drilled.depth, holeRadius = radius };
+            }
+            return found.found;
+        }
+
         Vector3 lastRegionCenter;
+        int bitAtSearch = -1;
+        bool[] walls;  // which sides of the new hole have metal (null = all)
+
+        bool BreaksThroughEdge
+        {
+            get
+            {
+                if (walls == null)
+                    return false;
+                foreach (var w in walls)
+                    if (!w)
+                        return true;
+                return false;
+            }
+        }
 
         bool alreadyDrilled;
 
@@ -256,10 +323,11 @@ namespace Protobot.Tools
         IEnumerator DrillRoutine()
         {
             drilling = true;
-            PlaySound(ToolSounds.Drill, 0.5f);
+            PlaySound(Sounds.Drill, 0.5f);
             var part = aimedPart;
             var renderer = aimedRenderer;
             var target = hole;
+            var targetWalls = walls;
             var radius = BitDiameter / 2f;
             var rest = ViewModel != null ? ViewModel.transform.localPosition : Vector3.zero;
             for (var t = 0f; t < 0.5f; t += Time.deltaTime)
@@ -281,10 +349,10 @@ namespace Protobot.Tools
             {
                 var volumeBefore = PartShape.Volume(part.gameObject);
                 var filter = renderer.GetComponent<MeshFilter>();
-                var result = HoleDrilling.Drill(filter.sharedMesh, target, radius);
+                var result = HoleDrilling.Drill(filter.sharedMesh, target, radius, targetWalls);
                 if (result == null)
                 {
-                    Hud.ShowToast("Nothing to drill here");
+                    Hud.ShowError("Nothing to drill here");
                 }
                 else
                 {
@@ -297,7 +365,7 @@ namespace Protobot.Tools
                         center = partSpaceCenter, normal = partSpaceNormal, diameter = radius * 2f, depth = target.thickness,
                     });
                     PartShape.AfterEdit(part.gameObject, volumeBefore);
-                    Hud.ShowToast($"Drilled a {BitLabel} hole");
+                    Hud.ShowToast($"Drilled a {Bits[bitIndex].name} hole");
                 }
             }
             ClearAim();

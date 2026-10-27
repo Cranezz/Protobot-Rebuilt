@@ -135,9 +135,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
-  title: Top 3
-  hint: "38.1 \xD7 22 \xD7 6 mm  \xB7  8.8 g"
-  highlightBrightness: 1.3
+  title: 3-Hole Hinge (top)
+  hint: "1 1/2 \xD7 0.867 \xD7 0.235 in  \xB7  8.8 g"
 --- !u!1 &8765028746186047689 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 6265358468823026077, guid: 4050dc95e185edf4086c64afe0232471, type: 3}

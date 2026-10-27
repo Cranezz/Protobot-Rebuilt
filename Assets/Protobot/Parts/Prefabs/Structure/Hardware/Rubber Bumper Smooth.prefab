@@ -151,8 +151,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: Rubber Bumper Smooth
-  hint: "20.6 \xD7 19 \xD7 19 mm  \xB7  5 g"
-  highlightBrightness: 1.3
+  hint: "13/16 \xD7 3/4 \xD7 3/4 in  \xB7  5 g"
 --- !u!1 &1836700126063552248 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -7175497441153661879, guid: 072b4c8b03cf57d4894c52279e413a44, type: 3}

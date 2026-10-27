@@ -28,7 +28,7 @@ namespace Protobot.Tools
         protected GameObject ViewModel { get; private set; }
 
         /// <summary>Plays a sound from the tool in hand.</summary>
-        protected void PlaySound(AudioClip clip, float volume = 0.6f) => Belt.PlaySound(clip, volume);
+        protected static void PlaySound(AudioClip clip, float volume = 0.6f) => Audio.Sounds.Play(clip, volume);
 
         internal void Bind(ToolBelt belt, GameObject viewModel)
         {

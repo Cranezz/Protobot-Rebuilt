@@ -162,6 +162,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
-  title: Standoff 3.00
-  hint: "76.2 \xD7 7.3 \xD7 6.4 mm  \xB7  6.2 g"
-  highlightBrightness: 1.3
+  title: 3.00" Standoff
+  hint: "3 \xD7 0.289 \xD7 1/4 in  \xB7  6.2 g"

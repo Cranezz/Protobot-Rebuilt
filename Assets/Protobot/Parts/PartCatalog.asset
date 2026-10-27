@@ -24,7 +24,7 @@ MonoBehaviour:
     massKg: 0.01406846
     cuttable: 0
   - id: Electronics/Sensors/Bumper Switch - V1
-    displayName: Bumper Switch - V1
+    displayName: Cortex Bumper Switch
     binId: sensors
     model: {fileID: 919132149155446097, guid: f44b927f0802ee044aa1167a72ee9a37, type: 3}
     prefab: {fileID: 1174959210362361218, guid: b98a0151970309d47b790a704dab9407, type: 3}
@@ -34,7 +34,7 @@ MonoBehaviour:
     massKg: 0.026962318
     cuttable: 0
   - id: Electronics/Sensors/Bumper Switch - V2
-    displayName: Bumper Switch - V2
+    displayName: V5 Bumper Switch
     binId: sensors
     model: {fileID: 919132149155446097, guid: e5b7b82547a5b2b40a2d25ac6274046c, type: 3}
     prefab: {fileID: 1613101167869532529, guid: bbac4807e0e90e141baf358115f89b27, type: 3}
@@ -74,7 +74,7 @@ MonoBehaviour:
     massKg: 0.037178576
     cuttable: 0
   - id: Electronics/Sensors/Line Tracker - V1
-    displayName: Line Tracker - V1
+    displayName: Line Tracker
     binId: sensors
     model: {fileID: 919132149155446097, guid: ebbb4d4a672896f4ea4a89d3c3b81d82, type: 3}
     prefab: {fileID: 3894914739607222300, guid: b301327795473ce4ba6e9330570bac21, type: 3}
@@ -84,7 +84,7 @@ MonoBehaviour:
     massKg: 0.014561018
     cuttable: 0
   - id: Electronics/Sensors/Line Tracker - V2
-    displayName: Line Tracker - V2
+    displayName: Line Tracker V2
     binId: sensors
     model: {fileID: 919132149155446097, guid: c4fc317ca96fc644f8ff2ec10a11477d, type: 3}
     prefab: {fileID: 8029021513871568536, guid: 9acbd7503b3c6f440bb97acb28a79a25, type: 3}
@@ -144,7 +144,7 @@ MonoBehaviour:
     massKg: 0.040120434
     cuttable: 0
   - id: Electronics/Sensors/V5 Distance Sensor
-    displayName: V5 Distance Sensor
+    displayName: Distance Sensor
     binId: sensors
     model: {fileID: 919132149155446097, guid: c7af105a53fe7d8499f0bbfe5964bb24, type: 3}
     prefab: {fileID: 8768366400103008953, guid: fa76f6171631afa49becfdcfc29bbc1d, type: 3}
@@ -154,7 +154,7 @@ MonoBehaviour:
     massKg: 0.017055428
     cuttable: 0
   - id: Electronics/Sensors/V5 GPS Sensor
-    displayName: V5 GPS Sensor
+    displayName: GPS Sensor
     binId: sensors
     model: {fileID: 919132149155446097, guid: dad6a440f8f5edd41a0533f5138a4521, type: 3}
     prefab: {fileID: 5635906925049703747, guid: dc7185bebe3ad2a4ca96ad3a4f3a0137, type: 3}
@@ -164,7 +164,7 @@ MonoBehaviour:
     massKg: 0.023966081
     cuttable: 0
   - id: Electronics/Sensors/V5 Inertial Sensor
-    displayName: V5 Inertial Sensor
+    displayName: Inertial Sensor
     binId: sensors
     model: {fileID: 919132149155446097, guid: 5f0b136714864394a882089f05d7a632, type: 3}
     prefab: {fileID: 8777382829095896585, guid: 7cbdb6ff2df6d4a48ab6d8727cf2199c, type: 3}
@@ -174,7 +174,7 @@ MonoBehaviour:
     massKg: 0.012367897
     cuttable: 0
   - id: Electronics/Sensors/V5 Optical Sensor
-    displayName: V5 Optical Sensor
+    displayName: Optical Sensor
     binId: sensors
     model: {fileID: 919132149155446097, guid: 0e57cfa0a51b17b48a6b89695af27b95, type: 3}
     prefab: {fileID: 9172934691124474454, guid: 31f3340a16c68cf45884cc031a65dfc4, type: 3}
@@ -184,7 +184,7 @@ MonoBehaviour:
     massKg: 0.017832942
     cuttable: 0
   - id: Electronics/Sensors/V5 Rotation Sensor
-    displayName: V5 Rotation Sensor
+    displayName: Rotation Sensor
     binId: sensors
     model: {fileID: 919132149155446097, guid: 4ea07890f0726644783051e74d5b9e8f, type: 3}
     prefab: {fileID: 206977472637874313, guid: 72dcfa178b249e141be46ddf820c180e, type: 3}
@@ -194,7 +194,7 @@ MonoBehaviour:
     massKg: 0.028586691
     cuttable: 0
   - id: Electronics/Sensors/V5 Vision Sensor
-    displayName: V5 Vision Sensor
+    displayName: Vision Sensor
     binId: sensors
     model: {fileID: 919132149155446097, guid: d9738a2c8d6645d418b77ab7c3ab8066, type: 3}
     prefab: {fileID: 1116339528826090954, guid: e0ebabae40f756b4ba39c44b09c7f3e6, type: 3}
@@ -224,7 +224,7 @@ MonoBehaviour:
     massKg: 0.040118944
     cuttable: 0
   - id: Electronics/V5 Battery Clip
-    displayName: V5 Battery Clip
+    displayName: Battery Clip
     binId: brain
     model: {fileID: 919132149155446097, guid: 779a081fe8d339741962706179fb4218, type: 3}
     prefab: {fileID: 8485137864800881630, guid: eed6f776e9eac0e4ca3057ddedeb1c2b, type: 3}
@@ -234,7 +234,7 @@ MonoBehaviour:
     massKg: 0.010021195
     cuttable: 0
   - id: Electronics/V5 Battery
-    displayName: V5 Battery
+    displayName: Battery
     binId: brain
     model: {fileID: 919132149155446097, guid: 123a52c0699a6994584203f666c5e7d2, type: 3}
     prefab: {fileID: 2026420697166478216, guid: 28144e8d4136be44bad63203aab3beb1, type: 3}
@@ -244,7 +244,7 @@ MonoBehaviour:
     massKg: 0.14898299
     cuttable: 0
   - id: Electronics/V5 Brain Mount Long
-    displayName: V5 Brain Mount Long
+    displayName: Brain Mount (long)
     binId: brain
     model: {fileID: 919132149155446097, guid: 780b44cb7bacbda4d83ba94d64676c8a, type: 3}
     prefab: {fileID: 1109983453246642886, guid: 1e1c3e97d4acdf44bacfe129f4077dd0, type: 3}
@@ -254,7 +254,7 @@ MonoBehaviour:
     massKg: 0.009933735
     cuttable: 0
   - id: Electronics/V5 Brain Mount Short
-    displayName: V5 Brain Mount Short
+    displayName: Brain Mount (short)
     binId: brain
     model: {fileID: 919132149155446097, guid: 083f58f28edd84c48be9741ed698b1ad, type: 3}
     prefab: {fileID: 6083311127913508420, guid: f9e29908388a6e242ac43e55ba862ea8, type: 3}
@@ -264,7 +264,7 @@ MonoBehaviour:
     massKg: 0.0056863194
     cuttable: 0
   - id: Electronics/V5 Brain
-    displayName: V5 Brain
+    displayName: Brain
     binId: brain
     model: {fileID: 919132149155446097, guid: 7bbe93a11f203d64387ecdd01abdcfd2, type: 3}
     prefab: {fileID: 9145801526641342279, guid: 026685e743cfcca4da2f24dad49c7dc6, type: 3}
@@ -274,7 +274,7 @@ MonoBehaviour:
     massKg: 0.28612363
     cuttable: 0
   - id: Electronics/V5 Motor (5.5W)
-    displayName: V5 Motor (5.5W)
+    displayName: 5.5W Motor
     binId: motors
     model: {fileID: 919132149155446097, guid: b9fffe8b3918aff4caf47fa46a0b39b4, type: 3}
     prefab: {fileID: 7747881567833871645, guid: 714db0d6ed460b94ab7f639e2370811e, type: 3}
@@ -284,17 +284,17 @@ MonoBehaviour:
     massKg: 0.06063452
     cuttable: 0
   - id: Electronics/V5 Motor
-    displayName: V5 Motor
+    displayName: 11W Motor
     binId: motors
     model: {fileID: 919132149155446097, guid: 0165a9b23ac19804cb9ada05a6076d2e, type: 3}
     prefab: {fileID: 4667647282337154818, guid: c201e6af37d5cfe4d8b31e7d908a43ea, type: 3}
     thumbnail: {fileID: 21300000, guid: 8ea8063dbc9813244b36fcb44fc61e5e, type: 3}
     size: {x: 0.0573, y: 0.07235, z: 0.033}
     triangles: 225409
-    massKg: 0.155
+    massKg: 0.0889243
     cuttable: 0
   - id: Electronics/V5 Radio
-    displayName: V5 Radio
+    displayName: Radio
     binId: brain
     model: {fileID: 919132149155446097, guid: 0b2b7923a3d299448816b048551e8bc1, type: 3}
     prefab: {fileID: 5166296066814441085, guid: 2aebce95a5e5a184bba37f773e819a07, type: 3}
@@ -304,7 +304,7 @@ MonoBehaviour:
     massKg: 0.030752508
     cuttable: 0
   - id: Electronics/V5 Simple Battery
-    displayName: V5 Simple Battery
+    displayName: Battery (simple)
     binId: brain
     model: {fileID: 919132149155446097, guid: 4af77f7fcd9685145a55eadeedbe8581, type: 3}
     prefab: {fileID: 2268108877531587229, guid: cc7c83572fb444643a00fe32276fa296, type: 3}
@@ -314,7 +314,7 @@ MonoBehaviour:
     massKg: 0.2315167
     cuttable: 0
   - id: Electronics/V5 Simple Brain
-    displayName: V5 Simple Brain
+    displayName: Brain (simple)
     binId: brain
     model: {fileID: 919132149155446097, guid: 93a8c3503057fc249831d105575122f8, type: 3}
     prefab: {fileID: 74065725938055483, guid: 5e151d9c1b821b349b42ca4ccee4487a, type: 3}
@@ -324,7 +324,7 @@ MonoBehaviour:
     massKg: 0.47770992
     cuttable: 0
   - id: Electronics/V5 Simple Motor
-    displayName: V5 Simple Motor
+    displayName: 11W Motor (simple)
     binId: motors
     model: {fileID: 919132149155446097, guid: 79cf859295a45014fa3f91e6c873837d, type: 3}
     prefab: {fileID: 5506063292203072093, guid: b9de290cd572cef4089fc9503f11dfe6, type: 3}
@@ -334,7 +334,7 @@ MonoBehaviour:
     massKg: 0.12273396
     cuttable: 0
   - id: Electronics/V5 Simple Radio
-    displayName: V5 Simple Radio
+    displayName: Radio (simple)
     binId: brain
     model: {fileID: 919132149155446097, guid: 27cc343d6ccfc0c4387d01c53b148b9f, type: 3}
     prefab: {fileID: 8548179945555134854, guid: 779c4c6bf9d706d4e95bbe82f6fbff6a, type: 3}
@@ -354,7 +354,7 @@ MonoBehaviour:
     massKg: 6.599191
     cuttable: 0
   - id: Game Objects/High Stakes/Field Perimeter/Perimeter Parts/276-7596-003
-    displayName: 276-7596-003
+    displayName: Perimeter Parts 276-7596-003
     binId: game
     model: {fileID: 919132149155446097, guid: bf6a2023165623145adaaa852ff9e483, type: 3}
     prefab: {fileID: 3981529470618998427, guid: 7e939082ab7232844882cbccbcf49df2, type: 3}
@@ -364,7 +364,7 @@ MonoBehaviour:
     massKg: 0.0039034782
     cuttable: 0
   - id: Game Objects/High Stakes/Field Perimeter/Perimeter Parts/276-7596-004_Compressed
-    displayName: 276-7596-004_Compressed
+    displayName: Perimeter Parts 276-7596-004 Compressed
     binId: game
     model: {fileID: 919132149155446097, guid: e1b6660ddbb7ffd40881a11f5b646f23, type: 3}
     prefab: {fileID: 2890706951231674050, guid: 06affae55bf15184c976c5bde9dadc35, type: 3}
@@ -374,7 +374,7 @@ MonoBehaviour:
     massKg: 0.0005
     cuttable: 0
   - id: Game Objects/High Stakes/Field Perimeter/Perimeter Parts/276-7596-005
-    displayName: 276-7596-005
+    displayName: Perimeter Parts 276-7596-005
     binId: game
     model: {fileID: 919132149155446097, guid: c9d669f31d05f70409921cd9e62b8b89, type: 3}
     prefab: {fileID: 2409476075638658879, guid: 64e347f40bdc4ab489d7485ef20c321b, type: 3}
@@ -384,7 +384,7 @@ MonoBehaviour:
     massKg: 0.06338621
     cuttable: 0
   - id: Game Objects/High Stakes/Field Perimeter/Perimeter Parts/276-7596-006
-    displayName: 276-7596-006
+    displayName: Perimeter Parts 276-7596-006
     binId: game
     model: {fileID: 919132149155446097, guid: c118ae0f126151c429c6a0b0dc59b8d4, type: 3}
     prefab: {fileID: 7189995413638452054, guid: 8ec00e2470098a144ba0d1f5f81afa02, type: 3}
@@ -394,7 +394,7 @@ MonoBehaviour:
     massKg: 0.06658566
     cuttable: 0
   - id: Game Objects/High Stakes/Field Perimeter/Perimeter Parts/276-7596-008
-    displayName: 276-7596-008
+    displayName: Perimeter Parts 276-7596-008
     binId: game
     model: {fileID: 919132149155446097, guid: 66184f87c01e3f74eaa00925b75f40ab, type: 3}
     prefab: {fileID: 1899759698949814961, guid: 23d19ef5b4356514281d763de05b4117, type: 3}
@@ -404,7 +404,7 @@ MonoBehaviour:
     massKg: 0.06660713
     cuttable: 0
   - id: Game Objects/High Stakes/Field Perimeter/Perimeter Parts/276-7596-009
-    displayName: 276-7596-009
+    displayName: Perimeter Parts 276-7596-009
     binId: game
     model: {fileID: 919132149155446097, guid: e183662995c620643b55d459276f8e29, type: 3}
     prefab: {fileID: 2567102248804494573, guid: 2965f6b207a39f84c93f0d36ea9da834, type: 3}
@@ -414,7 +414,7 @@ MonoBehaviour:
     massKg: 0.07942418
     cuttable: 0
   - id: Game Objects/High Stakes/Field Perimeter/Perimeter Parts/276-7596-010
-    displayName: 276-7596-010
+    displayName: Perimeter Parts 276-7596-010
     binId: game
     model: {fileID: 919132149155446097, guid: e8f941df0c8d96e4da4a36b9dd70de9d, type: 3}
     prefab: {fileID: 6567287270871677439, guid: 28ec1985989074a429ada06f15c230e4, type: 3}
@@ -424,7 +424,7 @@ MonoBehaviour:
     massKg: 0.0196766
     cuttable: 0
   - id: Game Objects/High Stakes/Field Perimeter/Perimeter Parts/276-7596-014
-    displayName: 276-7596-014
+    displayName: Perimeter Parts 276-7596-014
     binId: game
     model: {fileID: 919132149155446097, guid: a91e9cbd392f4334f82c2b58e2c5c584, type: 3}
     prefab: {fileID: 4593186437528675180, guid: 43a0c3a9c8e6bde439071d053ff80bd2, type: 3}
@@ -434,7 +434,7 @@ MonoBehaviour:
     massKg: 0.62795424
     cuttable: 0
   - id: Game Objects/High Stakes/Field Perimeter/Perimeter Parts/276-7596-015
-    displayName: 276-7596-015
+    displayName: Perimeter Parts 276-7596-015
     binId: game
     model: {fileID: 919132149155446097, guid: bec25be30a953b74da7b16268362db13, type: 3}
     prefab: {fileID: 3100670436420684487, guid: 0e9aa4695059bcd439c86acd3261fcfe, type: 3}
@@ -444,7 +444,7 @@ MonoBehaviour:
     massKg: 0.6142284
     cuttable: 0
   - id: Game Objects/High Stakes/Field Perimeter/Perimeter Parts/276-7596-018
-    displayName: 276-7596-018
+    displayName: Perimeter Parts 276-7596-018
     binId: game
     model: {fileID: 919132149155446097, guid: 3cd0d0eb99bf58a43bb48c17460506d5, type: 3}
     prefab: {fileID: 630424712784689624, guid: 019d37af21f479f45ae626722adff84a, type: 3}
@@ -454,7 +454,7 @@ MonoBehaviour:
     massKg: 0.24173301
     cuttable: 0
   - id: Game Objects/High Stakes/Field Perimeter/Perimeter Parts/276-7596-316
-    displayName: 276-7596-316
+    displayName: Perimeter Parts 276-7596-316
     binId: game
     model: {fileID: 919132149155446097, guid: 967b5b584d9c5f74e8573fe15a68f47d, type: 3}
     prefab: {fileID: 2747602528119053312, guid: 07686d9deff8f084887d71aa9c1ae050, type: 3}
@@ -464,7 +464,7 @@ MonoBehaviour:
     massKg: 0.096161224
     cuttable: 0
   - id: Game Objects/High Stakes/Field Perimeter/Perimeter Parts/276-7596-317_Corner
-    displayName: 276-7596-317_Corner
+    displayName: Perimeter Parts 276-7596-317 Corner
     binId: game
     model: {fileID: 919132149155446097, guid: cd1b6eba7994d5b409bd9fe2be04a5e0, type: 3}
     prefab: {fileID: 3165309372753086877, guid: e1627cd7ad5452f449c170fc09233d61, type: 3}
@@ -474,7 +474,7 @@ MonoBehaviour:
     massKg: 0.09046288
     cuttable: 0
   - id: Game Objects/High Stakes/Field Perimeter/Perimeter Parts/276-7596-350_276-7596-301
-    displayName: 276-7596-350_276-7596-301
+    displayName: Perimeter Parts 276-7596-350 276-7596-301
     binId: game
     model: {fileID: 919132149155446097, guid: 27b448c3f8863834a8b413ef23315e04, type: 3}
     prefab: {fileID: 6190499614556275136, guid: ac791178c15d81c4ba3790ff93dfcccc, type: 3}
@@ -484,7 +484,7 @@ MonoBehaviour:
     massKg: 0.58605075
     cuttable: 0
   - id: Game Objects/High Stakes/Field Perimeter/Perimeter Parts/276-7596-350_276-7596-302
-    displayName: 276-7596-350_276-7596-302
+    displayName: Perimeter Parts 276-7596-350 276-7596-302
     binId: game
     model: {fileID: 919132149155446097, guid: 23e5203f68f4d97488901ee8ca0ea1cc, type: 3}
     prefab: {fileID: 3333606654915713482, guid: 70b0420e07df04a4ea37f3ce0bc8ba1f, type: 3}
@@ -494,7 +494,7 @@ MonoBehaviour:
     massKg: 0.58291084
     cuttable: 0
   - id: Game Objects/High Stakes/Field Perimeter/Perimeter Parts/276-7596-350_276-7596-303
-    displayName: 276-7596-350_276-7596-303
+    displayName: Perimeter Parts 276-7596-350 276-7596-303
     binId: game
     model: {fileID: 919132149155446097, guid: 49ef827b5084ccf43a21d522928aa3a8, type: 3}
     prefab: {fileID: 2951125772439631320, guid: 29e84e3a6ef841d48af70554637e17ce, type: 3}
@@ -504,7 +504,7 @@ MonoBehaviour:
     massKg: 0.5860509
     cuttable: 0
   - id: Game Objects/High Stakes/Field Perimeter/Perimeter Parts/276-7596-350_276-7596-304
-    displayName: 276-7596-350_276-7596-304
+    displayName: Perimeter Parts 276-7596-350 276-7596-304
     binId: game
     model: {fileID: 919132149155446097, guid: 8a7c85074c998a041a9fabfcdbcd1ea4, type: 3}
     prefab: {fileID: 1263817351130756980, guid: 325fa7669e47a0f44911dc210784393e, type: 3}
@@ -514,7 +514,7 @@ MonoBehaviour:
     massKg: 0.58605033
     cuttable: 0
   - id: Game Objects/High Stakes/Field Perimeter/Perimeter Parts/276-7596-350_276-7596-305
-    displayName: 276-7596-350_276-7596-305
+    displayName: Perimeter Parts 276-7596-350 276-7596-305
     binId: game
     model: {fileID: 919132149155446097, guid: 9c2d6a7b8358fc44fa0f6ecfed067c3a, type: 3}
     prefab: {fileID: 942059217869833282, guid: 1b0fe5817e9c4734a9c33eb89059f797, type: 3}
@@ -524,7 +524,7 @@ MonoBehaviour:
     massKg: 0.5829114
     cuttable: 0
   - id: Game Objects/High Stakes/Field Perimeter/Perimeter Parts/276-7596-350_276-7596-306
-    displayName: 276-7596-350_276-7596-306
+    displayName: Perimeter Parts 276-7596-350 276-7596-306
     binId: game
     model: {fileID: 919132149155446097, guid: 11c1b6d187ffc4947b6e8f0889822edd, type: 3}
     prefab: {fileID: 4058029965118253192, guid: 3e87ca86cca22cb45a43fff67945492f, type: 3}
@@ -534,7 +534,7 @@ MonoBehaviour:
     massKg: 0.58605075
     cuttable: 0
   - id: Game Objects/High Stakes/Field Perimeter/Perimeter Parts/276-7596-350_276-7596-307
-    displayName: 276-7596-350_276-7596-307
+    displayName: Perimeter Parts 276-7596-350 276-7596-307
     binId: game
     model: {fileID: 919132149155446097, guid: 557137c273723aa4a851fdf1a3daaf50, type: 3}
     prefab: {fileID: 3759257465628985097, guid: 4f0f788575a5b4049a5b8659e0edee9d, type: 3}
@@ -544,7 +544,7 @@ MonoBehaviour:
     massKg: 0.5859818
     cuttable: 0
   - id: Game Objects/High Stakes/Field Perimeter/Perimeter Parts/276-7596-350_276-7596-308
-    displayName: 276-7596-350_276-7596-308
+    displayName: Perimeter Parts 276-7596-350 276-7596-308
     binId: game
     model: {fileID: 919132149155446097, guid: f6bb6dafaa190a849b290bf1b3f67232, type: 3}
     prefab: {fileID: 2263595733505843616, guid: d87217afd71424c429fad38f0fb59703, type: 3}
@@ -554,7 +554,7 @@ MonoBehaviour:
     massKg: 0.5828357
     cuttable: 0
   - id: Game Objects/High Stakes/Field Perimeter/Perimeter Parts/276-7596-350_276-7596-309
-    displayName: 276-7596-350_276-7596-309
+    displayName: Perimeter Parts 276-7596-350 276-7596-309
     binId: game
     model: {fileID: 919132149155446097, guid: c716e20671d9fb547a885cf76dbbae33, type: 3}
     prefab: {fileID: 6029657758919855587, guid: 1eacb3c768c612b41ba4ec9bc9910f15, type: 3}
@@ -564,7 +564,7 @@ MonoBehaviour:
     massKg: 0.58605117
     cuttable: 0
   - id: Game Objects/High Stakes/Field Perimeter/Perimeter Parts/276-7596-350_276-7596-310
-    displayName: 276-7596-350_276-7596-310
+    displayName: Perimeter Parts 276-7596-350 276-7596-310
     binId: game
     model: {fileID: 919132149155446097, guid: 95d8fa52ecd38f1489ea5ebaa8572f0f, type: 3}
     prefab: {fileID: 6175851565125689888, guid: b859e0dda982e2945824286c2b37b690, type: 3}
@@ -574,7 +574,7 @@ MonoBehaviour:
     massKg: 0.58601385
     cuttable: 0
   - id: Game Objects/High Stakes/Field Perimeter/Perimeter Parts/276-7596-350_276-7596-311
-    displayName: 276-7596-350_276-7596-311
+    displayName: Perimeter Parts 276-7596-350 276-7596-311
     binId: game
     model: {fileID: 919132149155446097, guid: 162cd0451ae43754c9773c61e3ddca68, type: 3}
     prefab: {fileID: 7014428041847228289, guid: 4bd8eafc1cf14ec4db775020a9cb79d8, type: 3}
@@ -584,7 +584,7 @@ MonoBehaviour:
     massKg: 0.5829114
     cuttable: 0
   - id: Game Objects/High Stakes/Field Perimeter/Perimeter Parts/276-7596-350_276-7596-312
-    displayName: 276-7596-350_276-7596-312
+    displayName: Perimeter Parts 276-7596-350 276-7596-312
     binId: game
     model: {fileID: 919132149155446097, guid: 88df4fc238853db419bbfdd3dcec9e82, type: 3}
     prefab: {fileID: 1137076260742597497, guid: 0ce70bda215762442b999204ab191f3b, type: 3}
@@ -594,7 +594,7 @@ MonoBehaviour:
     massKg: 0.58605057
     cuttable: 0
   - id: Game Objects/High Stakes/Field Perimeter/Perimeter Parts/276-7596-351_276-7596-313
-    displayName: 276-7596-351_276-7596-313
+    displayName: Perimeter Parts 276-7596-351 276-7596-313
     binId: game
     model: {fileID: 919132149155446097, guid: 732e5010cc1920e4785915c5e264e294, type: 3}
     prefab: {fileID: 1222129492374505870, guid: ccaae7c6292b29848b47dbe9dccb2b2a, type: 3}
@@ -604,7 +604,7 @@ MonoBehaviour:
     massKg: 0.7307852
     cuttable: 0
   - id: Game Objects/High Stakes/Field Perimeter/Perimeter Parts/276-7596-351_276-7596-314
-    displayName: 276-7596-351_276-7596-314
+    displayName: Perimeter Parts 276-7596-351 276-7596-314
     binId: game
     model: {fileID: 919132149155446097, guid: 5623b7bc7507219458f7312aff9db517, type: 3}
     prefab: {fileID: 6388077484276018998, guid: d6133f2f524a25f458e58d82df3407f7, type: 3}
@@ -614,7 +614,7 @@ MonoBehaviour:
     massKg: 0.7251924
     cuttable: 0
   - id: Game Objects/High Stakes/Field Perimeter/Perimeter Parts/276-7596-351_276-7596-315
-    displayName: 276-7596-351_276-7596-315
+    displayName: Perimeter Parts 276-7596-351 276-7596-315
     binId: game
     model: {fileID: 919132149155446097, guid: 2d9df3b3dc983184b8d5c58e53fb03bc, type: 3}
     prefab: {fileID: 8589392789628431631, guid: 21661e7533202e349b4858a3626165fb, type: 3}
@@ -624,7 +624,7 @@ MonoBehaviour:
     massKg: 0.7307856
     cuttable: 0
   - id: Game Objects/High Stakes/Hardware/276-8868-206_95893A815
-    displayName: 276-8868-206_95893A815
+    displayName: Hardware 276-8868-206 95893A815
     binId: game
     model: {fileID: 919132149155446097, guid: 0a74b1e9d6a64b544b74db19a70f01d4, type: 3}
     prefab: {fileID: 4367292893536319805, guid: 7d822fb59a5b2cf4b83f44ecde7cc392, type: 3}
@@ -724,7 +724,7 @@ MonoBehaviour:
     massKg: 0.0028193211
     cuttable: 0
   - id: Game Objects/High Stakes/Ladder/276-8868-052
-    displayName: 276-8868-052
+    displayName: Ladder 276-8868-052
     binId: game
     model: {fileID: 919132149155446097, guid: b46c04c841aeb4542bb0594c815d0fc3, type: 3}
     prefab: {fileID: 6899223845309723360, guid: 8a1adc198d639a14b8449a856799c7ea, type: 3}
@@ -734,7 +734,7 @@ MonoBehaviour:
     massKg: 0.635751
     cuttable: 0
   - id: Game Objects/High Stakes/Ladder/276-8868-056
-    displayName: 276-8868-056
+    displayName: Ladder 276-8868-056
     binId: game
     model: {fileID: 919132149155446097, guid: c7c845e212ed134408db1cfcfd1dff5c, type: 3}
     prefab: {fileID: 9200458318147414307, guid: c56706cf5e5b7654eae116367b14ca68, type: 3}
@@ -744,7 +744,7 @@ MonoBehaviour:
     massKg: 0.033283487
     cuttable: 0
   - id: Game Objects/High Stakes/Ladder/276-8868-057
-    displayName: 276-8868-057
+    displayName: Ladder 276-8868-057
     binId: game
     model: {fileID: 919132149155446097, guid: 158b717517a77b545aa2c07295a4c8c6, type: 3}
     prefab: {fileID: 1701829757724137155, guid: 5bd7ada27bc841b47a1be66683907c23, type: 3}
@@ -774,7 +774,7 @@ MonoBehaviour:
     massKg: 0.20698056
     cuttable: 0
   - id: Game Objects/High Stakes/Ladder/Tier 1/276-8868-051_BLACK
-    displayName: 276-8868-051_BLACK
+    displayName: Ladder Tier 1 276-8868-051 BLACK
     binId: game
     model: {fileID: 919132149155446097, guid: 97fa4253368b5094ea308e1f2c8f74dc, type: 3}
     prefab: {fileID: 98882381362124092, guid: d4d6570dcbdf2034582b39bdc631962d, type: 3}
@@ -784,7 +784,7 @@ MonoBehaviour:
     massKg: 0.12574333
     cuttable: 0
   - id: Game Objects/High Stakes/Ladder/Tier 1/276-8868-053_BLACK
-    displayName: 276-8868-053_BLACK
+    displayName: Ladder Tier 1 276-8868-053 BLACK
     binId: game
     model: {fileID: 919132149155446097, guid: 34fc097fd27647443bd4033d5f5ead8c, type: 3}
     prefab: {fileID: 6124172985875710226, guid: a276f1c9544846149849861a2d7ba46e, type: 3}
@@ -794,7 +794,7 @@ MonoBehaviour:
     massKg: 0.4325092
     cuttable: 0
   - id: Game Objects/High Stakes/Ladder/Tier 2/276-8868-051_GREY
-    displayName: 276-8868-051_GREY
+    displayName: Ladder Tier 2 276-8868-051 GREY
     binId: game
     model: {fileID: 919132149155446097, guid: 7e493ea3f6185c6478d6a8b8249c7692, type: 3}
     prefab: {fileID: 2294066414091261574, guid: 0f3bfcf2d00ad754f83cc6557d80153b, type: 3}
@@ -804,7 +804,7 @@ MonoBehaviour:
     massKg: 0.12376411
     cuttable: 0
   - id: Game Objects/High Stakes/Ladder/Tier 2/276-8868-053_GREY
-    displayName: 276-8868-053_GREY
+    displayName: Ladder Tier 2 276-8868-053 GREY
     binId: game
     model: {fileID: 919132149155446097, guid: 93e3e9d47009b204ab8d815e3a2f532e, type: 3}
     prefab: {fileID: 8361368208408747604, guid: c947e6b3bcb7e3f40a53aae9be806938, type: 3}
@@ -814,7 +814,7 @@ MonoBehaviour:
     massKg: 0.4325092
     cuttable: 0
   - id: Game Objects/High Stakes/Ladder/Tier 3/276-8868-051
-    displayName: 276-8868-051
+    displayName: Ladder Tier 3 276-8868-051
     binId: game
     model: {fileID: 919132149155446097, guid: 6eef197a8ba1a594ea1d8e5ea3c4a722, type: 3}
     prefab: {fileID: 5920421159030789502, guid: 1fb3e7e571f0d714a913fca326a2a963, type: 3}
@@ -824,7 +824,7 @@ MonoBehaviour:
     massKg: 0.1257527
     cuttable: 0
   - id: Game Objects/High Stakes/Ladder/Tier 3/276-8868-053
-    displayName: 276-8868-053
+    displayName: Ladder Tier 3 276-8868-053
     binId: game
     model: {fileID: 919132149155446097, guid: 5ae44303e23af014baeae974115b0eec, type: 3}
     prefab: {fileID: 2141638838672882909, guid: 6edd3c93a4053454587e7711f6fd0629, type: 3}
@@ -944,7 +944,7 @@ MonoBehaviour:
     massKg: 0.14558508
     cuttable: 0
   - id: Game Objects/High Stakes/Stakes/High Stake/276-8868-058
-    displayName: 276-8868-058
+    displayName: High Stake 276-8868-058
     binId: game
     model: {fileID: 919132149155446097, guid: b2eb833493438ab40a0e4b9bde298359, type: 3}
     prefab: {fileID: 5443802136682478323, guid: fe0f758c989d7ab49b86b7ec72fc0aaa, type: 3}
@@ -954,7 +954,7 @@ MonoBehaviour:
     massKg: 0.023570111
     cuttable: 0
   - id: Game Objects/High Stakes/Stakes/Mobile Goal/276-8868-201
-    displayName: 276-8868-201
+    displayName: Mobile Goal 276-8868-201
     binId: game
     model: {fileID: 919132149155446097, guid: 01d5eebc94d3ae44a913b8aa769ba8dc, type: 3}
     prefab: {fileID: 7795851799449361951, guid: 2ff4aa80b8607af438f522066f42dd0f, type: 3}
@@ -964,7 +964,7 @@ MonoBehaviour:
     massKg: 0.30920428
     cuttable: 0
   - id: Game Objects/High Stakes/Stakes/Mobile Goal/276-8868-202
-    displayName: 276-8868-202
+    displayName: Mobile Goal 276-8868-202
     binId: game
     model: {fileID: 919132149155446097, guid: 9756bf59f378f8944a56f440b47bb9f2, type: 3}
     prefab: {fileID: 3187298655256950888, guid: 558faf654beff05479604854c8a73696, type: 3}
@@ -974,7 +974,7 @@ MonoBehaviour:
     massKg: 0.06768421
     cuttable: 0
   - id: Game Objects/High Stakes/Stakes/Mobile Goal/276-8868-203
-    displayName: 276-8868-203
+    displayName: Mobile Goal 276-8868-203
     binId: game
     model: {fileID: 919132149155446097, guid: 1eea936c907471d45b3ed6c59f2f5fe9, type: 3}
     prefab: {fileID: 8254480617151443976, guid: 9c2cee6a621425f4bb0d44b6ee242129, type: 3}
@@ -984,7 +984,7 @@ MonoBehaviour:
     massKg: 0.07602461
     cuttable: 0
   - id: Game Objects/High Stakes/Stakes/Mobile Goal/276-8868-204
-    displayName: 276-8868-204
+    displayName: Mobile Goal 276-8868-204
     binId: game
     model: {fileID: 919132149155446097, guid: bef9bb5cabaac3244b98c4a25d6c83d0, type: 3}
     prefab: {fileID: 8245902833262197948, guid: bc3823d3184cc0248a6d1e275dbfb7a0, type: 3}
@@ -1184,7 +1184,7 @@ MonoBehaviour:
     massKg: 0.014456531
     cuttable: 0
   - id: Motion/Advanced Gears/Drop off Cam
-    displayName: Drop off Cam
+    displayName: Drop Off Cam
     binId: advanced
     model: {fileID: 919132149155446097, guid: 43a577b27c928c14b80d986805516d55, type: 3}
     prefab: {fileID: 6628412426431072858, guid: 4cab74255f3ff844b855cd8b87d76796, type: 3}
@@ -1204,7 +1204,7 @@ MonoBehaviour:
     massKg: 0.003187182
     cuttable: 0
   - id: Motion/Advanced Gears/Lead Screw Mounting Bracket
-    displayName: Lead Screw Mounting Bracket
+    displayName: Lead Screw Bracket
     binId: advanced
     model: {fileID: 919132149155446097, guid: e41b01dd59a282d458f60f1ef2b29666, type: 3}
     prefab: {fileID: 7742267256454839722, guid: 8fa31722b8a4b5b4e8d56e9eea1f3601, type: 3}
@@ -1404,7 +1404,7 @@ MonoBehaviour:
     massKg: 0.0014568275
     cuttable: 0
   - id: Motion/Gears/LS 12T Gear Steel
-    displayName: LS 12T Gear Steel
+    displayName: Normal 12T Steel Gear
     binId: gears
     model: {fileID: 919132149155446097, guid: 970400c5324b0a14d84c096713ab7a71, type: 3}
     prefab: {fileID: 3008510885722981609, guid: 088006727cb5cc741962c28016d64af9, type: 3}
@@ -1414,7 +1414,7 @@ MonoBehaviour:
     massKg: 0.006174201
     cuttable: 0
   - id: Motion/Gears/LS 12T Gear
-    displayName: LS 12T Gear
+    displayName: Normal 12T Gear
     binId: gears
     model: {fileID: 919132149155446097, guid: 6514dd000432b45458a7a73d8b21f958, type: 3}
     prefab: {fileID: 3695717760621192156, guid: 510f432e59e89514bbb6b0cced4b6a89, type: 3}
@@ -1424,7 +1424,7 @@ MonoBehaviour:
     massKg: 0.00091910746
     cuttable: 0
   - id: Motion/Gears/LS 36T Gear
-    displayName: LS 36T Gear
+    displayName: Normal 36T Gear
     binId: gears
     model: {fileID: 919132149155446097, guid: 0f4d5b72ea374994f8ee7089ea3db947, type: 3}
     prefab: {fileID: 4068813047599045384, guid: dd4690cc65d185a4fa97f4c20e359b79, type: 3}
@@ -1434,7 +1434,7 @@ MonoBehaviour:
     massKg: 0.0045167836
     cuttable: 0
   - id: Motion/Gears/LS 60T Gear
-    displayName: LS 60T Gear
+    displayName: Normal 60T Gear
     binId: gears
     model: {fileID: 919132149155446097, guid: 83fc4c46e49f15d4ca8eba8c46920ad0, type: 3}
     prefab: {fileID: 1468647124281992747, guid: b4fc3c6410a20054b827c3e6775e67bd, type: 3}
@@ -1444,7 +1444,7 @@ MonoBehaviour:
     massKg: 0.009763711
     cuttable: 0
   - id: Motion/Gears/LS 84T Gear
-    displayName: LS 84T Gear
+    displayName: Normal 84T Gear
     binId: gears
     model: {fileID: 919132149155446097, guid: a0ed547267278794e947924bfba5a443, type: 3}
     prefab: {fileID: 1209405761850150398, guid: c9d7de25d4f7af649ac1ae1509de3ace, type: 3}
@@ -1454,7 +1454,7 @@ MonoBehaviour:
     massKg: 0.022560583
     cuttable: 0
   - id: Motion/Gears/Reference Files/HS 12T Gear, No Insert
-    displayName: HS 12T Gear, No Insert
+    displayName: HS 12T Gear
     binId: gears
     model: {fileID: 919132149155446097, guid: 661f899cee95bf04899db48f87815a70, type: 3}
     prefab: {fileID: 3843518021491223662, guid: 418ff65e965a0384e86b86e24e2ed999, type: 3}
@@ -1464,7 +1464,7 @@ MonoBehaviour:
     massKg: 0.008141071
     cuttable: 0
   - id: Motion/Gears/Reference Files/HS 24T Gear, No Insert
-    displayName: HS 24T Gear, No Insert
+    displayName: HS 24T Gear
     binId: gears
     model: {fileID: 919132149155446097, guid: f4ea9030f92ffe646830da8ebd122614, type: 3}
     prefab: {fileID: 256141985632300604, guid: 66c9f47369b170540a265e67dd8600b9, type: 3}
@@ -1474,7 +1474,7 @@ MonoBehaviour:
     massKg: 0.045768954
     cuttable: 0
   - id: Motion/Gears/Reference Files/HS 36T Gear, No Insert
-    displayName: HS 36T Gear, No Insert
+    displayName: HS 36T Gear
     binId: gears
     model: {fileID: 919132149155446097, guid: a658ac3b7ff61054ea667a2a19f35672, type: 3}
     prefab: {fileID: 7306465941774947281, guid: 2497bc29fcfeeed42a10e3e0f1110829, type: 3}
@@ -1484,7 +1484,7 @@ MonoBehaviour:
     massKg: 0.010447368
     cuttable: 0
   - id: Motion/Gears/Reference Files/HS 48T Gear, No Insert
-    displayName: HS 48T Gear, No Insert
+    displayName: HS 48T Gear
     binId: gears
     model: {fileID: 919132149155446097, guid: dbb6f082258bcf345bd8b3c9a8a8fc9c, type: 3}
     prefab: {fileID: 1571758491773946469, guid: faf22f86a6760f944bd824225e388b1d, type: 3}
@@ -1494,7 +1494,7 @@ MonoBehaviour:
     massKg: 0.015409004
     cuttable: 0
   - id: Motion/Gears/Reference Files/HS 60T Gear, No Insert
-    displayName: HS 60T Gear, No Insert
+    displayName: HS 60T Gear
     binId: gears
     model: {fileID: 919132149155446097, guid: ff36ecc5eb103da4cbca5f263e8a9cdc, type: 3}
     prefab: {fileID: 7200961802748706497, guid: 1ded50e1bf8015e498327ca2c907e9a8, type: 3}
@@ -1504,7 +1504,7 @@ MonoBehaviour:
     massKg: 0.021424923
     cuttable: 0
   - id: Motion/Gears/Reference Files/HS 72T Gear, No Insert
-    displayName: HS 72T Gear, No Insert
+    displayName: HS 72T Gear
     binId: gears
     model: {fileID: 919132149155446097, guid: 5d05e97875e4092419211348ea374c45, type: 3}
     prefab: {fileID: 4195872679014529926, guid: d0051974dd7e0a34db782e6b4eff6c79, type: 3}
@@ -1514,7 +1514,7 @@ MonoBehaviour:
     massKg: 0.029643897
     cuttable: 0
   - id: Motion/Gears/Reference Files/HS 84T Gear, No Insert
-    displayName: HS 84T Gear, No Insert
+    displayName: HS 84T Gear
     binId: gears
     model: {fileID: 919132149155446097, guid: 857341ab69efb0f4a989726d57ae8a49, type: 3}
     prefab: {fileID: 5771648970482646783, guid: 3b592b4b826660941ad1cf972df2cc2b, type: 3}
@@ -1544,7 +1544,7 @@ MonoBehaviour:
     massKg: 0.002821423
     cuttable: 0
   - id: Motion/Hinges/Reference Parts/2 Holes/Bottom 2
-    displayName: Bottom 2
+    displayName: 2-Hole Hinge (bottom)
     binId: hinges
     model: {fileID: 919132149155446097, guid: 99520c18796267247ac5067f948bf5f7, type: 3}
     prefab: {fileID: 6474616161458972763, guid: d8a5bdf4228adf84fbe154463966daba, type: 3}
@@ -1554,7 +1554,7 @@ MonoBehaviour:
     massKg: 0.0062973816
     cuttable: 0
   - id: Motion/Hinges/Reference Parts/2 Holes/Pin 2
-    displayName: Pin 2
+    displayName: 2-Hole Hinge Pin
     binId: hinges
     model: {fileID: 919132149155446097, guid: 870c410cf10a62c45b26fc63a760db1b, type: 3}
     prefab: {fileID: 4237580132664411015, guid: a541dea61e11f7e46a95d7bdece18ff6, type: 3}
@@ -1564,7 +1564,7 @@ MonoBehaviour:
     massKg: 0.001573271
     cuttable: 0
   - id: Motion/Hinges/Reference Parts/2 Holes/Top 2
-    displayName: Top 2
+    displayName: 2-Hole Hinge (top)
     binId: hinges
     model: {fileID: 919132149155446097, guid: 763fd64f0d9cd58488ef21470d619810, type: 3}
     prefab: {fileID: 5881589290410841617, guid: 6e3c8e595a2d39048a683ef0f4fa37b2, type: 3}
@@ -1574,7 +1574,7 @@ MonoBehaviour:
     massKg: 0.004797866
     cuttable: 0
   - id: Motion/Hinges/Reference Parts/3 Holes/Bottom 3
-    displayName: Bottom 3
+    displayName: 3-Hole Hinge (bottom)
     binId: hinges
     model: {fileID: 919132149155446097, guid: ba5e85e7b02621546b06c0f8f323b354, type: 3}
     prefab: {fileID: 5354731070890103798, guid: 8a97dfcda9bb4bd4abc9affd29aa198b, type: 3}
@@ -1584,7 +1584,7 @@ MonoBehaviour:
     massKg: 0.007879565
     cuttable: 0
   - id: Motion/Hinges/Reference Parts/3 Holes/Pin 3
-    displayName: Pin 3
+    displayName: 3-Hole Hinge Pin
     binId: hinges
     model: {fileID: 919132149155446097, guid: 70e00665eaaed764e96fa78b6c2c1b45, type: 3}
     prefab: {fileID: 1460142691606729208, guid: 999a69e6f98536d44991a8689877d75a, type: 3}
@@ -1594,7 +1594,7 @@ MonoBehaviour:
     massKg: 0.0023559479
     cuttable: 0
   - id: Motion/Hinges/Reference Parts/3 Holes/Top 3
-    displayName: Top 3
+    displayName: 3-Hole Hinge (top)
     binId: hinges
     model: {fileID: 919132149155446097, guid: 4050dc95e185edf4086c64afe0232471, type: 3}
     prefab: {fileID: 2563054721353020421, guid: b9e2ce1c77d257a478d0b6682842db65, type: 3}
@@ -1604,7 +1604,7 @@ MonoBehaviour:
     massKg: 0.008824878
     cuttable: 0
   - id: Motion/Hinges/Reference Parts/4 Holes/Bottom 4
-    displayName: Bottom 4
+    displayName: 4-Hole Hinge (bottom)
     binId: hinges
     model: {fileID: 919132149155446097, guid: 44a3650f7967feb4bb63aab769d4a695, type: 3}
     prefab: {fileID: 4611737393256684201, guid: 36cf1174ab849144abf50c47373f1383, type: 3}
@@ -1614,7 +1614,7 @@ MonoBehaviour:
     massKg: 0.011591284
     cuttable: 0
   - id: Motion/Hinges/Reference Parts/4 Holes/Pin 4
-    displayName: Pin 4
+    displayName: 4-Hole Hinge Pin
     binId: hinges
     model: {fileID: 919132149155446097, guid: b2760b8482157804587593eae97fe9dc, type: 3}
     prefab: {fileID: 5101258291488572885, guid: 2d7fd0e7225ed7247823044273880d90, type: 3}
@@ -1624,7 +1624,7 @@ MonoBehaviour:
     massKg: 0.0031370206
     cuttable: 0
   - id: Motion/Hinges/Reference Parts/4 Holes/Top 4
-    displayName: Top 4
+    displayName: 4-Hole Hinge (top)
     binId: hinges
     model: {fileID: 919132149155446097, guid: 1d8cba3377cf3b744baaae6816a90e22, type: 3}
     prefab: {fileID: 301183122123746708, guid: 04df4f8e55a76014dac28f7dfc583166, type: 3}
@@ -1634,7 +1634,7 @@ MonoBehaviour:
     massKg: 0.010683429
     cuttable: 0
   - id: Motion/Hinges/Reference Parts/5 Holes/Bottom 5
-    displayName: Bottom 5
+    displayName: 5-Hole Hinge (bottom)
     binId: hinges
     model: {fileID: 919132149155446097, guid: 8c867e9111bd9f34898608760caec5d6, type: 3}
     prefab: {fileID: 2089396601683330341, guid: 7d16c7d70e4b375498db2716fb29ab67, type: 3}
@@ -1644,7 +1644,7 @@ MonoBehaviour:
     massKg: 0.014175836
     cuttable: 0
   - id: Motion/Hinges/Reference Parts/5 Holes/Pin 5
-    displayName: Pin 5
+    displayName: 5-Hole Hinge Pin
     binId: hinges
     model: {fileID: 919132149155446097, guid: 4e959d4574cc05c4b8fb37ac2a7d71a7, type: 3}
     prefab: {fileID: 9114957540434884453, guid: 93b7f5394a2a09043bdf78fc64da9407, type: 3}
@@ -1654,7 +1654,7 @@ MonoBehaviour:
     massKg: 0.003913546
     cuttable: 0
   - id: Motion/Hinges/Reference Parts/5 Holes/Top 5
-    displayName: Top 5
+    displayName: 5-Hole Hinge (top)
     binId: hinges
     model: {fileID: 919132149155446097, guid: 31f4b56f613a86f4ea5a45c7bcf788b9, type: 3}
     prefab: {fileID: 6793304884801407882, guid: 0fd1c69b3d1dc5b418631e668dec49e1, type: 3}
@@ -1774,7 +1774,7 @@ MonoBehaviour:
     massKg: 0.039286677
     cuttable: 0
   - id: Motion/Pneumatics/Legacy - SMC Pneumatics/Reservoir
-    displayName: Reservoir
+    displayName: Legacy Pneumatic Air Reservoir
     binId: pneumatics
     model: {fileID: 919132149155446097, guid: e40af9f21bb8b6143b66e5540d5adfec, type: 3}
     prefab: {fileID: 3215095360775557928, guid: 4aa0587397bd66a43b895f586b181acd, type: 3}
@@ -1824,7 +1824,7 @@ MonoBehaviour:
     massKg: 0.0025169011
     cuttable: 0
   - id: Motion/Pneumatics/New - V5 Pneumatics/Air Reservoir
-    displayName: Air Reservoir
+    displayName: V5 Pneumatic Air Reservoir
     binId: pneumatics
     model: {fileID: 919132149155446097, guid: 1927cc6f283912f42b05df19bca42ab2, type: 3}
     prefab: {fileID: 6786024662775799419, guid: 1dac2b0a8cb963344a412c562d75c510, type: 3}
@@ -1905,7 +1905,7 @@ MonoBehaviour:
     cuttable: 0
   - id: Motion/Pneumatics/Reference Parts/Pistons/25mm Stroke Pneumatic Cylinder
       Body
-    displayName: 25mm Stroke Pneumatic Cylinder Body
+    displayName: 25mm Piston (body)
     binId: pneumatics
     model: {fileID: 919132149155446097, guid: 32289d4abee2e5f4fac808f52aa46515, type: 3}
     prefab: {fileID: 953726738606563668, guid: 174647b1ac4fb6c40b636a44656194a2, type: 3}
@@ -1916,7 +1916,7 @@ MonoBehaviour:
     cuttable: 0
   - id: Motion/Pneumatics/Reference Parts/Pistons/25mm Stroke Pneumatic Cylinder
       Rod
-    displayName: 25mm Stroke Pneumatic Cylinder Rod
+    displayName: 25mm Piston (rod)
     binId: pneumatics
     model: {fileID: 919132149155446097, guid: 46687e8704b15f44bba35de920bd501c, type: 3}
     prefab: {fileID: 309572273312521546, guid: 3ed061f9ac315c24fa17d0afb835ac2f, type: 3}
@@ -1927,7 +1927,7 @@ MonoBehaviour:
     cuttable: 0
   - id: Motion/Pneumatics/Reference Parts/Pistons/50mm Stroke Pneumatic Cylinder
       Body
-    displayName: 50mm Stroke Pneumatic Cylinder Body
+    displayName: 50mm Piston (body)
     binId: pneumatics
     model: {fileID: 919132149155446097, guid: d11504ed974a6614d8c461ff7d91cd95, type: 3}
     prefab: {fileID: 6285776479272963814, guid: 1ffca20afc8ebec47af4daebc212a863, type: 3}
@@ -1938,7 +1938,7 @@ MonoBehaviour:
     cuttable: 0
   - id: Motion/Pneumatics/Reference Parts/Pistons/50mm Stroke Pneumatic Cylinder
       Rod
-    displayName: 50mm Stroke Pneumatic Cylinder Rod
+    displayName: 50mm Piston (rod)
     binId: pneumatics
     model: {fileID: 919132149155446097, guid: 67f7c9abc8680ce42af5743103f7bb3b, type: 3}
     prefab: {fileID: 6699208325789645876, guid: 82872ae6cd3309a47ab6ab0b9d6dcc3d, type: 3}
@@ -1948,7 +1948,7 @@ MonoBehaviour:
     massKg: 0.0037370631
     cuttable: 0
   - id: Motion/Pneumatics/Reference Parts/Pistons/75mm Piston Body
-    displayName: 75mm Piston Body
+    displayName: 75mm Piston (body)
     binId: pneumatics
     model: {fileID: 919132149155446097, guid: 33fd88406bc14644b832ba21e53d23a6, type: 3}
     prefab: {fileID: 5825369686474444777, guid: e5f57cdc1667e5b44a98e6adf0dc3229, type: 3}
@@ -1958,7 +1958,7 @@ MonoBehaviour:
     massKg: 0.036409635
     cuttable: 0
   - id: Motion/Pneumatics/Reference Parts/Pistons/75mm Piston Rod
-    displayName: 75mm Piston Rod
+    displayName: 75mm Piston (rod)
     binId: pneumatics
     model: {fileID: 919132149155446097, guid: 2c0c8c8b81c654244a4c21fc5a5e8848, type: 3}
     prefab: {fileID: 1506747856663689531, guid: df75633d659f87241bda051e1b2de467, type: 3}
@@ -1968,7 +1968,7 @@ MonoBehaviour:
     massKg: 0.0045756353
     cuttable: 0
   - id: Motion/Pneumatics/Reference Parts/Pistons/Double Acting Piston Body
-    displayName: Double Acting Piston Body
+    displayName: Legacy Double Acting Piston (body)
     binId: pneumatics
     model: {fileID: 919132149155446097, guid: a90afa82bd728c047a999df81bde9d8f, type: 3}
     prefab: {fileID: 1074311559206770868, guid: 82c8c4734ad547f45aeca43a8323bd85, type: 3}
@@ -1978,7 +1978,7 @@ MonoBehaviour:
     massKg: 0.020709436
     cuttable: 0
   - id: Motion/Pneumatics/Reference Parts/Pistons/Double Acting Piston Rod
-    displayName: Double Acting Piston Rod
+    displayName: Legacy Double Acting Piston (rod)
     binId: pneumatics
     model: {fileID: 919132149155446097, guid: 92ca8fba40bf1a74baca3da2b1f1c6f7, type: 3}
     prefab: {fileID: 7176799192875631133, guid: b7604ee53d6d4684f9d17c8e235860fe, type: 3}
@@ -1988,7 +1988,7 @@ MonoBehaviour:
     massKg: 0.012504336
     cuttable: 0
   - id: Motion/Pneumatics/Reference Parts/Pistons/Single Acting Piston Body
-    displayName: Single Acting Piston Body
+    displayName: Legacy Single Acting Piston (body)
     binId: pneumatics
     model: {fileID: 919132149155446097, guid: ec512151a658fa34588562446821e70b, type: 3}
     prefab: {fileID: 5093869202623276734, guid: 0bcd054b0a48943469e02d7dc03841b3, type: 3}
@@ -1998,7 +1998,7 @@ MonoBehaviour:
     massKg: 0.028413774
     cuttable: 0
   - id: Motion/Pneumatics/Reference Parts/Pistons/Single Acting Piston Rod
-    displayName: Single Acting Piston Rod
+    displayName: Legacy Single Acting Piston (rod)
     binId: pneumatics
     model: {fileID: 919132149155446097, guid: 078a5e61818ba8e4396526ad3b256ee7, type: 3}
     prefab: {fileID: 8791953644066185832, guid: 0e5bd034ace3a79449e1e9f8ea0f80ec, type: 3}
@@ -2068,7 +2068,7 @@ MonoBehaviour:
     massKg: 0.0005
     cuttable: 0
   - id: Motion/Reference Files/Shaft Collar Metal
-    displayName: Shaft Collar Metal
+    displayName: Normal Clamping Shaft Collar
     binId: bearings
     model: {fileID: 919132149155446097, guid: b55760fb274f2ba4d9b6e3e9240111cd, type: 3}
     prefab: {fileID: 1550282131669551421, guid: 09f75bce9a48b2b47a3ad47333a05454, type: 3}
@@ -2098,7 +2098,7 @@ MonoBehaviour:
     massKg: 0.0021771367
     cuttable: 0
   - id: Motion/Shaft HS/HS Bushing 0.1250
-    displayName: HS Bushing 0.1250
+    displayName: 1/8" HS Bushing
     binId: spacers
     model: {fileID: 919132149155446097, guid: a6e3ef34f853f5c42b3702d68cd31027, type: 3}
     prefab: {fileID: 7806534430355283142, guid: e747920b64208104f8bd6a671cbdd772, type: 3}
@@ -2108,7 +2108,7 @@ MonoBehaviour:
     massKg: 0.0005
     cuttable: 0
   - id: Motion/Shaft HS/HS Bushing 0.3125
-    displayName: HS Bushing 0.3125
+    displayName: 5/16" HS Bushing
     binId: spacers
     model: {fileID: 919132149155446097, guid: a4079da3018d49d478c4dfa72bdd95ee, type: 3}
     prefab: {fileID: 3938747177365483439, guid: 45885329c80d8144691e1df1e8abcf34, type: 3}
@@ -2118,7 +2118,7 @@ MonoBehaviour:
     massKg: 0.00051059097
     cuttable: 0
   - id: Motion/Shaft HS/HS Lock Bar - 3 hole
-    displayName: HS Lock Bar - 3 hole
+    displayName: HS Lock Bar (3 hole)
     binId: bearings
     model: {fileID: 919132149155446097, guid: 6628693515459ec4e8bfc2ebd76df56a, type: 3}
     prefab: {fileID: 7629058382573382726, guid: 1e0047fb190ff3b4581734a86d642208, type: 3}
@@ -2128,7 +2128,7 @@ MonoBehaviour:
     massKg: 0.0042054798
     cuttable: 0
   - id: Motion/Shaft HS/HS Lock Bar - 5 hole
-    displayName: HS Lock Bar - 5 hole
+    displayName: HS Lock Bar (5 hole)
     binId: bearings
     model: {fileID: 919132149155446097, guid: f2458825a2d31d44ab102881ab1ff837, type: 3}
     prefab: {fileID: 4566541746304442680, guid: 60a2fbc6f4a492340b866673748af0b1, type: 3}
@@ -2138,7 +2138,7 @@ MonoBehaviour:
     massKg: 0.007151928
     cuttable: 0
   - id: Motion/Shaft HS/HS Lock Bar - 7 hole
-    displayName: HS Lock Bar - 7 hole
+    displayName: HS Lock Bar (7 hole)
     binId: bearings
     model: {fileID: 919132149155446097, guid: 43238e57e68469f40aa29b6d43cb3fa8, type: 3}
     prefab: {fileID: 3106411779006359579, guid: d3552f2e8512eb24ba46043ae3af4ac8, type: 3}
@@ -2148,7 +2148,7 @@ MonoBehaviour:
     massKg: 0.010098111
     cuttable: 0
   - id: Motion/Shaft HS/HS Pillow Bearing Block
-    displayName: HS Pillow Bearing Block
+    displayName: HS Block Bearing
     binId: bearings
     model: {fileID: 919132149155446097, guid: d19d4cac8c5936745af98f8d137350e5, type: 3}
     prefab: {fileID: 3754750162098736713, guid: 4951d81d630fc1b4897dd3ac4e6a03c8, type: 3}
@@ -2158,7 +2158,7 @@ MonoBehaviour:
     massKg: 0.0026304815
     cuttable: 0
   - id: Motion/Shaft HS/HS Shaft Collar
-    displayName: HS Shaft Collar
+    displayName: HS Clamping Shaft Collar
     binId: bearings
     model: {fileID: 919132149155446097, guid: 5d2000d095e6b2f4db282ddb3185b9a4, type: 3}
     prefab: {fileID: 4187624553840138005, guid: a78a87447087d4d44b8a830677a34fc1, type: 3}
@@ -2178,7 +2178,7 @@ MonoBehaviour:
     massKg: 0.0005
     cuttable: 0
   - id: Motion/Shaft HS/HS Spacer/HSpacer .0625
-    displayName: HSpacer .0625
+    displayName: 1/16" HS Spacer
     binId: spacers
     model: {fileID: 919132149155446097, guid: 136e1bbad0b65cd43a0ab8eaab6344e5, type: 3}
     prefab: {fileID: 7633593371905878519, guid: 02c19c43bfc5b124ea7fc0f696c99097, type: 3}
@@ -2188,7 +2188,7 @@ MonoBehaviour:
     massKg: 0.0005
     cuttable: 0
   - id: Motion/Shaft HS/HS Spacer/HSpacer .1250
-    displayName: HSpacer .1250
+    displayName: 1/8" HS Spacer
     binId: spacers
     model: {fileID: 919132149155446097, guid: 884696b0ba9c0064c8297ce8ece7cf1d, type: 3}
     prefab: {fileID: 7075984664367523027, guid: e9aa57e51e631c64a800f8e32ca43a08, type: 3}
@@ -2198,7 +2198,7 @@ MonoBehaviour:
     massKg: 0.0005
     cuttable: 0
   - id: Motion/Shaft HS/HS Spacer/HSpacer .2500
-    displayName: HSpacer .2500
+    displayName: 1/4" HS Spacer
     binId: spacers
     model: {fileID: 919132149155446097, guid: 8a2ae8cca1f59a04790da240d0dbed37, type: 3}
     prefab: {fileID: 9127128173708328300, guid: 041158e6decdf274890e9658ceebf487, type: 3}
@@ -2208,7 +2208,7 @@ MonoBehaviour:
     massKg: 0.0005
     cuttable: 0
   - id: Motion/Shaft HS/HS Spacer/HSpacer .5000
-    displayName: HSpacer .5000
+    displayName: 1/2" HS Spacer
     binId: spacers
     model: {fileID: 919132149155446097, guid: b466f5b0d7e239d4c8de231be94c9665, type: 3}
     prefab: {fileID: 2163565337398650158, guid: 9fb873ab53dc16e4cac3878c8a8435d5, type: 3}
@@ -2218,7 +2218,7 @@ MonoBehaviour:
     massKg: 0.0005698569
     cuttable: 0
   - id: Motion/Shaft HS/Low Profile HS Shaft Collar
-    displayName: Low Profile HS Shaft Collar
+    displayName: Low Profile HS Clamping Shaft Collar
     binId: bearings
     model: {fileID: 919132149155446097, guid: b82f27bcf840df34d8887d25dc8a9332, type: 3}
     prefab: {fileID: 630320583491059691, guid: f370ff1d68e86874c8bc131b8259283f, type: 3}
@@ -2228,7 +2228,7 @@ MonoBehaviour:
     massKg: 0.0017155188
     cuttable: 0
   - id: Motion/Shaft HS/Shaft HS/Shaft HS 24.0 in
-    displayName: Shaft HS 24.0 in
+    displayName: 24" HS Shaft
     binId: shafts
     model: {fileID: 919132149155446097, guid: b71d6ba235e359c4d90928ed6104d4d8, type: 3}
     prefab: {fileID: 1136126025842792785, guid: 3f05aedffd06d174e865d5da2c4070e6, type: 3}
@@ -2258,7 +2258,7 @@ MonoBehaviour:
     massKg: 0.0014269982
     cuttable: 0
   - id: Motion/Shaft LS/Bearing Flat Low Profile
-    displayName: Bearing Flat Low Profile
+    displayName: Low Profile Bearing Flat
     binId: bearings
     model: {fileID: 919132149155446097, guid: c4d0e2400a964274d8da81c3b48c1fe9, type: 3}
     prefab: {fileID: 6985700256270515751, guid: 79f48497893edc74da59b88790fb7529, type: 3}
@@ -2278,7 +2278,7 @@ MonoBehaviour:
     massKg: 0.0017227833
     cuttable: 0
   - id: Motion/Shaft LS/LS Pillow Bearing Block
-    displayName: LS Pillow Bearing Block
+    displayName: Block Bearing
     binId: bearings
     model: {fileID: 919132149155446097, guid: fedda7d72bc9b864d8875ca63de14952, type: 3}
     prefab: {fileID: 2890384476283037347, guid: 26418bc52e9e30543bbbf6cd17aa01b6, type: 3}
@@ -2288,7 +2288,7 @@ MonoBehaviour:
     massKg: 0.0015979863
     cuttable: 0
   - id: Motion/Shaft LS/Lock Bar Metal
-    displayName: Lock Bar Metal
+    displayName: Metal Lock Bar
     binId: bearings
     model: {fileID: 919132149155446097, guid: b85f6d7bdd986d249bae1f72caa082a7, type: 3}
     prefab: {fileID: 554674808571501352, guid: 809f971ccab122f4082981841ec95a0d, type: 3}
@@ -2298,7 +2298,7 @@ MonoBehaviour:
     massKg: 0.00050537754
     cuttable: 0
   - id: Motion/Shaft LS/Lock Bar Plastic
-    displayName: Lock Bar Plastic
+    displayName: Plastic Lock Bar
     binId: bearings
     model: {fileID: 919132149155446097, guid: 4d653d1adcc61b64a88ff62aa1f90870, type: 3}
     prefab: {fileID: 5608966457378081642, guid: a0821b71fbb4fb64abe1e09592a9a32a, type: 3}
@@ -2308,7 +2308,7 @@ MonoBehaviour:
     massKg: 0.0009753237
     cuttable: 0
   - id: Motion/Shaft LS/Shaft Collar Metal/Shaft Collar Hex Smooth
-    displayName: Shaft Collar Hex Smooth
+    displayName: Shaft Collar (hex screw)
     binId: bearings
     model: {fileID: 919132149155446097, guid: feee09de40445bf4d9a4c5086772811c, type: 3}
     prefab: {fileID: 4600276394819199257, guid: f42ab4bfa383dcf47a69d54eae0bfcb9, type: 3}
@@ -2318,7 +2318,7 @@ MonoBehaviour:
     massKg: 0.004904374
     cuttable: 0
   - id: Motion/Shaft LS/Shaft Collar Metal/Shaft Collar Hex Threaded
-    displayName: Shaft Collar Hex Threaded
+    displayName: Shaft Collar (hex screw, threads shown)
     binId: bearings
     model: {fileID: 919132149155446097, guid: dccb039e8ab6bdd4a8d9a8f90003cf2b, type: 3}
     prefab: {fileID: 5160293495720976137, guid: f21c18702bd8a904e9638cf734534ae6, type: 3}
@@ -2328,7 +2328,7 @@ MonoBehaviour:
     massKg: 0.0047993334
     cuttable: 0
   - id: Motion/Shaft LS/Shaft Collar Metal/Shaft Collar No Screw
-    displayName: Shaft Collar No Screw
+    displayName: Shaft Collar (no screw)
     binId: bearings
     model: {fileID: 919132149155446097, guid: 7eec481197de5db4ebb2dbf9aef44d9e, type: 3}
     prefab: {fileID: 7642851359959648242, guid: 8ebd1ef85de8cbf45a6b450dd2cd9c29, type: 3}
@@ -2338,7 +2338,7 @@ MonoBehaviour:
     massKg: 0.0037205573
     cuttable: 0
   - id: Motion/Shaft LS/Shaft Collar Metal/Shaft Collar Set Screw
-    displayName: Shaft Collar Set Screw
+    displayName: Shaft Collar (set screw)
     binId: bearings
     model: {fileID: 919132149155446097, guid: e4414306559cf204d98ab9f6cc2ef0cb, type: 3}
     prefab: {fileID: 4342817614912214037, guid: 1b00a3a16df77374b96255ccbc28ef56, type: 3}
@@ -2348,7 +2348,7 @@ MonoBehaviour:
     massKg: 0.0039869184
     cuttable: 0
   - id: Motion/Shaft LS/Shaft Collar Metal/Shaft Collar Star Smooth
-    displayName: Shaft Collar Star Smooth
+    displayName: Shaft Collar (star screw)
     binId: bearings
     model: {fileID: 919132149155446097, guid: b817c5a50b9395447830012a2938ee31, type: 3}
     prefab: {fileID: 5613408932359270350, guid: 9505773f496d8144ba7134d3e6eb8a39, type: 3}
@@ -2358,7 +2358,7 @@ MonoBehaviour:
     massKg: 0.004866853
     cuttable: 0
   - id: Motion/Shaft LS/Shaft Collar Metal/Shaft Collar Star Threaded
-    displayName: Shaft Collar Star Threaded
+    displayName: Shaft Collar (star screw, threads shown)
     binId: bearings
     model: {fileID: 919132149155446097, guid: 75449f2b5d3b24c4cb6ae0519f4a5ed9, type: 3}
     prefab: {fileID: 5142715807114527923, guid: bae19fbea8ea8824898ebf2313dbadc8, type: 3}
@@ -2368,7 +2368,7 @@ MonoBehaviour:
     massKg: 0.0047637396
     cuttable: 0
   - id: Motion/Shaft LS/Shaft Collar Rubber
-    displayName: Shaft Collar Rubber
+    displayName: Rubber Shaft Collar
     binId: bearings
     model: {fileID: 919132149155446097, guid: 050a13274f8110142a696082df9f517c, type: 3}
     prefab: {fileID: 2064632189317632468, guid: 201d375254552f84c91116f302520d1b, type: 3}
@@ -2378,7 +2378,7 @@ MonoBehaviour:
     massKg: 0.0005
     cuttable: 0
   - id: Motion/Shaft LS/Shaft LS Capped/Shaft LS Capped 6.0
-    displayName: Shaft LS Capped 6.0
+    displayName: 6" Capped Shaft
     binId: shafts
     model: {fileID: 919132149155446097, guid: 3c695fd0ae7a16049ab7253e8f09401b, type: 3}
     prefab: {fileID: 5146380623725877095, guid: bea1e8e4bc7887649bf382e9069801b1, type: 3}
@@ -2388,7 +2388,7 @@ MonoBehaviour:
     massKg: 0.012030776
     cuttable: 1
   - id: Motion/Shaft LS/Shaft LS/Shaft LS 12.0
-    displayName: Shaft LS 12.0
+    displayName: 12" Shaft
     binId: shafts
     model: {fileID: 919132149155446097, guid: d867f18ae8ac5d341aa4378e37091332, type: 3}
     prefab: {fileID: 1433943815679777228, guid: d27aad5506511304b8415c0f061be6fd, type: 3}
@@ -2428,7 +2428,7 @@ MonoBehaviour:
     massKg: 0.09928631
     cuttable: 0
   - id: Motion/Spacers/Spacer Nylon .313 OD
-    displayName: Spacer Nylon .313 OD
+    displayName: Nylon Spacer (5/16" OD)
     binId: spacers
     model: {fileID: 919132149155446097, guid: 34d60241601e3df42af343bfc7fa937b, type: 3}
     prefab: {fileID: 2076529209035287691, guid: 244c045eb4143324e8e1664f2246ef44, type: 3}
@@ -2438,7 +2438,7 @@ MonoBehaviour:
     massKg: 0.0005
     cuttable: 0
   - id: Motion/Spacers/Spacer Nylon .313 OD/NSpacer .313 OD x .125
-    displayName: NSpacer .313 OD x .125
+    displayName: 1/8" Nylon Spacer (5/16" OD)
     binId: spacers
     model: {fileID: 919132149155446097, guid: f4301facc2f4fb44784bccd6d40dc6f6, type: 3}
     prefab: {fileID: 2016066611685350551, guid: 48b78fa96ff716646839c8787d564e15, type: 3}
@@ -2448,7 +2448,7 @@ MonoBehaviour:
     massKg: 0.0005
     cuttable: 0
   - id: Motion/Spacers/Spacer Nylon .313 OD/NSpacer .313 OD x .250
-    displayName: NSpacer .313 OD x .250
+    displayName: 1/4" Nylon Spacer (5/16" OD)
     binId: spacers
     model: {fileID: 919132149155446097, guid: ef0c6e2de842aa344848b2cb3f0571d8, type: 3}
     prefab: {fileID: 6883193803813837247, guid: a5c4947f73ad22648a8b3dd3fc785a21, type: 3}
@@ -2458,7 +2458,7 @@ MonoBehaviour:
     massKg: 0.0005
     cuttable: 0
   - id: Motion/Spacers/Spacer Nylon .313 OD/NSpacer .313 OD x .375
-    displayName: NSpacer .313 OD x .375
+    displayName: 3/8" Nylon Spacer (5/16" OD)
     binId: spacers
     model: {fileID: 919132149155446097, guid: e13a84800850a634c85d6890d6ecca96, type: 3}
     prefab: {fileID: 1746322806232828774, guid: 6db7f3887e154ac45b81315360a81327, type: 3}
@@ -2468,7 +2468,7 @@ MonoBehaviour:
     massKg: 0.000571429
     cuttable: 0
   - id: Motion/Spacers/Spacer Nylon .313 OD/NSpacer .313 OD x .500
-    displayName: NSpacer .313 OD x .500
+    displayName: 1/2" Nylon Spacer (5/16" OD)
     binId: spacers
     model: {fileID: 919132149155446097, guid: 06eb174c629e4ed4d94a44f12e9f6a9c, type: 3}
     prefab: {fileID: 1527213134776584849, guid: d4cbf25b277003a40b6d1324777c7f0d, type: 3}
@@ -2478,7 +2478,7 @@ MonoBehaviour:
     massKg: 0.0007619054
     cuttable: 0
   - id: Motion/Spacers/Spacer Nylon .313 OD/NSpacer .313 OD x .875
-    displayName: NSpacer .313 OD x .875
+    displayName: 7/8" Nylon Spacer (5/16" OD)
     binId: spacers
     model: {fileID: 919132149155446097, guid: e07c9e51e41fa1b47ae6f867079e5c34, type: 3}
     prefab: {fileID: 1542709860869223460, guid: af5dccb9e3c80334aa52304459f81edb, type: 3}
@@ -2488,7 +2488,7 @@ MonoBehaviour:
     massKg: 0.0013327757
     cuttable: 0
   - id: Motion/Spacers/Spacer Nylon .375 OD
-    displayName: Spacer Nylon .375 OD
+    displayName: Nylon Spacer (3/8" OD)
     binId: spacers
     model: {fileID: 919132149155446097, guid: 060bc6711a403684594fb07c048f7fab, type: 3}
     prefab: {fileID: 1720338740430681967, guid: 66f815ec0ee29404492281591311c1cd, type: 3}
@@ -2498,7 +2498,7 @@ MonoBehaviour:
     massKg: 0.0005
     cuttable: 0
   - id: Motion/Spacers/Spacer Nylon .375 OD/NSpacer .375 OD x .125
-    displayName: NSpacer .375 OD x .125
+    displayName: 1/8" Nylon Spacer (3/8" OD)
     binId: spacers
     model: {fileID: 919132149155446097, guid: 48708c2998a19b24d9b33a7514e9ea05, type: 3}
     prefab: {fileID: 8212294070650346677, guid: 6aedb4e24d1fb104daa6a3c7269824e4, type: 3}
@@ -2508,7 +2508,7 @@ MonoBehaviour:
     massKg: 0.0005
     cuttable: 0
   - id: Motion/Spacers/Spacer Nylon .375 OD/NSpacer .375 OD x .250
-    displayName: NSpacer .375 OD x .250
+    displayName: 1/4" Nylon Spacer (3/8" OD)
     binId: spacers
     model: {fileID: 919132149155446097, guid: 78124ce6f1b5ce245b142ce44b6a565f, type: 3}
     prefab: {fileID: 1724689601594981137, guid: 89338e763699f944dbc61a2dcab8bdf2, type: 3}
@@ -2518,7 +2518,7 @@ MonoBehaviour:
     massKg: 0.0005
     cuttable: 0
   - id: Motion/Spacers/Spacer Nylon .375 OD/NSpacer .375 OD x .375
-    displayName: NSpacer .375 OD x .375
+    displayName: 3/8" Nylon Spacer (3/8" OD)
     binId: spacers
     model: {fileID: 919132149155446097, guid: 9ddb233cf6c625e4b820ea29cfce6f08, type: 3}
     prefab: {fileID: 7330427128485373622, guid: 2f2f61b2bcf99d34fbb00357b69b72d4, type: 3}
@@ -2528,7 +2528,7 @@ MonoBehaviour:
     massKg: 0.000571429
     cuttable: 0
   - id: Motion/Spacers/Spacer Nylon .375 OD/NSpacer .375 OD x .500
-    displayName: NSpacer .375 OD x .500
+    displayName: 1/2" Nylon Spacer (3/8" OD)
     binId: spacers
     model: {fileID: 919132149155446097, guid: 09c2ae9eafedf5b42b4ae4b0ba9a259b, type: 3}
     prefab: {fileID: 5432309836477094169, guid: a50fc1c44cc38f94a82683523ee61d4d, type: 3}
@@ -2538,7 +2538,7 @@ MonoBehaviour:
     massKg: 0.0007619054
     cuttable: 0
   - id: Motion/Spacers/Spacer Nylon .375 OD/NSpacer .375 OD x .875
-    displayName: NSpacer .375 OD x .875
+    displayName: 7/8" Nylon Spacer (3/8" OD)
     binId: spacers
     model: {fileID: 919132149155446097, guid: baa489bb0e2321149bf6b11089f57358, type: 3}
     prefab: {fileID: 4689366192279635512, guid: b64b9fe31e72f3144bf8852f56ce878c, type: 3}
@@ -2548,7 +2548,7 @@ MonoBehaviour:
     massKg: 0.0013327757
     cuttable: 0
   - id: Motion/Spacers/Spacer Nylon .375 OD/NSpacer .375 OD x 1.000
-    displayName: NSpacer .375 OD x 1.000
+    displayName: 1.00" Nylon Spacer (3/8" OD)
     binId: spacers
     model: {fileID: 919132149155446097, guid: 8d8fa989f2df61f4ba9f6de6cec8af17, type: 3}
     prefab: {fileID: 916631970479563964, guid: 82b1849dd6832304484c16637dddd8fa, type: 3}
@@ -2558,7 +2558,7 @@ MonoBehaviour:
     massKg: 0.0015230471
     cuttable: 0
   - id: Motion/Spacers/Spacer Nylon .500 OD
-    displayName: Spacer Nylon .500 OD
+    displayName: Nylon Spacer (1/2" OD)
     binId: spacers
     model: {fileID: 919132149155446097, guid: 5ed33cedd960f4e4fa95c4f0ba3eb084, type: 3}
     prefab: {fileID: 1712718870035084643, guid: 25989ad753781d64c8bef3897ba24a92, type: 3}
@@ -2568,7 +2568,7 @@ MonoBehaviour:
     massKg: 0.0005
     cuttable: 0
   - id: Motion/Spacers/Spacer Nylon .500 OD/NSpacer Black .500 OD x .125
-    displayName: NSpacer Black .500 OD x .125
+    displayName: 1/8" Black Nylon Spacer (1/2" OD)
     binId: spacers
     model: {fileID: 919132149155446097, guid: 937048d2228e86a4e9f5845b4921a08f, type: 3}
     prefab: {fileID: 2958371223230607686, guid: 6f3498929e75650448b433b1078846d9, type: 3}
@@ -2578,7 +2578,7 @@ MonoBehaviour:
     massKg: 0.0005
     cuttable: 0
   - id: Motion/Spacers/Spacer Nylon .500 OD/NSpacer Black .500 OD x .250
-    displayName: NSpacer Black .500 OD x .250
+    displayName: 1/4" Black Nylon Spacer (1/2" OD)
     binId: spacers
     model: {fileID: 919132149155446097, guid: 684660f93cc7727459db811b8be3e4df, type: 3}
     prefab: {fileID: 1892842208671734023, guid: 85804d30f0dc778488fff2c805f47a0a, type: 3}
@@ -2588,7 +2588,7 @@ MonoBehaviour:
     massKg: 0.0007853302
     cuttable: 0
   - id: Motion/Spacers/Spacer Nylon .500 OD/NSpacer Black .500 OD x .375
-    displayName: NSpacer Black .500 OD x .375
+    displayName: 3/8" Black Nylon Spacer (1/2" OD)
     binId: spacers
     model: {fileID: 919132149155446097, guid: b864970e933a8a24a852e23268befcd0, type: 3}
     prefab: {fileID: 6897430226243998549, guid: f7f313801da55c34d87d3cb0be29d6f8, type: 3}
@@ -2598,7 +2598,7 @@ MonoBehaviour:
     massKg: 0.0011779952
     cuttable: 0
   - id: Motion/Spacers/Spacer Nylon .500 OD/NSpacer Black .500 OD x .500
-    displayName: NSpacer Black .500 OD x .500
+    displayName: 1/2" Black Nylon Spacer (1/2" OD)
     binId: spacers
     model: {fileID: 919132149155446097, guid: d289a45b7deb10643b1d53df1413d04d, type: 3}
     prefab: {fileID: 6905857212090962730, guid: 66f839cdeefefd6449ca5143e0d0e6f6, type: 3}
@@ -2608,7 +2608,7 @@ MonoBehaviour:
     massKg: 0.0015710444
     cuttable: 0
   - id: Motion/Spacers/Spacer Nylon .500 OD/NSpacer White .500 OD x .125
-    displayName: NSpacer White .500 OD x .125
+    displayName: 1/8" White Nylon Spacer (1/2" OD)
     binId: spacers
     model: {fileID: 919132149155446097, guid: 7e549030d2d9152479d39c61350fb20b, type: 3}
     prefab: {fileID: 3932359845321796490, guid: 4637b37fc42bd034bac0be4395839e07, type: 3}
@@ -2618,7 +2618,7 @@ MonoBehaviour:
     massKg: 0.0005
     cuttable: 0
   - id: Motion/Spacers/Spacer Nylon .500 OD/NSpacer White .500 OD x .250
-    displayName: NSpacer White .500 OD x .250
+    displayName: 1/4" White Nylon Spacer (1/2" OD)
     binId: spacers
     model: {fileID: 919132149155446097, guid: fe7b9de75d13ea44b98647d9bc86dac0, type: 3}
     prefab: {fileID: 6351262273084351853, guid: 12f6c509179386c438c9d44150f4cdee, type: 3}
@@ -2628,7 +2628,7 @@ MonoBehaviour:
     massKg: 0.0007853302
     cuttable: 0
   - id: Motion/Spacers/Spacer Nylon .500 OD/NSpacer White .500 OD x .375
-    displayName: NSpacer White .500 OD x .375
+    displayName: 3/8" White Nylon Spacer (1/2" OD)
     binId: spacers
     model: {fileID: 919132149155446097, guid: 1e38821e2c29bfa4a83cabca3cf0946f, type: 3}
     prefab: {fileID: 4190583443993786806, guid: 149ce9d3ef5e5c24a8ab19c1e8f658f2, type: 3}
@@ -2638,7 +2638,7 @@ MonoBehaviour:
     massKg: 0.0011779952
     cuttable: 0
   - id: Motion/Spacers/Spacer Nylon .500 OD/NSpacer White .500 OD x .500
-    displayName: NSpacer White .500 OD x .500
+    displayName: 1/2" White Nylon Spacer (1/2" OD)
     binId: spacers
     model: {fileID: 919132149155446097, guid: 05dca2b1f882d0f43b36d589edddf8fd, type: 3}
     prefab: {fileID: 5230931139406115578, guid: f61a0f2b44229be4aaf6d800b8cf8caf, type: 3}
@@ -2658,7 +2658,7 @@ MonoBehaviour:
     massKg: 0.0005
     cuttable: 0
   - id: Motion/Spacers/Spacer Nylon Click On/Nspacer Click On x .0625
-    displayName: Nspacer Click On x .0625
+    displayName: 1/16" Click-On Spacer
     binId: spacers
     model: {fileID: 919132149155446097, guid: 42c6c94263d0a4e4db6d61baeda13ce3, type: 3}
     prefab: {fileID: 9186122362065320660, guid: 7a1ecdfcce2ccc04c9b36ba977f4acbe, type: 3}
@@ -2668,7 +2668,7 @@ MonoBehaviour:
     massKg: 0.0005
     cuttable: 0
   - id: Motion/Spacers/Spacer Nylon Click On/Nspacer Click On x .1250
-    displayName: Nspacer Click On x .1250
+    displayName: 1/8" Click-On Spacer
     binId: spacers
     model: {fileID: 919132149155446097, guid: 8009b6f61de0f084e8cc085f621c396f, type: 3}
     prefab: {fileID: 6931692820206664763, guid: cd8d05e1d392bdf429992999b11b6fdc, type: 3}
@@ -2678,7 +2678,7 @@ MonoBehaviour:
     massKg: 0.0005
     cuttable: 0
   - id: Motion/Spacers/Spacer Nylon Click On/Nspacer Click On x .2500
-    displayName: Nspacer Click On x .2500
+    displayName: 1/4" Click-On Spacer
     binId: spacers
     model: {fileID: 919132149155446097, guid: f31766c1a630fc944a8c7d62465a42a0, type: 3}
     prefab: {fileID: 3725705099923623734, guid: 486f20b9061f35f488de3c30476f2c51, type: 3}
@@ -2698,7 +2698,7 @@ MonoBehaviour:
     massKg: 0.0005
     cuttable: 0
   - id: Motion/Spacers/Spacer Plastic/PSpacer 4.6
-    displayName: PSpacer 4.6
+    displayName: 4.6mm Plastic Spacer
     binId: spacers
     model: {fileID: 919132149155446097, guid: 38639d9f2303a214388462f0ef8679ee, type: 3}
     prefab: {fileID: 6259909307641220025, guid: 67355cfa4774aa54983b34b1fb55a682, type: 3}
@@ -2708,7 +2708,7 @@ MonoBehaviour:
     massKg: 0.0005
     cuttable: 0
   - id: Motion/Spacers/Spacer Plastic/PSpacer 8.0
-    displayName: PSpacer 8.0
+    displayName: 8mm Plastic Spacer
     binId: spacers
     model: {fileID: 919132149155446097, guid: 7b32b5e9b654dad4ea423def28b7aea9, type: 3}
     prefab: {fileID: 2251986019884047128, guid: 8af1e2371bf7e7c4d9de3cd7769f09ce, type: 3}
@@ -2728,7 +2728,7 @@ MonoBehaviour:
     massKg: 0.0005
     cuttable: 0
   - id: Motion/Spacers/Washer Steel/SWasher .375 OD x .015625
-    displayName: SWasher .375 OD x .015625
+    displayName: 0.02" Steel Washer (3/8" OD)
     binId: spacers
     model: {fileID: 919132149155446097, guid: 9946728159f90fe43b99f58ddcc53098, type: 3}
     prefab: {fileID: 648606179146602798, guid: dee14e2d90bee0440a976d0a923a1152, type: 3}
@@ -2738,7 +2738,7 @@ MonoBehaviour:
     massKg: 0.0005
     cuttable: 0
   - id: Motion/Spacers/Washer Steel/SWasher .375 OD x .031250
-    displayName: SWasher .375 OD x .031250
+    displayName: 0.03" Steel Washer (3/8" OD)
     binId: spacers
     model: {fileID: 919132149155446097, guid: 4f3d3fd87b3fea54895a60e217399b9f, type: 3}
     prefab: {fileID: 1526517987929552829, guid: 67a4c4c975943654a870bb9424d4b281, type: 3}
@@ -2748,7 +2748,7 @@ MonoBehaviour:
     massKg: 0.0005
     cuttable: 0
   - id: Motion/Spacers/Washer Steel/SWasher .375 OD x .062500
-    displayName: SWasher .375 OD x .062500
+    displayName: 1/16" Steel Washer (3/8" OD)
     binId: spacers
     model: {fileID: 919132149155446097, guid: 1fac55771418bdd45a3c71e9d163120e, type: 3}
     prefab: {fileID: 5224334179157493107, guid: cd7dfb6f8ad712441a638fc791d90547, type: 3}
@@ -2768,7 +2768,7 @@ MonoBehaviour:
     massKg: 0.0005
     cuttable: 0
   - id: Motion/Spacers/Washer Teflon/TWasher .375 OD x .03125
-    displayName: TWasher .375 OD x .03125
+    displayName: 0.03" Teflon Washer (3/8" OD)
     binId: spacers
     model: {fileID: 919132149155446097, guid: 53e5624e775b69942aa47cab9aa40d03, type: 3}
     prefab: {fileID: 5981549778012773788, guid: 4dc3ac7458769004f840116cc7fbe909, type: 3}
@@ -2778,7 +2778,7 @@ MonoBehaviour:
     massKg: 0.0005
     cuttable: 0
   - id: Motion/Spacers/Washer Teflon/TWasher .375 OD x .04000
-    displayName: TWasher .375 OD x .04000
+    displayName: 0.04" Teflon Washer (3/8" OD)
     binId: spacers
     model: {fileID: 919132149155446097, guid: 82e97f911942cfc40b263fdadb4f180a, type: 3}
     prefab: {fileID: 6265320444048165360, guid: bd48a7d22f34a1540b8ec9f2643136c0, type: 3}
@@ -2788,7 +2788,7 @@ MonoBehaviour:
     massKg: 0.0005
     cuttable: 0
   - id: Motion/Spacers/Washer Teflon/TWasher .375 OD x .06250
-    displayName: TWasher .375 OD x .06250
+    displayName: 1/16" Teflon Washer (3/8" OD)
     binId: spacers
     model: {fileID: 919132149155446097, guid: 54c131a57d472154db2571287b38aa92, type: 3}
     prefab: {fileID: 5567432706679397777, guid: fcaead67e2fc35a49882a26206dcbb55, type: 3}
@@ -2798,7 +2798,7 @@ MonoBehaviour:
     massKg: 0.0005
     cuttable: 0
   - id: Motion/Spacers/Washer Teflon/TWasher .500 OD x .04000
-    displayName: TWasher .500 OD x .04000
+    displayName: 0.04" Teflon Washer (1/2" OD)
     binId: spacers
     model: {fileID: 919132149155446097, guid: f7d89c1876b3c2645813c31875c4c093, type: 3}
     prefab: {fileID: 442211210752004250, guid: 1b4804bc54e8ba147b2c94a9c7ebd4ab, type: 3}
@@ -2808,7 +2808,7 @@ MonoBehaviour:
     massKg: 0.0005
     cuttable: 0
   - id: Motion/Sprockets/3P 10T Sprocket
-    displayName: 3P 10T Sprocket
+    displayName: Normal 10T Sprocket
     binId: sprockets
     model: {fileID: 919132149155446097, guid: f70483043ee045c4e8a7b9414d35424e, type: 3}
     prefab: {fileID: 3346564738501835246, guid: 5aa233cd251a3284fa2666edf35f0023, type: 3}
@@ -2818,7 +2818,7 @@ MonoBehaviour:
     massKg: 0.00055191957
     cuttable: 0
   - id: Motion/Sprockets/3P 12T Sprocket
-    displayName: 3P 12T Sprocket
+    displayName: Normal 12T Sprocket
     binId: sprockets
     model: {fileID: 919132149155446097, guid: 9cedd74b084627a48a5580c7853698f8, type: 3}
     prefab: {fileID: 8644640366963270976, guid: f65d4c0ddf4f36a4097f3c0b532dea63, type: 3}
@@ -2828,7 +2828,7 @@ MonoBehaviour:
     massKg: 0.0009969013
     cuttable: 0
   - id: Motion/Sprockets/3P 24T Sprocket
-    displayName: 3P 24T Sprocket
+    displayName: Normal 24T Sprocket
     binId: sprockets
     model: {fileID: 919132149155446097, guid: e0c2896aafeb1144ea1ff20d6471591c, type: 3}
     prefab: {fileID: 5938588949524241185, guid: 32ffcb93da9afb5409f5259c58a796bf, type: 3}
@@ -2838,7 +2838,7 @@ MonoBehaviour:
     massKg: 0.0015957975
     cuttable: 0
   - id: Motion/Sprockets/3P 40T Sprocket
-    displayName: 3P 40T Sprocket
+    displayName: Normal 40T Sprocket
     binId: sprockets
     model: {fileID: 919132149155446097, guid: a8e59c29db54070418f63f6b07d0b22b, type: 3}
     prefab: {fileID: 9082923519358133366, guid: 55888e24273b93a4a8cfeeafe0e1f01c, type: 3}
@@ -2848,7 +2848,7 @@ MonoBehaviour:
     massKg: 0.004844577
     cuttable: 0
   - id: Motion/Sprockets/3P 48T Sprocket
-    displayName: 3P 48T Sprocket
+    displayName: Normal 48T Sprocket
     binId: sprockets
     model: {fileID: 919132149155446097, guid: 4f0ceaecbe884f54fb41cc6d98cf9ea1, type: 3}
     prefab: {fileID: 8085594011102905454, guid: 7227780f7bda49443b5a10badd0463a7, type: 3}
@@ -2928,7 +2928,7 @@ MonoBehaviour:
     massKg: 0.0014739439
     cuttable: 0
   - id: Motion/Sprockets/Reference Files/9P 12T Sprocket, No Insert
-    displayName: 9P 12T Sprocket, No Insert
+    displayName: HS 12T Sprocket
     binId: sprockets
     model: {fileID: 919132149155446097, guid: 7ebed228e8fdf92429c6fc67ccdfa4e6, type: 3}
     prefab: {fileID: 167930808675666991, guid: d305ea519a716b646ad1ca6d0addc804, type: 3}
@@ -2938,7 +2938,7 @@ MonoBehaviour:
     massKg: 0.0060248133
     cuttable: 0
   - id: Motion/Sprockets/Reference Files/9P 18T Sprocket, No Insert
-    displayName: 9P 18T Sprocket, No Insert
+    displayName: HS 18T Sprocket
     binId: sprockets
     model: {fileID: 919132149155446097, guid: 29f75e2f9efeac342a674f35a18bf121, type: 3}
     prefab: {fileID: 446878744912564943, guid: 4b8405d8316b4264383bb40b593f8cf8, type: 3}
@@ -2948,7 +2948,7 @@ MonoBehaviour:
     massKg: 0.011101087
     cuttable: 0
   - id: Motion/Sprockets/Reference Files/9P 24T Sprocket, No Insert
-    displayName: 9P 24T Sprocket, No Insert
+    displayName: HS 24T Sprocket
     binId: sprockets
     model: {fileID: 919132149155446097, guid: 860887e9796bd074ea1f3336fa121f71, type: 3}
     prefab: {fileID: 11778376201383284, guid: fc0e1adebfc292c4a9462b6da6f07689, type: 3}
@@ -2958,7 +2958,7 @@ MonoBehaviour:
     massKg: 0.01767566
     cuttable: 0
   - id: Motion/Sprockets/Reference Files/9P 30T Sprocket, No Insert
-    displayName: 9P 30T Sprocket, No Insert
+    displayName: HS 30T Sprocket
     binId: sprockets
     model: {fileID: 919132149155446097, guid: 1a58d6ccfafa0114dbc6e10c2f6d50b8, type: 3}
     prefab: {fileID: 314392568366253734, guid: c63ed8cd7426be84f9358d7503fadb9a, type: 3}
@@ -2968,7 +2968,7 @@ MonoBehaviour:
     massKg: 0.025925541
     cuttable: 0
   - id: Motion/Sprockets/Reference Files/9P 6T Sprocket, No Insert
-    displayName: 9P 6T Sprocket, No Insert
+    displayName: HS 6T Sprocket
     binId: sprockets
     model: {fileID: 919132149155446097, guid: 22bfc0c3a4296094f9d3c8dcd7d81b50, type: 3}
     prefab: {fileID: 8326383319404697538, guid: 2b5fd7b2672a64c4baa3bd6f71c5076e, type: 3}
@@ -3018,7 +3018,7 @@ MonoBehaviour:
     massKg: 0.018825743
     cuttable: 0
   - id: Motion/Wheels/Flex Wheels/1.625 Flex Wheel
-    displayName: 1.625 Flex Wheel
+    displayName: 1.625" Flex Wheel
     binId: wheels
     model: {fileID: 919132149155446097, guid: c0228375b078bbf429df2b8f8624cfda, type: 3}
     prefab: {fileID: 6784685974746788588, guid: a4920b9ef0bc3a64cb90fd3773fd3f06, type: 3}
@@ -3028,7 +3028,7 @@ MonoBehaviour:
     massKg: 0.013033439
     cuttable: 0
   - id: Motion/Wheels/Flex Wheels/1.625 Flex Wheel/1.625 30A .125
-    displayName: 1.625 30A .125
+    displayName: 1.625" Flex Wheel, 30A, 1/8" wide
     binId: wheels
     model: {fileID: 919132149155446097, guid: 9b95dcbc7e547c64c984b603373df8f3, type: 3}
     prefab: {fileID: 3608131524902973161, guid: c996257dd82f85849ade5b0532c04b7d, type: 3}
@@ -3038,7 +3038,7 @@ MonoBehaviour:
     massKg: 0.0032584155
     cuttable: 0
   - id: Motion/Wheels/Flex Wheels/1.625 Flex Wheel/1.625 30A .250
-    displayName: 1.625 30A .250
+    displayName: 1.625" Flex Wheel, 30A, 1/4" wide
     binId: wheels
     model: {fileID: 919132149155446097, guid: af10ebcde717af44e9c07d5c43da8a9c, type: 3}
     prefab: {fileID: 5064862804457751133, guid: b8ba56ebe72009a42ae6e6e68b8c80b1, type: 3}
@@ -3048,7 +3048,7 @@ MonoBehaviour:
     massKg: 0.0065168324
     cuttable: 0
   - id: Motion/Wheels/Flex Wheels/1.625 Flex Wheel/1.625 30A .375
-    displayName: 1.625 30A .375
+    displayName: 1.625" Flex Wheel, 30A, 3/8" wide
     binId: wheels
     model: {fileID: 919132149155446097, guid: 7ad3eab891bb0ab4a8055b42552561f4, type: 3}
     prefab: {fileID: 6659513005625028772, guid: f27a6dc479bf92a409112401815682a8, type: 3}
@@ -3058,7 +3058,7 @@ MonoBehaviour:
     massKg: 0.009775247
     cuttable: 0
   - id: Motion/Wheels/Flex Wheels/1.625 Flex Wheel/1.625 30A .500
-    displayName: 1.625 30A .500
+    displayName: 1.625" Flex Wheel, 30A, 1/2" wide
     binId: wheels
     model: {fileID: 919132149155446097, guid: cd0a70e13f9225a46974de1c9f0c2f6b, type: 3}
     prefab: {fileID: 166269607821993251, guid: 505cdc452c7af274191d12c7a235ade6, type: 3}
@@ -3068,7 +3068,7 @@ MonoBehaviour:
     massKg: 0.013033439
     cuttable: 0
   - id: Motion/Wheels/Flex Wheels/1.625 Flex Wheel/1.625 40A .125
-    displayName: 1.625 40A .125
+    displayName: 1.625" Flex Wheel, 40A, 1/8" wide
     binId: wheels
     model: {fileID: 919132149155446097, guid: 2bdf1b7a5b6c5224fb5cf3392c5a4f18, type: 3}
     prefab: {fileID: 5695858589419420784, guid: 456c3c2075e0404419e1e8312313138d, type: 3}
@@ -3078,7 +3078,7 @@ MonoBehaviour:
     massKg: 0.0032584155
     cuttable: 0
   - id: Motion/Wheels/Flex Wheels/1.625 Flex Wheel/1.625 40A .250
-    displayName: 1.625 40A .250
+    displayName: 1.625" Flex Wheel, 40A, 1/4" wide
     binId: wheels
     model: {fileID: 919132149155446097, guid: 47db816583f8eb74c85f8448455d9f89, type: 3}
     prefab: {fileID: 2267343018062729881, guid: a4625d0741ff89d4aad8c0344cf54ec4, type: 3}
@@ -3088,7 +3088,7 @@ MonoBehaviour:
     massKg: 0.0065168324
     cuttable: 0
   - id: Motion/Wheels/Flex Wheels/1.625 Flex Wheel/1.625 40A .375
-    displayName: 1.625 40A .375
+    displayName: 1.625" Flex Wheel, 40A, 3/8" wide
     binId: wheels
     model: {fileID: 919132149155446097, guid: 698668fe98bf44440a06a35449a479aa, type: 3}
     prefab: {fileID: 2624686831660378043, guid: 70e617b2fcc4cd04eb3b7d32410ca701, type: 3}
@@ -3098,7 +3098,7 @@ MonoBehaviour:
     massKg: 0.009775247
     cuttable: 0
   - id: Motion/Wheels/Flex Wheels/1.625 Flex Wheel/1.625 40A .500
-    displayName: 1.625 40A .500
+    displayName: 1.625" Flex Wheel, 40A, 1/2" wide
     binId: wheels
     model: {fileID: 919132149155446097, guid: 0185e7e818b28ad4dab73658e8371927, type: 3}
     prefab: {fileID: 5753188359776664536, guid: 802e8d612b16cce45a848f8d1b63621f, type: 3}
@@ -3108,7 +3108,7 @@ MonoBehaviour:
     massKg: 0.013033439
     cuttable: 0
   - id: Motion/Wheels/Flex Wheels/1.625 Flex Wheel/1.625 60A .125
-    displayName: 1.625 60A .125
+    displayName: 1.625" Flex Wheel, 60A, 1/8" wide
     binId: wheels
     model: {fileID: 919132149155446097, guid: 54a589cf912ec39408ee9ced8fc327c4, type: 3}
     prefab: {fileID: 8506824543839899159, guid: 31f7a536e5af07b49bfdb455c16241b7, type: 3}
@@ -3118,7 +3118,7 @@ MonoBehaviour:
     massKg: 0.0032584155
     cuttable: 0
   - id: Motion/Wheels/Flex Wheels/1.625 Flex Wheel/1.625 60A .250
-    displayName: 1.625 60A .250
+    displayName: 1.625" Flex Wheel, 60A, 1/4" wide
     binId: wheels
     model: {fileID: 919132149155446097, guid: 1c3bba74358800c47bdfa91a9eee5484, type: 3}
     prefab: {fileID: 6197635595378702913, guid: d208e0752ab35de42aaa1fa56e3baf39, type: 3}
@@ -3128,7 +3128,7 @@ MonoBehaviour:
     massKg: 0.0065168324
     cuttable: 0
   - id: Motion/Wheels/Flex Wheels/1.625 Flex Wheel/1.625 60A .375
-    displayName: 1.625 60A .375
+    displayName: 1.625" Flex Wheel, 60A, 3/8" wide
     binId: wheels
     model: {fileID: 919132149155446097, guid: 091b0c1937e9b454da8a46a428bc788d, type: 3}
     prefab: {fileID: 879937445924471316, guid: ab760ae1f7830204f8d4a6754b5df42b, type: 3}
@@ -3138,7 +3138,7 @@ MonoBehaviour:
     massKg: 0.009775247
     cuttable: 0
   - id: Motion/Wheels/Flex Wheels/1.625 Flex Wheel/1.625 60A .500
-    displayName: 1.625 60A .500
+    displayName: 1.625" Flex Wheel, 60A, 1/2" wide
     binId: wheels
     model: {fileID: 919132149155446097, guid: b2424c7a8182ca8418ed30849cac363e, type: 3}
     prefab: {fileID: 125810171583443140, guid: c747592c3d79de649b0975637bb9fa8a, type: 3}
@@ -3148,7 +3148,7 @@ MonoBehaviour:
     massKg: 0.013033439
     cuttable: 0
   - id: Motion/Wheels/Flex Wheels/2.000 Flex Wheel
-    displayName: 2.000 Flex Wheel
+    displayName: 2" Flex Wheel
     binId: wheels
     model: {fileID: 919132149155446097, guid: 9c18bbe036115a24ca13fb914e9d9fc6, type: 3}
     prefab: {fileID: 5506212720175057835, guid: 28bc993b657456949873cdaae22d755e, type: 3}
@@ -3158,7 +3158,7 @@ MonoBehaviour:
     massKg: 0.016419323
     cuttable: 0
   - id: Motion/Wheels/Flex Wheels/2.000 Flex Wheel/2.000 30A .125
-    displayName: 2.000 30A .125
+    displayName: 2" Flex Wheel, 30A, 1/8" wide
     binId: wheels
     model: {fileID: 919132149155446097, guid: 011023665b4ec6e46baf0630b226fbd1, type: 3}
     prefab: {fileID: 6011757844484701482, guid: 54f3af4dcb83ebe4189816ca136f46d0, type: 3}
@@ -3168,7 +3168,7 @@ MonoBehaviour:
     massKg: 0.004104831
     cuttable: 0
   - id: Motion/Wheels/Flex Wheels/2.000 Flex Wheel/2.000 30A .250
-    displayName: 2.000 30A .250
+    displayName: 2" Flex Wheel, 30A, 1/4" wide
     binId: wheels
     model: {fileID: 919132149155446097, guid: 9588548e15a005b46891f5de6e311ee7, type: 3}
     prefab: {fileID: 1297281279847359228, guid: ff8f686bab13f0245b0ae666cfd704b3, type: 3}
@@ -3178,7 +3178,7 @@ MonoBehaviour:
     massKg: 0.0082096625
     cuttable: 0
   - id: Motion/Wheels/Flex Wheels/2.000 Flex Wheel/2.000 30A .375
-    displayName: 2.000 30A .375
+    displayName: 2" Flex Wheel, 30A, 3/8" wide
     binId: wheels
     model: {fileID: 919132149155446097, guid: 281904a845bdb004da39bba9f039f336, type: 3}
     prefab: {fileID: 1580594153263950069, guid: 1e9b78b79eb33ff4289ef77f778ada9d, type: 3}
@@ -3188,7 +3188,7 @@ MonoBehaviour:
     massKg: 0.012314492
     cuttable: 0
   - id: Motion/Wheels/Flex Wheels/2.000 Flex Wheel/2.000 30A .500
-    displayName: 2.000 30A .500
+    displayName: 2" Flex Wheel, 30A, 1/2" wide
     binId: wheels
     model: {fileID: 919132149155446097, guid: 6e21c09fb7964f5409cab76e92dcdbe0, type: 3}
     prefab: {fileID: 3060817135474255724, guid: dc07a8f267e085b49a2407381fb19b3b, type: 3}
@@ -3198,7 +3198,7 @@ MonoBehaviour:
     massKg: 0.016419323
     cuttable: 0
   - id: Motion/Wheels/Flex Wheels/2.000 Flex Wheel/2.000 40A .125
-    displayName: 2.000 40A .125
+    displayName: 2" Flex Wheel, 40A, 1/8" wide
     binId: wheels
     model: {fileID: 919132149155446097, guid: 83d45b5cf9334fd45ab3748050b4c20d, type: 3}
     prefab: {fileID: 7432642401367221979, guid: e4c0393f93efc3e43a8fe40e666b5ec6, type: 3}
@@ -3208,7 +3208,7 @@ MonoBehaviour:
     massKg: 0.004104831
     cuttable: 0
   - id: Motion/Wheels/Flex Wheels/2.000 Flex Wheel/2.000 40A .250
-    displayName: 2.000 40A .250
+    displayName: 2" Flex Wheel, 40A, 1/4" wide
     binId: wheels
     model: {fileID: 919132149155446097, guid: aaffd2bfb31b1ea41b99117411e8729f, type: 3}
     prefab: {fileID: 4196252905122056814, guid: e08def25116befd4ca4d808a329870ef, type: 3}
@@ -3218,7 +3218,7 @@ MonoBehaviour:
     massKg: 0.0082096625
     cuttable: 0
   - id: Motion/Wheels/Flex Wheels/2.000 Flex Wheel/2.000 40A .375
-    displayName: 2.000 40A .375
+    displayName: 2" Flex Wheel, 40A, 3/8" wide
     binId: wheels
     model: {fileID: 919132149155446097, guid: 012c383240a8ea842b2fb61f8f7cd30c, type: 3}
     prefab: {fileID: 6154849163632809178, guid: 331aefd74048866408ebec295661ada2, type: 3}
@@ -3228,7 +3228,7 @@ MonoBehaviour:
     massKg: 0.012314492
     cuttable: 0
   - id: Motion/Wheels/Flex Wheels/2.000 Flex Wheel/2.000 40A .500
-    displayName: 2.000 40A .500
+    displayName: 2" Flex Wheel, 40A, 1/2" wide
     binId: wheels
     model: {fileID: 919132149155446097, guid: e843515f24dda2146b798f0df30e2dfb, type: 3}
     prefab: {fileID: 8363111927378026224, guid: db22d8a3954c65f40bd6611f10b487bc, type: 3}
@@ -3238,7 +3238,7 @@ MonoBehaviour:
     massKg: 0.016419323
     cuttable: 0
   - id: Motion/Wheels/Flex Wheels/2.000 Flex Wheel/2.000 60A .125
-    displayName: 2.000 60A .125
+    displayName: 2" Flex Wheel, 60A, 1/8" wide
     binId: wheels
     model: {fileID: 919132149155446097, guid: 4837ea16274a10d478aa5cd3535c2c65, type: 3}
     prefab: {fileID: 4121827208669988292, guid: 3a5fd595f55611940aeb9d6d3b0c4d98, type: 3}
@@ -3248,7 +3248,7 @@ MonoBehaviour:
     massKg: 0.004104831
     cuttable: 0
   - id: Motion/Wheels/Flex Wheels/2.000 Flex Wheel/2.000 60A .250
-    displayName: 2.000 60A .250
+    displayName: 2" Flex Wheel, 60A, 1/4" wide
     binId: wheels
     model: {fileID: 919132149155446097, guid: 533694605549c6448bffc131947daecd, type: 3}
     prefab: {fileID: 304618472468740016, guid: 4a95ed84d4aac034ebcf7bd8e0d40420, type: 3}
@@ -3258,7 +3258,7 @@ MonoBehaviour:
     massKg: 0.0082096625
     cuttable: 0
   - id: Motion/Wheels/Flex Wheels/2.000 Flex Wheel/2.000 60A .375
-    displayName: 2.000 60A .375
+    displayName: 2" Flex Wheel, 60A, 3/8" wide
     binId: wheels
     model: {fileID: 919132149155446097, guid: bb49d658b81c0bd439d739b1812001ee, type: 3}
     prefab: {fileID: 282162693349632040, guid: 300000e8315980c49b0112d04d950e06, type: 3}
@@ -3268,7 +3268,7 @@ MonoBehaviour:
     massKg: 0.012314492
     cuttable: 0
   - id: Motion/Wheels/Flex Wheels/2.000 Flex Wheel/2.000 60A .500
-    displayName: 2.000 60A .500
+    displayName: 2" Flex Wheel, 60A, 1/2" wide
     binId: wheels
     model: {fileID: 919132149155446097, guid: 6708e80812e892e43ba4aeed92d76e61, type: 3}
     prefab: {fileID: 1175854800665213146, guid: b9504d93b605b4d4bb7afcc26bbf1bbe, type: 3}
@@ -3278,7 +3278,7 @@ MonoBehaviour:
     massKg: 0.016419323
     cuttable: 0
   - id: Motion/Wheels/Flex Wheels/3.000 Flex Wheel
-    displayName: 3.000 Flex Wheel
+    displayName: 3" Flex Wheel
     binId: wheels
     model: {fileID: 919132149155446097, guid: db0e9662267a3d24e8bd67724d61b15e, type: 3}
     prefab: {fileID: 5143155241009020390, guid: 890c278daa725c24d8396ff5795e3dfd, type: 3}
@@ -3288,7 +3288,7 @@ MonoBehaviour:
     massKg: 0.078783065
     cuttable: 0
   - id: Motion/Wheels/Flex Wheels/3.000 Flex Wheel/3.000 30A .125
-    displayName: 3.000 30A .125
+    displayName: 3" Flex Wheel, 30A, 1/8" wide
     binId: wheels
     model: {fileID: 919132149155446097, guid: 58675a070493ce940a45c747bed8c632, type: 3}
     prefab: {fileID: 3835958151327750359, guid: d54eca6f8cfa38244a824934332b7abf, type: 3}
@@ -3298,7 +3298,7 @@ MonoBehaviour:
     massKg: 0.009847749
     cuttable: 0
   - id: Motion/Wheels/Flex Wheels/3.000 Flex Wheel/3.000 30A .250
-    displayName: 3.000 30A .250
+    displayName: 3" Flex Wheel, 30A, 1/4" wide
     binId: wheels
     model: {fileID: 919132149155446097, guid: b6c3f12fcabaa844d8ff42281287a3fe, type: 3}
     prefab: {fileID: 3807228901452763041, guid: d4b20417078a2614bacda21dc09f3192, type: 3}
@@ -3308,7 +3308,7 @@ MonoBehaviour:
     massKg: 0.019695502
     cuttable: 0
   - id: Motion/Wheels/Flex Wheels/3.000 Flex Wheel/3.000 30A .375
-    displayName: 3.000 30A .375
+    displayName: 3" Flex Wheel, 30A, 3/8" wide
     binId: wheels
     model: {fileID: 919132149155446097, guid: 372a50eab8f644a46b76b8c118520b9b, type: 3}
     prefab: {fileID: 9143257332949050159, guid: c43a5e0ec9904fc4289f9a79d1af87ac, type: 3}
@@ -3318,7 +3318,7 @@ MonoBehaviour:
     massKg: 0.029544847
     cuttable: 0
   - id: Motion/Wheels/Flex Wheels/3.000 Flex Wheel/3.000 30A .500
-    displayName: 3.000 30A .500
+    displayName: 3" Flex Wheel, 30A, 1/2" wide
     binId: wheels
     model: {fileID: 919132149155446097, guid: cda485505f2d6d04395fa974b05fca49, type: 3}
     prefab: {fileID: 7395499209526656099, guid: 1e1ca704b49dd104ca34688ac6d8bc6d, type: 3}
@@ -3328,7 +3328,7 @@ MonoBehaviour:
     massKg: 0.039393127
     cuttable: 0
   - id: Motion/Wheels/Flex Wheels/3.000 Flex Wheel/3.000 30A .750
-    displayName: 3.000 30A .750
+    displayName: 3" Flex Wheel, 30A, 3/4" wide
     binId: wheels
     model: {fileID: 919132149155446097, guid: 45ffcd9be055d2d4594a5df1a0b24b45, type: 3}
     prefab: {fileID: 8228176319802542851, guid: 25e977b68337fae4ea0a27a8e44d4f0c, type: 3}
@@ -3338,7 +3338,7 @@ MonoBehaviour:
     massKg: 0.059086498
     cuttable: 0
   - id: Motion/Wheels/Flex Wheels/3.000 Flex Wheel/3.000 30A 1.000
-    displayName: 3.000 30A 1.000
+    displayName: 3" Flex Wheel, 30A, 1.00" wide
     binId: wheels
     model: {fileID: 919132149155446097, guid: 1e04adaedfb3d104289c70c2ec9e4df5, type: 3}
     prefab: {fileID: 2931610144779516516, guid: ce42e160e237bb94bb9ef5f01d15d84a, type: 3}
@@ -3348,7 +3348,7 @@ MonoBehaviour:
     massKg: 0.078783065
     cuttable: 0
   - id: Motion/Wheels/Flex Wheels/3.000 Flex Wheel/3.000 40A .125
-    displayName: 3.000 40A .125
+    displayName: 3" Flex Wheel, 40A, 1/8" wide
     binId: wheels
     model: {fileID: 919132149155446097, guid: 5916a0cd0313a804ea6ed6bf1f1a0bf4, type: 3}
     prefab: {fileID: 6134291275028814172, guid: e95730b1b2c361445b59a5d12a17e55c, type: 3}
@@ -3358,7 +3358,7 @@ MonoBehaviour:
     massKg: 0.009847749
     cuttable: 0
   - id: Motion/Wheels/Flex Wheels/3.000 Flex Wheel/3.000 40A .250
-    displayName: 3.000 40A .250
+    displayName: 3" Flex Wheel, 40A, 1/4" wide
     binId: wheels
     model: {fileID: 919132149155446097, guid: 68edd774e963afb44a8bf932c0a9dc68, type: 3}
     prefab: {fileID: 4368184840435828725, guid: 0ec0420cc32f2154fb2122432d13aa9f, type: 3}
@@ -3368,7 +3368,7 @@ MonoBehaviour:
     massKg: 0.019695502
     cuttable: 0
   - id: Motion/Wheels/Flex Wheels/3.000 Flex Wheel/3.000 40A .375
-    displayName: 3.000 40A .375
+    displayName: 3" Flex Wheel, 40A, 3/8" wide
     binId: wheels
     model: {fileID: 919132149155446097, guid: d15342fcfd7dcfe448ebeaca0a0c004b, type: 3}
     prefab: {fileID: 8721014744267447182, guid: 152aeb18ff79357419705834f4c9a67a, type: 3}
@@ -3378,7 +3378,7 @@ MonoBehaviour:
     massKg: 0.029544847
     cuttable: 0
   - id: Motion/Wheels/Flex Wheels/3.000 Flex Wheel/3.000 40A .500
-    displayName: 3.000 40A .500
+    displayName: 3" Flex Wheel, 40A, 1/2" wide
     binId: wheels
     model: {fileID: 919132149155446097, guid: bbd30764329ace3488839c7fbc6998c0, type: 3}
     prefab: {fileID: 9210077336170581908, guid: 1273236e8e9992942865e9e0af3f4fac, type: 3}
@@ -3388,7 +3388,7 @@ MonoBehaviour:
     massKg: 0.039393127
     cuttable: 0
   - id: Motion/Wheels/Flex Wheels/3.000 Flex Wheel/3.000 40A .750
-    displayName: 3.000 40A .750
+    displayName: 3" Flex Wheel, 40A, 3/4" wide
     binId: wheels
     model: {fileID: 919132149155446097, guid: 81e1f359dbf48c744aba49f1c8ff99bc, type: 3}
     prefab: {fileID: 5629151617746567218, guid: 977a3bf2d53c9aa4fb867d13d1925050, type: 3}
@@ -3398,7 +3398,7 @@ MonoBehaviour:
     massKg: 0.059086498
     cuttable: 0
   - id: Motion/Wheels/Flex Wheels/3.000 Flex Wheel/3.000 40A 1.000
-    displayName: 3.000 40A 1.000
+    displayName: 3" Flex Wheel, 40A, 1.00" wide
     binId: wheels
     model: {fileID: 919132149155446097, guid: 3240ee1ff4bc9c04c899c79ff0f417ba, type: 3}
     prefab: {fileID: 2543127258590764839, guid: d994b2f20ed2e9247a4a87da8ee3e984, type: 3}
@@ -3408,7 +3408,7 @@ MonoBehaviour:
     massKg: 0.078783065
     cuttable: 0
   - id: Motion/Wheels/Flex Wheels/3.000 Flex Wheel/3.000 60A .125
-    displayName: 3.000 60A .125
+    displayName: 3" Flex Wheel, 60A, 1/8" wide
     binId: wheels
     model: {fileID: 919132149155446097, guid: f2e8be298e767cf41a90c47946e74a01, type: 3}
     prefab: {fileID: 288100789969280957, guid: 535c8ac166af94b4a91c3b6e1d1e5237, type: 3}
@@ -3418,7 +3418,7 @@ MonoBehaviour:
     massKg: 0.009847749
     cuttable: 0
   - id: Motion/Wheels/Flex Wheels/3.000 Flex Wheel/3.000 60A .250
-    displayName: 3.000 60A .250
+    displayName: 3" Flex Wheel, 60A, 1/4" wide
     binId: wheels
     model: {fileID: 919132149155446097, guid: 11cb12d01c7c1d145ad50ccfb117f761, type: 3}
     prefab: {fileID: 1938203203471939011, guid: 4ea348f23bed15c44b8b01a09e2cb7de, type: 3}
@@ -3428,7 +3428,7 @@ MonoBehaviour:
     massKg: 0.019695502
     cuttable: 0
   - id: Motion/Wheels/Flex Wheels/3.000 Flex Wheel/3.000 60A .375
-    displayName: 3.000 60A .375
+    displayName: 3" Flex Wheel, 60A, 3/8" wide
     binId: wheels
     model: {fileID: 919132149155446097, guid: be6665915a697d64095aba2d21637663, type: 3}
     prefab: {fileID: 4514493751403250111, guid: d3889298cec39e04b8cfe9ba45cb83c6, type: 3}
@@ -3438,7 +3438,7 @@ MonoBehaviour:
     massKg: 0.029544847
     cuttable: 0
   - id: Motion/Wheels/Flex Wheels/3.000 Flex Wheel/3.000 60A .500
-    displayName: 3.000 60A .500
+    displayName: 3" Flex Wheel, 60A, 1/2" wide
     binId: wheels
     model: {fileID: 919132149155446097, guid: c6e1b16086100d64dad928e508306646, type: 3}
     prefab: {fileID: 4623209416298424579, guid: be0e33fe1bd61564ca3ea8add4c93594, type: 3}
@@ -3448,7 +3448,7 @@ MonoBehaviour:
     massKg: 0.039393127
     cuttable: 0
   - id: Motion/Wheels/Flex Wheels/3.000 Flex Wheel/3.000 60A .750
-    displayName: 3.000 60A .750
+    displayName: 3" Flex Wheel, 60A, 3/4" wide
     binId: wheels
     model: {fileID: 919132149155446097, guid: 74e175b6448136a4188b75fabb8e0357, type: 3}
     prefab: {fileID: 515458369304553635, guid: 796557e6cf068ba4b85e5f7b75d7dc5b, type: 3}
@@ -3458,7 +3458,7 @@ MonoBehaviour:
     massKg: 0.059086498
     cuttable: 0
   - id: Motion/Wheels/Flex Wheels/3.000 Flex Wheel/3.000 60A 1.000
-    displayName: 3.000 60A 1.000
+    displayName: 3" Flex Wheel, 60A, 1.00" wide
     binId: wheels
     model: {fileID: 919132149155446097, guid: 036c5de767097504d934d6928fe64029, type: 3}
     prefab: {fileID: 6384028413923094121, guid: d90b91dc2d2df1243b8c16540a931268, type: 3}
@@ -3468,7 +3468,7 @@ MonoBehaviour:
     massKg: 0.078783065
     cuttable: 0
   - id: Motion/Wheels/Flex Wheels/4.000 Flex Wheel
-    displayName: 4.000 Flex Wheel
+    displayName: 4" Flex Wheel
     binId: wheels
     model: {fileID: 919132149155446097, guid: 20d13201aab5f2647b819826284b4a3d, type: 3}
     prefab: {fileID: 7752404917240450848, guid: 88e9e8c6bfacfbf4d964375f82dbab86, type: 3}
@@ -3478,7 +3478,7 @@ MonoBehaviour:
     massKg: 0.122863054
     cuttable: 0
   - id: Motion/Wheels/Flex Wheels/4.000 Flex Wheel/4.000 30A .125
-    displayName: 4.000 30A .125
+    displayName: 4" Flex Wheel, 30A, 1/8" wide
     binId: wheels
     model: {fileID: 919132149155446097, guid: f2009cfd7b9dc5743ae9ecb28f21e8cd, type: 3}
     prefab: {fileID: 6180438298654571212, guid: 5a608cf9eb405a847961b16a89b0cbe9, type: 3}
@@ -3488,7 +3488,7 @@ MonoBehaviour:
     massKg: 0.015357707
     cuttable: 0
   - id: Motion/Wheels/Flex Wheels/4.000 Flex Wheel/4.000 30A .250
-    displayName: 4.000 30A .250
+    displayName: 4" Flex Wheel, 30A, 1/4" wide
     binId: wheels
     model: {fileID: 919132149155446097, guid: bb177f97b1e37af40b069ee3dab09abf, type: 3}
     prefab: {fileID: 4216520126565392863, guid: e39fa7c8d13445441b2321914dd371de, type: 3}
@@ -3498,7 +3498,7 @@ MonoBehaviour:
     massKg: 0.030715417
     cuttable: 0
   - id: Motion/Wheels/Flex Wheels/4.000 Flex Wheel/4.000 30A .375
-    displayName: 4.000 30A .375
+    displayName: 4" Flex Wheel, 30A, 3/8" wide
     binId: wheels
     model: {fileID: 919132149155446097, guid: 11ea6020fa2b4ac49895af98a130bd46, type: 3}
     prefab: {fileID: 6790050516176052605, guid: d25d4c00b38c25b44b9ce23b399f9fed, type: 3}
@@ -3508,7 +3508,7 @@ MonoBehaviour:
     massKg: 0.046073135
     cuttable: 0
   - id: Motion/Wheels/Flex Wheels/4.000 Flex Wheel/4.000 30A .500
-    displayName: 4.000 30A .500
+    displayName: 4" Flex Wheel, 30A, 1/2" wide
     binId: wheels
     model: {fileID: 919132149155446097, guid: 67773fbae7941994bbbf92a70999ca02, type: 3}
     prefab: {fileID: 5454010152308673195, guid: 1bcb931e2bc308749aacf12c95713ba9, type: 3}
@@ -3518,7 +3518,7 @@ MonoBehaviour:
     massKg: 0.06143154
     cuttable: 0
   - id: Motion/Wheels/Flex Wheels/4.000 Flex Wheel/4.000 30A .750
-    displayName: 4.000 30A .750
+    displayName: 4" Flex Wheel, 30A, 3/4" wide
     binId: wheels
     model: {fileID: 919132149155446097, guid: bc2e6db39e9f7ce49850650a9d502eab, type: 3}
     prefab: {fileID: 7935228918794562711, guid: 39b455589e625d04eabde6a04e61855b, type: 3}
@@ -3528,7 +3528,7 @@ MonoBehaviour:
     massKg: 0.09214729
     cuttable: 0
   - id: Motion/Wheels/Flex Wheels/4.000 Flex Wheel/4.000 30A 1.000
-    displayName: 4.000 30A 1.000
+    displayName: 4" Flex Wheel, 30A, 1.00" wide
     binId: wheels
     model: {fileID: 919132149155446097, guid: 222e351574cd89a459a9fee02c487fc8, type: 3}
     prefab: {fileID: 781058144607928886, guid: 6bfee34dedef53545aa182e22765d1ea, type: 3}
@@ -3538,7 +3538,7 @@ MonoBehaviour:
     massKg: 0.122863054
     cuttable: 0
   - id: Motion/Wheels/Flex Wheels/4.000 Flex Wheel/4.000 40A .125
-    displayName: 4.000 40A .125
+    displayName: 4" Flex Wheel, 40A, 1/8" wide
     binId: wheels
     model: {fileID: 919132149155446097, guid: b97183547eaf57348af323e788fbee81, type: 3}
     prefab: {fileID: 2417552902013541459, guid: 52282b08c138ec54abf8bbaea40cba36, type: 3}
@@ -3548,7 +3548,7 @@ MonoBehaviour:
     massKg: 0.015357707
     cuttable: 0
   - id: Motion/Wheels/Flex Wheels/4.000 Flex Wheel/4.000 40A .250
-    displayName: 4.000 40A .250
+    displayName: 4" Flex Wheel, 40A, 1/4" wide
     binId: wheels
     model: {fileID: 919132149155446097, guid: ca1fb08f244edca4585e1ea5769cb80e, type: 3}
     prefab: {fileID: 7668173363810521915, guid: 99857f107fcedf344ab29459c339aee3, type: 3}
@@ -3558,7 +3558,7 @@ MonoBehaviour:
     massKg: 0.030715417
     cuttable: 0
   - id: Motion/Wheels/Flex Wheels/4.000 Flex Wheel/4.000 40A .375
-    displayName: 4.000 40A .375
+    displayName: 4" Flex Wheel, 40A, 3/8" wide
     binId: wheels
     model: {fileID: 919132149155446097, guid: 8bf4161079d2d5f418ec61f7c2ddcc96, type: 3}
     prefab: {fileID: 5671385644089063182, guid: 043ac82c67cdc9c46b34bbac4b0d43dc, type: 3}
@@ -3568,7 +3568,7 @@ MonoBehaviour:
     massKg: 0.046073135
     cuttable: 0
   - id: Motion/Wheels/Flex Wheels/4.000 Flex Wheel/4.000 40A .500
-    displayName: 4.000 40A .500
+    displayName: 4" Flex Wheel, 40A, 1/2" wide
     binId: wheels
     model: {fileID: 919132149155446097, guid: 96d53bb311d48bf48bad30781171ffb2, type: 3}
     prefab: {fileID: 5141010304613013569, guid: 1f0ec4afddf363b44af9f769a9515325, type: 3}
@@ -3578,7 +3578,7 @@ MonoBehaviour:
     massKg: 0.06143154
     cuttable: 0
   - id: Motion/Wheels/Flex Wheels/4.000 Flex Wheel/4.000 40A .750
-    displayName: 4.000 40A .750
+    displayName: 4" Flex Wheel, 40A, 3/4" wide
     binId: wheels
     model: {fileID: 919132149155446097, guid: 32f420ced4284a64fb05f5238497338b, type: 3}
     prefab: {fileID: 2881871869434968919, guid: d26e1624850345046ab7ca8d196b3586, type: 3}
@@ -3588,7 +3588,7 @@ MonoBehaviour:
     massKg: 0.09214729
     cuttable: 0
   - id: Motion/Wheels/Flex Wheels/4.000 Flex Wheel/4.000 40A 1.000
-    displayName: 4.000 40A 1.000
+    displayName: 4" Flex Wheel, 40A, 1.00" wide
     binId: wheels
     model: {fileID: 919132149155446097, guid: 7642d8ad28ff8d54eb6efff7f56fb5b1, type: 3}
     prefab: {fileID: 8717468801998368531, guid: 03ab4ab7182db07438c336df3efb9019, type: 3}
@@ -3598,7 +3598,7 @@ MonoBehaviour:
     massKg: 0.122863054
     cuttable: 0
   - id: Motion/Wheels/Flex Wheels/4.000 Flex Wheel/4.000 60A .125
-    displayName: 4.000 60A .125
+    displayName: 4" Flex Wheel, 60A, 1/8" wide
     binId: wheels
     model: {fileID: 919132149155446097, guid: 20bf37e19b2cb294fbef3a0344e939a9, type: 3}
     prefab: {fileID: 5628026383426706824, guid: 2b9c47635c7f50e47b68481fdf02d100, type: 3}
@@ -3608,7 +3608,7 @@ MonoBehaviour:
     massKg: 0.015357707
     cuttable: 0
   - id: Motion/Wheels/Flex Wheels/4.000 Flex Wheel/4.000 60A .250
-    displayName: 4.000 60A .250
+    displayName: 4" Flex Wheel, 60A, 1/4" wide
     binId: wheels
     model: {fileID: 919132149155446097, guid: 4200342473bd24641a683651b02b05a4, type: 3}
     prefab: {fileID: 9126521736328339076, guid: b91c5cfbe41b77c49ae8fb9b6395a080, type: 3}
@@ -3618,7 +3618,7 @@ MonoBehaviour:
     massKg: 0.030715417
     cuttable: 0
   - id: Motion/Wheels/Flex Wheels/4.000 Flex Wheel/4.000 60A .375
-    displayName: 4.000 60A .375
+    displayName: 4" Flex Wheel, 60A, 3/8" wide
     binId: wheels
     model: {fileID: 919132149155446097, guid: fb61ad1b5e6b4fb4dbb56db937654cad, type: 3}
     prefab: {fileID: 6152272343524223051, guid: f08be5485c915ca47a1773f7b77d00c7, type: 3}
@@ -3628,7 +3628,7 @@ MonoBehaviour:
     massKg: 0.046073135
     cuttable: 0
   - id: Motion/Wheels/Flex Wheels/4.000 Flex Wheel/4.000 60A .500
-    displayName: 4.000 60A .500
+    displayName: 4" Flex Wheel, 60A, 1/2" wide
     binId: wheels
     model: {fileID: 919132149155446097, guid: 9fa2725181c3c4841b75cb5536ff59b5, type: 3}
     prefab: {fileID: 7436152023360730514, guid: 9e3d585489b1f6848969068c3db43586, type: 3}
@@ -3638,7 +3638,7 @@ MonoBehaviour:
     massKg: 0.06143154
     cuttable: 0
   - id: Motion/Wheels/Flex Wheels/4.000 Flex Wheel/4.000 60A .750
-    displayName: 4.000 60A .750
+    displayName: 4" Flex Wheel, 60A, 3/4" wide
     binId: wheels
     model: {fileID: 919132149155446097, guid: 9ea968b110a19f641b6cd333f6e20853, type: 3}
     prefab: {fileID: 1844653511480947503, guid: 598836212c5b7214c8d1291185fc8b14, type: 3}
@@ -3648,7 +3648,7 @@ MonoBehaviour:
     massKg: 0.09214729
     cuttable: 0
   - id: Motion/Wheels/Flex Wheels/4.000 Flex Wheel/4.000 60A 1.000
-    displayName: 4.000 60A 1.000
+    displayName: 4" Flex Wheel, 60A, 1.00" wide
     binId: wheels
     model: {fileID: 919132149155446097, guid: e68a8876d80472741a48d8fa07e885e6, type: 3}
     prefab: {fileID: 390942039930733554, guid: f07941f39b7990842a715b99b582d968, type: 3}
@@ -3658,7 +3658,7 @@ MonoBehaviour:
     massKg: 0.122863054
     cuttable: 0
   - id: Motion/Wheels/Flex Wheels/VersaHex Adapters .125
-    displayName: VersaHex Adapters .125
+    displayName: 1/8" VersaHex Adapter
     binId: wheels
     model: {fileID: 919132149155446097, guid: 24d874ddf544afe48a567984ce8172d7, type: 3}
     prefab: {fileID: 5099485593742290346, guid: d6966bc94705d7c4c8f3c658129b04e8, type: 3}
@@ -3668,7 +3668,7 @@ MonoBehaviour:
     massKg: 0.00088366546
     cuttable: 0
   - id: Motion/Wheels/Flex Wheels/VersaHex Adapters .250
-    displayName: VersaHex Adapters .250
+    displayName: 1/4" VersaHex Adapter
     binId: wheels
     model: {fileID: 919132149155446097, guid: bc890c852811d094eb8a2b2198d686f1, type: 3}
     prefab: {fileID: 6452133444599816366, guid: b6b6c2a3280bb6c4aa82bf5ac94376f0, type: 3}
@@ -3698,7 +3698,7 @@ MonoBehaviour:
     massKg: 0.0074979244
     cuttable: 0
   - id: Motion/Wheels/Omni Wheel/2 Omni AS, No Insert
-    displayName: 2 Omni AS, No Insert
+    displayName: 2" Anti-Static Omni Wheel
     binId: omni_wheels
     model: {fileID: 919132149155446097, guid: aedc844edf0786c43b8fe2164cb33c90, type: 3}
     prefab: {fileID: 6172544173099439556, guid: 108a211288290ba429f2c1ec39d38008, type: 3}
@@ -3708,7 +3708,7 @@ MonoBehaviour:
     massKg: 0.021537574
     cuttable: 0
   - id: Motion/Wheels/Omni Wheel/2.75 Omni Half
-    displayName: 2.75 Omni Half
+    displayName: 2.75" Omni Wheel (half)
     binId: omni_wheels
     model: {fileID: 919132149155446097, guid: 8e0bfb469e6482f43a53e2288cec69e8, type: 3}
     prefab: {fileID: 8561775502362251001, guid: 72bae31e65f984141bed5b669f047b33, type: 3}
@@ -3718,7 +3718,7 @@ MonoBehaviour:
     massKg: 0.03176341
     cuttable: 0
   - id: Motion/Wheels/Omni Wheel/2.75 Omni Old
-    displayName: 2.75 Omni Old
+    displayName: 2.75" Omni Wheel (old)
     binId: omni_wheels
     model: {fileID: 919132149155446097, guid: c2beb963c35a3a743be5803809aeb383, type: 3}
     prefab: {fileID: 2300630519220704409, guid: c9fcc1ccef7de364e832b7ecccff60ad, type: 3}
@@ -3728,7 +3728,7 @@ MonoBehaviour:
     massKg: 0.04519679
     cuttable: 0
   - id: Motion/Wheels/Omni Wheel/3.25 Omni Half
-    displayName: 3.25 Omni Half
+    displayName: 3.25" Omni Wheel (half)
     binId: omni_wheels
     model: {fileID: 919132149155446097, guid: 56a96c219b9c0904facbae5698bf3bc0, type: 3}
     prefab: {fileID: 5474370129146649972, guid: 33c40a3c4ce64e647b4fa970ff9d2b56, type: 3}
@@ -3738,7 +3738,7 @@ MonoBehaviour:
     massKg: 0.024737552
     cuttable: 0
   - id: Motion/Wheels/Omni Wheel/4 Omni Half
-    displayName: 4 Omni Half
+    displayName: 4" Omni Wheel (half)
     binId: omni_wheels
     model: {fileID: 919132149155446097, guid: f7e6e66b896739f45b110f461bbc990c, type: 3}
     prefab: {fileID: 211162592134752579, guid: a7bb81451e3294248a407e0ce889c4f2, type: 3}
@@ -3748,7 +3748,7 @@ MonoBehaviour:
     massKg: 0.050349154
     cuttable: 0
   - id: Motion/Wheels/Reference Files/2 Mecanum Left
-    displayName: 2 Mecanum Left
+    displayName: 2" Mecanum Wheel (left)
     binId: wheels
     model: {fileID: 919132149155446097, guid: d7b180b1436489a4ea0cee34068c61fe, type: 3}
     prefab: {fileID: 8557082310793980691, guid: 63aa4a61431591e4e9372b42d22a94d2, type: 3}
@@ -3758,7 +3758,7 @@ MonoBehaviour:
     massKg: 0.063971914
     cuttable: 0
   - id: Motion/Wheels/Reference Files/2 Mecanum Right
-    displayName: 2 Mecanum Right
+    displayName: 2" Mecanum Wheel (right)
     binId: wheels
     model: {fileID: 919132149155446097, guid: 9024373d8ef6b584f828943db81b60d1, type: 3}
     prefab: {fileID: 2966689753205642530, guid: c21f5474f88ea4e4c856567f12a6e34d, type: 3}
@@ -3768,7 +3768,7 @@ MonoBehaviour:
     massKg: 0.063971885
     cuttable: 0
   - id: Motion/Wheels/Reference Files/2.75 Omni Antistatic
-    displayName: 2.75 Omni Antistatic
+    displayName: 2.75" Anti-Static Omni Wheel
     binId: omni_wheels
     model: {fileID: 919132149155446097, guid: 61a44cf03b02eda43b94265b3d3e6869, type: 3}
     prefab: {fileID: 886430795177457795, guid: bc4851b5ce1802b42b2bd51cf9f1da5f, type: 3}
@@ -3778,7 +3778,7 @@ MonoBehaviour:
     massKg: 0.04774148
     cuttable: 0
   - id: Motion/Wheels/Reference Files/2.75 Omni
-    displayName: 2.75 Omni
+    displayName: 2.75" Omni Wheel
     binId: omni_wheels
     model: {fileID: 919132149155446097, guid: 56b85ad14f385c14ca0d7d945b23c489, type: 3}
     prefab: {fileID: 5040338088776042494, guid: 500167b66ce09c14aa8cd0e7a511bb6a, type: 3}
@@ -3788,7 +3788,7 @@ MonoBehaviour:
     massKg: 0.06935143
     cuttable: 0
   - id: Motion/Wheels/Reference Files/2.75 Traction Antistatic
-    displayName: 2.75 Traction Antistatic
+    displayName: 2.75" Anti-Static Traction Wheel
     binId: wheels
     model: {fileID: 919132149155446097, guid: 72b08c1b7c22c474a9e0d3e7659ecd4f, type: 3}
     prefab: {fileID: 1959229293539499236, guid: 4d5770d7beed93e44abd90e30f5c7b4d, type: 3}
@@ -3798,7 +3798,7 @@ MonoBehaviour:
     massKg: 0.04821283
     cuttable: 0
   - id: Motion/Wheels/Reference Files/2.75 Traction
-    displayName: 2.75 Traction
+    displayName: 2.75" Traction Wheel
     binId: wheels
     model: {fileID: 919132149155446097, guid: 47f260c71d633d744a0cc5a5450fd995, type: 3}
     prefab: {fileID: 7245959729692555209, guid: 0d02158624e5ce241b5fb1e7c5d01e32, type: 3}
@@ -3808,7 +3808,7 @@ MonoBehaviour:
     massKg: 0.049292926
     cuttable: 0
   - id: Motion/Wheels/Reference Files/3.25 Omni Antistatic
-    displayName: 3.25 Omni Antistatic
+    displayName: 3.25" Anti-Static Omni Wheel
     binId: omni_wheels
     model: {fileID: 919132149155446097, guid: 25f92154ea205f044886a12866a00cb6, type: 3}
     prefab: {fileID: 8244398911995306767, guid: 8c6f526452ef3104098fcb4ab271bab6, type: 3}
@@ -3818,7 +3818,7 @@ MonoBehaviour:
     massKg: 0.06258246
     cuttable: 0
   - id: Motion/Wheels/Reference Files/3.25 Omni
-    displayName: 3.25 Omni
+    displayName: 3.25" Omni Wheel
     binId: omni_wheels
     model: {fileID: 919132149155446097, guid: 544364b15c29bfa459e8570a301f7bb6, type: 3}
     prefab: {fileID: 7782178926384876482, guid: 0cd6a6e1e9203df4cb5cd97fef690f2f, type: 3}
@@ -3828,7 +3828,7 @@ MonoBehaviour:
     massKg: 0.04940077
     cuttable: 0
   - id: Motion/Wheels/Reference Files/3.25 Traction Antistatic
-    displayName: 3.25 Traction Antistatic
+    displayName: 3.25" Anti-Static Traction Wheel
     binId: wheels
     model: {fileID: 919132149155446097, guid: 380e80ab0caff8b4e9350534327585e0, type: 3}
     prefab: {fileID: 3758730036215890481, guid: 68e5c121cacbc4141a9076d22668aa25, type: 3}
@@ -3838,7 +3838,7 @@ MonoBehaviour:
     massKg: 0.061872877
     cuttable: 0
   - id: Motion/Wheels/Reference Files/3.25 Traction
-    displayName: 3.25 Traction
+    displayName: 3.25" Traction Wheel
     binId: wheels
     model: {fileID: 919132149155446097, guid: 163778cccee948d4195ae98c13ddac4a, type: 3}
     prefab: {fileID: 3563680596084821269, guid: abbc9117d19e33c4a8e03cfd33abe265, type: 3}
@@ -3848,7 +3848,7 @@ MonoBehaviour:
     massKg: 0.05377427
     cuttable: 0
   - id: Motion/Wheels/Reference Files/4 Mecanum Left
-    displayName: 4 Mecanum Left
+    displayName: 4" Mecanum Wheel (left)
     binId: wheels
     model: {fileID: 919132149155446097, guid: 5b4ba217927578a49aa97826babd4333, type: 3}
     prefab: {fileID: 1698239945948926245, guid: c524395dc91fda54fa43c1097c71ec98, type: 3}
@@ -3858,7 +3858,7 @@ MonoBehaviour:
     massKg: 0.20582107
     cuttable: 0
   - id: Motion/Wheels/Reference Files/4 Mecanum Right
-    displayName: 4 Mecanum Right
+    displayName: 4" Mecanum Wheel (right)
     binId: wheels
     model: {fileID: 919132149155446097, guid: 37fa620da024d62448decb6bddc9d5e1, type: 3}
     prefab: {fileID: 3761077247067541762, guid: 866b2a6aeb6a9b24a837b080ee894676, type: 3}
@@ -3868,7 +3868,7 @@ MonoBehaviour:
     massKg: 0.20582116
     cuttable: 0
   - id: Motion/Wheels/Reference Files/4 Omni Antistatic
-    displayName: 4 Omni Antistatic
+    displayName: 4" Anti-Static Omni Wheel
     binId: omni_wheels
     model: {fileID: 919132149155446097, guid: f43b1c56e89f40b4b996e77b98b2f2ac, type: 3}
     prefab: {fileID: 7087717196384976559, guid: 8a39c467184be874db23de74354d064a, type: 3}
@@ -3878,7 +3878,7 @@ MonoBehaviour:
     massKg: 0.08400426
     cuttable: 0
   - id: Motion/Wheels/Reference Files/4 Omni Locked
-    displayName: 4 Omni Locked
+    displayName: 4" Omni Wheel (locked)
     binId: omni_wheels
     model: {fileID: 919132149155446097, guid: 669413315eeb5a645b675b127d97af41, type: 3}
     prefab: {fileID: 624106152784953329, guid: 6440692083ed0e74b841567ca378bcee, type: 3}
@@ -3888,7 +3888,7 @@ MonoBehaviour:
     massKg: 0.1444957
     cuttable: 0
   - id: Motion/Wheels/Reference Files/4 Omni
-    displayName: 4 Omni
+    displayName: 4" Omni Wheel
     binId: omni_wheels
     model: {fileID: 919132149155446097, guid: dd2dc7e03a8c7274294a3ee48d3e5898, type: 3}
     prefab: {fileID: 146651936024331894, guid: bc07693cb48cf954d84c78f96c6eaf72, type: 3}
@@ -3898,7 +3898,7 @@ MonoBehaviour:
     massKg: 0.11214668
     cuttable: 0
   - id: Motion/Wheels/Reference Files/4 Traction 169
-    displayName: 4 Traction 169
+    displayName: 4" Traction Wheel (169)
     binId: wheels
     model: {fileID: 919132149155446097, guid: adecea212135772468da13447b8af2b9, type: 3}
     prefab: {fileID: 3843597675438413321, guid: 76f6d7cb568e52f43a39c1fd9594c011, type: 3}
@@ -3908,7 +3908,7 @@ MonoBehaviour:
     massKg: 0.086333126
     cuttable: 0
   - id: Motion/Wheels/Reference Files/4 Traction Antistatic
-    displayName: 4 Traction Antistatic
+    displayName: 4" Anti-Static Traction Wheel
     binId: wheels
     model: {fileID: 919132149155446097, guid: cac0bd0474c9edb40a0ca79f30a31781, type: 3}
     prefab: {fileID: 6461836753098038875, guid: 95ac2cf57413f8142a32b2ad6e5e31a2, type: 3}
@@ -3918,7 +3918,7 @@ MonoBehaviour:
     massKg: 0.08302933
     cuttable: 0
   - id: Motion/Wheels/Reference Files/4 Traction Tire
-    displayName: 4 Traction Tire
+    displayName: 4" Traction Tire
     binId: wheels
     model: {fileID: 919132149155446097, guid: 21fe2c3f3b50b46478063be454dce6f0, type: 3}
     prefab: {fileID: 5801653299031499601, guid: 9f666e2449a9fc240aa955be421fbe92, type: 3}
@@ -3928,7 +3928,7 @@ MonoBehaviour:
     massKg: 0.07848849
     cuttable: 0
   - id: Motion/Wheels/Reference Files/4 Traction
-    displayName: 4 Traction
+    displayName: 4" Traction Wheel
     binId: wheels
     model: {fileID: 919132149155446097, guid: b9763683b45990748bddf7f307a97192, type: 3}
     prefab: {fileID: 2352424927009949830, guid: 9bc7880cf94403c459bba8f71949f508, type: 3}
@@ -3938,7 +3938,7 @@ MonoBehaviour:
     massKg: 0.08639454
     cuttable: 0
   - id: Motion/Wheels/Traction Wheel/5 Traction
-    displayName: 5 Traction
+    displayName: 5" Traction Wheel
     binId: wheels
     model: {fileID: 919132149155446097, guid: 5a30b0601cf67d446a0c2f1632a19329, type: 3}
     prefab: {fileID: 2178709295635578432, guid: 08d14fb3103e1704680c0e98dfa7ca7f, type: 3}
@@ -3988,7 +3988,7 @@ MonoBehaviour:
     massKg: 0.0011067662
     cuttable: 0
   - id: Structure/Angle/Aluminum 1x1/Alu Angle 1x1x35
-    displayName: Alu Angle 1x1x35
+    displayName: 1x1 Aluminum Angle (35)
     binId: angles
     model: {fileID: 919132149155446097, guid: 45caa830efda4ad46bdeb55eff65d84f, type: 3}
     prefab: {fileID: 1373656445834025239, guid: fbbd877d9b60af14d931d94056594c1e, type: 3}
@@ -3998,7 +3998,7 @@ MonoBehaviour:
     massKg: 0.037170526
     cuttable: 1
   - id: Structure/Angle/Aluminum 2x2/Alu Angle 2x2x35
-    displayName: Alu Angle 2x2x35
+    displayName: 2x2 Aluminum Angle (35)
     binId: angles
     model: {fileID: 919132149155446097, guid: 78b042c5fda9dc04caf932a998e9b377, type: 3}
     prefab: {fileID: 7345087454073841121, guid: 6b72b6cec3aee134d87e4db382e06931, type: 3}
@@ -4008,7 +4008,7 @@ MonoBehaviour:
     massKg: 0.079108596
     cuttable: 1
   - id: Structure/Angle/Steel 2x2/Steel  Angle 2x2x35
-    displayName: Steel  Angle 2x2x35
+    displayName: 2x2 Steel Angle (35)
     binId: angles
     model: {fileID: 919132149155446097, guid: 8289cb7ef714f164c83b23fe996b3608, type: 3}
     prefab: {fileID: 6228997735935359251, guid: 664e3fbf77e56e146bb5b05bb318ff19, type: 3}
@@ -4018,7 +4018,7 @@ MonoBehaviour:
     massKg: 0.17131159
     cuttable: 1
   - id: Structure/Angle/Steel 3x3/Steel Angle 3x3x35
-    displayName: Steel Angle 3x3x35
+    displayName: 3x3 Steel Angle (35)
     binId: angles
     model: {fileID: 919132149155446097, guid: 74cdea051446ab44b8759e1ec72e1d9a, type: 3}
     prefab: {fileID: 6670600689618337413, guid: a48ef4d8c0c7d6c4dbcb596e3680660b, type: 3}
@@ -4088,7 +4088,7 @@ MonoBehaviour:
     massKg: 0.06607756
     cuttable: 0
   - id: Structure/C Channel/Aluminum 1x2x1 Half/Alu Half C 1x2x1x35
-    displayName: Alu Half C 1x2x1x35
+    displayName: 1x2x1 Aluminum Half C-Channel (35)
     binId: c_channels
     model: {fileID: 919132149155446097, guid: fed2d851922a428479505ed8a67f38c3, type: 3}
     prefab: {fileID: 8857411035492748853, guid: d8d6e866ee8c2f043b4af3b2642cf1e1, type: 3}
@@ -4098,7 +4098,7 @@ MonoBehaviour:
     massKg: 0.038861144
     cuttable: 1
   - id: Structure/C Channel/Aluminum 1x2x1/Alu C 1x2x1x35
-    displayName: Alu C 1x2x1x35
+    displayName: 1x2x1 Aluminum C-Channel (35)
     binId: c_channels
     model: {fileID: 919132149155446097, guid: 54055bcaa5ec9584391bcb1756a9bfd0, type: 3}
     prefab: {fileID: 8046371234881766322, guid: 43942394ef266e94baeac1881b91caa8, type: 3}
@@ -4108,7 +4108,7 @@ MonoBehaviour:
     massKg: 0.077722386
     cuttable: 1
   - id: Structure/C Channel/Aluminum 1x3x1 Half Thick Cut/Alu C Half Thick 1x3x1x35
-    displayName: Alu C Half Thick 1x3x1x35
+    displayName: 1x3x1 Aluminum Half C-Channel, Thick Cut (35)
     binId: c_channels
     model: {fileID: 919132149155446097, guid: 7b41326af6dbc7342a7b087876f39bd0, type: 3}
     prefab: {fileID: 597988902730954698, guid: fc41a21a4f0a2b746b09bcb6cc8874da, type: 3}
@@ -4118,7 +4118,7 @@ MonoBehaviour:
     massKg: 0.048095968
     cuttable: 1
   - id: Structure/C Channel/Aluminum 1x3x1 Half/Alu C Half 1x3x1x35
-    displayName: Alu C Half 1x3x1x35
+    displayName: 1x3x1 Aluminum Half C-Channel (35)
     binId: c_channels
     model: {fileID: 919132149155446097, guid: dc41b53f582512a4f91921b18636e336, type: 3}
     prefab: {fileID: 8732656844571745888, guid: 5f3f346dd45244045a741f8321c2102b, type: 3}
@@ -4128,7 +4128,7 @@ MonoBehaviour:
     massKg: 0.040401462
     cuttable: 1
   - id: Structure/C Channel/Aluminum 1x3x1/Alu C 1x3x1x35
-    displayName: Alu C 1x3x1x35
+    displayName: 1x3x1 Aluminum C-Channel (35)
     binId: c_channels
     model: {fileID: 919132149155446097, guid: 2974b79fdec0d2049ae788c55c37e4df, type: 3}
     prefab: {fileID: 8693863605300911410, guid: e979ccc81c60faa48adae7c3543b1fd9, type: 3}
@@ -4138,7 +4138,7 @@ MonoBehaviour:
     massKg: 0.101828225
     cuttable: 1
   - id: Structure/C Channel/Aluminum 1x5x1/Alu C 1x5x1x35
-    displayName: Alu C 1x5x1x35
+    displayName: 1x5x1 Aluminum C-Channel (35)
     binId: c_channels
     model: {fileID: 919132149155446097, guid: 50c652040f786e848bc78a8a06b8eab5, type: 3}
     prefab: {fileID: 8835388841757892863, guid: 19f4e7ce8a9d92e4f93e14f1d80fb495, type: 3}
@@ -4148,7 +4148,7 @@ MonoBehaviour:
     massKg: 0.14387867
     cuttable: 1
   - id: Structure/C Channel/Aluminum 2x2x2/Alu C 2x2x2x20
-    displayName: Alu C 2x2x2x20
+    displayName: 2x2x2 Aluminum C-Channel (20)
     binId: rails
     model: {fileID: 919132149155446097, guid: d6b5225dc1644d84d9ab92023020b052, type: 3}
     prefab: {fileID: 4290104718978531528, guid: 9d90a8a0e5da2444aa44abd90808aef9, type: 3}
@@ -4158,7 +4158,7 @@ MonoBehaviour:
     massKg: 0.068531856
     cuttable: 1
   - id: Structure/C Channel/Steel 1x2x1 Half/Steel Half C 1x2x1x35
-    displayName: Steel Half C 1x2x1x35
+    displayName: 1x2x1 Steel Half C-Channel (35)
     binId: c_channels
     model: {fileID: 919132149155446097, guid: 042e19fdfa1ddd44b81c6fbb6bf597f8, type: 3}
     prefab: {fileID: 1582208078943913612, guid: 2f189fea8ddf71c46a4a96b9ad6b914b, type: 3}
@@ -4168,7 +4168,7 @@ MonoBehaviour:
     massKg: 0.08518888
     cuttable: 1
   - id: Structure/C Channel/Steel 1x2x1/Steel C 1x2x1x35
-    displayName: Steel C 1x2x1x35
+    displayName: 1x2x1 Steel C-Channel (35)
     binId: c_channels
     model: {fileID: 919132149155446097, guid: 4817ca2a19aa97641821305e41da5b29, type: 3}
     prefab: {fileID: 8793654832166445093, guid: b664c82a0c719f3408ee9baad9d01488, type: 3}
@@ -4178,7 +4178,7 @@ MonoBehaviour:
     massKg: 0.17037778
     cuttable: 1
   - id: Structure/C Channel/Steel 1x5x1 Half Thick Cut/Steel Half C Thick 1x5x1x35
-    displayName: Steel Half C Thick 1x5x1x35
+    displayName: 1x5x1 Steel Half C-Channel, Thick Cut (35)
     binId: c_channels
     model: {fileID: 919132149155446097, guid: 06e4953a671a610488fd7e763d028abe, type: 3}
     prefab: {fileID: 6738605376739812582, guid: 1c4280e519c2de64391bae064964ed81, type: 3}
@@ -4188,7 +4188,7 @@ MonoBehaviour:
     massKg: 0.10532584
     cuttable: 1
   - id: Structure/C Channel/Steel 1x5x1 Half/Steel Half C 1x5x1x35
-    displayName: Steel Half C 1x5x1x35
+    displayName: 1x5x1 Steel Half C-Channel (35)
     binId: c_channels
     model: {fileID: 919132149155446097, guid: 70dee2868e01b4149ad643080cc8d956, type: 3}
     prefab: {fileID: 7024687617779551388, guid: 0e181e1ec74705a40893ddb5efed6a28, type: 3}
@@ -4198,7 +4198,7 @@ MonoBehaviour:
     massKg: 0.08854749
     cuttable: 1
   - id: Structure/C Channel/Steel 1x5x1/Steel C Chan 1x5x1x35
-    displayName: Steel C Chan 1x5x1x35
+    displayName: 1x5x1 Steel C-Channel (35)
     binId: c_channels
     model: {fileID: 919132149155446097, guid: 15c36dd22d731a1418683faad9056f0a, type: 3}
     prefab: {fileID: 3859812281942198535, guid: ad30ee94cde16074ea5a43a56ba70bf7, type: 3}
@@ -4208,7 +4208,7 @@ MonoBehaviour:
     massKg: 0.3146355
     cuttable: 1
   - id: Structure/Chassis Rails/Alu Chassis Rail 2x1x25
-    displayName: Alu Chassis Rail 2x1x25
+    displayName: 2x1 Aluminum Chassis Rail (25)
     binId: rails
     model: {fileID: 919132149155446097, guid: cb1630ddd0514a8478a4a007a08307eb, type: 3}
     prefab: {fileID: 4517581574059815043, guid: 3d561506b0739f9418190de445620184, type: 3}
@@ -4218,7 +4218,7 @@ MonoBehaviour:
     massKg: 0.11732766
     cuttable: 1
   - id: Structure/Chassis Rails/Steel Chassis Rail 2x1x16
-    displayName: Steel Chassis Rail 2x1x16
+    displayName: 2x1 Steel Chassis Rail (16)
     binId: rails
     model: {fileID: 919132149155446097, guid: a3642f46ad344f3439463b4570f36fd7, type: 3}
     prefab: {fileID: 8774561610632485424, guid: 3f75da1bcde2c0f43b14fb8ef1c68d25, type: 3}
@@ -4228,7 +4228,7 @@ MonoBehaviour:
     massKg: 0.05481631
     cuttable: 1
   - id: Structure/Chassis Rails/Steel Chassis Rail 2x1x25
-    displayName: Steel Chassis Rail 2x1x25
+    displayName: 2x1 Steel Chassis Rail (25)
     binId: rails
     model: {fileID: 919132149155446097, guid: 89dfcdd38103e3544b8b7d8bf4fc8b0e, type: 3}
     prefab: {fileID: 4352119338704571130, guid: 0021496651446a047863525636e45e18, type: 3}
@@ -4238,7 +4238,7 @@ MonoBehaviour:
     massKg: 0.08456732
     cuttable: 1
   - id: Structure/Chassis Rails/Steel Chassis Rail 2x1x35
-    displayName: Steel Chassis Rail 2x1x35
+    displayName: 2x1 Steel Chassis Rail (35)
     binId: rails
     model: {fileID: 919132149155446097, guid: a2a71ed0f10be5e40b7ffe50fb6fa3e5, type: 3}
     prefab: {fileID: 3593212900632628606, guid: 5dc2432838597ae4a87ac91bab94a207, type: 3}
@@ -4248,7 +4248,7 @@ MonoBehaviour:
     massKg: 0.11762402
     cuttable: 1
   - id: Structure/Chassis Rails/Steel Chassis Rail 3x2x35
-    displayName: Steel Chassis Rail 3x2x35
+    displayName: 3x2 Steel Chassis Rail (35)
     binId: rails
     model: {fileID: 919132149155446097, guid: c9b34310aeab18b4ba3025efb475582f, type: 3}
     prefab: {fileID: 990846563715348345, guid: 39737efb661a7204c95e308990aeadfc, type: 3}
@@ -4258,7 +4258,7 @@ MonoBehaviour:
     massKg: 0.20828211
     cuttable: 1
   - id: Structure/Gussets/30 Bent Gusset
-    displayName: 30 Bent Gusset
+    displayName: 30 Degree Bent
     binId: gussets
     model: {fileID: 919132149155446097, guid: 7d697e870284ac3438fb60466f8157ab, type: 3}
     prefab: {fileID: 7407809891620416039, guid: 628581469afeb3b46b3d5c8e1c5f94e8, type: 3}
@@ -4268,7 +4268,7 @@ MonoBehaviour:
     massKg: 0.006673498
     cuttable: 0
   - id: Structure/Gussets/45 Bent Gusset
-    displayName: 45 Bent Gusset
+    displayName: 45 Degree Bent
     binId: gussets
     model: {fileID: 919132149155446097, guid: 22b6205b4e9d94547b9c9ae5072b7328, type: 3}
     prefab: {fileID: 8235428217138679421, guid: e96ea073fce8bd343b1222e5f79cbd0b, type: 3}
@@ -4278,7 +4278,7 @@ MonoBehaviour:
     massKg: 0.0064211283
     cuttable: 0
   - id: Structure/Gussets/45 Flat Gusset
-    displayName: 45 Flat Gusset
+    displayName: 45 Degree Flat
     binId: gussets
     model: {fileID: 919132149155446097, guid: 6fa4509fc98fda746b5d9a7251886b04, type: 3}
     prefab: {fileID: 720757230084716075, guid: 64be0c746d4265d44a823df73d1d8737, type: 3}
@@ -4288,7 +4288,7 @@ MonoBehaviour:
     massKg: 0.0026821753
     cuttable: 0
   - id: Structure/Gussets/45 Old Gusset
-    displayName: 45 Old Gusset
+    displayName: 45 Degree Gusset (old)
     binId: gussets
     model: {fileID: 919132149155446097, guid: f308395eb92c4fc429cd1707cac94e0f, type: 3}
     prefab: {fileID: 6739931198401522846, guid: 0934a5fc89534ea44ae9ae408777f7b2, type: 3}
@@ -4298,7 +4298,7 @@ MonoBehaviour:
     massKg: 0.005828403
     cuttable: 0
   - id: Structure/Gussets/60 Bent Gusset
-    displayName: 60 Bent Gusset
+    displayName: 60 Degree Bent
     binId: gussets
     model: {fileID: 919132149155446097, guid: 958d0dcc6090a7641a4190ee090ebac0, type: 3}
     prefab: {fileID: 4919717470179343972, guid: 71e9c497b940bad41894d62e6b65ed26, type: 3}
@@ -4308,7 +4308,7 @@ MonoBehaviour:
     massKg: 0.0060948343
     cuttable: 0
   - id: Structure/Gussets/60 Flat Gusset
-    displayName: 60 Flat Gusset
+    displayName: 60 Degree Flat
     binId: gussets
     model: {fileID: 919132149155446097, guid: 39f2b2a782a081c4aaeb44854461feca, type: 3}
     prefab: {fileID: 599128930791137178, guid: 1f88bc042f5ef65428e78e23b190dbc0, type: 3}
@@ -4318,7 +4318,7 @@ MonoBehaviour:
     massKg: 0.0026821522
     cuttable: 0
   - id: Structure/Gussets/90 Angle Gusset
-    displayName: 90 Angle Gusset
+    displayName: 90 Degree Angle
     binId: angles
     model: {fileID: 919132149155446097, guid: ef46c80f96586ee4cb7304d3be491c4a, type: 3}
     prefab: {fileID: 3334070279607283678, guid: 39c82e4507aa56d429c6a0cf968623c7, type: 3}
@@ -4328,7 +4328,7 @@ MonoBehaviour:
     massKg: 0.003084717
     cuttable: 0
   - id: Structure/Gussets/90 Bent Gusset
-    displayName: 90 Bent Gusset
+    displayName: 90 Degree Bent
     binId: gussets
     model: {fileID: 919132149155446097, guid: bce437f9df66d8240b068f8a3433d233, type: 3}
     prefab: {fileID: 5328170282139677929, guid: 7bd00299824d0144d925bfa049614b92, type: 3}
@@ -4338,7 +4338,7 @@ MonoBehaviour:
     massKg: 0.0058472455
     cuttable: 0
   - id: Structure/Gussets/90 Flat Gusset
-    displayName: 90 Flat Gusset
+    displayName: 90 Degree Flat
     binId: gussets
     model: {fileID: 919132149155446097, guid: 22a08aac0890019458a84e539c4d3272, type: 3}
     prefab: {fileID: 2429061154522461280, guid: 6132501d5e2e63941acd00e65a52b4ef, type: 3}
@@ -4348,7 +4348,7 @@ MonoBehaviour:
     massKg: 0.0037433612
     cuttable: 0
   - id: Structure/Gussets/90 Plate Gusset
-    displayName: 90 Plate Gusset
+    displayName: 90 Degree Plate
     binId: gussets
     model: {fileID: 919132149155446097, guid: b088168263620ed46b87dd0ba6f3df14, type: 3}
     prefab: {fileID: 7795265707566090207, guid: 89540063bc4c98840a1fbd6603f24288, type: 3}
@@ -4358,7 +4358,7 @@ MonoBehaviour:
     massKg: 0.003667527
     cuttable: 0
   - id: Structure/Gussets/Angle Corner Gusset
-    displayName: Angle Corner Gusset
+    displayName: Angle Corner
     binId: angles
     model: {fileID: 919132149155446097, guid: dca2ea1c77717ed45861889857bd0fba, type: 3}
     prefab: {fileID: 7093112939170644515, guid: 3c682c364f4663a469a3c8dbcc2873a3, type: 3}
@@ -4368,7 +4368,7 @@ MonoBehaviour:
     massKg: 0.015182761
     cuttable: 0
   - id: Structure/Gussets/Angle Coupler Gusset
-    displayName: Angle Coupler Gusset
+    displayName: Angle Coupler
     binId: angles
     model: {fileID: 919132149155446097, guid: 9e6f4e076356d48469a91f0a206b92ac, type: 3}
     prefab: {fileID: 5964708256417243577, guid: ddbfea8afcf02764bb6d9e3649382feb, type: 3}
@@ -4388,7 +4388,7 @@ MonoBehaviour:
     massKg: 0.0065759053
     cuttable: 0
   - id: Structure/Gussets/C Channel Coupler
-    displayName: C Channel Coupler
+    displayName: C-Channel Coupler
     binId: c_channels
     model: {fileID: 919132149155446097, guid: c47febe4bf8fa5b439af85ae017eb3bd, type: 3}
     prefab: {fileID: 101808707327247926, guid: 4caf996b844c0dd4abef6fddcd7d2991, type: 3}
@@ -4428,7 +4428,7 @@ MonoBehaviour:
     massKg: 0.0009980078
     cuttable: 0
   - id: Structure/Hardware/Coupler/Coupler Hex .5
-    displayName: Coupler Hex .5
+    displayName: 1/2" Hex Coupler
     binId: standoffs
     model: {fileID: 919132149155446097, guid: 14dba622dd3f865438fab0856851e94c, type: 3}
     prefab: {fileID: 4516826976358707493, guid: bf7b9264621edde45990621498167402, type: 3}
@@ -4438,7 +4438,7 @@ MonoBehaviour:
     massKg: 0.0009898865
     cuttable: 0
   - id: Structure/Hardware/Coupler/Coupler Hex 1
-    displayName: Coupler Hex 1
+    displayName: 1.00" Hex Coupler
     binId: standoffs
     model: {fileID: 919132149155446097, guid: 6f537c856464c144fb3feec09b994b55, type: 3}
     prefab: {fileID: 742524607301282692, guid: 1f4ec58083034f64eb97a93acdc9e55d, type: 3}
@@ -4448,7 +4448,7 @@ MonoBehaviour:
     massKg: 0.002041496
     cuttable: 0
   - id: Structure/Hardware/Coupler/Coupler Star .5
-    displayName: Coupler Star .5
+    displayName: 1/2" Star Coupler
     binId: standoffs
     model: {fileID: 919132149155446097, guid: 0bf1256554058a44b8e6156a4f26adae, type: 3}
     prefab: {fileID: 444587573640582837, guid: f439025df5ce5684489965dbddc0c611, type: 3}
@@ -4458,7 +4458,7 @@ MonoBehaviour:
     massKg: 0.0009980078
     cuttable: 0
   - id: Structure/Hardware/Coupler/Coupler Star 1
-    displayName: Coupler Star 1
+    displayName: 1.00" Star Coupler
     binId: standoffs
     model: {fileID: 919132149155446097, guid: 131e6ca1abeaed04f957a680bd0f8baa, type: 3}
     prefab: {fileID: 1732734088495005617, guid: f9b6e83fa67e3b542be9d6f00cbe3fb4, type: 3}
@@ -4468,7 +4468,7 @@ MonoBehaviour:
     massKg: 0.0020496151
     cuttable: 0
   - id: Structure/Hardware/Nut Alu
-    displayName: Nut Alu
+    displayName: Aluminum Nut
     binId: nuts
     model: {fileID: 919132149155446097, guid: a6c6bf8cd45042b4b993e6d3007d2c79, type: 3}
     prefab: {fileID: 6461925921366993267, guid: 82cb7fc76767b2648a90ee89a58a20a1, type: 3}
@@ -4478,7 +4478,7 @@ MonoBehaviour:
     massKg: 0.0005
     cuttable: 0
   - id: Structure/Hardware/Nut Hex
-    displayName: Nut Hex
+    displayName: Hex Nut
     binId: nuts
     model: {fileID: 919132149155446097, guid: 416d8db2090c2a14ba80fc06e95db922, type: 3}
     prefab: {fileID: 3870357867233612004, guid: 02a08ddd1ce5a6249bcae620164830d8, type: 3}
@@ -4488,7 +4488,7 @@ MonoBehaviour:
     massKg: 0.0011870369
     cuttable: 0
   - id: Structure/Hardware/Nut Keps
-    displayName: Nut Keps
+    displayName: Keps Nut
     binId: nuts
     model: {fileID: 919132149155446097, guid: f74fa3107095154488581a4c0a6c4711, type: 3}
     prefab: {fileID: 4196316848442603080, guid: a46cb6928589def4b922874b27362b75, type: 3}
@@ -4498,7 +4498,7 @@ MonoBehaviour:
     massKg: 0.0014895588
     cuttable: 0
   - id: Structure/Hardware/Nut Low Profile
-    displayName: Nut Low Profile
+    displayName: Low Profile Nut
     binId: nuts
     model: {fileID: 919132149155446097, guid: 7917391bc2f310342bee7b122a498628, type: 3}
     prefab: {fileID: 6774165790956785457, guid: 20115f5e42fd8cb4988b0df7d6da38eb, type: 3}
@@ -4508,7 +4508,7 @@ MonoBehaviour:
     massKg: 0.00095357135
     cuttable: 0
   - id: Structure/Hardware/Nut M5 Thin Hex
-    displayName: Nut M5 Thin Hex
+    displayName: M5 Thin Hex Nut
     binId: nuts
     model: {fileID: 919132149155446097, guid: cd80b760d980644468be68af5a6c48a5, type: 3}
     prefab: {fileID: 2943766194333023371, guid: b8b48589e4b68b84aa56394ade68a773, type: 3}
@@ -4518,7 +4518,7 @@ MonoBehaviour:
     massKg: 0.0008029784
     cuttable: 0
   - id: Structure/Hardware/Nut Nylock
-    displayName: Nut Nylock
+    displayName: Nylock Nut
     binId: nuts
     model: {fileID: 919132149155446097, guid: 44e3993abd83f4c4ab686a53c6bc0883, type: 3}
     prefab: {fileID: 2591254740193216748, guid: 530fda7dee0ae0e4183ca4234d88b602, type: 3}
@@ -4528,7 +4528,7 @@ MonoBehaviour:
     massKg: 0.001954373
     cuttable: 0
   - id: Structure/Hardware/Nut Nylon
-    displayName: Nut Nylon
+    displayName: Nylon Nut
     binId: nuts
     model: {fileID: 919132149155446097, guid: dd99cae2e524a1442b65a3a75c74a4f4, type: 3}
     prefab: {fileID: 5851527801955724869, guid: bb9ab6b85ac6d8e4abf8520e0c82ff42, type: 3}
@@ -4538,7 +4538,7 @@ MonoBehaviour:
     massKg: 0.0005
     cuttable: 0
   - id: Structure/Hardware/Nut Thin Nylock
-    displayName: Nut Thin Nylock
+    displayName: Thin Nylock Nut
     binId: nuts
     model: {fileID: 919132149155446097, guid: f7c134b2bed0f0942acf83643269669d, type: 3}
     prefab: {fileID: 2599102514906488975, guid: 9837aa60580a0374ca1e06538311547e, type: 3}
@@ -4548,7 +4548,7 @@ MonoBehaviour:
     massKg: 0.0015999351
     cuttable: 0
   - id: Structure/Hardware/Nylon Hardware/Nut Nylon - Black
-    displayName: Nut Nylon - Black
+    displayName: Black Nylon Nut
     binId: nuts
     model: {fileID: 919132149155446097, guid: e9f7ded03028f784899c550c28f4fc2b, type: 3}
     prefab: {fileID: 8811174537437437281, guid: be167738dc74c8d42a7ea87d6ece55a0, type: 3}
@@ -4558,7 +4558,7 @@ MonoBehaviour:
     massKg: 0.0005
     cuttable: 0
   - id: Structure/Hardware/Nylon Hardware/Nut Nylon Flange Thread-Forming - Grainger
-    displayName: Nut Nylon Flange Thread-Forming - Grainger
+    displayName: Nylon Flange Thread-Forming Nut
     binId: nuts
     model: {fileID: 919132149155446097, guid: e6a8b447e57f6a64aa8a9dac7ea08883, type: 3}
     prefab: {fileID: 7748141055086845099, guid: 2d6d269ac36ccc64a837434fdb9c0fe9, type: 3}
@@ -4568,7 +4568,7 @@ MonoBehaviour:
     massKg: 0.0005
     cuttable: 0
   - id: Structure/Hardware/Nylon Hardware/Nut Nylon Thread-Forming - McMaster-Carr
-    displayName: Nut Nylon Thread-Forming - McMaster-Carr
+    displayName: Nylon Thread-Forming Nut
     binId: nuts
     model: {fileID: 919132149155446097, guid: bcd3e58175442fb48a1e998f771b468e, type: 3}
     prefab: {fileID: 8034888035851445544, guid: db4f08b26161416449f90c3e1ff7c40c, type: 3}
@@ -4629,7 +4629,7 @@ MonoBehaviour:
     cuttable: 0
   - id: Structure/Hardware/Screw Shoulder Robosource/SScrew Shoulder Smooth .290
       x .09
-    displayName: SScrew Shoulder Smooth .290 x .09
+    displayName: 0.29" Shoulder Screw (0.09" shoulder)
     binId: screws
     model: {fileID: 919132149155446097, guid: 24d16d8cb3bcc814989fb556822af38f, type: 3}
     prefab: {fileID: 2451684269641058192, guid: b6a77aae785b3034f95dc16c6d54c2be, type: 3}
@@ -4640,7 +4640,7 @@ MonoBehaviour:
     cuttable: 0
   - id: Structure/Hardware/Screw Shoulder Robosource/SScrew Shoulder Smooth .375
       x .12
-    displayName: SScrew Shoulder Smooth .375 x .12
+    displayName: 3/8" Shoulder Screw (0.12" shoulder)
     binId: screws
     model: {fileID: 919132149155446097, guid: 58e4fa96b57ab79489aa90bc5baabe6b, type: 3}
     prefab: {fileID: 5245629676603153502, guid: 50e79e9dbd8cbcb4d9467ff40eade15d, type: 3}
@@ -4651,7 +4651,7 @@ MonoBehaviour:
     cuttable: 0
   - id: Structure/Hardware/Screw Shoulder Robosource/SScrew Shoulder Smooth .500
       x .04
-    displayName: SScrew Shoulder Smooth .500 x .04
+    displayName: 1/2" Shoulder Screw (0.04" shoulder)
     binId: screws
     model: {fileID: 919132149155446097, guid: 8a1a048da46c7cd47baa56bfc2b8b4a2, type: 3}
     prefab: {fileID: 2776375862365247788, guid: fbf7ebe35cccdc7478f9f14249f8bf3f, type: 3}
@@ -4662,7 +4662,7 @@ MonoBehaviour:
     cuttable: 0
   - id: Structure/Hardware/Screw Shoulder Robosource/SScrew Shoulder Smooth .500
       x .18
-    displayName: SScrew Shoulder Smooth .500 x .18
+    displayName: 1/2" Shoulder Screw (0.18" shoulder)
     binId: screws
     model: {fileID: 919132149155446097, guid: 864a18902a411104a99e06922ce01079, type: 3}
     prefab: {fileID: 7264186786724639037, guid: acbec3aaf27032e4eb40c33ac2495a3d, type: 3}
@@ -4673,7 +4673,7 @@ MonoBehaviour:
     cuttable: 0
   - id: Structure/Hardware/Screw Shoulder Robosource/SScrew Shoulder Smooth 1.000
       x .12
-    displayName: SScrew Shoulder Smooth 1.000 x .12
+    displayName: 1.00" Shoulder Screw (0.12" shoulder)
     binId: screws
     model: {fileID: 919132149155446097, guid: bab2c086f6c906b4f9653ba477345ffb, type: 3}
     prefab: {fileID: 3700001524278126288, guid: 5a21be5efad9186479ec79007e1109ff, type: 3}
@@ -4684,7 +4684,7 @@ MonoBehaviour:
     cuttable: 0
   - id: Structure/Hardware/Screw Shoulder Robosource/SScrew Shoulder Smooth 1.500
       x .18
-    displayName: SScrew Shoulder Smooth 1.500 x .18
+    displayName: 1.50" Shoulder Screw (0.18" shoulder)
     binId: screws
     model: {fileID: 919132149155446097, guid: 78f7d5cb2d248aa48a3c416fd18f3859, type: 3}
     prefab: {fileID: 5869204638468489160, guid: cbff8f46b91f4274397973cac5b60bff, type: 3}
@@ -4695,7 +4695,7 @@ MonoBehaviour:
     cuttable: 0
   - id: Structure/Hardware/Screw Shoulder Robosource/SScrew Shoulder Smooth 2.000
       x .04
-    displayName: SScrew Shoulder Smooth 2.000 x .04
+    displayName: 2.00" Shoulder Screw (0.04" shoulder)
     binId: screws
     model: {fileID: 919132149155446097, guid: 28bbb0b4ad9aee44aab752d51cf3d559, type: 3}
     prefab: {fileID: 5025273914539814919, guid: 70dc217f700d949439c7f3b525c8423d, type: 3}
@@ -4706,7 +4706,7 @@ MonoBehaviour:
     cuttable: 0
   - id: Structure/Hardware/Screw Shoulder Robosource/SScrew Shoulder Threaded .290
       x .09
-    displayName: SScrew Shoulder Threaded .290 x .09
+    displayName: 0.29" Shoulder Screw (0.09" shoulder), threads shown
     binId: screws
     model: {fileID: 919132149155446097, guid: 1f7aead7a63b42a49846b20eb484d832, type: 3}
     prefab: {fileID: 1202633791379658166, guid: 5affe5e24d90f1b43a5bb5a9833995f5, type: 3}
@@ -4717,7 +4717,7 @@ MonoBehaviour:
     cuttable: 0
   - id: Structure/Hardware/Screw Shoulder Robosource/SScrew Shoulder Threaded .375
       x .12
-    displayName: SScrew Shoulder Threaded .375 x .12
+    displayName: 3/8" Shoulder Screw (0.12" shoulder), threads shown
     binId: screws
     model: {fileID: 919132149155446097, guid: 75ea930f0749fb4478368df6eb4238c9, type: 3}
     prefab: {fileID: 6816968155613304779, guid: 20ba4656cf78a0846b044a56c37f5ebe, type: 3}
@@ -4728,7 +4728,7 @@ MonoBehaviour:
     cuttable: 0
   - id: Structure/Hardware/Screw Shoulder Robosource/SScrew Shoulder Threaded .500
       x .04
-    displayName: SScrew Shoulder Threaded .500 x .04
+    displayName: 1/2" Shoulder Screw (0.04" shoulder), threads shown
     binId: screws
     model: {fileID: 919132149155446097, guid: 88d65776b4a4ffc4bb667091305fd9cb, type: 3}
     prefab: {fileID: 5839151275884730458, guid: 409385bef4bd46743b5ead1a84a13a4d, type: 3}
@@ -4739,7 +4739,7 @@ MonoBehaviour:
     cuttable: 0
   - id: Structure/Hardware/Screw Shoulder Robosource/SScrew Shoulder Threaded .500
       x .18
-    displayName: SScrew Shoulder Threaded .500 x .18
+    displayName: 1/2" Shoulder Screw (0.18" shoulder), threads shown
     binId: screws
     model: {fileID: 919132149155446097, guid: b791db3bfe2c0864da05879f5c73149e, type: 3}
     prefab: {fileID: 6185722656647261474, guid: 2f77c2c82b8552c4c9e80ff4339a288d, type: 3}
@@ -4750,7 +4750,7 @@ MonoBehaviour:
     cuttable: 0
   - id: Structure/Hardware/Screw Shoulder Robosource/SScrew Shoulder Threaded 1.000
       x .12
-    displayName: SScrew Shoulder Threaded 1.000 x .12
+    displayName: 1.00" Shoulder Screw (0.12" shoulder), threads shown
     binId: screws
     model: {fileID: 919132149155446097, guid: c1c55085c85dcd44dbdd3108bd8b2eb6, type: 3}
     prefab: {fileID: 1371352239533425696, guid: 01aab906e1bd0cc4e82e50e88134bd4d, type: 3}
@@ -4761,7 +4761,7 @@ MonoBehaviour:
     cuttable: 0
   - id: Structure/Hardware/Screw Shoulder Robosource/SScrew Shoulder Threaded 1.500
       x .18
-    displayName: SScrew Shoulder Threaded 1.500 x .18
+    displayName: 1.50" Shoulder Screw (0.18" shoulder), threads shown
     binId: screws
     model: {fileID: 919132149155446097, guid: eddb3ab8eece29244a581a10dcb38968, type: 3}
     prefab: {fileID: 2406419405574712552, guid: 9ed6dd877e2d6954e88a263d98b894fb, type: 3}
@@ -4772,7 +4772,7 @@ MonoBehaviour:
     cuttable: 0
   - id: Structure/Hardware/Screw Shoulder Robosource/SScrew Shoulder Threaded 2.000
       x .04
-    displayName: SScrew Shoulder Threaded 2.000 x .04
+    displayName: 2.00" Shoulder Screw (0.04" shoulder), threads shown
     binId: screws
     model: {fileID: 919132149155446097, guid: 07ddb205ee154ec46a380dd5d0e06bdd, type: 3}
     prefab: {fileID: 6647779477253974039, guid: 8902f4ea878b4fd4fb56d0f2b0bbcc47, type: 3}
@@ -4792,7 +4792,7 @@ MonoBehaviour:
     massKg: 0.0013262109
     cuttable: 0
   - id: Structure/Hardware/Screw Steel - Hex
-    displayName: Screw Steel - Hex
+    displayName: Hex Screw
     binId: screws
     model: {fileID: 919132149155446097, guid: 84585f56d349f904eabd11ee04b98c87, type: 3}
     prefab: {fileID: 2730943045644159076, guid: 7b790ff0a9dfad647ae8e5eb6360c69b, type: 3}
@@ -4802,7 +4802,7 @@ MonoBehaviour:
     massKg: 0.001233665
     cuttable: 0
   - id: Structure/Hardware/Screw Steel - Hex/SScrew Hex Smooth .250
-    displayName: SScrew Hex Smooth .250
+    displayName: 1/4" Hex Screw
     binId: screws
     model: {fileID: 919132149155446097, guid: 34fa02ff3c23e144d9a2b2b3c33342d8, type: 3}
     prefab: {fileID: 4221320512373976857, guid: 4663e3d10c39f6a4fb40004ef6743184, type: 3}
@@ -4812,7 +4812,7 @@ MonoBehaviour:
     massKg: 0.001233665
     cuttable: 0
   - id: Structure/Hardware/Screw Steel - Hex/SScrew Hex Smooth .375
-    displayName: SScrew Hex Smooth .375
+    displayName: 3/8" Hex Screw
     binId: screws
     model: {fileID: 919132149155446097, guid: 82e3fa4b8643b7e4f9bada2bc3148eaf, type: 3}
     prefab: {fileID: 5524687330786097887, guid: d462e15d477b7b24284ac45dcb16f8c0, type: 3}
@@ -4822,7 +4822,7 @@ MonoBehaviour:
     massKg: 0.0015723906
     cuttable: 0
   - id: Structure/Hardware/Screw Steel - Hex/SScrew Hex Smooth .500
-    displayName: SScrew Hex Smooth .500
+    displayName: 1/2" Hex Screw
     binId: screws
     model: {fileID: 919132149155446097, guid: dbe13576f00960c44beaf0ddba50e538, type: 3}
     prefab: {fileID: 4443455465620259020, guid: c50f7c87812887446b385c4f6ede0b4c, type: 3}
@@ -4832,7 +4832,7 @@ MonoBehaviour:
     massKg: 0.0019111737
     cuttable: 0
   - id: Structure/Hardware/Screw Steel - Hex/SScrew Hex Smooth .625
-    displayName: SScrew Hex Smooth .625
+    displayName: 5/8" Hex Screw
     binId: screws
     model: {fileID: 919132149155446097, guid: 8e96beffe7fad1b489a5048cf3c59c77, type: 3}
     prefab: {fileID: 5837065255339827652, guid: 5b1ed2b95313f274facd4e9f61837815, type: 3}
@@ -4842,7 +4842,7 @@ MonoBehaviour:
     massKg: 0.0022500576
     cuttable: 0
   - id: Structure/Hardware/Screw Steel - Hex/SScrew Hex Smooth .750
-    displayName: SScrew Hex Smooth .750
+    displayName: 3/4" Hex Screw
     binId: screws
     model: {fileID: 919132149155446097, guid: 99f194a8ff16f654d99e26e11891b391, type: 3}
     prefab: {fileID: 3234838682258052670, guid: ae4169e1285722c428596fe60b8998ad, type: 3}
@@ -4852,7 +4852,7 @@ MonoBehaviour:
     massKg: 0.0025888376
     cuttable: 0
   - id: Structure/Hardware/Screw Steel - Hex/SScrew Hex Smooth .875
-    displayName: SScrew Hex Smooth .875
+    displayName: 7/8" Hex Screw
     binId: screws
     model: {fileID: 919132149155446097, guid: da01be92dfe7f434088a982d916d5f4e, type: 3}
     prefab: {fileID: 815858778578262608, guid: cffb7b5e4c24ff94fa523edc8214e3d3, type: 3}
@@ -4862,7 +4862,7 @@ MonoBehaviour:
     massKg: 0.0029269583
     cuttable: 0
   - id: Structure/Hardware/Screw Steel - Hex/SScrew Hex Smooth 1.000
-    displayName: SScrew Hex Smooth 1.000
+    displayName: 1.00" Hex Screw
     binId: screws
     model: {fileID: 919132149155446097, guid: 50e1ed344906b03488a7a89ed03c0f76, type: 3}
     prefab: {fileID: 5361357538197267978, guid: 406ef55c6009fc34a81224a024ee7cfd, type: 3}
@@ -4872,7 +4872,7 @@ MonoBehaviour:
     massKg: 0.0032650363
     cuttable: 0
   - id: Structure/Hardware/Screw Steel - Hex/SScrew Hex Smooth 1.125
-    displayName: SScrew Hex Smooth 1.125
+    displayName: 1.13" Hex Screw
     binId: screws
     model: {fileID: 919132149155446097, guid: e154da93df84c864aa574da933c6179c, type: 3}
     prefab: {fileID: 3667397860306052036, guid: 65b559ba851de47469b91551d70dc503, type: 3}
@@ -4882,7 +4882,7 @@ MonoBehaviour:
     massKg: 0.0036027713
     cuttable: 0
   - id: Structure/Hardware/Screw Steel - Hex/SScrew Hex Smooth 1.250
-    displayName: SScrew Hex Smooth 1.250
+    displayName: 1.25" Hex Screw
     binId: screws
     model: {fileID: 919132149155446097, guid: 838ba20c61e93e14688216a5db340602, type: 3}
     prefab: {fileID: 3796967361984537068, guid: caa2177fa935c89469af9b200b2d4462, type: 3}
@@ -4892,7 +4892,7 @@ MonoBehaviour:
     massKg: 0.003940155
     cuttable: 0
   - id: Structure/Hardware/Screw Steel - Hex/SScrew Hex Smooth 1.500
-    displayName: SScrew Hex Smooth 1.500
+    displayName: 1.50" Hex Screw
     binId: screws
     model: {fileID: 919132149155446097, guid: 4a6e14d4e8460844f8f7d53859254f77, type: 3}
     prefab: {fileID: 1708824131081966451, guid: facf2651be8c1164185efab992f41204, type: 3}
@@ -4902,7 +4902,7 @@ MonoBehaviour:
     massKg: 0.004613774
     cuttable: 0
   - id: Structure/Hardware/Screw Steel - Hex/SScrew Hex Smooth 1.750
-    displayName: SScrew Hex Smooth 1.750
+    displayName: 1.75" Hex Screw
     binId: screws
     model: {fileID: 919132149155446097, guid: 4210fde9c56fcdd43b3efc9cd77d748f, type: 3}
     prefab: {fileID: 9217922267756751586, guid: f355452a49c6f344d927a42eb680f288, type: 3}
@@ -4912,7 +4912,7 @@ MonoBehaviour:
     massKg: 0.0052876244
     cuttable: 0
   - id: Structure/Hardware/Screw Steel - Hex/SScrew Hex Smooth 2.000
-    displayName: SScrew Hex Smooth 2.000
+    displayName: 2.00" Hex Screw
     binId: screws
     model: {fileID: 919132149155446097, guid: d719c093c9b017f4dbcf3ac52cc61f53, type: 3}
     prefab: {fileID: 8753803341465668942, guid: 894675342cccce74081c539963ba642d, type: 3}
@@ -4922,7 +4922,7 @@ MonoBehaviour:
     massKg: 0.005960356
     cuttable: 0
   - id: Structure/Hardware/Screw Steel - Hex/SScrew Hex Smooth 2.250
-    displayName: SScrew Hex Smooth 2.250
+    displayName: 2.25" Hex Screw
     binId: screws
     model: {fileID: 919132149155446097, guid: 92c3a97f0db199344965e4d03dba8af0, type: 3}
     prefab: {fileID: 1723004455034152023, guid: e08eeb78a76c54a45a358f7c851c0fa2, type: 3}
@@ -4932,7 +4932,7 @@ MonoBehaviour:
     massKg: 0.0066318354
     cuttable: 0
   - id: Structure/Hardware/Screw Steel - Hex/SScrew Hex Smooth 2.500
-    displayName: SScrew Hex Smooth 2.500
+    displayName: 2.50" Hex Screw
     binId: screws
     model: {fileID: 919132149155446097, guid: a411796079d0d6141a95ab3697b0e021, type: 3}
     prefab: {fileID: 1677678846716820261, guid: db8824c641983fe4bb2c350b830cb11f, type: 3}
@@ -4942,7 +4942,7 @@ MonoBehaviour:
     massKg: 0.0073026633
     cuttable: 0
   - id: Structure/Hardware/Screw Steel - Hex/SScrew Hex Threaded .250
-    displayName: SScrew Hex Threaded .250
+    displayName: 1/4" Hex Screw, threads shown
     binId: screws
     model: {fileID: 919132149155446097, guid: 0f91e46c46731b647930e4f78c6d4295, type: 3}
     prefab: {fileID: 4648108151195242248, guid: c23b6207fdf44914fbf69ab415dfdd53, type: 3}
@@ -4952,7 +4952,7 @@ MonoBehaviour:
     massKg: 0.0010913895
     cuttable: 0
   - id: Structure/Hardware/Screw Steel - Hex/SScrew Hex Threaded .375
-    displayName: SScrew Hex Threaded .375
+    displayName: 3/8" Hex Screw, threads shown
     binId: screws
     model: {fileID: 919132149155446097, guid: eda8ed1b2356d854990cbb3b4ba96a2e, type: 3}
     prefab: {fileID: 499208254726502421, guid: c14880a14d62eda49aa24c5c148fd46f, type: 3}
@@ -4962,7 +4962,7 @@ MonoBehaviour:
     massKg: 0.0013546873
     cuttable: 0
   - id: Structure/Hardware/Screw Steel - Hex/SScrew Hex Threaded .500
-    displayName: SScrew Hex Threaded .500
+    displayName: 1/2" Hex Screw, threads shown
     binId: screws
     model: {fileID: 919132149155446097, guid: 7124091cc15ad0e4cb17c4d3f6613930, type: 3}
     prefab: {fileID: 4992085083772129705, guid: 349d52ac38859ea43bd84b2d022ef809, type: 3}
@@ -4972,7 +4972,7 @@ MonoBehaviour:
     massKg: 0.0016172051
     cuttable: 0
   - id: Structure/Hardware/Screw Steel - Hex/SScrew Hex Threaded .625
-    displayName: SScrew Hex Threaded .625
+    displayName: 5/8" Hex Screw, threads shown
     binId: screws
     model: {fileID: 919132149155446097, guid: d0b31c06032ab60448d77cf6abd801b7, type: 3}
     prefab: {fileID: 2529306913786940770, guid: 0d9880a7de274234a882dc9e471ec930, type: 3}
@@ -4982,7 +4982,7 @@ MonoBehaviour:
     massKg: 0.0018791487
     cuttable: 0
   - id: Structure/Hardware/Screw Steel - Hex/SScrew Hex Threaded .750
-    displayName: SScrew Hex Threaded .750
+    displayName: 3/4" Hex Screw, threads shown
     binId: screws
     model: {fileID: 919132149155446097, guid: a5a11ae283ddd7c4e89b2eed04689af5, type: 3}
     prefab: {fileID: 6728557114771016019, guid: cf69beeb082d398479ad282e6d3b41f1, type: 3}
@@ -4992,7 +4992,7 @@ MonoBehaviour:
     massKg: 0.0021437744
     cuttable: 0
   - id: Structure/Hardware/Screw Steel - Hex/SScrew Hex Threaded .875
-    displayName: SScrew Hex Threaded .875
+    displayName: 7/8" Hex Screw, threads shown
     binId: screws
     model: {fileID: 919132149155446097, guid: f04a8c3656349374ab13b9f87f9cc818, type: 3}
     prefab: {fileID: 4715256884247786223, guid: 73819ba15dfe23c41b713c7fadb0851c, type: 3}
@@ -5002,7 +5002,7 @@ MonoBehaviour:
     massKg: 0.0024062858
     cuttable: 0
   - id: Structure/Hardware/Screw Steel - Hex/SScrew Hex Threaded 1.000
-    displayName: SScrew Hex Threaded 1.000
+    displayName: 1.00" Hex Screw, threads shown
     binId: screws
     model: {fileID: 919132149155446097, guid: 35504c94d72343d42ae5fc06edf8713b, type: 3}
     prefab: {fileID: 3748220588055123075, guid: 31ff028af9b3e86498ce9b1111835359, type: 3}
@@ -5012,7 +5012,7 @@ MonoBehaviour:
     massKg: 0.0026684513
     cuttable: 0
   - id: Structure/Hardware/Screw Steel - Hex/SScrew Hex Threaded 1.125
-    displayName: SScrew Hex Threaded 1.125
+    displayName: 1.13" Hex Screw, threads shown
     binId: screws
     model: {fileID: 919132149155446097, guid: 27b75aa60815ceb45be9959ab66a4ec2, type: 3}
     prefab: {fileID: 1991127333754948667, guid: 06dc3b070ee803f48a5b5fc520d7a790, type: 3}
@@ -5022,7 +5022,7 @@ MonoBehaviour:
     massKg: 0.0029303536
     cuttable: 0
   - id: Structure/Hardware/Screw Steel - Hex/SScrew Hex Threaded 1.250
-    displayName: SScrew Hex Threaded 1.250
+    displayName: 1.25" Hex Screw, threads shown
     binId: screws
     model: {fileID: 919132149155446097, guid: 34713d62e8a6e87448259891c3fbf851, type: 3}
     prefab: {fileID: 9089020410708326300, guid: ee680b5e1c3c45c40976840a766e5257, type: 3}
@@ -5032,7 +5032,7 @@ MonoBehaviour:
     massKg: 0.0031918567
     cuttable: 0
   - id: Structure/Hardware/Screw Steel - Hex/SScrew Hex Threaded 1.500
-    displayName: SScrew Hex Threaded 1.500
+    displayName: 1.50" Hex Screw, threads shown
     binId: screws
     model: {fileID: 919132149155446097, guid: e0fc08dfdc9aa604c8a62fe68baeb611, type: 3}
     prefab: {fileID: 615984936635458754, guid: 77a7ed8e2c4c02443bdd04393d5281f9, type: 3}
@@ -5042,7 +5042,7 @@ MonoBehaviour:
     massKg: 0.003713927
     cuttable: 0
   - id: Structure/Hardware/Screw Steel - Hex/SScrew Hex Threaded 1.750
-    displayName: SScrew Hex Threaded 1.750
+    displayName: 1.75" Hex Screw, threads shown
     binId: screws
     model: {fileID: 919132149155446097, guid: 0a0d520f0ea4dc843b1fd14601946479, type: 3}
     prefab: {fileID: 2788983582118747050, guid: 020d5745147414244a4835ee85fd1ca7, type: 3}
@@ -5052,7 +5052,7 @@ MonoBehaviour:
     massKg: 0.004234829
     cuttable: 0
   - id: Structure/Hardware/Screw Steel - Hex/SScrew Hex Threaded 2.000
-    displayName: SScrew Hex Threaded 2.000
+    displayName: 2.00" Hex Screw, threads shown
     binId: screws
     model: {fileID: 919132149155446097, guid: c6761857efbc03e40830263af157d2b5, type: 3}
     prefab: {fileID: 4212737610871684155, guid: 65f078c6f54702941b022abe7486189d, type: 3}
@@ -5062,7 +5062,7 @@ MonoBehaviour:
     massKg: 0.0047634942
     cuttable: 0
   - id: Structure/Hardware/Screw Steel - Hex/SScrew Hex Threaded 2.250
-    displayName: SScrew Hex Threaded 2.250
+    displayName: 2.25" Hex Screw, threads shown
     binId: screws
     model: {fileID: 919132149155446097, guid: 25800e55764207e489adcc10137d9ece, type: 3}
     prefab: {fileID: 7150822476982031325, guid: 9e6f1b29fbd1b824e99fccb68878c895, type: 3}
@@ -5072,7 +5072,7 @@ MonoBehaviour:
     massKg: 0.0052846805
     cuttable: 0
   - id: Structure/Hardware/Screw Steel - Hex/SScrew Hex Threaded 2.500
-    displayName: SScrew Hex Threaded 2.500
+    displayName: 2.50" Hex Screw, threads shown
     binId: screws
     model: {fileID: 919132149155446097, guid: 756e2fb0adc09394cbacf720ddd079a6, type: 3}
     prefab: {fileID: 4890690435871107257, guid: 6fa219c4fdb6463449c1fcb0a275df02, type: 3}
@@ -5082,7 +5082,7 @@ MonoBehaviour:
     massKg: 0.0058164895
     cuttable: 0
   - id: Structure/Hardware/Screw Steel - Star
-    displayName: Screw Steel - Star
+    displayName: Star Screw
     binId: screws
     model: {fileID: 919132149155446097, guid: 1f1af792c83de7d47ad9365c8ea93e59, type: 3}
     prefab: {fileID: 2772050694758991283, guid: 8f21b3aa4fac54e49b5149e179e4dc33, type: 3}
@@ -5092,7 +5092,7 @@ MonoBehaviour:
     massKg: 0.0011961386
     cuttable: 0
   - id: Structure/Hardware/Screw Steel - Star/SScrew Star Smooth .250
-    displayName: SScrew Star Smooth .250
+    displayName: 1/4" Star Screw
     binId: screws
     model: {fileID: 919132149155446097, guid: ee980869631c11b4a971827b5165dcc5, type: 3}
     prefab: {fileID: 3118730961963985402, guid: 5e604b9a2ee386d4dac963c62b5f0706, type: 3}
@@ -5102,7 +5102,7 @@ MonoBehaviour:
     massKg: 0.0011961386
     cuttable: 0
   - id: Structure/Hardware/Screw Steel - Star/SScrew Star Smooth .290
-    displayName: SScrew Star Smooth .290
+    displayName: 0.29" Star Screw
     binId: screws
     model: {fileID: 919132149155446097, guid: 67bf9c18bf8cab84085a751079ce3282, type: 3}
     prefab: {fileID: 8135283438656977608, guid: cf3caed9cd849e245bd8e83d43dc4d19, type: 3}
@@ -5112,7 +5112,7 @@ MonoBehaviour:
     massKg: 0.0013043984
     cuttable: 0
   - id: Structure/Hardware/Screw Steel - Star/SScrew Star Smooth .375
-    displayName: SScrew Star Smooth .375
+    displayName: 3/8" Star Screw
     binId: screws
     model: {fileID: 919132149155446097, guid: 3fff275a1388d2249b4d75c50c34e9d7, type: 3}
     prefab: {fileID: 4997282595681094010, guid: e97e219d3c3ebeb45b374ae65c07d5e2, type: 3}
@@ -5122,7 +5122,7 @@ MonoBehaviour:
     massKg: 0.001534864
     cuttable: 0
   - id: Structure/Hardware/Screw Steel - Star/SScrew Star Smooth .500
-    displayName: SScrew Star Smooth .500
+    displayName: 1/2" Star Screw
     binId: screws
     model: {fileID: 919132149155446097, guid: f3e420cac7a487a4db5622bec421dc0b, type: 3}
     prefab: {fileID: 6247073009656112695, guid: e239084c1240c6b498f45f497e0c092e, type: 3}
@@ -5132,7 +5132,7 @@ MonoBehaviour:
     massKg: 0.0018736472
     cuttable: 0
   - id: Structure/Hardware/Screw Steel - Star/SScrew Star Smooth .625
-    displayName: SScrew Star Smooth .625
+    displayName: 5/8" Star Screw
     binId: screws
     model: {fileID: 919132149155446097, guid: aae8723612009e843a450c28aee11cc1, type: 3}
     prefab: {fileID: 1343636714359983774, guid: 4fdb94816b52f6946801087e2b2ecde3, type: 3}
@@ -5142,7 +5142,7 @@ MonoBehaviour:
     massKg: 0.0022125312
     cuttable: 0
   - id: Structure/Hardware/Screw Steel - Star/SScrew Star Smooth .750
-    displayName: SScrew Star Smooth .750
+    displayName: 3/4" Star Screw
     binId: screws
     model: {fileID: 919132149155446097, guid: 62837f639e751f445b75e974f45e9f9d, type: 3}
     prefab: {fileID: 8484542305107080993, guid: 610d5e8b88e46c043843153b21d3fc2d, type: 3}
@@ -5152,7 +5152,7 @@ MonoBehaviour:
     massKg: 0.002551311
     cuttable: 0
   - id: Structure/Hardware/Screw Steel - Star/SScrew Star Smooth .875
-    displayName: SScrew Star Smooth .875
+    displayName: 7/8" Star Screw
     binId: screws
     model: {fileID: 919132149155446097, guid: 3ceaddb3bb71dcb488d24f32f8296e19, type: 3}
     prefab: {fileID: 5538031874723983681, guid: 4e34e02db5e335c4ca59c0823dc97b43, type: 3}
@@ -5162,7 +5162,7 @@ MonoBehaviour:
     massKg: 0.0028894036
     cuttable: 0
   - id: Structure/Hardware/Screw Steel - Star/SScrew Star Smooth 1.000
-    displayName: SScrew Star Smooth 1.000
+    displayName: 1.00" Star Screw
     binId: screws
     model: {fileID: 919132149155446097, guid: d45c275aa4475df4091916ad49e43117, type: 3}
     prefab: {fileID: 3272998819133655432, guid: 46d9948a0658cf342af34e37f7ff6973, type: 3}
@@ -5172,7 +5172,7 @@ MonoBehaviour:
     massKg: 0.0032274611
     cuttable: 0
   - id: Structure/Hardware/Screw Steel - Star/SScrew Star Smooth 1.250
-    displayName: SScrew Star Smooth 1.250
+    displayName: 1.25" Star Screw
     binId: screws
     model: {fileID: 919132149155446097, guid: 1cd84e3e14d55024bad98c1a5a10e603, type: 3}
     prefab: {fileID: 1257739076220839088, guid: 740aed977b9e6e541831bc3ec2e91371, type: 3}
@@ -5182,7 +5182,7 @@ MonoBehaviour:
     massKg: 0.0039025715
     cuttable: 0
   - id: Structure/Hardware/Screw Steel - Star/SScrew Star Smooth 1.500
-    displayName: SScrew Star Smooth 1.500
+    displayName: 1.50" Star Screw
     binId: screws
     model: {fileID: 919132149155446097, guid: aeec73af70d7dd541ba22ba331d1eb98, type: 3}
     prefab: {fileID: 3259443846056785883, guid: 1992cc72d415e5444b970aa822ada269, type: 3}
@@ -5192,7 +5192,7 @@ MonoBehaviour:
     massKg: 0.0045762025
     cuttable: 0
   - id: Structure/Hardware/Screw Steel - Star/SScrew Star Smooth 1.750
-    displayName: SScrew Star Smooth 1.750
+    displayName: 1.75" Star Screw
     binId: screws
     model: {fileID: 919132149155446097, guid: 8a990af7f827d1346aeccbba4ae79aa5, type: 3}
     prefab: {fileID: 7428643828751977533, guid: 218869e6e7f087841ad4bb1a2eb49d0e, type: 3}
@@ -5202,7 +5202,7 @@ MonoBehaviour:
     massKg: 0.0052500498
     cuttable: 0
   - id: Structure/Hardware/Screw Steel - Star/SScrew Star Smooth 2.000
-    displayName: SScrew Star Smooth 2.000
+    displayName: 2.00" Star Screw
     binId: screws
     model: {fileID: 919132149155446097, guid: 6c1cbfb913ba23b4f9d76b10d3d4be13, type: 3}
     prefab: {fileID: 6928799089558008619, guid: ad31320f6bf90d3459c58ef3f314e80b, type: 3}
@@ -5212,7 +5212,7 @@ MonoBehaviour:
     massKg: 0.0059227725
     cuttable: 0
   - id: Structure/Hardware/Screw Steel - Star/SScrew Star Smooth 2.250
-    displayName: SScrew Star Smooth 2.250
+    displayName: 2.25" Star Screw
     binId: screws
     model: {fileID: 919132149155446097, guid: e2179deb977015a4a8ef100370741e45, type: 3}
     prefab: {fileID: 6629629082984582124, guid: 9a59eec7648b19743997512a381be4ae, type: 3}
@@ -5222,7 +5222,7 @@ MonoBehaviour:
     massKg: 0.006594261
     cuttable: 0
   - id: Structure/Hardware/Screw Steel - Star/SScrew Star Smooth 2.500
-    displayName: SScrew Star Smooth 2.500
+    displayName: 2.50" Star Screw
     binId: screws
     model: {fileID: 919132149155446097, guid: 3feac27acd200e741bd73fff2cdfa941, type: 3}
     prefab: {fileID: 5526027958766313686, guid: 4892c3dfcb6690b4194f111ca8015a90, type: 3}
@@ -5232,7 +5232,7 @@ MonoBehaviour:
     massKg: 0.0072650816
     cuttable: 0
   - id: Structure/Hardware/Screw Steel - Star/SScrew Star Threaded .250
-    displayName: SScrew Star Threaded .250
+    displayName: 1/4" Star Screw, threads shown
     binId: screws
     model: {fileID: 919132149155446097, guid: 73bff8260ff3e6d48b0fd1c386d30012, type: 3}
     prefab: {fileID: 6134243439106968330, guid: 3aea212bf5539dd488068c509f5791f3, type: 3}
@@ -5242,7 +5242,7 @@ MonoBehaviour:
     massKg: 0.0010549538
     cuttable: 0
   - id: Structure/Hardware/Screw Steel - Star/SScrew Star Threaded .290
-    displayName: SScrew Star Threaded .290
+    displayName: 0.29" Star Screw, threads shown
     binId: screws
     model: {fileID: 919132149155446097, guid: 9d587029d3d03884683ea80e78b0c03d, type: 3}
     prefab: {fileID: 6359725925981259905, guid: f7ca8a830147fd34a8ce280fc26130a3, type: 3}
@@ -5252,7 +5252,7 @@ MonoBehaviour:
     massKg: 0.0011390552
     cuttable: 0
   - id: Structure/Hardware/Screw Steel - Star/SScrew Star Threaded .375
-    displayName: SScrew Star Threaded .375
+    displayName: 3/8" Star Screw, threads shown
     binId: screws
     model: {fileID: 919132149155446097, guid: b500fa1ad8ef44944a008dba4473521d, type: 3}
     prefab: {fileID: 3359235739075313343, guid: 07c1a6311d93a3142bcbfb4705bce09b, type: 3}
@@ -5262,7 +5262,7 @@ MonoBehaviour:
     massKg: 0.0013188558
     cuttable: 0
   - id: Structure/Hardware/Screw Steel - Star/SScrew Star Threaded .500
-    displayName: SScrew Star Threaded .500
+    displayName: 1/2" Star Screw, threads shown
     binId: screws
     model: {fileID: 919132149155446097, guid: 207542aca5faf6243ad7183b31297b51, type: 3}
     prefab: {fileID: 3709664009559749126, guid: 49102f775cb0ded48938e56c0a1727f5, type: 3}
@@ -5272,7 +5272,7 @@ MonoBehaviour:
     massKg: 0.0015819059
     cuttable: 0
   - id: Structure/Hardware/Screw Steel - Star/SScrew Star Threaded .625
-    displayName: SScrew Star Threaded .625
+    displayName: 5/8" Star Screw, threads shown
     binId: screws
     model: {fileID: 919132149155446097, guid: 594e6c95bed2f924d9760cc7d28ca513, type: 3}
     prefab: {fileID: 1453739704905046373, guid: 605f23bf043ba5d4fad644f7b6fe8d1f, type: 3}
@@ -5282,7 +5282,7 @@ MonoBehaviour:
     massKg: 0.0018444833
     cuttable: 0
   - id: Structure/Hardware/Screw Steel - Star/SScrew Star Threaded .750
-    displayName: SScrew Star Threaded .750
+    displayName: 3/4" Star Screw, threads shown
     binId: screws
     model: {fileID: 919132149155446097, guid: f23d1cc5f24305a4bac9ebdf319583f0, type: 3}
     prefab: {fileID: 8952144618685268244, guid: a903c7291a4878f44a1b656242d02369, type: 3}
@@ -5292,7 +5292,7 @@ MonoBehaviour:
     massKg: 0.0021096868
     cuttable: 0
   - id: Structure/Hardware/Screw Steel - Star/SScrew Star Threaded .875
-    displayName: SScrew Star Threaded .875
+    displayName: 7/8" Star Screw, threads shown
     binId: screws
     model: {fileID: 919132149155446097, guid: dec9d7f493333504886c256c1a0b3206, type: 3}
     prefab: {fileID: 4483224935218617547, guid: a579c3208ff746c4e8f2d6b805b17cbf, type: 3}
@@ -5302,7 +5302,7 @@ MonoBehaviour:
     massKg: 0.0023726856
     cuttable: 0
   - id: Structure/Hardware/Screw Steel - Star/SScrew Star Threaded 1.000
-    displayName: SScrew Star Threaded 1.000
+    displayName: 1.00" Star Screw, threads shown
     binId: screws
     model: {fileID: 919132149155446097, guid: 4fe7905cfef52dd4bbc211ab0b0f4386, type: 3}
     prefab: {fileID: 3665001468297225000, guid: 9e114158144b3ab4bb32625497143aca, type: 3}
@@ -5312,7 +5312,7 @@ MonoBehaviour:
     massKg: 0.0026353716
     cuttable: 0
   - id: Structure/Hardware/Screw Steel - Star/SScrew Star Threaded 1.250
-    displayName: SScrew Star Threaded 1.250
+    displayName: 1.25" Star Screw, threads shown
     binId: screws
     model: {fileID: 919132149155446097, guid: d0cabb3dc71dbd54db7939b106a2b771, type: 3}
     prefab: {fileID: 7892317952907291042, guid: 0067860483f29ff4ab9f57d565b4f5ef, type: 3}
@@ -5322,7 +5322,7 @@ MonoBehaviour:
     massKg: 0.0031600683
     cuttable: 0
   - id: Structure/Hardware/Screw Steel - Star/SScrew Star Threaded 1.500
-    displayName: SScrew Star Threaded 1.500
+    displayName: 1.50" Star Screw, threads shown
     binId: screws
     model: {fileID: 919132149155446097, guid: 8430a851104e9054188f2c29b5090c3b, type: 3}
     prefab: {fileID: 1608120082174357752, guid: 85f491c7177dfc545b0ad1f87e5d1cec, type: 3}
@@ -5332,7 +5332,7 @@ MonoBehaviour:
     massKg: 0.0036833123
     cuttable: 0
   - id: Structure/Hardware/Screw Steel - Star/SScrew Star Threaded 1.750
-    displayName: SScrew Star Threaded 1.750
+    displayName: 1.75" Star Screw, threads shown
     binId: screws
     model: {fileID: 919132149155446097, guid: a0b345d281a34f143b3f540958a5f2c8, type: 3}
     prefab: {fileID: 7640151163170272874, guid: c9ded4b8e0e268a4e9b30c45010fb1b2, type: 3}
@@ -5342,7 +5342,7 @@ MonoBehaviour:
     massKg: 0.0042047915
     cuttable: 0
   - id: Structure/Hardware/Screw Steel - Star/SScrew Star Threaded 2.000
-    displayName: SScrew Star Threaded 2.000
+    displayName: 2.00" Star Screw, threads shown
     binId: screws
     model: {fileID: 919132149155446097, guid: 93af716074e683a4fb1f5f5731ed9b62, type: 3}
     prefab: {fileID: 4092577533270324590, guid: b503f1197933098448f3298b0f7ec77e, type: 3}
@@ -5352,7 +5352,7 @@ MonoBehaviour:
     massKg: 0.004735174
     cuttable: 0
   - id: Structure/Hardware/Screw Steel - Star/SScrew Star Threaded 2.250
-    displayName: SScrew Star Threaded 2.250
+    displayName: 2.25" Star Screw, threads shown
     binId: screws
     model: {fileID: 919132149155446097, guid: 52bf8d5f85318e14c8f41d3f3323fac7, type: 3}
     prefab: {fileID: 545620274269459150, guid: 320d5a79a30dde34aa14f7587a955989, type: 3}
@@ -5362,7 +5362,7 @@ MonoBehaviour:
     massKg: 0.005266197
     cuttable: 0
   - id: Structure/Hardware/Screw Steel - Star/SScrew Star Threaded 2.500
-    displayName: SScrew Star Threaded 2.500
+    displayName: 2.50" Star Screw, threads shown
     binId: screws
     model: {fileID: 919132149155446097, guid: bd71e1c0d6aeb844d8d9bd2effe5bd40, type: 3}
     prefab: {fileID: 8121958813776791523, guid: 46853e8f704d1544b9718efb4b65fe14, type: 3}
@@ -5392,7 +5392,7 @@ MonoBehaviour:
     massKg: 0.0005
     cuttable: 0
   - id: Structure/Plate/Aluminum/Alu Plate 5x25
-    displayName: Alu Plate 5x25
+    displayName: Aluminum Plate (5x25)
     binId: plates
     model: {fileID: 919132149155446097, guid: ed2672805045051458c03cf6c8c686b1, type: 3}
     prefab: {fileID: 3774236737468807642, guid: 589e2e16bfe043446919490c63fa12ad, type: 3}
@@ -5402,7 +5402,7 @@ MonoBehaviour:
     massKg: 0.069490194
     cuttable: 1
   - id: Structure/Plate/Steel/Steel Plate 5x25
-    displayName: Steel Plate 5x25
+    displayName: Steel Plate (5x25)
     binId: plates
     model: {fileID: 919132149155446097, guid: fb830ef0331e62d48a1687c0c40874d1, type: 3}
     prefab: {fileID: 1035410053586033024, guid: 22353abbf3183a144a2a775d229766e5, type: 3}
@@ -5412,7 +5412,7 @@ MonoBehaviour:
     massKg: 0.15152785
     cuttable: 1
   - id: Structure/Reference Files/Angle 1x1
-    displayName: Angle 1x1
+    displayName: 1x1 Angle
     binId: angles
     model: {fileID: 919132149155446097, guid: e9b346e44608c3a43a2620d64c6c2a74, type: 3}
     prefab: {fileID: 5227400801957162552, guid: b5a1ff9517de9be45907255e8684d9e1, type: 3}
@@ -5422,7 +5422,7 @@ MonoBehaviour:
     massKg: 0.037170526
     cuttable: 1
   - id: Structure/Reference Files/Angle 2x2
-    displayName: Angle 2x2
+    displayName: 2x2 Angle
     binId: angles
     model: {fileID: 919132149155446097, guid: a5e4a26f58530e748b3b0f64f8a1137e, type: 3}
     prefab: {fileID: 2099781440175640331, guid: 5f0fff5ed7c2eb74181bde6cc390e9e0, type: 3}
@@ -5432,7 +5432,7 @@ MonoBehaviour:
     massKg: 0.17131159
     cuttable: 1
   - id: Structure/Reference Files/Angle 3x3
-    displayName: Angle 3x3
+    displayName: 3x3 Angle
     binId: angles
     model: {fileID: 919132149155446097, guid: 40754f41b942e05478c0e21bd7521ffb, type: 3}
     prefab: {fileID: 534259305967345512, guid: b026c98608bc798448e2d398b531262d, type: 3}
@@ -5442,7 +5442,7 @@ MonoBehaviour:
     massKg: 0.24956936
     cuttable: 1
   - id: Structure/Reference Files/C Channel 1x2x1
-    displayName: C Channel 1x2x1
+    displayName: 1x2x1 C-Channel
     binId: c_channels
     model: {fileID: 919132149155446097, guid: 6a8a90af443f25742b5e2226b2312918, type: 3}
     prefab: {fileID: 4343785624176536937, guid: 2268fd055f5d70440b4cda1aecc65069, type: 3}
@@ -5452,7 +5452,7 @@ MonoBehaviour:
     massKg: 0.077722386
     cuttable: 1
   - id: Structure/Reference Files/C Channel 1x3x1 & 1x5x1
-    displayName: C Channel 1x3x1 & 1x5x1
+    displayName: 1x3x1 & 1x5x1 C-Channel
     binId: c_channels
     model: {fileID: 919132149155446097, guid: b22fea2902667db49a6ebb98d8bceb48, type: 3}
     prefab: {fileID: 924612290404081107, guid: 3f33a646833116e498bb2a1a24ec6795, type: 3}
@@ -5472,7 +5472,7 @@ MonoBehaviour:
     massKg: 0.069490194
     cuttable: 1
   - id: Structure/Segmented Angle/Segmented Angle 1x1x25
-    displayName: Segmented Angle 1x1x25
+    displayName: 1x1 Segmented Angle (25)
     binId: angles
     model: {fileID: 919132149155446097, guid: b533bffd81cf7e8438ec3f8e64a0e573, type: 3}
     prefab: {fileID: 8236437465158112652, guid: 3aac9775cb97dce49b3c2d2bfb2b1539, type: 3}
@@ -5482,7 +5482,7 @@ MonoBehaviour:
     massKg: 0.077168755
     cuttable: 1
   - id: Structure/Segmented Angle/Segmented Angle 1x1x35
-    displayName: Segmented Angle 1x1x35
+    displayName: 1x1 Segmented Angle (35)
     binId: angles
     model: {fileID: 919132149155446097, guid: e8b3230b71e055c4e99bb48f6a5c5ef6, type: 3}
     prefab: {fileID: 4968866927052194907, guid: cd102361becde8841adfb1238e4ed6aa, type: 3}
@@ -5522,7 +5522,7 @@ MonoBehaviour:
     massKg: 0.0005
     cuttable: 0
   - id: Structure/Standoff/Standoff .25
-    displayName: Standoff .25
+    displayName: 1/4" Standoff
     binId: standoffs
     model: {fileID: 919132149155446097, guid: 90e1e9c02bea18c4183c565c89f00a24, type: 3}
     prefab: {fileID: 1514335330359226583, guid: 6b842b545b85b0c41b65e7480ffd0a74, type: 3}
@@ -5532,7 +5532,7 @@ MonoBehaviour:
     massKg: 0.0005
     cuttable: 0
   - id: Structure/Standoff/Standoff .50
-    displayName: Standoff .50
+    displayName: 1/2" Standoff
     binId: standoffs
     model: {fileID: 919132149155446097, guid: e7074f390ca836749b864667262ada7b, type: 3}
     prefab: {fileID: 1240294587171871372, guid: 0ea89500860aa87498fd9a2687c6eacc, type: 3}
@@ -5542,7 +5542,7 @@ MonoBehaviour:
     massKg: 0.00072020525
     cuttable: 0
   - id: Structure/Standoff/Standoff .75
-    displayName: Standoff .75
+    displayName: 3/4" Standoff
     binId: standoffs
     model: {fileID: 919132149155446097, guid: c1d4d9b39bc9f3b4d97d06ebf6724c22, type: 3}
     prefab: {fileID: 3801034445068708466, guid: 6e9dea02369b8e5468ac501e8410adf5, type: 3}
@@ -5552,7 +5552,7 @@ MonoBehaviour:
     massKg: 0.0010829443
     cuttable: 0
   - id: Structure/Standoff/Standoff .875
-    displayName: Standoff .875
+    displayName: 7/8" Standoff
     binId: standoffs
     model: {fileID: 919132149155446097, guid: 958555bf083af7b4bbec695fa11c7a9d, type: 3}
     prefab: {fileID: 4483007034822831284, guid: cdefd3fe59aac8f439cbe20743d60d04, type: 3}
@@ -5562,7 +5562,7 @@ MonoBehaviour:
     massKg: 0.0012642934
     cuttable: 0
   - id: Structure/Standoff/Standoff 1.00
-    displayName: Standoff 1.00
+    displayName: 1.00" Standoff
     binId: standoffs
     model: {fileID: 919132149155446097, guid: ac2eb7cf7aa9f60418a4b6f0862b2357, type: 3}
     prefab: {fileID: 26418123235617798, guid: 3c13e5b2b54d020488992777f50020ae, type: 3}
@@ -5572,7 +5572,7 @@ MonoBehaviour:
     massKg: 0.0014459457
     cuttable: 0
   - id: Structure/Standoff/Standoff 1.50
-    displayName: Standoff 1.50
+    displayName: 1.50" Standoff
     binId: standoffs
     model: {fileID: 919132149155446097, guid: 1eb20716f8718fe43ac615d0db30f2ca, type: 3}
     prefab: {fileID: 4204105225828740334, guid: 47962f9c4dc46344480971fbfe96f09d, type: 3}
@@ -5582,7 +5582,7 @@ MonoBehaviour:
     massKg: 0.0026437906
     cuttable: 0
   - id: Structure/Standoff/Standoff 2.00
-    displayName: Standoff 2.00
+    displayName: 2.00" Standoff
     binId: standoffs
     model: {fileID: 919132149155446097, guid: e8f61ab389f18164897bd601e460448a, type: 3}
     prefab: {fileID: 6367823234393837895, guid: b0920f99865654b4db0d4a533fc9cd7b, type: 3}
@@ -5592,7 +5592,7 @@ MonoBehaviour:
     massKg: 0.0038431445
     cuttable: 0
   - id: Structure/Standoff/Standoff 2.50
-    displayName: Standoff 2.50
+    displayName: 2.50" Standoff
     binId: standoffs
     model: {fileID: 919132149155446097, guid: 47800197b3dedb341a3145dca85c8b40, type: 3}
     prefab: {fileID: 3212151468784857667, guid: bcc9f0dbfdd9ba747804faff4fe7208a, type: 3}
@@ -5602,7 +5602,7 @@ MonoBehaviour:
     massKg: 0.005041802
     cuttable: 0
   - id: Structure/Standoff/Standoff 3.00
-    displayName: Standoff 3.00
+    displayName: 3.00" Standoff
     binId: standoffs
     model: {fileID: 919132149155446097, guid: 5484c775cd98b9e47aa0f94b54a6b936, type: 3}
     prefab: {fileID: 7258734966879681288, guid: 4b567f404ad70424397bb7e06a15c3fc, type: 3}
@@ -5612,7 +5612,7 @@ MonoBehaviour:
     massKg: 0.006240018
     cuttable: 0
   - id: Structure/Standoff/Standoff 4.00
-    displayName: Standoff 4.00
+    displayName: 4.00" Standoff
     binId: standoffs
     model: {fileID: 919132149155446097, guid: 532fea54541d74b48aad6e41aa7eb6b1, type: 3}
     prefab: {fileID: 6948963872603988979, guid: 7bb53389df6ab5b4a8b8dff7813cc2c6, type: 3}
@@ -5622,7 +5622,7 @@ MonoBehaviour:
     massKg: 0.008636999
     cuttable: 0
   - id: Structure/Standoff/Standoff 5.00
-    displayName: Standoff 5.00
+    displayName: 5.00" Standoff
     binId: standoffs
     model: {fileID: 919132149155446097, guid: f58b17e9e0bfe744697f579f9903701d, type: 3}
     prefab: {fileID: 2128443369510724600, guid: c1f218184f240b24a93a5c3214c4c66f, type: 3}
@@ -5632,7 +5632,7 @@ MonoBehaviour:
     massKg: 0.0110334065
     cuttable: 0
   - id: Structure/Standoff/Standoff 6.00
-    displayName: Standoff 6.00
+    displayName: 6.00" Standoff
     binId: standoffs
     model: {fileID: 919132149155446097, guid: 6cc19059e8935b348b113d2065ed0621, type: 3}
     prefab: {fileID: 1579570522233240278, guid: ecc641a9c61861c4c8863380787937fe, type: 3}

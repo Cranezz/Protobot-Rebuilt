@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Protobot.Core;
 using UnityEngine;
 
 namespace Protobot.Parts
@@ -44,7 +45,7 @@ namespace Protobot.Parts
         /// <summary>Full-length stock (metal, shafts) that the player cuts to size with the saw.</summary>
         public bool cuttable;
 
-        /// <summary>"444.5 × 25.4 × 14.3 mm", largest dimension first.</summary>
+        /// <summary>"17 1/2 × 1 × 9/16 in", largest dimension first.</summary>
         public string SizeLabel => FormatSize(size);
 
         public string MassLabel => FormatMass(massKg);
@@ -53,7 +54,7 @@ namespace Protobot.Parts
         {
             var d = new[] { size.x, size.y, size.z };
             System.Array.Sort(d);
-            return $"{d[2] * 1000f:0.#} × {d[1] * 1000f:0.#} × {d[0] * 1000f:0.#} mm";
+            return $"{Units.Inches(d[2], false)} × {Units.Inches(d[1], false)} × {Units.Inches(d[0])}";
         }
 
         public static string FormatMass(float kg) => kg >= 1f ? $"{kg:0.00} kg" : $"{kg * 1000f:0.#} g";

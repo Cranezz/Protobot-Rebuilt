@@ -162,6 +162,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
-  title: 75mm Piston Body
-  hint: "142.5 \xD7 12 \xD7 12 mm  \xB7  36.4 g"
-  highlightBrightness: 1.3
+  title: 75mm Piston (body)
+  hint: "5.61 \xD7 0.472 \xD7 0.472 in  \xB7  36.4 g"

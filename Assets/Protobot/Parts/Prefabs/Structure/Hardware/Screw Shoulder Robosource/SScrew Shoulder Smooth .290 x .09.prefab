@@ -140,9 +140,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
-  title: SScrew Shoulder Smooth .290 x .09
-  hint: "9.6 \xD7 7.9 \xD7 7.9 mm  \xB7  1.4 g"
-  highlightBrightness: 1.3
+  title: 0.29" Shoulder Screw (0.09" shoulder)
+  hint: "0.377 \xD7 5/16 \xD7 5/16 in  \xB7  1.4 g"
 --- !u!1 &3651516681699507848 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -7175497441153661879, guid: 24d16d8cb3bcc814989fb556822af38f, type: 3}
