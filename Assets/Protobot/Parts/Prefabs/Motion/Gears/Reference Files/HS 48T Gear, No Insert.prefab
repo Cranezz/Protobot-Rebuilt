@@ -159,7 +159,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: HS 48T Gear, No Insert
-  hint: "52.9 \xD7 52.9 \xD7 12.7 mm  \xB7  15.4 g  \xB7  hold to pick up"
+  hint: "52.9 \xD7 52.9 \xD7 12.7 mm  \xB7  15.4 g"
   highlightBrightness: 1.3
 --- !u!1 &2639748198284613492 stripped
 GameObject:

@@ -167,5 +167,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: Solenoid - Single Acting
-  hint: "35.6 \xD7 22.9 \xD7 21 mm  \xB7  13.7 g  \xB7  hold to pick up"
+  hint: "35.6 \xD7 22.9 \xD7 21 mm  \xB7  13.7 g"
   highlightBrightness: 1.3

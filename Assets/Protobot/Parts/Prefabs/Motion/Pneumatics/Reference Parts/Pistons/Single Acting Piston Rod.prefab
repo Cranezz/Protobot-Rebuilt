@@ -163,5 +163,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: Single Acting Piston Rod
-  hint: "109.4 \xD7 10 \xD7 10 mm  \xB7  12.9 g  \xB7  hold to pick up"
+  hint: "109.4 \xD7 10 \xD7 10 mm  \xB7  12.9 g"
   highlightBrightness: 1.3

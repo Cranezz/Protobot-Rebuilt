@@ -163,5 +163,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: Analog Accelerometer
-  hint: "30.5 \xD7 25.4 \xD7 14.4 mm  \xB7  14.1 g  \xB7  hold to pick up"
+  hint: "30.5 \xD7 25.4 \xD7 14.4 mm  \xB7  14.1 g"
   highlightBrightness: 1.3

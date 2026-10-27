@@ -64,6 +64,31 @@ namespace Protobot.Menus
             return image;
         }
 
+        static Sprite circle;
+
+        /// <summary>A smooth-edged filled circle (made once at runtime), for round buttons and discs.</summary>
+        public static Sprite Circle()
+        {
+            if (circle != null)
+                return circle;
+            const int size = 128;
+            var tex = new Texture2D(size, size, TextureFormat.RGBA32, true) { name = "Circle", wrapMode = TextureWrapMode.Clamp };
+            var pixels = new Color32[size * size];
+            for (var y = 0; y < size; y++)
+            {
+                for (var x = 0; x < size; x++)
+                {
+                    var d = Vector2.Distance(new Vector2(x + 0.5f, y + 0.5f), new Vector2(size / 2f, size / 2f));
+                    var alpha = Mathf.Clamp01(size / 2f - d);  // one pixel of anti-aliasing at the edge
+                    pixels[y * size + x] = new Color32(255, 255, 255, (byte)(alpha * 255f));
+                }
+            }
+            tex.SetPixels32(pixels);
+            tex.Apply();
+            circle = Sprite.Create(tex, new Rect(0f, 0f, size, size), new Vector2(0.5f, 0.5f), 100f);
+            return circle;
+        }
+
         public static Image Panel(Transform parent, string name, UiTheme theme, Color color, bool shadow = false)
         {
             if (shadow)
@@ -161,9 +186,15 @@ namespace Protobot.Menus
             fillArea.sizeDelta = new Vector2(0f, 10f);
             var fill = Image(fillArea, "Fill", theme.accent, theme.rounded);
             fill.rectTransform.sizeDelta = Vector2.zero;
-            var handleArea = Rect("HandleArea", root).Fill(10f, 0f, 10f, 0f);
+            // The slider stretches the handle over the handle area's height, so that area is a zero-height
+            // line through the middle and the handle's own size is the knob.
+            var handleArea = Rect("HandleArea", root);
+            handleArea.anchorMin = new Vector2(0f, 0.5f);
+            handleArea.anchorMax = new Vector2(1f, 0.5f);
+            handleArea.sizeDelta = new Vector2(-22f, 0f);
             var handle = Image(handleArea, "Handle", theme.text, theme.rounded, true);
-            handle.rectTransform.sizeDelta = new Vector2(20f, 28f);
+            handle.rectTransform.sizeDelta = new Vector2(22f, 22f);
+            handle.pixelsPerUnitMultiplier = 2f;  // corners as round as the knob is small
             slider.fillRect = fill.rectTransform;
             slider.handleRect = handle.rectTransform;
             slider.targetGraphic = handle;

@@ -16,11 +16,14 @@ namespace Protobot.Interaction
 
     /// <summary>
     /// Marks an object the cursor reacts to: the cursor shape, a tooltip, and a subtle highlight.
+    /// Also owns the object's colour overrides (spray paint), so painting and highlighting work together.
     /// Needs a collider on this object or a child so the cursor's raycast can find it.
     /// </summary>
     public class HoverTarget : MonoBehaviour
     {
         static readonly int BaseColor = Shader.PropertyToID("_BaseColor");
+        static readonly int Metallic = Shader.PropertyToID("_Metallic");
+        static readonly int Smoothness = Shader.PropertyToID("_Smoothness");
 
         [SerializeField] CursorKind cursor = CursorKind.Point;
         [SerializeField] string title;
@@ -29,10 +32,13 @@ namespace Protobot.Interaction
 
         Renderer[] renderers;
         MaterialPropertyBlock block;
+        bool highlighted;
+        Color? paint;
 
         public CursorKind Cursor => cursor;
         public string Title => title;
         public string Hint => hint;
+        public Color? Paint => paint;
 
         public void Configure(CursorKind kind, string newTitle, string newHint)
         {
@@ -41,8 +47,30 @@ namespace Protobot.Interaction
             hint = newHint;
         }
 
+        public void SetHint(string newHint) => hint = newHint;
+
         /// <summary>Brightens the object while the cursor is over it.</summary>
         public void SetHighlighted(bool on)
+        {
+            highlighted = on;
+            Apply();
+        }
+
+        /// <summary>Paints the whole object one colour (a satin paint finish); null removes the paint.</summary>
+        public void SetPaint(Color? color)
+        {
+            paint = color;
+            Apply();
+        }
+
+        /// <summary>Call after renderers were added or removed (e.g. a part was cut).</summary>
+        public void RefreshRenderers()
+        {
+            renderers = null;
+            Apply();
+        }
+
+        void Apply()
         {
             renderers ??= GetComponentsInChildren<Renderer>();
             block ??= new MaterialPropertyBlock();
@@ -53,18 +81,31 @@ namespace Protobot.Interaction
                 var materials = r.sharedMaterials;
                 for (var i = 0; i < materials.Length; i++)
                 {
-                    if (!on || materials[i] == null || !materials[i].HasProperty(BaseColor))
+                    var material = materials[i];
+                    if ((!highlighted && paint == null) || material == null || !material.HasProperty(BaseColor))
                     {
                         r.SetPropertyBlock(null, i);
                         continue;
                     }
-                    var color = materials[i].GetColor(BaseColor);
-                    block.SetColor(BaseColor, new Color(color.r * highlightBrightness, color.g * highlightBrightness, color.b * highlightBrightness, color.a));
+                    block.Clear();
+                    var color = paint ?? material.GetColor(BaseColor);
+                    if (highlighted)
+                        color = new Color(color.r * highlightBrightness, color.g * highlightBrightness, color.b * highlightBrightness, color.a);
+                    block.SetColor(BaseColor, color);
+                    if (paint != null)
+                    {
+                        block.SetFloat(Metallic, 0.05f);
+                        block.SetFloat(Smoothness, 0.55f);
+                    }
                     r.SetPropertyBlock(block, i);
                 }
             }
         }
 
-        void OnDisable() => SetHighlighted(false);
+        void OnDisable()
+        {
+            highlighted = false;
+            Apply();
+        }
     }
 }

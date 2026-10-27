@@ -140,7 +140,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: Bearing Flat Low Profile
-  hint: "34 \xD7 8.6 \xD7 6.9 mm  \xB7  1.3 g  \xB7  hold to pick up"
+  hint: "34 \xD7 8.6 \xD7 6.9 mm  \xB7  1.3 g"
   highlightBrightness: 1.3
 --- !u!1 &8095461771031676735 stripped
 GameObject:

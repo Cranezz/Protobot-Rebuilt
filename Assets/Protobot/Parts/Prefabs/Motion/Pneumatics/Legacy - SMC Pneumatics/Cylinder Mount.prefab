@@ -136,7 +136,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: Cylinder Mount
-  hint: "19.1 \xD7 15.2 \xD7 12.7 mm  \xB7  5.2 g  \xB7  hold to pick up"
+  hint: "19.1 \xD7 15.2 \xD7 12.7 mm  \xB7  5.2 g"
   highlightBrightness: 1.3
 --- !u!1 &7394764936687208805 stripped
 GameObject:

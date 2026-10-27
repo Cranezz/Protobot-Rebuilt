@@ -74,6 +74,9 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: dc41b53f582512a4f91921b18636e336, type: 3}
       insertIndex: -1
+      addedObject: {fileID: 7380867107622002577}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: dc41b53f582512a4f91921b18636e336, type: 3}
+      insertIndex: -1
       addedObject: {fileID: 8674533097206580689}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: dc41b53f582512a4f91921b18636e336, type: 3}
       insertIndex: -1
@@ -81,42 +84,51 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: dc41b53f582512a4f91921b18636e336, type: 3}
       insertIndex: -1
       addedObject: {fileID: 7088285378057426153}
-    - targetCorrespondingSourceObject: {fileID: 4445948748397649984, guid: dc41b53f582512a4f91921b18636e336, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 2437462238171015097}
   m_SourcePrefab: {fileID: 100100000, guid: dc41b53f582512a4f91921b18636e336, type: 3}
---- !u!1 &5206977164570624881 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 4445948748397649984, guid: dc41b53f582512a4f91921b18636e336, type: 3}
-  m_PrefabInstance: {fileID: 8498794905111896881}
-  m_PrefabAsset: {fileID: 0}
---- !u!64 &2437462238171015097
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5206977164570624881}
-  m_Material: {fileID: 13400000, guid: 7c1438b7c2246e3449cb98af75fde723, type: 2}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 1
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 6413805903724522286, guid: dc41b53f582512a4f91921b18636e336, type: 3}
 --- !u!1 &8732656844571745888 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: dc41b53f582512a4f91921b18636e336, type: 3}
   m_PrefabInstance: {fileID: 8498794905111896881}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &7380867107622002577
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8732656844571745888}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e4020603aaf096b4a9d86061d6cceed3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.StockProfile
+  axis: {x: 0, y: 1, z: 0}
+  u: {x: 0, y: 0, z: 1}
+  v: {x: 1, y: 0, z: 0}
+  origin: {x: 0.012699999, y: 0.22224997, z: -0.007143732}
+  start: -0.22224997
+  end: 0.22224997
+  points:
+  - {x: 0.006793744, y: 0.005209595}
+  - {x: 0.0055562374, y: 0.003968751}
+  - {x: 0.0055562374, y: -0.006349999}
+  - {x: 0.0071437373, y: -0.006349999}
+  - {x: 0.0071437373, y: 0.003968751}
+  - {x: 0.0047624875, y: 0.0047625005}
+  - {x: 0.006793744, y: 0.005209595}
+  - {x: 0.0061911987, y: 0.0058681536}
+  - {x: 0.0056792772, y: 0.0061599165}
+  - {x: 0.0047624875, y: 0.0063499995}
+  - {x: -0.007143761, y: 0.0063499995}
+  - {x: -0.007143761, y: 0.0047625005}
+  - {x: 0.0053425636, y: 0.0045102406}
+  - {x: 0.0055562374, y: 0.003968751}
+  - {x: 0.006793744, y: 0.005209595}
+  - {x: 0.0047624875, y: 0.0047625005}
+  - {x: 0.0053425636, y: 0.0045102406}
+  - {x: 0.006793744, y: 0.005209595}
+  pieceSizes: 05000000070000000300000003000000
+  physicsMaterial: {fileID: 13400000, guid: 7c1438b7c2246e3449cb98af75fde723, type: 2}
 --- !u!54 &8674533097206580689
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -171,5 +183,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: Alu C Half 1x3x1x35
-  hint: "444.5 \xD7 14.3 \xD7 12.7 mm  \xB7  40.4 g  \xB7  hold to pick up"
+  hint: "444.5 \xD7 14.3 \xD7 12.7 mm  \xB7  40.4 g"
   highlightBrightness: 1.3

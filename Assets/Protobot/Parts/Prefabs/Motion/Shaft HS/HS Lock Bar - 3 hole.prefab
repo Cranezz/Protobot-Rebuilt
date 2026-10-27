@@ -163,5 +163,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: HS Lock Bar - 3 hole
-  hint: "38.1 \xD7 12.7 \xD7 1.4 mm  \xB7  4.2 g  \xB7  hold to pick up"
+  hint: "38.1 \xD7 12.7 \xD7 1.4 mm  \xB7  4.2 g"
   highlightBrightness: 1.3

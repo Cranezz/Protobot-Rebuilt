@@ -163,5 +163,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: 90 Plate Gusset
-  hint: "50.5 \xD7 50.5 \xD7 1.6 mm  \xB7  3.7 g  \xB7  hold to pick up"
+  hint: "50.5 \xD7 50.5 \xD7 1.6 mm  \xB7  3.7 g"
   highlightBrightness: 1.3

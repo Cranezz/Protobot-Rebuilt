@@ -171,5 +171,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: 3P 40T Sprocket
-  hint: "49 \xD7 49 \xD7 12.5 mm  \xB7  4.8 g  \xB7  hold to pick up"
+  hint: "49 \xD7 49 \xD7 12.5 mm  \xB7  4.8 g"
   highlightBrightness: 1.3

@@ -50,7 +50,8 @@ namespace Protobot.Menus
             hintText = UiFactory.Text(tooltip, "Hint", theme, "", 20f, theme.textDim);
 
             toast = UiFactory.Image(transform, "Toast", theme.panel, theme.rounded);
-            toast.rectTransform.Place(new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 90f), new Vector2(560f, 52f));
+            // Above the tool hotbar and its controls line.
+            toast.rectTransform.Place(new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 205f), new Vector2(560f, 52f));
             toastText = UiFactory.Text(toast.transform, "Text", theme, "", 24f, theme.text, true, TextAlignmentOptions.Center);
             toastText.rectTransform.Fill(16f, 0f, 16f, 0f);
             toast.gameObject.SetActive(false);
@@ -64,9 +65,10 @@ namespace Protobot.Menus
                 toast.gameObject.SetActive(false);
         }
 
-        public void SetReticle(Sprite sprite, bool large)
+        public void SetReticle(Sprite sprite, bool large, Color tint)
         {
             reticle.sprite = sprite != null ? sprite : theme.reticleDot;
+            reticle.color = tint;
             reticle.rectTransform.sizeDelta = large ? new Vector2(44f, 44f) : new Vector2(24f, 24f);
         }
 
@@ -93,6 +95,8 @@ namespace Protobot.Menus
         {
             toastText.text = message;
             toast.gameObject.SetActive(true);
+            toastText.ForceMeshUpdate();
+            toast.rectTransform.sizeDelta = new Vector2(Mathf.Min(toastText.preferredWidth + 48f, 1100f), 52f);
             toastUntil = Time.unscaledTime + seconds;
         }
     }

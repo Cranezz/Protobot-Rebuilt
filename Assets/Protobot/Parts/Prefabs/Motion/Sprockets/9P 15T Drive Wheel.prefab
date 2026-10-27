@@ -171,5 +171,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: 9P 15T Drive Wheel
-  hint: "50.8 \xD7 50.7 \xD7 25.4 mm  \xB7  14.9 g  \xB7  hold to pick up"
+  hint: "50.8 \xD7 50.7 \xD7 25.4 mm  \xB7  14.9 g"
   highlightBrightness: 1.3

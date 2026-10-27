@@ -140,7 +140,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: V5 Flywheel Weight
-  hint: "85.2 \xD7 85.2 \xD7 3 mm  \xB7  111.3 g  \xB7  hold to pick up"
+  hint: "85.2 \xD7 85.2 \xD7 3 mm  \xB7  111.3 g"
   highlightBrightness: 1.3
 --- !u!1 &5999347558435809468 stripped
 GameObject:

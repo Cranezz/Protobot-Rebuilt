@@ -171,5 +171,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: Field Stake Mount
-  hint: "82.5 \xD7 39.4 \xD7 19.1 mm  \xB7  16.3 g  \xB7  hold to pick up"
+  hint: "82.5 \xD7 39.4 \xD7 19.1 mm  \xB7  16.3 g"
   highlightBrightness: 1.3

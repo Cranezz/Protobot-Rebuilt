@@ -1,18 +1,15 @@
-using Protobot.Core;
+using Protobot.Interaction;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
-namespace Protobot.Interaction
+namespace Protobot.Tools
 {
     /// <summary>
-    /// What the player does with the left mouse button: click things that react (bins), and hold the button
-    /// on a part to pick it up. A held part is pulled towards a point in front of the camera with physics,
-    /// so it still bumps into things; let go and it falls (or flies, if you were moving it).
-    /// The mouse wheel moves a held part closer or further away.
+    /// Empty hands: hold left click on a part to pick it up. A held part is pulled towards a point in front of
+    /// the camera with physics, so it still bumps into things; let go and it falls (or flies, if you swung it).
+    /// The mouse wheel moves a held part closer or further away; right click while holding spins it a quarter turn.
     /// </summary>
-    public class PlayerHands : MonoBehaviour
+    public class HandsTool : PlayerTool
     {
-        [SerializeField] CursorController cursor;
         [SerializeField] Transform head;
 
         [Header("Holding")]
@@ -37,45 +34,33 @@ namespace Protobot.Interaction
 
         public bool IsHolding => held != null;
 
-        void Update()
+        public override string ControlsHint => IsHolding
+            ? "Release: drop   ·   Scroll: closer / further   ·   Right click: turn 90°"
+            : "Hold left click on a part to pick it up";
+
+        public override void PrimaryDown()
         {
-            var mouse = Mouse.current;
-            if (mouse == null)
+            var target = Cursor.Current;
+            if (target == null || !Cursor.CurrentInReach)
                 return;
-
-            if (MenuState.AnyOpen)
-            {
-                Release();
-                return;
-            }
-
-            if (mouse.leftButton.wasPressedThisFrame)
-                Press();
-            else if (mouse.leftButton.wasReleasedThisFrame)
-                Release();
-
-            if (held != null)
-            {
-                var scroll = mouse.scroll.ReadValue().y;
-                if (Mathf.Abs(scroll) > 0.01f)
-                    holdDistance = Mathf.Clamp(holdDistance + Mathf.Sign(scroll) * scrollStep, minHoldDistance, maxHoldDistance);
-            }
+            if (target.Cursor == CursorKind.Grab && target.GetComponentInParent<Rigidbody>() is { isKinematic: false } body)
+                Grab(body, target, Cursor.CurrentHit);
         }
 
-        void Press()
+        public override void PrimaryUp() => Release();
+        public override void OnUnequip() => Release();
+        public override void OnSuspend() => Release();
+
+        public override void Scroll(int notches)
         {
-            var target = cursor.Current;
-            if (target == null || !cursor.CurrentInReach)
-                return;
+            if (held != null)
+                holdDistance = Mathf.Clamp(holdDistance + notches * scrollStep, minHoldDistance, maxHoldDistance);
+        }
 
-            if (target.GetComponentInParent<IInteractable>() is { } interactable)
-            {
-                interactable.Interact();
-                return;
-            }
-
-            if (target.Cursor == CursorKind.Grab && target.GetComponentInParent<Rigidbody>() is { isKinematic: false } body)
-                Grab(body, target, cursor.CurrentHit);
+        public override void SecondaryTap()
+        {
+            if (held != null)
+                rotationFromView = Quaternion.Euler(0f, 90f, 0f) * rotationFromView;
         }
 
         void Grab(Rigidbody body, HoverTarget target, RaycastHit hit)
@@ -94,21 +79,24 @@ namespace Protobot.Interaction
             body.angularDamping = 6f;
             body.interpolation = RigidbodyInterpolation.Interpolate;
             body.WakeUp();
-            cursor.Holding = target;
+            Cursor.Holding = target;
         }
 
         public void Release()
         {
             if (held == null)
                 return;
-            held.useGravity = heldUsedGravity;
-            held.linearDamping = heldDrag;
-            held.angularDamping = heldAngularDrag;
-            // Don't let a fast swing launch parts across the room.
-            held.linearVelocity = Vector3.ClampMagnitude(held.linearVelocity, 2.5f);
+            if (held)
+            {
+                held.useGravity = heldUsedGravity;
+                held.linearDamping = heldDrag;
+                held.angularDamping = heldAngularDrag;
+                // Don't let a fast swing launch parts across the room.
+                held.linearVelocity = Vector3.ClampMagnitude(held.linearVelocity, 2.5f);
+            }
             held = null;
             heldTarget = null;
-            cursor.Holding = null;
+            Cursor.Holding = null;
         }
 
         void FixedUpdate()

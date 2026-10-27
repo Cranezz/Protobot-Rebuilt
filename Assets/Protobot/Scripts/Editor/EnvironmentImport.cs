@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
+using UnityEditor.AssetImporters;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -38,22 +39,52 @@ namespace Protobot.Editor
                 importer.sRGBTexture = false;
         }
 
+        public const string ToolModelRoot = "Assets/Protobot/Art/Tools/";
+
         void OnPreprocessModel()
         {
-            if (!assetPath.StartsWith(EnvironmentRoot))
+            var isTool = assetPath.StartsWith(ToolModelRoot);
+            if (!assetPath.StartsWith(EnvironmentRoot) && !isTool)
                 return;
 
             var importer = (ModelImporter)assetImporter;
             importer.globalScale = 1f;
             importer.useFileScale = true;
-            importer.generateSecondaryUV = true;  // lightmap UVs for baked lighting
-            importer.addCollider = true;          // walls, benches and props block the player
+            importer.generateSecondaryUV = !isTool;  // lightmap UVs for the baked room; hand tools are lit in real time
+            importer.addCollider = !isTool;          // walls, benches and props block the player
             importer.bakeAxisConversion = true;   // Blender is Z-up: bake the conversion so every object has a clean transform
             importer.animationType = ModelImporterAnimationType.None;
             importer.importAnimation = false;
             importer.importCameras = false;
             importer.importLights = false;
             importer.materialImportMode = ModelImporterMaterialImportMode.ImportViaMaterialDescription;
+        }
+
+        // FBX doesn't carry Blender's metal/roughness, so the hand tools' metals would come in as flat
+        // light-grey paint. Their surfaces by material name (Tools/Blender/tool_models.py): colour, metallic, smoothness.
+        static readonly Dictionary<string, (Color color, float metallic, float smoothness)> ToolSurfaces = new()
+        {
+            ["Saw_Frame"] = (new Color(0.08f, 0.25f, 0.62f), 0.45f, 0.65f),
+            ["Saw_Blade"] = (new Color(0.56f, 0.57f, 0.6f), 0.85f, 0.55f),
+            ["Saw_Grip"] = (new Color(0.05f, 0.05f, 0.055f), 0f, 0.25f),
+            ["Gun_Body"] = (new Color(0.52f, 0.53f, 0.56f), 0.85f, 0.6f),
+            ["Gun_Dark"] = (new Color(0.06f, 0.06f, 0.07f), 0f, 0.3f),
+            ["PaintChamber"] = (new Color(0.8f, 0.1f, 0.1f), 0f, 0.6f),
+            ["Drill_Body"] = (new Color(0.95f, 0.72f, 0.05f), 0f, 0.45f),
+            ["Drill_Black"] = (new Color(0.05f, 0.05f, 0.055f), 0f, 0.25f),
+            ["Drill_Steel"] = (new Color(0.56f, 0.57f, 0.6f), 0.9f, 0.6f),
+        };
+
+        // Runs after URP's own FBX material conversion (which sets up the Lit material), so these values win.
+        public override int GetPostprocessOrder() => 100;
+
+        void OnPreprocessMaterialDescription(MaterialDescription description, Material material, AnimationClip[] clips)
+        {
+            if (!assetPath.StartsWith(ToolModelRoot) || !ToolSurfaces.TryGetValue(description.materialName, out var surface))
+                return;
+            material.SetColor("_BaseColor", surface.color);
+            material.SetFloat("_Metallic", surface.metallic);
+            material.SetFloat("_Smoothness", surface.smoothness);
         }
 
         [Serializable]

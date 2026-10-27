@@ -163,5 +163,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: VersaHex Adapters .250
-  hint: "17.8 \xD7 17.8 \xD7 8.7 mm  \xB7  1.2 g  \xB7  hold to pick up"
+  hint: "17.8 \xD7 17.8 \xD7 8.7 mm  \xB7  1.2 g"
   highlightBrightness: 1.3

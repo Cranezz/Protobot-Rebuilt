@@ -22,10 +22,12 @@ namespace Protobot.Parts
 
             var jitter = new Vector3(Random.Range(-spread.x, spread.x), 0f, Random.Range(-spread.y, spread.y));
             var position = dropPoint.position + dropPoint.rotation * jitter;
-            var rotation = dropPoint.rotation * Quaternion.Euler(0f, Random.Range(-25f, 25f), 0f);
 
-            var instance = Instantiate(prefab, position, rotation, spawnedParent);
+            var instance = Instantiate(prefab, position, dropPoint.rotation, spawnedParent);
             instance.name = part.displayName;
+            // Lying flat with its long side along the bench, so long stock is easy to reach and saw.
+            var along = Quaternion.AngleAxis(Random.Range(-8f, 8f), Vector3.up) * dropPoint.right;
+            instance.transform.rotation = LyingRotation(instance, along);
 
             // Find the surface below (ignoring the new part itself) and rest its bounding box 3 cm above it.
             var colliders = instance.GetComponentsInChildren<Collider>();
@@ -41,8 +43,33 @@ namespace Protobot.Parts
             foreach (var c in colliders)
                 c.enabled = true;
 
+            // Parts interpolate, which overwrites a moved transform with the body's own pose: move both.
+            if (instance.TryGetComponent(out Rigidbody body))
+            {
+                body.position = instance.transform.position;
+                body.rotation = instance.transform.rotation;
+            }
+
             RecentParts.Add(part.id);
             return instance;
+        }
+
+        /// <summary>
+        /// The rotation that lays a part on its broadest side (thinnest dimension up) with its longest side
+        /// along <paramref name="along"/>.
+        /// </summary>
+        public static Quaternion LyingRotation(GameObject part, Vector3 along)
+        {
+            var size = PartShape.LocalBounds(part).size;
+            var longest = size.x >= size.y && size.x >= size.z ? 0 : size.y >= size.z ? 1 : 2;
+            var thinnest = size.x <= size.y && size.x <= size.z ? 0 : size.y <= size.z ? 1 : 2;
+            if (longest == thinnest)
+                return Quaternion.LookRotation(along, Vector3.up);  // a cube: any way up
+            var longAxis = Vector3.zero;
+            longAxis[longest] = 1f;
+            var upAxis = Vector3.zero;
+            upAxis[thinnest] = 1f;
+            return Quaternion.LookRotation(along, Vector3.up) * Quaternion.Inverse(Quaternion.LookRotation(longAxis, upAxis));
         }
 
         static Bounds WorldBounds(GameObject go)

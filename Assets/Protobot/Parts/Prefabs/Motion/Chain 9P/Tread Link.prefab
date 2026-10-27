@@ -171,5 +171,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: Tread Link
-  hint: "38 \xD7 16.9 \xD7 9.7 mm  \xB7  1.5 g  \xB7  hold to pick up"
+  hint: "38 \xD7 16.9 \xD7 9.7 mm  \xB7  1.5 g"
   highlightBrightness: 1.3

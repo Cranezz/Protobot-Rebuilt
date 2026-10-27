@@ -158,7 +158,7 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1174959210362361218}
   serializedVersion: 5
-  m_Mass: 0.009643753
+  m_Mass: 0.026962318
   m_LinearDamping: 0.05
   m_AngularDamping: 0.15
   m_CenterOfMass: {x: 0, y: 0, z: 0}
@@ -204,7 +204,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: Bumper Switch - V1
-  hint: "53 \xD7 34.1 \xD7 23 mm  \xB7  9.6 g  \xB7  hold to pick up"
+  hint: "53 \xD7 34.1 \xD7 23 mm  \xB7  27 g"
   highlightBrightness: 1.3
 --- !u!1 &2394802469652678803 stripped
 GameObject:

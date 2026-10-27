@@ -205,5 +205,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: Nut Keps
-  hint: "10 \xD7 10 \xD7 3.8 mm  \xB7  1.5 g  \xB7  hold to pick up"
+  hint: "10 \xD7 10 \xD7 3.8 mm  \xB7  1.5 g"
   highlightBrightness: 1.3

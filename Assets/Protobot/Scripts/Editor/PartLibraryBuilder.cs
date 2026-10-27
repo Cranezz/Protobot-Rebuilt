@@ -113,12 +113,25 @@ namespace Protobot.Editor
                     model = AssetDatabase.LoadAssetAtPath<GameObject>(ModelPath(part)),
                     size = new Vector3(part.size[0], part.size[1], part.size[2]),
                     triangles = part.triangles,
-                    cuttable = binId is "c_channels" or "angles" or "plates" or "rails" or "shafts",
+                    cuttable = IsStock(binId, part.size),
                 });
             }
             EditorUtility.SetDirty(catalog);
             AssetDatabase.SaveAssets();
             return catalog;
+        }
+
+        /// <summary>
+        /// Metal stock that comes full length and gets cut to size: long, straight pieces from the structure and
+        /// shaft bins. Gussets and couplers live in the same bins but are short brackets, not stock.
+        /// </summary>
+        public static bool IsStock(string binId, float[] size)
+        {
+            if (binId is not ("c_channels" or "angles" or "plates" or "rails" or "shafts"))
+                return false;
+            var sorted = new List<float>(size);
+            sorted.Sort();
+            return sorted[2] >= 0.1f && sorted[2] >= sorted[1] * 3f;
         }
 
         /// <summary>Adds a PartBin + click collider to each Bin_XX group of the workshop model in the open scene.</summary>
@@ -219,14 +232,14 @@ namespace Protobot.Editor
             float metallic, smoothness;
             var transparent = false;
 
-            if (n.Contains("black") && IsMetal(n))
+            if ((n.Contains("black") && IsMetal(n)) || (n.Contains("screw") && cadColor.maxColorComponent < 0.3f))
             {
                 // Black-oxide screws, anodised black aluminium.
                 color = new Color(0.07f, 0.07f, 0.075f);
                 metallic = 0.85f;
                 smoothness = 0.45f;
             }
-            else if (n.Contains("aluminum") || n.Contains("aluminium") || n.Contains("anodized"))
+            else if (IsAluminum(n))
             {
                 color = new Color(0.84f, 0.85f, 0.87f);
                 metallic = 1f;
@@ -273,10 +286,16 @@ namespace Protobot.Editor
                 MakeTransparent(material);
         }
 
+        // Some libraries name it "Alu" or "VEX_Alu"; VEX standoffs are aluminium too.
+        static bool IsAluminum(string n) =>
+            n.Contains("aluminum") || n.Contains("aluminium") || n.Contains("anodized") || n == "alu" || n.StartsWith("alu_")
+            || n.Contains("_alu") || n.Contains("standoff");
+
         static bool IsMetal(string n) =>
             n.Contains("steel") || n.Contains("stainless") || n.Contains("chrome") || n.Contains("zinc") || n.Contains("titanium")
-            || n.Contains("machined") || n.Contains("aluminum") || n.Contains("anodized") || n.Contains("brass") || n.Contains("bronze")
-            || n.Contains("copper") || (n.Contains("iron") && !n.Contains("gray")) || n == "semi-polished" || n.StartsWith("polished");
+            || n.Contains("machined") || IsAluminum(n) || n.Contains("brass") || n.Contains("bronze")
+            || n.Contains("copper") || (n.Contains("iron") && !n.Contains("gray")) || n == "semi-polished" || n.StartsWith("polished")
+            || n.Contains("screw") || n.Contains("vex_metal");
 
         static void MakeTransparent(Material material)
         {

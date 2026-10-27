@@ -136,7 +136,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: NSpacer .375 OD x .250
-  hint: "9.5 \xD7 9.5 \xD7 6.4 mm  \xB7  0.5 g  \xB7  hold to pick up"
+  hint: "9.5 \xD7 9.5 \xD7 6.4 mm  \xB7  0.5 g"
   highlightBrightness: 1.3
 --- !u!1 &7546333392405821450 stripped
 GameObject:

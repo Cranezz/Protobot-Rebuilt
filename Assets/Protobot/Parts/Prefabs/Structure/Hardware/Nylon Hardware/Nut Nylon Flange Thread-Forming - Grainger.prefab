@@ -171,5 +171,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: Nut Nylon Flange Thread-Forming - Grainger
-  hint: "11.7 \xD7 11.7 \xD7 5.8 mm  \xB7  0.5 g  \xB7  hold to pick up"
+  hint: "11.7 \xD7 11.7 \xD7 5.8 mm  \xB7  0.5 g"
   highlightBrightness: 1.3

@@ -136,7 +136,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: VEXU Small
-  hint: "393.7 \xD7 393.7 \xD7 381 mm  \xB7  4.31 kg  \xB7  hold to pick up"
+  hint: "393.7 \xD7 393.7 \xD7 381 mm  \xB7  4.31 kg"
   highlightBrightness: 1.3
 --- !u!1 &8780811005234929368 stripped
 GameObject:

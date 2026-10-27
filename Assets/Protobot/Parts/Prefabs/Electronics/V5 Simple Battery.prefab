@@ -136,7 +136,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: V5 Simple Battery
-  hint: "176.3 \xD7 46.4 \xD7 30.4 mm  \xB7  231.5 g  \xB7  hold to pick up"
+  hint: "176.3 \xD7 46.4 \xD7 30.4 mm  \xB7  231.5 g"
   highlightBrightness: 1.3
 --- !u!1 &6930849830672179590 stripped
 GameObject:

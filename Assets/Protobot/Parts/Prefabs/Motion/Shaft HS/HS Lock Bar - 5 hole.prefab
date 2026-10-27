@@ -136,7 +136,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: HS Lock Bar - 5 hole
-  hint: "63.5 \xD7 12.7 \xD7 1.4 mm  \xB7  7.2 g  \xB7  hold to pick up"
+  hint: "63.5 \xD7 12.7 \xD7 1.4 mm  \xB7  7.2 g"
   highlightBrightness: 1.3
 --- !u!1 &4614289339328979491 stripped
 GameObject:

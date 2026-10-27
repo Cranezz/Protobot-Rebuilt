@@ -213,5 +213,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: Rubber Bumper Threaded
-  hint: "20.6 \xD7 19 \xD7 19 mm  \xB7  5.4 g  \xB7  hold to pick up"
+  hint: "20.6 \xD7 19 \xD7 19 mm  \xB7  5.4 g"
   highlightBrightness: 1.3

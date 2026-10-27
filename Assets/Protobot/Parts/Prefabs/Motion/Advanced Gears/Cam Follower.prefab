@@ -255,5 +255,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: Cam Follower
-  hint: "129.5 \xD7 12.7 \xD7 12.4 mm  \xB7  9.2 g  \xB7  hold to pick up"
+  hint: "129.5 \xD7 12.7 \xD7 12.4 mm  \xB7  9.2 g"
   highlightBrightness: 1.3

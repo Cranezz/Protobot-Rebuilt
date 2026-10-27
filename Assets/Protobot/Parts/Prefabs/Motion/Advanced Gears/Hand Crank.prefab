@@ -144,7 +144,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: Hand Crank
-  hint: "50.8 \xD7 33 \xD7 19 mm  \xB7  3.2 g  \xB7  hold to pick up"
+  hint: "50.8 \xD7 33 \xD7 19 mm  \xB7  3.2 g"
   highlightBrightness: 1.3
 --- !u!1 &3691784456450928202 stripped
 GameObject:

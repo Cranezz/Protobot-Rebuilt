@@ -171,5 +171,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: 4-Post Standoff Retainer
-  hint: "17.2 \xD7 17.2 \xD7 9.4 mm  \xB7  1.1 g  \xB7  hold to pick up"
+  hint: "17.2 \xD7 17.2 \xD7 9.4 mm  \xB7  1.1 g"
   highlightBrightness: 1.3

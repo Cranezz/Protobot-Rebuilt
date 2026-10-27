@@ -213,5 +213,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: Alliance Stake Red
-  hint: "424.6 \xD7 90.7 \xD7 81.3 mm  \xB7  106 g  \xB7  hold to pick up"
+  hint: "424.6 \xD7 90.7 \xD7 81.3 mm  \xB7  106 g"
   highlightBrightness: 1.3

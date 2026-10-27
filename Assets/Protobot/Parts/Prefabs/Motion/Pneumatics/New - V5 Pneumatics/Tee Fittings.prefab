@@ -261,7 +261,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: Tee Fittings
-  hint: "37.4 \xD7 24.3 \xD7 11.2 mm  \xB7  3.8 g  \xB7  hold to pick up"
+  hint: "37.4 \xD7 24.3 \xD7 11.2 mm  \xB7  3.8 g"
   highlightBrightness: 1.3
 --- !u!1 &3048600984671471321 stripped
 GameObject:

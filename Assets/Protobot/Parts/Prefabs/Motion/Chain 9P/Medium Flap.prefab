@@ -213,5 +213,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: Medium Flap
-  hint: "38 \xD7 29.7 \xD7 16.9 mm  \xB7  3.4 g  \xB7  hold to pick up"
+  hint: "38 \xD7 29.7 \xD7 16.9 mm  \xB7  3.4 g"
   highlightBrightness: 1.3

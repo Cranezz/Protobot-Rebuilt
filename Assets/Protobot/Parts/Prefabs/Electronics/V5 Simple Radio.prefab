@@ -163,5 +163,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: V5 Simple Radio
-  hint: "84.5 \xD7 25.4 \xD7 22.6 mm  \xB7  40.5 g  \xB7  hold to pick up"
+  hint: "84.5 \xD7 25.4 \xD7 22.6 mm  \xB7  40.5 g"
   highlightBrightness: 1.3

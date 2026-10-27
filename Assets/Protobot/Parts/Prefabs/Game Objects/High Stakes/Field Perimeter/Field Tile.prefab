@@ -140,7 +140,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: Field Tile
-  hint: "618.8 \xD7 618.8 \xD7 16 mm  \xB7  6.60 kg  \xB7  hold to pick up"
+  hint: "618.8 \xD7 618.8 \xD7 16 mm  \xB7  6.60 kg"
   highlightBrightness: 1.3
 --- !u!1 &2233555490722640120 stripped
 GameObject:

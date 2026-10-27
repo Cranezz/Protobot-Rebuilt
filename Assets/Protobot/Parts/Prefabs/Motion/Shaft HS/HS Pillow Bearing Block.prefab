@@ -171,5 +171,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: HS Pillow Bearing Block
-  hint: "38 \xD7 13.4 \xD7 12.7 mm  \xB7  2.6 g  \xB7  hold to pick up"
+  hint: "38 \xD7 13.4 \xD7 12.7 mm  \xB7  2.6 g"
   highlightBrightness: 1.3

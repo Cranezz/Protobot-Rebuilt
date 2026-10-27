@@ -66,6 +66,18 @@ namespace Protobot.Player
 
         public void Jump() => jumpQueued = true;
 
+        /// <summary>Puts the player somewhere, facing a direction (degrees; positive pitch looks down).</summary>
+        public void Teleport(Vector3 position, float newYaw, float newPitch)
+        {
+            body.enabled = false;
+            transform.SetPositionAndRotation(position, Quaternion.Euler(0f, newYaw, 0f));
+            body.enabled = true;
+            yaw = newYaw;
+            pitch = Mathf.Clamp(newPitch, -85f, 85f);
+            horizontalVelocity = Vector3.zero;
+            verticalVelocity = 0f;
+        }
+
         void Update()
         {
             UpdateHeight();

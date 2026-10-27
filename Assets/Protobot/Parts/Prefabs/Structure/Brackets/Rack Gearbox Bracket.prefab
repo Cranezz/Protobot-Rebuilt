@@ -167,5 +167,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: Rack Gearbox Bracket
-  hint: "52.4 \xD7 50.8 \xD7 24.6 mm  \xB7  50.7 g  \xB7  hold to pick up"
+  hint: "52.4 \xD7 50.8 \xD7 24.6 mm  \xB7  50.7 g"
   highlightBrightness: 1.3

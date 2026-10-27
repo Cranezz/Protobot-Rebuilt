@@ -98,7 +98,7 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1109983453246642886}
   serializedVersion: 5
-  m_Mass: 0.0045157867
+  m_Mass: 0.009933735
   m_LinearDamping: 0.05
   m_AngularDamping: 0.15
   m_CenterOfMass: {x: 0, y: 0, z: 0}
@@ -144,7 +144,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: V5 Brain Mount Long
-  hint: "87.7 \xD7 18.5 \xD7 9.4 mm  \xB7  4.5 g  \xB7  hold to pick up"
+  hint: "87.7 \xD7 18.5 \xD7 9.4 mm  \xB7  9.9 g"
   highlightBrightness: 1.3
 --- !u!1 &4473537968078538711 stripped
 GameObject:

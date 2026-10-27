@@ -164,5 +164,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: SScrew Shoulder Smooth 2.000 x .04
-  hint: "53 \xD7 7.9 \xD7 7.9 mm  \xB7  5.9 g  \xB7  hold to pick up"
+  hint: "53 \xD7 7.9 \xD7 7.9 mm  \xB7  5.9 g"
   highlightBrightness: 1.3

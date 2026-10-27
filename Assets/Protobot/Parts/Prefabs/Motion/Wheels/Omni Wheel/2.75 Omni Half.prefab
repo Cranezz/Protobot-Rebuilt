@@ -1053,5 +1053,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: 2.75 Omni Half
-  hint: "70 \xD7 69.2 \xD7 15 mm  \xB7  31.8 g  \xB7  hold to pick up"
+  hint: "70 \xD7 69.2 \xD7 15 mm  \xB7  31.8 g"
   highlightBrightness: 1.3

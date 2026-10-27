@@ -171,5 +171,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: 276-7596-005
-  hint: "139.4 \xD7 105.6 \xD7 25.3 mm  \xB7  63.4 g  \xB7  hold to pick up"
+  hint: "139.4 \xD7 105.6 \xD7 25.3 mm  \xB7  63.4 g"
   highlightBrightness: 1.3

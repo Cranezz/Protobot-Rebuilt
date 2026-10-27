@@ -171,5 +171,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: Winch Drum
-  hint: "39.5 \xD7 35.3 \xD7 35.3 mm  \xB7  9.8 g  \xB7  hold to pick up"
+  hint: "39.5 \xD7 35.3 \xD7 35.3 mm  \xB7  9.8 g"
   highlightBrightness: 1.3

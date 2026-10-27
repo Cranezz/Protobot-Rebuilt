@@ -843,5 +843,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: 12T Bevel Gear
-  hint: "18.7 \xD7 18.7 \xD7 14.3 mm  \xB7  1.2 g  \xB7  hold to pick up"
+  hint: "18.7 \xD7 18.7 \xD7 14.3 mm  \xB7  1.2 g"
   highlightBrightness: 1.3

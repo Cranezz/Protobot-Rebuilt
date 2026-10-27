@@ -93,7 +93,7 @@ MeshCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4815443556564040048}
-  m_Material: {fileID: 13400000, guid: 7b41823d24d681e45af2872a54c4ecbe, type: 2}
+  m_Material: {fileID: 13400000, guid: 7c1438b7c2246e3449cb98af75fde723, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -121,7 +121,7 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5942797328505340008}
   serializedVersion: 5
-  m_Mass: 0.001200822
+  m_Mass: 0.0028193211
   m_LinearDamping: 0.05
   m_AngularDamping: 0.15
   m_CenterOfMass: {x: 0, y: 0, z: 0}
@@ -167,5 +167,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: THF0832-0250_275-1017-001
-  hint: "38.1 \xD7 7.3 \xD7 6.4 mm  \xB7  1.2 g  \xB7  hold to pick up"
+  hint: "38.1 \xD7 7.3 \xD7 6.4 mm  \xB7  2.8 g"
   highlightBrightness: 1.3

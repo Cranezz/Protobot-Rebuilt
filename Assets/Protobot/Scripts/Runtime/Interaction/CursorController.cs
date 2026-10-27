@@ -5,10 +5,28 @@ using UnityEngine;
 
 namespace Protobot.Interaction
 {
+    /// <summary>What the reticle and tooltip show for the current target.</summary>
+    public struct CursorView
+    {
+        public Sprite reticle;
+        public Color reticleColor;
+        public bool large;
+        public string title;
+        public string hint;
+        public bool available;
+    }
+
+    /// <summary>Lets the equipped tool restyle the reticle/tooltip (see Tools.ToolBelt).</summary>
+    public interface ICursorOverride
+    {
+        bool Describe(HoverTarget target, bool inReach, ref CursorView view);
+    }
+
     /// <summary>
     /// In play the mouse is locked to the centre of the screen and drawn as a reticle: a dot normally,
     /// a pointing hand over things to click, an open hand over parts (closed while holding one). A label
-    /// next to it names what you're aiming at. When a menu opens the normal mouse pointer comes back.
+    /// next to it names what you're aiming at. The equipped tool can change both (e.g. the saw shows
+    /// whether a part can be cut). When a menu opens the normal mouse pointer comes back.
     /// </summary>
     public class CursorController : MonoBehaviour
     {
@@ -36,9 +54,16 @@ namespace Protobot.Interaction
         public RaycastHit CurrentHit { get; private set; }
         public Camera ViewCamera => viewCamera;
         public float Reach => reach;
+        public LayerMask RaycastMask => raycastMask;
 
-        /// <summary>Set by <see cref="PlayerHands"/> while it carries something, so the cursor shows a closed hand.</summary>
+        /// <summary>Set while the player carries something, so the cursor shows a closed hand.</summary>
         public HoverTarget Holding { get; set; }
+
+        /// <summary>The equipped tool's say over the reticle and tooltip.</summary>
+        public ICursorOverride Override { get; set; }
+
+        /// <summary>Ray from the centre of the screen.</summary>
+        public Ray AimRay => viewCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
 
         void OnEnable()
         {
@@ -64,14 +89,16 @@ namespace Protobot.Interaction
             if (Holding != null)
             {
                 SetHover(null);
-                ShowKind(CursorKind.Grabbing);
-                hud.ShowTooltip(Holding.Title, "Release to drop  ·  Scroll to move closer/further", true);
+                Show(new CursorView
+                {
+                    reticle = StyleFor(CursorKind.Grabbing).sprite, reticleColor = Color.white, large = true,
+                    title = Holding.Title, hint = "Release to drop  ·  Scroll: closer / further", available = true,
+                });
                 return;
             }
 
             HoverTarget target = null;
-            var ray = viewCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
-            if (Physics.Raycast(ray, out var hit, 30f, raycastMask, QueryTriggerInteraction.Collide))
+            if (Physics.Raycast(AimRay, out var hit, 30f, raycastMask, QueryTriggerInteraction.Collide))
             {
                 target = hit.collider.GetComponentInParent<HoverTarget>();
                 CurrentHit = hit;
@@ -79,12 +106,28 @@ namespace Protobot.Interaction
 
             SetHover(target);
             CurrentInReach = target != null && hit.distance <= reach;
-            ShowKind(CurrentInReach ? target.Cursor : CursorKind.Default);
 
-            if (target == null)
+            var kind = CurrentInReach ? target.Cursor : CursorKind.Default;
+            var view = new CursorView
+            {
+                reticle = kind == CursorKind.Default ? null : StyleFor(kind).sprite,
+                reticleColor = Color.white,
+                large = kind != CursorKind.Default,
+                title = target != null ? target.Title : null,
+                hint = target == null ? null : CurrentInReach ? target.Hint : "Move closer to use",
+                available = CurrentInReach,
+            };
+            Override?.Describe(target, CurrentInReach, ref view);
+            Show(view);
+        }
+
+        void Show(CursorView view)
+        {
+            hud.SetReticle(view.reticle, view.large, view.reticleColor);
+            if (string.IsNullOrEmpty(view.title))
                 hud.HideTooltip();
             else
-                hud.ShowTooltip(target.Title, CurrentInReach ? target.Hint : "Move closer to use", CurrentInReach);
+                hud.ShowTooltip(view.title, view.hint, view.available);
         }
 
         void EnterMenuMode()
@@ -129,13 +172,7 @@ namespace Protobot.Interaction
                 CurrentInReach = false;
         }
 
-        void ShowKind(CursorKind kind)
-        {
-            var style = StyleFor(kind);
-            hud.SetReticle(kind == CursorKind.Default ? null : style.sprite, kind != CursorKind.Default);
-        }
-
-        CursorStyle StyleFor(CursorKind kind)
+        public CursorStyle StyleFor(CursorKind kind)
         {
             foreach (var style in styles)
                 if (style.kind == kind)

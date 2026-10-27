@@ -189,7 +189,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: Differential
-  hint: "47.1 \xD7 40.2 \xD7 40.2 mm  \xB7  14.5 g  \xB7  hold to pick up"
+  hint: "47.1 \xD7 40.2 \xD7 40.2 mm  \xB7  14.5 g"
   highlightBrightness: 1.3
 --- !u!1 &7703012251477000028 stripped
 GameObject:

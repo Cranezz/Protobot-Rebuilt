@@ -171,5 +171,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: Blue Ring
-  hint: "177.8 \xD7 177.8 \xD7 50.8 mm  \xB7  140.3 g  \xB7  hold to pick up"
+  hint: "177.8 \xD7 177.8 \xD7 50.8 mm  \xB7  140.3 g"
   highlightBrightness: 1.3

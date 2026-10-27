@@ -159,7 +159,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: Neutral Stake
-  hint: "637.2 \xD7 90.7 \xD7 81.3 mm  \xB7  145.6 g  \xB7  hold to pick up"
+  hint: "637.2 \xD7 90.7 \xD7 81.3 mm  \xB7  145.6 g"
   highlightBrightness: 1.3
 --- !u!1 &3419995357062899394 stripped
 GameObject:

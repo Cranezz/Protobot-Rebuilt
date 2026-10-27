@@ -54,7 +54,7 @@ namespace Protobot.InputHandling
                 motor.Jump();
 
             var mouse = Mouse.current;
-            if (mouse != null && Cursor.lockState == CursorLockMode.Locked)
+            if (mouse != null && Cursor.lockState == CursorLockMode.Locked && !InputLocks.LookSuppressed)
             {
                 var settings = ControlSettings.Current;
                 var delta = mouse.delta.ReadValue() * (BaseSensitivity * settings.mouseSensitivity);

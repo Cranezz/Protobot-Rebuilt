@@ -297,5 +297,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: Bogie Wheel Single
-  hint: "39.5 \xD7 39.5 \xD7 24.5 mm  \xB7  18.8 g  \xB7  hold to pick up"
+  hint: "39.5 \xD7 39.5 \xD7 24.5 mm  \xB7  18.8 g"
   highlightBrightness: 1.3

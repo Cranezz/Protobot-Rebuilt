@@ -171,5 +171,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: Ladder Base
-  hint: "203.9 \xD7 203.9 \xD7 88.9 mm  \xB7  140.9 g  \xB7  hold to pick up"
+  hint: "203.9 \xD7 203.9 \xD7 88.9 mm  \xB7  140.9 g"
   highlightBrightness: 1.3

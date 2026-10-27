@@ -74,6 +74,9 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 89dfcdd38103e3544b8b7d8bf4fc8b0e, type: 3}
       insertIndex: -1
+      addedObject: {fileID: 4439813533219052596}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 89dfcdd38103e3544b8b7d8bf4fc8b0e, type: 3}
+      insertIndex: -1
       addedObject: {fileID: 3303984121879122274}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 89dfcdd38103e3544b8b7d8bf4fc8b0e, type: 3}
       insertIndex: -1
@@ -81,15 +84,53 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 89dfcdd38103e3544b8b7d8bf4fc8b0e, type: 3}
       insertIndex: -1
       addedObject: {fileID: 3894145445656372932}
-    - targetCorrespondingSourceObject: {fileID: 8310570232088225184, guid: 89dfcdd38103e3544b8b7d8bf4fc8b0e, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 7762765893045666101}
   m_SourcePrefab: {fileID: 100100000, guid: 89dfcdd38103e3544b8b7d8bf4fc8b0e, type: 3}
 --- !u!1 &4352119338704571130 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 89dfcdd38103e3544b8b7d8bf4fc8b0e, type: 3}
   m_PrefabInstance: {fileID: 3505133852753737643}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &4439813533219052596
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4352119338704571130}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e4020603aaf096b4a9d86061d6cceed3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.StockProfile
+  axis: {x: 1, y: 0, z: 0}
+  u: {x: 0, y: 1, z: 0}
+  v: {x: 0, y: 0, z: 1}
+  origin: {x: -0.10095194, y: 0.06021537, z: 0.005181604}
+  start: -0.15875
+  end: 0.15875
+  points:
+  - {x: 0.012065001, y: -0.004368799}
+  - {x: 0.012065001, y: 0.0063500004}
+  - {x: 0.010896601, y: 0.0063500004}
+  - {x: 0.010896601, y: -0.004368799}
+  - {x: 0.011074401, y: -0.006084569}
+  - {x: 0.011799574, y: -0.0053593987}
+  - {x: 0.011074401, y: -0.006084569}
+  - {x: 0.010083802, y: -0.005181599}
+  - {x: -0.012064997, y: -0.0051816003}
+  - {x: -0.012064997, y: -0.0063500004}
+  - {x: 0.010083802, y: -0.0063499985}
+  - {x: 0.010490201, y: -0.0050727087}
+  - {x: 0.010083802, y: -0.005181599}
+  - {x: 0.011074401, y: -0.006084569}
+  - {x: 0.011074401, y: -0.006084569}
+  - {x: 0.010896601, y: -0.004368799}
+  - {x: 0.010787711, y: -0.0047751986}
+  - {x: 0.010787711, y: -0.0047751986}
+  - {x: 0.010490201, y: -0.0050727087}
+  - {x: 0.011074401, y: -0.006084569}
+  pieceSizes: 0600000005000000030000000300000003000000
+  physicsMaterial: {fileID: 13400000, guid: 3122d1684761a0f468db748b5e9a9624, type: 2}
 --- !u!54 &3303984121879122274
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -144,32 +185,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: Steel Chassis Rail 2x1x25
-  hint: "317.5 \xD7 24.1 \xD7 12.7 mm  \xB7  84.6 g  \xB7  hold to pick up"
+  hint: "317.5 \xD7 24.1 \xD7 12.7 mm  \xB7  84.6 g"
   highlightBrightness: 1.3
---- !u!1 &4895886904632332811 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 8310570232088225184, guid: 89dfcdd38103e3544b8b7d8bf4fc8b0e, type: 3}
-  m_PrefabInstance: {fileID: 3505133852753737643}
-  m_PrefabAsset: {fileID: 0}
---- !u!64 &7762765893045666101
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4895886904632332811}
-  m_Material: {fileID: 13400000, guid: 3122d1684761a0f468db748b5e9a9624, type: 2}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 1
-  m_CookingOptions: 30
-  m_Mesh: {fileID: -4276077912901803465, guid: 89dfcdd38103e3544b8b7d8bf4fc8b0e, type: 3}

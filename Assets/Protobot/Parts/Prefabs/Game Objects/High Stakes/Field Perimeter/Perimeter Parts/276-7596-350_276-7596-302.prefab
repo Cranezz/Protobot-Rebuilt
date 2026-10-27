@@ -140,7 +140,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: 276-7596-350_276-7596-302
-  hint: "1187.8 \xD7 63.5 \xD7 50.8 mm  \xB7  582.9 g  \xB7  hold to pick up"
+  hint: "1187.8 \xD7 63.5 \xD7 50.8 mm  \xB7  582.9 g"
   highlightBrightness: 1.3
 --- !u!1 &4533351720501371090 stripped
 GameObject:

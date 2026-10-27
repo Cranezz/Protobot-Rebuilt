@@ -140,7 +140,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: Angle Corner Gusset
-  hint: "52.5 \xD7 52.5 \xD7 23.1 mm  \xB7  15.2 g  \xB7  hold to pick up"
+  hint: "52.5 \xD7 52.5 \xD7 23.1 mm  \xB7  15.2 g"
   highlightBrightness: 1.3
 --- !u!1 &7732757972491281678 stripped
 GameObject:

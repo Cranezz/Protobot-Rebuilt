@@ -480,7 +480,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: Bogie Wheel Double
-  hint: "59 \xD7 49.5 \xD7 39.5 mm  \xB7  39.1 g  \xB7  hold to pick up"
+  hint: "59 \xD7 49.5 \xD7 39.5 mm  \xB7  39.1 g"
   highlightBrightness: 1.3
 --- !u!1 &9187664081317286117 stripped
 GameObject:

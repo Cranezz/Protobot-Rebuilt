@@ -171,5 +171,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: 1-Post Bearing Flat Standoff Retainer
-  hint: "31.8 \xD7 9.5 \xD7 9.5 mm  \xB7  1 g  \xB7  hold to pick up"
+  hint: "31.8 \xD7 9.5 \xD7 9.5 mm  \xB7  1 g"
   highlightBrightness: 1.3

@@ -711,7 +711,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: 4 Omni Half
-  hint: "105.4 \xD7 105.4 \xD7 13.4 mm  \xB7  50.3 g  \xB7  hold to pick up"
+  hint: "105.4 \xD7 105.4 \xD7 13.4 mm  \xB7  50.3 g"
   highlightBrightness: 1.3
 --- !u!1 &961652365620964035 stripped
 GameObject:

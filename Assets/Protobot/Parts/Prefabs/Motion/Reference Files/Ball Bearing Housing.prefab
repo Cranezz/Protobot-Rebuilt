@@ -171,5 +171,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: Ball Bearing Housing
-  hint: "33.4 \xD7 33.4 \xD7 10.2 mm  \xB7  3.3 g  \xB7  hold to pick up"
+  hint: "33.4 \xD7 33.4 \xD7 10.2 mm  \xB7  3.3 g"
   highlightBrightness: 1.3

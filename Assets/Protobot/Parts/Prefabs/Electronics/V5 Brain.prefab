@@ -1301,7 +1301,7 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 9145801526641342279}
   serializedVersion: 5
-  m_Mass: 0.2150256
+  m_Mass: 0.28612363
   m_LinearDamping: 0.05
   m_AngularDamping: 0.15
   m_CenterOfMass: {x: 0, y: 0, z: 0}
@@ -1347,5 +1347,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: V5 Brain
-  hint: "140 \xD7 99.8 \xD7 31.5 mm  \xB7  215 g  \xB7  hold to pick up"
+  hint: "140 \xD7 99.8 \xD7 31.5 mm  \xB7  286.1 g"
   highlightBrightness: 1.3

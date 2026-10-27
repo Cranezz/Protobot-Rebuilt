@@ -293,7 +293,7 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7736664126480533302}
   serializedVersion: 5
-  m_Mass: 0.024017755
+  m_Mass: 0.04475689
   m_LinearDamping: 0.05
   m_AngularDamping: 0.15
   m_CenterOfMass: {x: 0, y: 0, z: 0}
@@ -339,5 +339,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: Optical Shaft Encoder
-  hint: "67.5 \xD7 50.5 \xD7 20.2 mm  \xB7  24 g  \xB7  hold to pick up"
+  hint: "67.5 \xD7 50.5 \xD7 20.2 mm  \xB7  44.8 g"
   highlightBrightness: 1.3

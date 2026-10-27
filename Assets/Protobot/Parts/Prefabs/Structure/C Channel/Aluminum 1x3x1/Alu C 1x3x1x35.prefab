@@ -74,6 +74,9 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 2974b79fdec0d2049ae788c55c37e4df, type: 3}
       insertIndex: -1
+      addedObject: {fileID: 6193227119845991558}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 2974b79fdec0d2049ae788c55c37e4df, type: 3}
+      insertIndex: -1
       addedObject: {fileID: 11208202084787131}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 2974b79fdec0d2049ae788c55c37e4df, type: 3}
       insertIndex: -1
@@ -81,42 +84,64 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 2974b79fdec0d2049ae788c55c37e4df, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2148935672680951265}
-    - targetCorrespondingSourceObject: {fileID: 4445948748397649984, guid: 2974b79fdec0d2049ae788c55c37e4df, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 209140463130899792}
   m_SourcePrefab: {fileID: 100100000, guid: 2974b79fdec0d2049ae788c55c37e4df, type: 3}
---- !u!1 &5320028682217111587 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 4445948748397649984, guid: 2974b79fdec0d2049ae788c55c37e4df, type: 3}
-  m_PrefabInstance: {fileID: 8387856668144525411}
-  m_PrefabAsset: {fileID: 0}
---- !u!64 &209140463130899792
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5320028682217111587}
-  m_Material: {fileID: 13400000, guid: 7c1438b7c2246e3449cb98af75fde723, type: 2}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 1
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 6413805903724522286, guid: 2974b79fdec0d2049ae788c55c37e4df, type: 3}
 --- !u!1 &8693863605300911410 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 2974b79fdec0d2049ae788c55c37e4df, type: 3}
   m_PrefabInstance: {fileID: 8387856668144525411}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &6193227119845991558
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8693863605300911410}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e4020603aaf096b4a9d86061d6cceed3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.StockProfile
+  axis: {x: 0, y: 1, z: 0}
+  u: {x: 0, y: 0, z: 1}
+  v: {x: 1, y: 0, z: 0}
+  origin: {x: 0, y: 0.22224997, z: -0.007143732}
+  start: -0.22224997
+  end: 0.22224997
+  points:
+  - {x: 0.0061873565, y: 0.01857142}
+  - {x: 0.0052414183, y: 0.018998213}
+  - {x: -0.007143737, y: 0.019049998}
+  - {x: -0.007143737, y: 0.0174625}
+  - {x: 0.004762511, y: 0.0174625}
+  - {x: 0.005683854, y: -0.018858265}
+  - {x: 0.004762511, y: -0.0174625}
+  - {x: -0.007143737, y: -0.0174625}
+  - {x: -0.007143737, y: -0.019049998}
+  - {x: 0.004762511, y: -0.019049998}
+  - {x: 0.005683854, y: -0.018858265}
+  - {x: 0.0061873565, y: -0.01857142}
+  - {x: 0.0067932983, y: -0.017910356}
+  - {x: 0.0071437606, y: -0.01666875}
+  - {x: 0.0071437606, y: 0.01666875}
+  - {x: 0.00699249, y: 0.01749539}
+  - {x: 0.0061873565, y: 0.01857142}
+  - {x: 0.005556261, y: 0.01666875}
+  - {x: 0.0055126227, y: -0.01692395}
+  - {x: 0.0051133046, y: -0.017378924}
+  - {x: 0.004762511, y: -0.0174625}
+  - {x: 0.005683854, y: -0.018858265}
+  - {x: 0.0061873565, y: 0.01857142}
+  - {x: 0.004762511, y: 0.0174625}
+  - {x: 0.0053439173, y: 0.01720884}
+  - {x: 0.0055126227, y: -0.01692395}
+  - {x: 0.0051133046, y: -0.017378924}
+  - {x: 0.005683854, y: -0.018858265}
+  - {x: 0.0061873565, y: 0.01857142}
+  - {x: 0.0053439173, y: 0.01720884}
+  - {x: 0.005556261, y: 0.01666875}
+  pieceSizes: 05000000050000000900000003000000030000000300000003000000
+  physicsMaterial: {fileID: 13400000, guid: 7c1438b7c2246e3449cb98af75fde723, type: 2}
 --- !u!54 &11208202084787131
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -171,5 +196,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: Alu C 1x3x1x35
-  hint: "444.5 \xD7 38.1 \xD7 14.3 mm  \xB7  101.8 g  \xB7  hold to pick up"
+  hint: "444.5 \xD7 38.1 \xD7 14.3 mm  \xB7  101.8 g"
   highlightBrightness: 1.3

@@ -9,7 +9,8 @@ with mouse/keyboard equivalents. The VR mode comes later.
   the largest plates). Players cut them down in the app, like a real hacksaw.
 - Cuts are done with mesh plane-slicing: the mesh is split along the cut plane and the open side is
   capped with new faces, so the cut part is solid (no hole left in the mesh).
-- The removed side disappears; only the kept side stays in the build.
+- ~~The removed side disappears~~ (changed after playtesting): the offcut becomes its own part, so both
+  pieces stay usable. Unwanted pieces go in the trash can.
 
 ## Workspace
 - Building happens in a workshop/garage: tall ceiling, tools and decorations, a metal table in the middle.
@@ -33,6 +34,18 @@ with mouse/keyboard equivalents. The VR mode comes later.
 - Bit-size picker: scrolling slider with labelled tick marks, ends fade out, stops at min/max size.
 - Drills perpendicular to the surface, only on existing holes. The preview snaps to the hole nearest the
   bit tip and shows the area that will be removed; confirm to drill.
+
+## Desktop controls (as built)
+- Keys 1-4 pick hands / saw / spray paint / drill; hold Tab for the tool wheel.
+- Saw: aim at stock, wheel = angle, right click = snap step, hold right click = precise cut menu, F = flip side.
+- Paint: left click paints the part, Shift + click strips it, right click = color picker.
+- Drill: wheel = bit size, right click = bit picker, left click drills the previewed hole.
+- Measurements are shown in inches by default.
+
+## Later: simulation
+Long-term goal: built robots are simulated: gears mesh and turn, joints move, pneumatics actuate, and the robot
+can be driven. Not being built yet, but keep part data simulation-friendly (joint/axis info, moving sub-parts such
+as pneumatic rods kept as separate bodies).
 
 ## Saving & loading
 - Save writes to the app's own saves folder automatically (no file picker each time).

@@ -163,5 +163,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: Piston Nut
-  hint: "9.1 \xD7 7.9 \xD7 2.8 mm  \xB7  1 g  \xB7  hold to pick up"
+  hint: "9.1 \xD7 7.9 \xD7 2.8 mm  \xB7  1 g"
   highlightBrightness: 1.3

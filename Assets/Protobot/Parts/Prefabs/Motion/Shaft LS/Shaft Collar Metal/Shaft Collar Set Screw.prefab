@@ -167,5 +167,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: Shaft Collar Set Screw
-  hint: "11 \xD7 11 \xD7 6.4 mm  \xB7  4 g  \xB7  hold to pick up"
+  hint: "11 \xD7 11 \xD7 6.4 mm  \xB7  4 g"
   highlightBrightness: 1.3

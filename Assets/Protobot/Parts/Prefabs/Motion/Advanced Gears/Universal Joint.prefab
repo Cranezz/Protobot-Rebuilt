@@ -423,5 +423,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: Universal Joint
-  hint: "27.8 \xD7 10 \xD7 10 mm  \xB7  1.7 g  \xB7  hold to pick up"
+  hint: "27.8 \xD7 10 \xD7 10 mm  \xB7  1.7 g"
   highlightBrightness: 1.3

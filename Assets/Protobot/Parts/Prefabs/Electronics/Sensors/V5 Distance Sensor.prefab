@@ -503,7 +503,7 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8768366400103008953}
   serializedVersion: 5
-  m_Mass: 0.007831623
+  m_Mass: 0.017055428
   m_LinearDamping: 0.05
   m_AngularDamping: 0.15
   m_CenterOfMass: {x: 0, y: 0, z: 0}
@@ -549,5 +549,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: V5 Distance Sensor
-  hint: "50.4 \xD7 23.3 \xD7 22.4 mm  \xB7  7.8 g  \xB7  hold to pick up"
+  hint: "50.4 \xD7 23.3 \xD7 22.4 mm  \xB7  17.1 g"
   highlightBrightness: 1.3

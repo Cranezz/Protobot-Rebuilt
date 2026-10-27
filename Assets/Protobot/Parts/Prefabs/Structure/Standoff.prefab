@@ -136,7 +136,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: Standoff
-  hint: "7.3 \xD7 6.4 \xD7 6.4 mm  \xB7  0.5 g  \xB7  hold to pick up"
+  hint: "7.3 \xD7 6.4 \xD7 6.4 mm  \xB7  0.5 g"
   highlightBrightness: 1.3
 --- !u!1 &8687231336196692025 stripped
 GameObject:
@@ -150,7 +150,7 @@ MeshCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8687231336196692025}
-  m_Material: {fileID: 13400000, guid: 7b41823d24d681e45af2872a54c4ecbe, type: 2}
+  m_Material: {fileID: 13400000, guid: 7c1438b7c2246e3449cb98af75fde723, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0

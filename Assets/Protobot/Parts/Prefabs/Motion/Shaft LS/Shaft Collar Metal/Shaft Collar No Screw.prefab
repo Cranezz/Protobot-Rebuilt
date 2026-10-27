@@ -140,7 +140,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: Shaft Collar No Screw
-  hint: "11 \xD7 11 \xD7 6.4 mm  \xB7  3.7 g  \xB7  hold to pick up"
+  hint: "11 \xD7 11 \xD7 6.4 mm  \xB7  3.7 g"
   highlightBrightness: 1.3
 --- !u!1 &8843440297766780650 stripped
 GameObject:

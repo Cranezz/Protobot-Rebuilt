@@ -171,5 +171,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: Inner Acetal Slide Truck
-  hint: "50.8 \xD7 17.4 \xD7 8.4 mm  \xB7  3.9 g  \xB7  hold to pick up"
+  hint: "50.8 \xD7 17.4 \xD7 8.4 mm  \xB7  3.9 g"
   highlightBrightness: 1.3

@@ -117,7 +117,7 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8652088099562229052}
   serializedVersion: 5
-  m_Mass: 0.004435761
+  m_Mass: 0.007221779
   m_LinearDamping: 0.05
   m_AngularDamping: 0.15
   m_CenterOfMass: {x: 0, y: 0, z: 0}
@@ -163,5 +163,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: Yaw Rate Gyroscope Sensor
-  hint: "30.5 \xD7 25.4 \xD7 14.4 mm  \xB7  4.4 g  \xB7  hold to pick up"
+  hint: "30.5 \xD7 25.4 \xD7 14.4 mm  \xB7  7.2 g"
   highlightBrightness: 1.3

@@ -74,6 +74,9 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: b22fea2902667db49a6ebb98d8bceb48, type: 3}
       insertIndex: -1
+      addedObject: {fileID: 6621823469588083210}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: b22fea2902667db49a6ebb98d8bceb48, type: 3}
+      insertIndex: -1
       addedObject: {fileID: 2396126078970370048}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: b22fea2902667db49a6ebb98d8bceb48, type: 3}
       insertIndex: -1
@@ -81,15 +84,63 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: b22fea2902667db49a6ebb98d8bceb48, type: 3}
       insertIndex: -1
       addedObject: {fileID: 6167197419816390602}
-    - targetCorrespondingSourceObject: {fileID: 4445948748397649984, guid: b22fea2902667db49a6ebb98d8bceb48, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 8981435464483333772}
   m_SourcePrefab: {fileID: 100100000, guid: b22fea2902667db49a6ebb98d8bceb48, type: 3}
 --- !u!1 &924612290404081107 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: b22fea2902667db49a6ebb98d8bceb48, type: 3}
   m_PrefabInstance: {fileID: 6060694125666434}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &6621823469588083210
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 924612290404081107}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e4020603aaf096b4a9d86061d6cceed3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.StockProfile
+  axis: {x: 0, y: 1, z: 0}
+  u: {x: 0, y: 0, z: 1}
+  v: {x: 1, y: 0, z: 0}
+  origin: {x: 0, y: 0.22224997, z: -0.007143732}
+  start: -0.22224997
+  end: 0.22224997
+  points:
+  - {x: 0.0065222997, y: -0.03097265}
+  - {x: 0.006992473, y: -0.030195449}
+  - {x: 0.0071437606, y: -0.02936875}
+  - {x: 0.0070970906, y: 0.029829038}
+  - {x: 0.0065222997, y: 0.03097265}
+  - {x: 0.005556261, y: 0.02936875}
+  - {x: 0.0055126166, y: -0.029623967}
+  - {x: 0.0065222997, y: 0.03097265}
+  - {x: 0.005755621, y: 0.03152854}
+  - {x: 0.0052413894, y: 0.03169822}
+  - {x: -0.007143737, y: 0.031749997}
+  - {x: -0.007143737, y: 0.030162498}
+  - {x: 0.004762511, y: 0.030162498}
+  - {x: 0.0065222997, y: -0.03097265}
+  - {x: 0.004762511, y: -0.030162498}
+  - {x: -0.007143737, y: -0.030162498}
+  - {x: -0.007143737, y: -0.031749997}
+  - {x: 0.005273874, y: -0.031692564}
+  - {x: 0.005113292, y: -0.030078929}
+  - {x: 0.004762511, y: -0.030162498}
+  - {x: 0.0065222997, y: -0.03097265}
+  - {x: 0.0065222997, y: 0.03097265}
+  - {x: 0.004762511, y: 0.030162498}
+  - {x: 0.0053438954, y: 0.029908862}
+  - {x: 0.0055126166, y: -0.029623967}
+  - {x: 0.005113292, y: -0.030078929}
+  - {x: 0.0065222997, y: -0.03097265}
+  - {x: 0.0065222997, y: 0.03097265}
+  - {x: 0.0053438954, y: 0.029908862}
+  - {x: 0.005556261, y: 0.02936875}
+  pieceSizes: 07000000060000000500000003000000030000000300000003000000
+  physicsMaterial: {fileID: 13400000, guid: 7c1438b7c2246e3449cb98af75fde723, type: 2}
 --- !u!54 &2396126078970370048
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -98,7 +149,7 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 924612290404081107}
   serializedVersion: 5
-  m_Mass: 0.061281655
+  m_Mass: 0.14387867
   m_LinearDamping: 0.05
   m_AngularDamping: 0.15
   m_CenterOfMass: {x: 0, y: 0, z: 0}
@@ -144,32 +195,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: C Channel 1x3x1 & 1x5x1
-  hint: "444.5 \xD7 63.5 \xD7 14.3 mm  \xB7  61.3 g  \xB7  hold to pick up"
+  hint: "444.5 \xD7 63.5 \xD7 14.3 mm  \xB7  143.9 g"
   highlightBrightness: 1.3
---- !u!1 &4442421700581540034 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 4445948748397649984, guid: b22fea2902667db49a6ebb98d8bceb48, type: 3}
-  m_PrefabInstance: {fileID: 6060694125666434}
-  m_PrefabAsset: {fileID: 0}
---- !u!64 &8981435464483333772
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4442421700581540034}
-  m_Material: {fileID: 13400000, guid: 7b41823d24d681e45af2872a54c4ecbe, type: 2}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 1
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 6413805903724522286, guid: b22fea2902667db49a6ebb98d8bceb48, type: 3}

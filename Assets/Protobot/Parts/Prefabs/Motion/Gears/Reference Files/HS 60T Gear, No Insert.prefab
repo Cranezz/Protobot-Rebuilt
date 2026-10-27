@@ -213,5 +213,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: HS 60T Gear, No Insert
-  hint: "65.6 \xD7 65.6 \xD7 12.7 mm  \xB7  21.4 g  \xB7  hold to pick up"
+  hint: "65.6 \xD7 65.6 \xD7 12.7 mm  \xB7  21.4 g"
   highlightBrightness: 1.3

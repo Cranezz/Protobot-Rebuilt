@@ -171,5 +171,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: Worm Gear
-  hint: "18.9 \xD7 14.6 \xD7 14.6 mm  \xB7  2.4 g  \xB7  hold to pick up"
+  hint: "18.9 \xD7 14.6 \xD7 14.6 mm  \xB7  2.4 g"
   highlightBrightness: 1.3

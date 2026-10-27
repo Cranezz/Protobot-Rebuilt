@@ -163,5 +163,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: 45 Bent Gusset
-  hint: "70.6 \xD7 30.4 \xD7 25.4 mm  \xB7  6.4 g  \xB7  hold to pick up"
+  hint: "70.6 \xD7 30.4 \xD7 25.4 mm  \xB7  6.4 g"
   highlightBrightness: 1.3

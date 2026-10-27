@@ -45,16 +45,17 @@ namespace Protobot.Parts
         public bool cuttable;
 
         /// <summary>"444.5 × 25.4 × 14.3 mm", largest dimension first.</summary>
-        public string SizeLabel
+        public string SizeLabel => FormatSize(size);
+
+        public string MassLabel => FormatMass(massKg);
+
+        public static string FormatSize(Vector3 size)
         {
-            get
-            {
-                var d = new[] { size.x, size.y, size.z };
-                System.Array.Sort(d);
-                return $"{d[2] * 1000f:0.#} × {d[1] * 1000f:0.#} × {d[0] * 1000f:0.#} mm";
-            }
+            var d = new[] { size.x, size.y, size.z };
+            System.Array.Sort(d);
+            return $"{d[2] * 1000f:0.#} × {d[1] * 1000f:0.#} × {d[0] * 1000f:0.#} mm";
         }
 
-        public string MassLabel => massKg >= 1f ? $"{massKg:0.00} kg" : $"{massKg * 1000f:0.#} g";
+        public static string FormatMass(float kg) => kg >= 1f ? $"{kg:0.00} kg" : $"{kg * 1000f:0.#} g";
     }
 }

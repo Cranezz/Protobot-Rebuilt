@@ -70,6 +70,9 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 0e47ad58f889055449d6451e53b36b42, type: 3}
       insertIndex: -1
+      addedObject: {fileID: 2245943495670505580}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 0e47ad58f889055449d6451e53b36b42, type: 3}
+      insertIndex: -1
       addedObject: {fileID: 2247922286751995319}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 0e47ad58f889055449d6451e53b36b42, type: 3}
       insertIndex: -1
@@ -77,42 +80,57 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 0e47ad58f889055449d6451e53b36b42, type: 3}
       insertIndex: -1
       addedObject: {fileID: 6607117090911941584}
-    - targetCorrespondingSourceObject: {fileID: 1487460747418248249, guid: 0e47ad58f889055449d6451e53b36b42, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 3512180267162314552}
   m_SourcePrefab: {fileID: 100100000, guid: 0e47ad58f889055449d6451e53b36b42, type: 3}
---- !u!1 &5686581438972081004 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1487460747418248249, guid: 0e47ad58f889055449d6451e53b36b42, type: 3}
-  m_PrefabInstance: {fileID: 6507224392075908949}
-  m_PrefabAsset: {fileID: 0}
---- !u!64 &3512180267162314552
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5686581438972081004}
-  m_Material: {fileID: 13400000, guid: 3122d1684761a0f468db748b5e9a9624, type: 2}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 1
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 6474491390285617096, guid: 0e47ad58f889055449d6451e53b36b42, type: 3}
 --- !u!1 &6237247759607147012 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 0e47ad58f889055449d6451e53b36b42, type: 3}
   m_PrefabInstance: {fileID: 6507224392075908949}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &2245943495670505580
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6237247759607147012}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e4020603aaf096b4a9d86061d6cceed3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Parts.StockProfile
+  axis: {x: 0, y: 1, z: 0}
+  u: {x: 0, y: 0, z: 1}
+  v: {x: 1, y: 0, z: 0}
+  origin: {x: 0.00889, y: 0.19049996, z: -0.008889985}
+  start: -0.19049996
+  end: 0.19049996
+  points:
+  - {x: -0.004851402, y: -0.00889}
+  - {x: -0.004851402, y: -0.0077216}
+  - {x: -0.008890002, y: -0.0077216}
+  - {x: -0.008890002, y: -0.00889}
+  - {x: 0.007899397, y: -0.00862457}
+  - {x: 0.006908797, y: -0.0077216}
+  - {x: -0.00022860244, y: -0.0077216}
+  - {x: -0.00022860244, y: -0.00889}
+  - {x: 0.0072166165, y: -0.008862302}
+  - {x: 0.007899397, y: -0.00862457}
+  - {x: 0.008624567, y: -0.0078994}
+  - {x: 0.008889996, y: -0.0069088005}
+  - {x: 0.008889996, y: 0.00889}
+  - {x: 0.007721597, y: 0.00889}
+  - {x: 0.007721597, y: -0.0069088005}
+  - {x: 0.007315197, y: -0.0076127104}
+  - {x: 0.006908797, y: -0.0077216}
+  - {x: 0.007899397, y: -0.00862457}
+  - {x: 0.007612707, y: -0.0073152003}
+  - {x: 0.007315197, y: -0.0076127104}
+  - {x: 0.007899397, y: -0.00862457}
+  - {x: 0.007899397, y: -0.00862457}
+  - {x: 0.007721597, y: -0.0069088005}
+  - {x: 0.007612707, y: -0.0073152003}
+  pieceSizes: 040000000500000006000000030000000300000003000000
+  physicsMaterial: {fileID: 13400000, guid: 3122d1684761a0f468db748b5e9a9624, type: 2}
 --- !u!54 &2247922286751995319
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -167,5 +185,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: Slotted Angle
-  hint: "381 \xD7 17.8 \xD7 17.8 mm  \xB7  89.8 g  \xB7  hold to pick up"
+  hint: "381 \xD7 17.8 \xD7 17.8 mm  \xB7  89.8 g"
   highlightBrightness: 1.3

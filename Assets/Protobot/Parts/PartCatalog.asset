@@ -31,7 +31,7 @@ MonoBehaviour:
     thumbnail: {fileID: 21300000, guid: 0bbe5dcc1a40d1d47b077b304f2180a8, type: 3}
     size: {x: 0.053, y: 0.034095, z: 0.022955}
     triangles: 46604
-    massKg: 0.009643753
+    massKg: 0.026962318
     cuttable: 0
   - id: Electronics/Sensors/Bumper Switch - V2
     displayName: Bumper Switch - V2
@@ -41,7 +41,7 @@ MonoBehaviour:
     thumbnail: {fileID: 21300000, guid: bfb0f3ee5031f5f4cbce7c39e50246f6, type: 3}
     size: {x: 0.050555, y: 0.025093, z: 0.023162}
     triangles: 187985
-    massKg: 0.008467056
+    massKg: 0.019098802
     cuttable: 0
   - id: Electronics/Sensors/Light Sensor
     displayName: Light Sensor
@@ -61,7 +61,7 @@ MonoBehaviour:
     thumbnail: {fileID: 21300000, guid: 3691f1f7b7ca76943b1ddb047d51a764, type: 3}
     size: {x: 0.064308, y: 0.039726, z: 0.01255}
     triangles: 10488
-    massKg: 0.01588792
+    massKg: 0.020839963
     cuttable: 0
   - id: Electronics/Sensors/Line Sensor Mounting Bar
     displayName: Line Sensor Mounting Bar
@@ -81,7 +81,7 @@ MonoBehaviour:
     thumbnail: {fileID: 21300000, guid: 37168283d5af51d4aa24f8123d359fe9, type: 3}
     size: {x: 0.019293, y: 0.05477, z: 0.0212}
     triangles: 20502
-    massKg: 0.007707144
+    massKg: 0.014561018
     cuttable: 0
   - id: Electronics/Sensors/Line Tracker - V2
     displayName: Line Tracker - V2
@@ -91,7 +91,7 @@ MonoBehaviour:
     thumbnail: {fileID: 21300000, guid: e1f2e0b1ae5005248be56e28d6685bcf, type: 3}
     size: {x: 0.012771, y: 0.056634, z: 0.0202}
     triangles: 48690
-    massKg: 0.006921156
+    massKg: 0.009496572
     cuttable: 0
   - id: Electronics/Sensors/Optical Shaft Encoder
     displayName: Optical Shaft Encoder
@@ -101,7 +101,7 @@ MonoBehaviour:
     thumbnail: {fileID: 21300000, guid: d3b90c25c8ca8e64fb6c5999902f2796, type: 3}
     size: {x: 0.0675, y: 0.0505, z: 0.0202}
     triangles: 53619
-    massKg: 0.024017755
+    massKg: 0.04475689
     cuttable: 0
   - id: Electronics/Sensors/Potentiometer V2
     displayName: Potentiometer V2
@@ -111,7 +111,7 @@ MonoBehaviour:
     thumbnail: {fileID: 21300000, guid: a2a57f87b3366774db8220db7cadf62a, type: 3}
     size: {x: 0.051022, y: 0.018662, z: 0.01735}
     triangles: 48464
-    massKg: 0.005805909
+    massKg: 0.010738126
     cuttable: 0
   - id: Electronics/Sensors/Potentiometer
     displayName: Potentiometer
@@ -121,7 +121,7 @@ MonoBehaviour:
     thumbnail: {fileID: 21300000, guid: 2241bd7d9e25c134ca67daf74117feb9, type: 3}
     size: {x: 0.038086, y: 0.00835, z: 0.037975}
     triangles: 26450
-    massKg: 0.004661784
+    massKg: 0.007849879
     cuttable: 0
   - id: Electronics/Sensors/Ultrasonic Range Finder
     displayName: Ultrasonic Range Finder
@@ -131,7 +131,7 @@ MonoBehaviour:
     thumbnail: {fileID: 21300000, guid: 15c37041c9a454b478735fc9a1bf8d97, type: 3}
     size: {x: 0.08125, y: 0.0303, z: 0.0205}
     triangles: 29100
-    massKg: 0.020656787
+    massKg: 0.032804485
     cuttable: 0
   - id: Electronics/Sensors/V5 3 Wire Expander
     displayName: V5 3 Wire Expander
@@ -151,7 +151,7 @@ MonoBehaviour:
     thumbnail: {fileID: 21300000, guid: d0d62e95bc5948240b241c8ac2a46cff, type: 3}
     size: {x: 0.050387, y: 0.022396, z: 0.023252}
     triangles: 58816
-    massKg: 0.007831623
+    massKg: 0.017055428
     cuttable: 0
   - id: Electronics/Sensors/V5 GPS Sensor
     displayName: V5 GPS Sensor
@@ -161,7 +161,7 @@ MonoBehaviour:
     thumbnail: {fileID: 21300000, guid: e40b87cd13d5eb549a6823bc8b81921c, type: 3}
     size: {x: 0.0381, y: 0.0254, z: 0.0381}
     triangles: 46720
-    massKg: 0.014241118
+    massKg: 0.023966081
     cuttable: 0
   - id: Electronics/Sensors/V5 Inertial Sensor
     displayName: V5 Inertial Sensor
@@ -181,7 +181,7 @@ MonoBehaviour:
     thumbnail: {fileID: 21300000, guid: 8bad398e5c34bcb4a9cc2b81ed15436f, type: 3}
     size: {x: 0.050387, y: 0.022396, z: 0.024312}
     triangles: 59552
-    massKg: 0.007983988
+    massKg: 0.017832942
     cuttable: 0
   - id: Electronics/Sensors/V5 Rotation Sensor
     displayName: V5 Rotation Sensor
@@ -201,7 +201,7 @@ MonoBehaviour:
     thumbnail: {fileID: 21300000, guid: c5f89cd349dd3634f9d8d969c176e23d, type: 3}
     size: {x: 0.063395, y: 0.054975, z: 0.02265}
     triangles: 279003
-    massKg: 0.028955797
+    massKg: 0.051309977
     cuttable: 0
   - id: Electronics/Sensors/Yaw Rate Gyroscope Sensor
     displayName: Yaw Rate Gyroscope Sensor
@@ -211,7 +211,7 @@ MonoBehaviour:
     thumbnail: {fileID: 21300000, guid: 731a104ea3402124d8e4113efb054143, type: 3}
     size: {x: 0.03048, y: 0.0254, z: 0.014351}
     triangles: 868
-    massKg: 0.004435761
+    massKg: 0.007221779
     cuttable: 0
   - id: Electronics/V5 3 Wire Expander
     displayName: V5 3 Wire Expander
@@ -231,7 +231,7 @@ MonoBehaviour:
     thumbnail: {fileID: 21300000, guid: 8cee8441e6eec0244bf602be6d6bf8a6, type: 3}
     size: {x: 0.054778, y: 0.012391, z: 0.022714}
     triangles: 12354
-    massKg: 0.0027642741
+    massKg: 0.010021195
     cuttable: 0
   - id: Electronics/V5 Battery
     displayName: V5 Battery
@@ -241,7 +241,7 @@ MonoBehaviour:
     thumbnail: {fileID: 21300000, guid: 36dc57bb5a61f5746b9565b97494a47f, type: 3}
     size: {x: 0.162324, y: 0.046448, z: 0.0304}
     triangles: 111807
-    massKg: 0.078408465
+    massKg: 0.14898299
     cuttable: 0
   - id: Electronics/V5 Brain Mount Long
     displayName: V5 Brain Mount Long
@@ -251,7 +251,7 @@ MonoBehaviour:
     thumbnail: {fileID: 21300000, guid: ce038f34eae2a1447b78577f9e7b0e55, type: 3}
     size: {x: 0.018535, y: 0.087716, z: 0.0094}
     triangles: 23596
-    massKg: 0.0045157867
+    massKg: 0.009933735
     cuttable: 0
   - id: Electronics/V5 Brain Mount Short
     displayName: V5 Brain Mount Short
@@ -261,7 +261,7 @@ MonoBehaviour:
     thumbnail: {fileID: 21300000, guid: fd9db548c8156f5488973e1ed2461a5b, type: 3}
     size: {x: 0.018539, y: 0.0502, z: 0.0094}
     triangles: 18200
-    massKg: 0.0025710827
+    massKg: 0.0056863194
     cuttable: 0
   - id: Electronics/V5 Brain
     displayName: V5 Brain
@@ -271,7 +271,7 @@ MonoBehaviour:
     thumbnail: {fileID: 21300000, guid: 58c50bdbca057794fb191a23276f5a24, type: 3}
     size: {x: 0.139961, y: 0.099822, z: 0.031507}
     triangles: 435302
-    massKg: 0.2150256
+    massKg: 0.28612363
     cuttable: 0
   - id: Electronics/V5 Motor (5.5W)
     displayName: V5 Motor (5.5W)
@@ -281,7 +281,7 @@ MonoBehaviour:
     thumbnail: {fileID: 21300000, guid: d4686d1fcfeb77e4da5f87f651db9783, type: 3}
     size: {x: 0.05705, y: 0.0254, z: 0.064375}
     triangles: 339411
-    massKg: 0.030226195
+    massKg: 0.06063452
     cuttable: 0
   - id: Electronics/V5 Motor
     displayName: V5 Motor
@@ -291,7 +291,7 @@ MonoBehaviour:
     thumbnail: {fileID: 21300000, guid: 8ea8063dbc9813244b36fcb44fc61e5e, type: 3}
     size: {x: 0.0573, y: 0.07235, z: 0.033}
     triangles: 225409
-    massKg: 0.04190643
+    massKg: 0.155
     cuttable: 0
   - id: Electronics/V5 Radio
     displayName: V5 Radio
@@ -301,7 +301,7 @@ MonoBehaviour:
     thumbnail: {fileID: 21300000, guid: fe967cbd89fd9b44ab2a97f3236822d6, type: 3}
     size: {x: 0.0845, y: 0.02545, z: 0.022}
     triangles: 53311
-    massKg: 0.015812261
+    massKg: 0.030752508
     cuttable: 0
   - id: Electronics/V5 Simple Battery
     displayName: V5 Simple Battery
@@ -711,7 +711,7 @@ MonoBehaviour:
     thumbnail: {fileID: 21300000, guid: b07b321d83ff9fb459e54c458ee8b49c, type: 3}
     size: {x: 0.007301, y: 0.00635, z: 0.0127}
     triangles: 5502
-    massKg: 0.0005
+    massKg: 0.00087518734
     cuttable: 0
   - id: Game Objects/High Stakes/Hardware/THF0832-0250_275-1017-001
     displayName: THF0832-0250_275-1017-001
@@ -721,7 +721,7 @@ MonoBehaviour:
     thumbnail: {fileID: 21300000, guid: 39112d47f77b05a419ab4e2ba376436a, type: 3}
     size: {x: 0.007301, y: 0.00635, z: 0.0381}
     triangles: 3688
-    massKg: 0.001200822
+    massKg: 0.0028193211
     cuttable: 0
   - id: Game Objects/High Stakes/Ladder/276-8868-052
     displayName: 276-8868-052
@@ -3885,7 +3885,7 @@ MonoBehaviour:
     thumbnail: {fileID: 21300000, guid: 6d39e89624c04f148bb87c6394eb4d8c, type: 3}
     size: {x: 0.106206, y: 0.032379, z: 0.10621}
     triangles: 363122
-    massKg: 0.1168861
+    massKg: 0.1444957
     cuttable: 0
   - id: Motion/Wheels/Reference Files/4 Omni
     displayName: 4 Omni
@@ -4115,7 +4115,7 @@ MonoBehaviour:
     thumbnail: {fileID: 21300000, guid: 5c96cfa30d6ecc24abe9ecb5792572cc, type: 3}
     size: {x: 0.016739, y: 0.4445, z: 0.014288}
     triangles: 9408
-    massKg: 0.02048532
+    massKg: 0.048095968
     cuttable: 1
   - id: Structure/C Channel/Aluminum 1x3x1 Half/Alu C Half 1x3x1x35
     displayName: Alu C Half 1x3x1x35
@@ -4145,7 +4145,7 @@ MonoBehaviour:
     thumbnail: {fileID: 21300000, guid: 06985fce8bc56444995d472f83603a5a, type: 3}
     size: {x: 0.0635, y: 0.4445, z: 0.014288}
     triangles: 30984
-    massKg: 0.061281655
+    massKg: 0.14387867
     cuttable: 1
   - id: Structure/C Channel/Aluminum 2x2x2/Alu C 2x2x2x20
     displayName: Alu C 2x2x2x20
@@ -4215,7 +4215,7 @@ MonoBehaviour:
     thumbnail: {fileID: 21300000, guid: cb4983f50a23ecc4380e9dc53836b349, type: 3}
     size: {x: 0.318364, y: 0.024562, z: 0.013132}
     triangles: 11688
-    massKg: 0.017188128
+    massKg: 0.11732766
     cuttable: 1
   - id: Structure/Chassis Rails/Steel Chassis Rail 2x1x16
     displayName: Steel Chassis Rail 2x1x16
@@ -4326,7 +4326,7 @@ MonoBehaviour:
     size: {x: 0.021438, y: 0.023106, z: 0.023107}
     triangles: 844
     massKg: 0.003084717
-    cuttable: 1
+    cuttable: 0
   - id: Structure/Gussets/90 Bent Gusset
     displayName: 90 Bent Gusset
     binId: gussets
@@ -4366,7 +4366,7 @@ MonoBehaviour:
     size: {x: 0.052488, y: 0.052488, z: 0.023089}
     triangles: 5300
     massKg: 0.015182761
-    cuttable: 1
+    cuttable: 0
   - id: Structure/Gussets/Angle Coupler Gusset
     displayName: Angle Coupler Gusset
     binId: angles
@@ -4376,7 +4376,7 @@ MonoBehaviour:
     size: {x: 0.0508, y: 0.024232, z: 0.024232}
     triangles: 2648
     massKg: 0.007977288
-    cuttable: 1
+    cuttable: 0
   - id: Structure/Gussets/Angle Gusset
     displayName: Angle Gusset
     binId: angles
@@ -4386,7 +4386,7 @@ MonoBehaviour:
     size: {x: 0.0127, y: 0.03556, z: 0.04445}
     triangles: 332
     massKg: 0.0065759053
-    cuttable: 1
+    cuttable: 0
   - id: Structure/Gussets/C Channel Coupler
     displayName: C Channel Coupler
     binId: c_channels
@@ -4396,7 +4396,7 @@ MonoBehaviour:
     size: {x: 0.022225, y: 0.0508, z: 0.0127}
     triangles: 1512
     massKg: 0.008372279
-    cuttable: 1
+    cuttable: 0
   - id: Structure/Gussets/Pivot Gusset
     displayName: Pivot Gusset
     binId: gussets
@@ -4425,7 +4425,7 @@ MonoBehaviour:
     thumbnail: {fileID: 21300000, guid: b2928b10427ac7c4f8e81bba10e6d3d9, type: 3}
     size: {x: 0.004166, y: 0.004166, z: 0.0127}
     triangles: 9506
-    massKg: 0.0005
+    massKg: 0.0009980078
     cuttable: 0
   - id: Structure/Hardware/Coupler/Coupler Hex .5
     displayName: Coupler Hex .5
@@ -4435,7 +4435,7 @@ MonoBehaviour:
     thumbnail: {fileID: 21300000, guid: b5217f9e8604729428416c33f1c1731c, type: 3}
     size: {x: 0.004166, y: 0.004166, z: 0.0127}
     triangles: 8886
-    massKg: 0.0005
+    massKg: 0.0009898865
     cuttable: 0
   - id: Structure/Hardware/Coupler/Coupler Hex 1
     displayName: Coupler Hex 1
@@ -4445,7 +4445,7 @@ MonoBehaviour:
     thumbnail: {fileID: 21300000, guid: e07b25530349e6449b14163db6011740, type: 3}
     size: {x: 0.004166, y: 0.004166, z: 0.0254}
     triangles: 17072
-    massKg: 0.0005
+    massKg: 0.002041496
     cuttable: 0
   - id: Structure/Hardware/Coupler/Coupler Star .5
     displayName: Coupler Star .5
@@ -4455,7 +4455,7 @@ MonoBehaviour:
     thumbnail: {fileID: 21300000, guid: dd930b4113fdcb94394b09ceafaa9aaf, type: 3}
     size: {x: 0.004166, y: 0.004166, z: 0.0127}
     triangles: 9506
-    massKg: 0.0005
+    massKg: 0.0009980078
     cuttable: 0
   - id: Structure/Hardware/Coupler/Coupler Star 1
     displayName: Coupler Star 1
@@ -4465,7 +4465,7 @@ MonoBehaviour:
     thumbnail: {fileID: 21300000, guid: 7fa17e6c8bfdcd446879e99e56d72dee, type: 3}
     size: {x: 0.004166, y: 0.004166, z: 0.0254}
     triangles: 17694
-    massKg: 0.0005
+    massKg: 0.0020496151
     cuttable: 0
   - id: Structure/Hardware/Nut Alu
     displayName: Nut Alu
@@ -4605,7 +4605,7 @@ MonoBehaviour:
     thumbnail: {fileID: 21300000, guid: 24b8886c1b67d744094d56c3e895b2bd, type: 3}
     size: {x: 0.01189, y: 0.010414, z: 0.031168}
     triangles: 10264
-    massKg: 0.001468432
+    massKg: 0.010023644
     cuttable: 0
   - id: Structure/Hardware/Rubber Link
     displayName: Rubber Link
@@ -4615,7 +4615,7 @@ MonoBehaviour:
     thumbnail: {fileID: 21300000, guid: 02749c13a9c91c147ae6000761cdaac9, type: 3}
     size: {x: 0.010414, y: 0.010414, z: 0.031242}
     triangles: 9318
-    massKg: 0.0014689224
+    massKg: 0.010026992
     cuttable: 0
   - id: Structure/Hardware/Screw Shoulder Robosource
     displayName: Screw Shoulder Robosource
@@ -4799,7 +4799,7 @@ MonoBehaviour:
     thumbnail: {fileID: 21300000, guid: 3cba05e3098c0fd4da10a7249faeaf1a, type: 3}
     size: {x: 0.007917, y: 0.007925, z: 0.00856}
     triangles: 1940
-    massKg: 0.0005
+    massKg: 0.001233665
     cuttable: 0
   - id: Structure/Hardware/Screw Steel - Hex/SScrew Hex Smooth .250
     displayName: SScrew Hex Smooth .250
@@ -4809,7 +4809,7 @@ MonoBehaviour:
     thumbnail: {fileID: 21300000, guid: c54e91eac2f136449803acfcb29ec6fc, type: 3}
     size: {x: 0.007917, y: 0.007925, z: 0.00856}
     triangles: 1940
-    massKg: 0.0005
+    massKg: 0.001233665
     cuttable: 0
   - id: Structure/Hardware/Screw Steel - Hex/SScrew Hex Smooth .375
     displayName: SScrew Hex Smooth .375
@@ -4819,7 +4819,7 @@ MonoBehaviour:
     thumbnail: {fileID: 21300000, guid: 45f3fb40e40854b44b11c4dc8bed988d, type: 3}
     size: {x: 0.007917, y: 0.007925, z: 0.011735}
     triangles: 2042
-    massKg: 0.0005
+    massKg: 0.0015723906
     cuttable: 0
   - id: Structure/Hardware/Screw Steel - Hex/SScrew Hex Smooth .500
     displayName: SScrew Hex Smooth .500
@@ -4829,7 +4829,7 @@ MonoBehaviour:
     thumbnail: {fileID: 21300000, guid: f7f0236070251b74cb5c9d46fa81b5cb, type: 3}
     size: {x: 0.007917, y: 0.007925, z: 0.01491}
     triangles: 2042
-    massKg: 0.0005
+    massKg: 0.0019111737
     cuttable: 0
   - id: Structure/Hardware/Screw Steel - Hex/SScrew Hex Smooth .625
     displayName: SScrew Hex Smooth .625
@@ -4839,7 +4839,7 @@ MonoBehaviour:
     thumbnail: {fileID: 21300000, guid: e7bf065e5ed2a6f48b4624a42a3fb177, type: 3}
     size: {x: 0.007917, y: 0.007925, z: 0.018085}
     triangles: 2042
-    massKg: 0.0005
+    massKg: 0.0022500576
     cuttable: 0
   - id: Structure/Hardware/Screw Steel - Hex/SScrew Hex Smooth .750
     displayName: SScrew Hex Smooth .750
@@ -4849,7 +4849,7 @@ MonoBehaviour:
     thumbnail: {fileID: 21300000, guid: 605d36f8e2475bc41b2cca88752366e7, type: 3}
     size: {x: 0.007917, y: 0.007925, z: 0.02126}
     triangles: 2042
-    massKg: 0.0005
+    massKg: 0.0025888376
     cuttable: 0
   - id: Structure/Hardware/Screw Steel - Hex/SScrew Hex Smooth .875
     displayName: SScrew Hex Smooth .875
@@ -4859,7 +4859,7 @@ MonoBehaviour:
     thumbnail: {fileID: 21300000, guid: 8dd952239666096418f1ddb12f57af9e, type: 3}
     size: {x: 0.007925, y: 0.007925, z: 0.024435}
     triangles: 1828
-    massKg: 0.0005
+    massKg: 0.0029269583
     cuttable: 0
   - id: Structure/Hardware/Screw Steel - Hex/SScrew Hex Smooth 1.000
     displayName: SScrew Hex Smooth 1.000
@@ -4869,7 +4869,7 @@ MonoBehaviour:
     thumbnail: {fileID: 21300000, guid: bc3140c0669607d438b517e173fae243, type: 3}
     size: {x: 0.007922, y: 0.00792, z: 0.02761}
     triangles: 1794
-    massKg: 0.0005
+    massKg: 0.0032650363
     cuttable: 0
   - id: Structure/Hardware/Screw Steel - Hex/SScrew Hex Smooth 1.125
     displayName: SScrew Hex Smooth 1.125
@@ -4879,7 +4879,7 @@ MonoBehaviour:
     thumbnail: {fileID: 21300000, guid: 46d40007b58138d40973f58c19bcf215, type: 3}
     size: {x: 0.007915, y: 0.007925, z: 0.030785}
     triangles: 1706
-    massKg: 0.00052779453
+    massKg: 0.0036027713
     cuttable: 0
   - id: Structure/Hardware/Screw Steel - Hex/SScrew Hex Smooth 1.250
     displayName: SScrew Hex Smooth 1.250
@@ -4889,7 +4889,7 @@ MonoBehaviour:
     thumbnail: {fileID: 21300000, guid: ca1f061fcbd6cc248a904d7588bc4baa, type: 3}
     size: {x: 0.007922, y: 0.007919, z: 0.03396}
     triangles: 1612
-    massKg: 0.00057722017
+    massKg: 0.003940155
     cuttable: 0
   - id: Structure/Hardware/Screw Steel - Hex/SScrew Hex Smooth 1.500
     displayName: SScrew Hex Smooth 1.500
@@ -4899,7 +4899,7 @@ MonoBehaviour:
     thumbnail: {fileID: 21300000, guid: b96ea7e8b27af81478913eb9bca2cfdf, type: 3}
     size: {x: 0.007922, y: 0.007918, z: 0.04031}
     triangles: 1344
-    massKg: 0.00067590317
+    massKg: 0.004613774
     cuttable: 0
   - id: Structure/Hardware/Screw Steel - Hex/SScrew Hex Smooth 1.750
     displayName: SScrew Hex Smooth 1.750
@@ -4909,7 +4909,7 @@ MonoBehaviour:
     thumbnail: {fileID: 21300000, guid: 26e200817b5af444985d82a9286e48df, type: 3}
     size: {x: 0.007921, y: 0.007917, z: 0.04666}
     triangles: 1334
-    massKg: 0.00077462016
+    massKg: 0.0052876244
     cuttable: 0
   - id: Structure/Hardware/Screw Steel - Hex/SScrew Hex Smooth 2.000
     displayName: SScrew Hex Smooth 2.000
@@ -4919,7 +4919,7 @@ MonoBehaviour:
     thumbnail: {fileID: 21300000, guid: 06c98718d618b6844bb6c809cf87aa73, type: 3}
     size: {x: 0.007925, y: 0.007925, z: 0.05301}
     triangles: 1238
-    massKg: 0.0008731732
+    massKg: 0.005960356
     cuttable: 0
   - id: Structure/Hardware/Screw Steel - Hex/SScrew Hex Smooth 2.250
     displayName: SScrew Hex Smooth 2.250
@@ -4929,7 +4929,7 @@ MonoBehaviour:
     thumbnail: {fileID: 21300000, guid: c8fcf142327c0874591c3c47bb6dfc91, type: 3}
     size: {x: 0.007906, y: 0.007925, z: 0.05936}
     triangles: 1152
-    massKg: 0.0009715428
+    massKg: 0.0066318354
     cuttable: 0
   - id: Structure/Hardware/Screw Steel - Hex/SScrew Hex Smooth 2.500
     displayName: SScrew Hex Smooth 2.500
@@ -4939,7 +4939,7 @@ MonoBehaviour:
     thumbnail: {fileID: 21300000, guid: ae7010c28376f0942bc0c5f70b25275d, type: 3}
     size: {x: 0.007925, y: 0.007925, z: 0.06571}
     triangles: 1018
-    massKg: 0.0010698169
+    massKg: 0.0073026633
     cuttable: 0
   - id: Structure/Hardware/Screw Steel - Hex/SScrew Hex Threaded .250
     displayName: SScrew Hex Threaded .250
@@ -4949,7 +4949,7 @@ MonoBehaviour:
     thumbnail: {fileID: 21300000, guid: 39b11b2bc908c624188837dddbd06442, type: 3}
     size: {x: 0.007917, y: 0.007925, z: 0.00856}
     triangles: 6168
-    massKg: 0.0005
+    massKg: 0.0010913895
     cuttable: 0
   - id: Structure/Hardware/Screw Steel - Hex/SScrew Hex Threaded .375
     displayName: SScrew Hex Threaded .375
@@ -4959,7 +4959,7 @@ MonoBehaviour:
     thumbnail: {fileID: 21300000, guid: 7ce099c87abb90d439ef671581c7d4e1, type: 3}
     size: {x: 0.007917, y: 0.007925, z: 0.011735}
     triangles: 10260
-    massKg: 0.0005
+    massKg: 0.0013546873
     cuttable: 0
   - id: Structure/Hardware/Screw Steel - Hex/SScrew Hex Threaded .500
     displayName: SScrew Hex Threaded .500
@@ -4969,7 +4969,7 @@ MonoBehaviour:
     thumbnail: {fileID: 21300000, guid: 62aa61089d27d614da3ceacef9650a4c, type: 3}
     size: {x: 0.007917, y: 0.007925, z: 0.01491}
     triangles: 10268
-    massKg: 0.0005
+    massKg: 0.0016172051
     cuttable: 0
   - id: Structure/Hardware/Screw Steel - Hex/SScrew Hex Threaded .625
     displayName: SScrew Hex Threaded .625
@@ -4979,7 +4979,7 @@ MonoBehaviour:
     thumbnail: {fileID: 21300000, guid: 8f27ec3d78513804999a5ee57504148e, type: 3}
     size: {x: 0.007917, y: 0.007925, z: 0.018085}
     triangles: 10264
-    massKg: 0.0005
+    massKg: 0.0018791487
     cuttable: 0
   - id: Structure/Hardware/Screw Steel - Hex/SScrew Hex Threaded .750
     displayName: SScrew Hex Threaded .750
@@ -4989,7 +4989,7 @@ MonoBehaviour:
     thumbnail: {fileID: 21300000, guid: 6503bb5676e1938479d1c67c2c9a3dc9, type: 3}
     size: {x: 0.007917, y: 0.007925, z: 0.02126}
     triangles: 18456
-    massKg: 0.0005
+    massKg: 0.0021437744
     cuttable: 0
   - id: Structure/Hardware/Screw Steel - Hex/SScrew Hex Threaded .875
     displayName: SScrew Hex Threaded .875
@@ -4999,7 +4999,7 @@ MonoBehaviour:
     thumbnail: {fileID: 21300000, guid: d162eb5c9829c584e8338c9f87ea8f53, type: 3}
     size: {x: 0.007925, y: 0.007925, z: 0.024435}
     triangles: 18338
-    massKg: 0.0005
+    massKg: 0.0024062858
     cuttable: 0
   - id: Structure/Hardware/Screw Steel - Hex/SScrew Hex Threaded 1.000
     displayName: SScrew Hex Threaded 1.000
@@ -5009,7 +5009,7 @@ MonoBehaviour:
     thumbnail: {fileID: 21300000, guid: b50d8cd174df42841a40d3633105a0fe, type: 3}
     size: {x: 0.007922, y: 0.00792, z: 0.02761}
     triangles: 18206
-    massKg: 0.0005
+    massKg: 0.0026684513
     cuttable: 0
   - id: Structure/Hardware/Screw Steel - Hex/SScrew Hex Threaded 1.125
     displayName: SScrew Hex Threaded 1.125
@@ -5019,7 +5019,7 @@ MonoBehaviour:
     thumbnail: {fileID: 21300000, guid: effef9cd1fc11a14981132c0ec7ddf2a, type: 3}
     size: {x: 0.007915, y: 0.007925, z: 0.030785}
     triangles: 18104
-    massKg: 0.0005
+    massKg: 0.0029303536
     cuttable: 0
   - id: Structure/Hardware/Screw Steel - Hex/SScrew Hex Threaded 1.250
     displayName: SScrew Hex Threaded 1.250
@@ -5029,7 +5029,7 @@ MonoBehaviour:
     thumbnail: {fileID: 21300000, guid: 7650cb89e0f582d4ea406beb752f34fd, type: 3}
     size: {x: 0.007922, y: 0.007919, z: 0.03396}
     triangles: 18006
-    massKg: 0.0005
+    massKg: 0.0031918567
     cuttable: 0
   - id: Structure/Hardware/Screw Steel - Hex/SScrew Hex Threaded 1.500
     displayName: SScrew Hex Threaded 1.500
@@ -5039,7 +5039,7 @@ MonoBehaviour:
     thumbnail: {fileID: 21300000, guid: be30bede03f8f764ea1699ae388ac6e5, type: 3}
     size: {x: 0.007922, y: 0.007918, z: 0.04031}
     triangles: 17820
-    massKg: 0.0005440785
+    massKg: 0.003713927
     cuttable: 0
   - id: Structure/Hardware/Screw Steel - Hex/SScrew Hex Threaded 1.750
     displayName: SScrew Hex Threaded 1.750
@@ -5049,7 +5049,7 @@ MonoBehaviour:
     thumbnail: {fileID: 21300000, guid: a8de715199f83b842ad0ed73aef7f627, type: 3}
     size: {x: 0.007921, y: 0.007917, z: 0.04666}
     triangles: 17746
-    massKg: 0.00062038895
+    massKg: 0.004234829
     cuttable: 0
   - id: Structure/Hardware/Screw Steel - Hex/SScrew Hex Threaded 2.000
     displayName: SScrew Hex Threaded 2.000
@@ -5059,7 +5059,7 @@ MonoBehaviour:
     thumbnail: {fileID: 21300000, guid: 189b07a719f3d214a828858d8024336c, type: 3}
     size: {x: 0.007925, y: 0.007925, z: 0.05301}
     triangles: 25844
-    massKg: 0.00069783675
+    massKg: 0.0047634942
     cuttable: 0
   - id: Structure/Hardware/Screw Steel - Hex/SScrew Hex Threaded 2.250
     displayName: SScrew Hex Threaded 2.250
@@ -5069,7 +5069,7 @@ MonoBehaviour:
     thumbnail: {fileID: 21300000, guid: 7dc6cb8a7f157c74f8068a9ce7f6ed79, type: 3}
     size: {x: 0.007906, y: 0.007925, z: 0.05936}
     triangles: 25742
-    massKg: 0.00077418884
+    massKg: 0.0052846805
     cuttable: 0
   - id: Structure/Hardware/Screw Steel - Hex/SScrew Hex Threaded 2.500
     displayName: SScrew Hex Threaded 2.500
@@ -5079,7 +5079,7 @@ MonoBehaviour:
     thumbnail: {fileID: 21300000, guid: 832b99e0ad910c542b03d252c07d1984, type: 3}
     size: {x: 0.00792, y: 0.007914, z: 0.06571}
     triangles: 33848
-    massKg: 0.0008520972
+    massKg: 0.0058164895
     cuttable: 0
   - id: Structure/Hardware/Screw Steel - Star
     displayName: Screw Steel - Star
@@ -5419,7 +5419,7 @@ MonoBehaviour:
     thumbnail: {fileID: 21300000, guid: 96677d7762ba0114aa7c604605d9ae7e, type: 3}
     size: {x: 0.0127, y: 0.4445, z: 0.0127}
     triangles: 9692
-    massKg: 0.01583189
+    massKg: 0.037170526
     cuttable: 1
   - id: Structure/Reference Files/Angle 2x2
     displayName: Angle 2x2
@@ -5449,7 +5449,7 @@ MonoBehaviour:
     thumbnail: {fileID: 21300000, guid: 9772232d9d8b07849aeb386af7c3d5ea, type: 3}
     size: {x: 0.0254, y: 0.4445, z: 0.014288}
     triangles: 22748
-    massKg: 0.033103976
+    massKg: 0.077722386
     cuttable: 1
   - id: Structure/Reference Files/C Channel 1x3x1 & 1x5x1
     displayName: C Channel 1x3x1 & 1x5x1
@@ -5459,7 +5459,7 @@ MonoBehaviour:
     thumbnail: {fileID: 21300000, guid: adc9dfe0a9634c844af425d94c17a63a, type: 3}
     size: {x: 0.0635, y: 0.4445, z: 0.014288}
     triangles: 30984
-    massKg: 0.061281655
+    massKg: 0.14387867
     cuttable: 1
   - id: Structure/Reference Files/Plate
     displayName: Plate
@@ -5469,7 +5469,7 @@ MonoBehaviour:
     thumbnail: {fileID: 21300000, guid: dbfb1cf1974ba8241a5686e61cef8612, type: 3}
     size: {x: 0.0635, y: 0.3175, z: 0.001588}
     triangles: 17120
-    massKg: 0.029597675
+    massKg: 0.069490194
     cuttable: 1
   - id: Structure/Segmented Angle/Segmented Angle 1x1x25
     displayName: Segmented Angle 1x1x25
@@ -5539,7 +5539,7 @@ MonoBehaviour:
     thumbnail: {fileID: 21300000, guid: e0230bb15c11a1d43b6dec23d2e3f915, type: 3}
     size: {x: 0.007332, y: 0.00635, z: 0.0127}
     triangles: 1584
-    massKg: 0.0005
+    massKg: 0.00072020525
     cuttable: 0
   - id: Structure/Standoff/Standoff .75
     displayName: Standoff .75
@@ -5549,7 +5549,7 @@ MonoBehaviour:
     thumbnail: {fileID: 21300000, guid: f458cc1c763301a48a32a78b500a310d, type: 3}
     size: {x: 0.007332, y: 0.00635, z: 0.01905}
     triangles: 1584
-    massKg: 0.0005
+    massKg: 0.0010829443
     cuttable: 0
   - id: Structure/Standoff/Standoff .875
     displayName: Standoff .875
@@ -5559,7 +5559,7 @@ MonoBehaviour:
     thumbnail: {fileID: 21300000, guid: 718df44fbc1879f44839da53e756b36e, type: 3}
     size: {x: 0.007332, y: 0.00635, z: 0.022225}
     triangles: 1584
-    massKg: 0.0005384953
+    massKg: 0.0012642934
     cuttable: 0
   - id: Structure/Standoff/Standoff 1.00
     displayName: Standoff 1.00
@@ -5569,7 +5569,7 @@ MonoBehaviour:
     thumbnail: {fileID: 21300000, guid: d787ce2668988404491071ab9fd23d8f, type: 3}
     size: {x: 0.007332, y: 0.00635, z: 0.0254}
     triangles: 1552
-    massKg: 0.00061586575
+    massKg: 0.0014459457
     cuttable: 0
   - id: Structure/Standoff/Standoff 1.50
     displayName: Standoff 1.50
@@ -5579,7 +5579,7 @@ MonoBehaviour:
     thumbnail: {fileID: 21300000, guid: dddbf3fcdcb44dc489659c05e6d01597, type: 3}
     size: {x: 0.007332, y: 0.00635, z: 0.0381}
     triangles: 1488
-    massKg: 0.0011260589
+    massKg: 0.0026437906
     cuttable: 0
   - id: Structure/Standoff/Standoff 2.00
     displayName: Standoff 2.00
@@ -5589,7 +5589,7 @@ MonoBehaviour:
     thumbnail: {fileID: 21300000, guid: 75b40257317f94243a8b3236927a3db5, type: 3}
     size: {x: 0.007332, y: 0.006351, z: 0.0508}
     triangles: 1076
-    massKg: 0.0016368949
+    massKg: 0.0038431445
     cuttable: 0
   - id: Structure/Standoff/Standoff 2.50
     displayName: Standoff 2.50
@@ -5599,7 +5599,7 @@ MonoBehaviour:
     thumbnail: {fileID: 21300000, guid: b7f6c85c5b613c647955661409a7fb4c, type: 3}
     size: {x: 0.007332, y: 0.00635, z: 0.0635}
     triangles: 940
-    massKg: 0.002147434
+    massKg: 0.005041802
     cuttable: 0
   - id: Structure/Standoff/Standoff 3.00
     displayName: Standoff 3.00
@@ -5609,7 +5609,7 @@ MonoBehaviour:
     thumbnail: {fileID: 21300000, guid: 6b07a441cf7ca2a429827eadafb81073, type: 3}
     size: {x: 0.007332, y: 0.00635, z: 0.0762}
     triangles: 856
-    massKg: 0.0026577855
+    massKg: 0.006240018
     cuttable: 0
   - id: Structure/Standoff/Standoff 4.00
     displayName: Standoff 4.00
@@ -5619,7 +5619,7 @@ MonoBehaviour:
     thumbnail: {fileID: 21300000, guid: 7e6a8b7211dfb0f4cbd58d6d5f165019, type: 3}
     size: {x: 0.007332, y: 0.006353, z: 0.1016}
     triangles: 724
-    massKg: 0.0036787218
+    massKg: 0.008636999
     cuttable: 0
   - id: Structure/Standoff/Standoff 5.00
     displayName: Standoff 5.00
@@ -5629,7 +5629,7 @@ MonoBehaviour:
     thumbnail: {fileID: 21300000, guid: 84a27eb8c59cd3b45a6f56c441a023a5, type: 3}
     size: {x: 0.007332, y: 0.00635, z: 0.127}
     triangles: 676
-    massKg: 0.004699414
+    massKg: 0.0110334065
     cuttable: 0
   - id: Structure/Standoff/Standoff 6.00
     displayName: Standoff 6.00
@@ -5639,5 +5639,5 @@ MonoBehaviour:
     thumbnail: {fileID: 21300000, guid: 3df1f306ce0a4cd4a86706c64c6b9a6a, type: 3}
     size: {x: 0.007332, y: 0.00635, z: 0.1524}
     triangles: 664
-    massKg: 0.0057194214
+    massKg: 0.013428207
     cuttable: 0

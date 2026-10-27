@@ -52,3 +52,11 @@ desktop.ini
 
 # Claude Code local settings
 .claude/settings.local.json
+
+# Screenshots taken while testing (Unity MCP camera captures)
+/[Aa]ssets/[Ss]creenshots/
+/[Aa]ssets/[Ss]creenshots.meta
+
+# Python bytecode from the Blender/texture scripts
+__pycache__/
+*.pyc

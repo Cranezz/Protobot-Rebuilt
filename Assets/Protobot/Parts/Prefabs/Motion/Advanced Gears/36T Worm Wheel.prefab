@@ -167,5 +167,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: 36T Worm Wheel
-  hint: "27.5 \xD7 27.5 \xD7 9.5 mm  \xB7  2.3 g  \xB7  hold to pick up"
+  hint: "27.5 \xD7 27.5 \xD7 9.5 mm  \xB7  2.3 g"
   highlightBrightness: 1.3

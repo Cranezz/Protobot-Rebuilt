@@ -163,5 +163,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: NSpacer Black .500 OD x .500
-  hint: "12.7 \xD7 12.7 \xD7 12.7 mm  \xB7  1.6 g  \xB7  hold to pick up"
+  hint: "12.7 \xD7 12.7 \xD7 12.7 mm  \xB7  1.6 g"
   highlightBrightness: 1.3

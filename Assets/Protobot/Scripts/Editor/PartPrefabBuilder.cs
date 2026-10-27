@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
+using Protobot.Geometry;
 using Protobot.Interaction;
 using Protobot.Parts;
 using UnityEditor;
@@ -125,6 +126,9 @@ namespace Protobot.Editor
                     list.Add(r);
                 }
 
+                // Metal stock and shafts get colliders that follow their cross-section (open C-channels etc.).
+                var useProfile = entry.cuttable && AddStockProfile(instance, bodies, physicsMaterials);
+
                 var mass = 0f;
                 foreach (var list in bodies.Values)
                 {
@@ -133,6 +137,8 @@ namespace Protobot.Editor
                     var finish = FinishOf(detailed.sharedMaterials);
                     var detailedMesh = detailed.GetComponent<MeshFilter>().sharedMesh;
                     mass += Volume(detailedMesh, detailed.transform) * Density[finish];
+                    if (useProfile)
+                        continue;
 
                     // Collider from the simplest LOD that still has a real shape (tiny bodies can be
                     // decimated down to a few vertices, which can't form a convex hull).
@@ -156,7 +162,7 @@ namespace Protobot.Editor
                     collider.sharedMaterial = physicsMaterials[finish];
                 }
 
-                entry.massKg = Mathf.Max(0.0005f, mass);
+                entry.massKg = Mathf.Max(0.0005f, RealisticMass(entry, mass));
                 var body = instance.AddComponent<Rigidbody>();
                 body.mass = entry.massKg;
                 body.interpolation = RigidbodyInterpolation.Interpolate;
@@ -165,8 +171,8 @@ namespace Protobot.Editor
                 body.angularDamping = 0.15f;
 
                 instance.AddComponent<PartBody>().Configure(entry.id);
-                instance.AddComponent<HoverTarget>().Configure(CursorKind.Grab, entry.displayName,
-                    $"{entry.SizeLabel}  ·  {entry.MassLabel}  ·  hold to pick up");
+                // How to pick it up is on the hands' controls line; the tooltip just describes the part.
+                instance.AddComponent<HoverTarget>().Configure(CursorKind.Grab, entry.displayName, $"{entry.SizeLabel}  ·  {entry.MassLabel}");
 
                 var path = PrefabFolder + entry.id + ".prefab";
                 Directory.CreateDirectory(Path.GetDirectoryName(path));
@@ -176,6 +182,106 @@ namespace Protobot.Editor
             {
                 Object.DestroyImmediate(instance);
             }
+        }
+
+        // ---------------------------------------------------------------- stock profile
+
+        /// <summary>
+        /// Finds the part's cross-section (sampled along its length, keeping the slice that misses the holes),
+        /// splits it into convex pieces and stores it in a StockProfile, which builds the colliders at runtime.
+        /// </summary>
+        static bool AddStockProfile(GameObject root, Dictionary<string, List<MeshRenderer>> bodies, Dictionary<Finish, PhysicsMaterial> materials)
+        {
+            var verts = new List<Vector3>();
+            var tris = new List<int>();
+            Material[] firstMaterials = null;
+            var toRoot = root.transform.worldToLocalMatrix;
+            foreach (var list in bodies.Values)
+            {
+                var r = list[0];
+                firstMaterials ??= r.sharedMaterials;
+                var mesh = r.GetComponent<MeshFilter>().sharedMesh;
+                var m = toRoot * r.transform.localToWorldMatrix;
+                var start = verts.Count;
+                foreach (var v in mesh.vertices)
+                    verts.Add(m.MultiplyPoint3x4(v));
+                for (var s = 0; s < mesh.subMeshCount; s++)
+                    foreach (var i in mesh.GetTriangles(s))
+                        tris.Add(start + i);
+            }
+            if (verts.Count == 0)
+                return false;
+
+            var bounds = new Bounds(verts[0], Vector3.zero);
+            foreach (var v in verts)
+                bounds.Encapsulate(v);
+            var size = bounds.size;
+            var axisIndex = size.x >= size.y && size.x >= size.z ? 0 : size.y >= size.z ? 1 : 2;
+            var axis = Vector3.zero;
+            axis[axisIndex] = 1f;
+            var u = Vector3.zero;
+            u[(axisIndex + 1) % 3] = 1f;
+            var w = Vector3.Cross(axis, u);
+            var half = size[axisIndex] / 2f;
+
+            List<MeshSlicer.Loop> best = null;
+            var bestArea = 0f;
+            for (var k = 0; k <= 16; k++)
+            {
+                var t = Mathf.Lerp(-0.4f, 0.4f, k / 16f) * size[axisIndex];
+                var loops = MeshSlicer.Section(verts, tris, new Plane(axis, bounds.center + axis * t));
+                var area = 0f;
+                foreach (var (outer, holes) in MeshSlicer.Nest(loops))
+                {
+                    area += Mathf.Abs(outer.signedArea);
+                    foreach (var h in holes)
+                        area -= Mathf.Abs(h.signedArea);
+                }
+                if (area > bestArea)
+                {
+                    bestArea = area;
+                    best = loops;
+                }
+            }
+            if (best == null)
+                return false;
+
+            // Express the outline in the profile's own u/w axes around the part's centre line, with rounded
+            // bends straightened out (a tenth of a millimetre is plenty for collisions).
+            foreach (var loop in best)
+            {
+                loop.points2D.Clear();
+                foreach (var p in loop.points3D)
+                    loop.points2D.Add(new Vector2(Vector3.Dot(p - bounds.center, u), Vector3.Dot(p - bounds.center, w)));
+                MeshSlicer.Simplify(loop, 0.0001f);
+            }
+            var (points, _, triangles) = MeshSlicer.Triangulate(best);
+            if (triangles.Count < 3)
+                return false;
+            var pieces = ConvexPieces.FromTriangles(points, triangles);
+            if (pieces.Count == 0 || pieces.Count > 48)
+                return false;
+
+            var profile = root.AddComponent<StockProfile>();
+            profile.Configure(axis, u, w, bounds.center, -half, half, pieces, materials[FinishOf(firstMaterials)]);
+            return true;
+        }
+
+        /// <summary>
+        /// Electronics are modelled as hollow shells (no circuit boards or motor inside), so their mesh volume
+        /// gives a far too low weight. Use the known weight where we have it, otherwise a typical density for
+        /// packed electronics applied to the outer size.
+        /// </summary>
+        static float RealisticMass(PartEntry entry, float meshMass)
+        {
+            if (entry.displayName == "V5 Motor")
+                return 0.155f;  // V5 Smart Motor (11 W), VEX spec
+            if (entry.binId is "motors" or "brain" or "sensors")
+            {
+                var s = entry.size;
+                return Mathf.Max(meshMass, s.x * s.y * s.z * 650f);
+            }
+            return meshMass;
         }
 
         /// <summary>Enclosed volume of a closed mesh (m³), via signed tetrahedra; falls back to a box estimate for open meshes.</summary>
@@ -209,8 +315,10 @@ namespace Protobot.Editor
                 var n = mat.name.ToLowerInvariant();
                 if (n.Contains("rubber") || n.Contains("flex_wheel") || n.Contains("tire") || n.Contains("tread")) return Finish.Rubber;
                 if (n.Contains("brass") || n.Contains("bronze") || n.Contains("copper")) return Finish.Brass;
-                if (n.Contains("aluminum") || n.Contains("aluminium") || n.Contains("anodized") || n.Contains("machined")) return Finish.Aluminum;
-                if (n.Contains("steel") || n.Contains("stainless") || n.Contains("chrome") || n.Contains("zinc") || n.Contains("titanium")) return Finish.Steel;
+                if (n.Contains("aluminum") || n.Contains("aluminium") || n == "alu" || n.StartsWith("alu_") || n.Contains("_alu")
+                    || n.Contains("anodized") || n.Contains("machined") || n.Contains("standoff")) return Finish.Aluminum;
+                if (n.Contains("steel") || n.Contains("stainless") || n.Contains("chrome") || n.Contains("zinc") || n.Contains("titanium")
+                    || n.Contains("screw") || n.Contains("vex_metal")) return Finish.Steel;
             }
             return Finish.Plastic;
         }

@@ -140,7 +140,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: Solenoid - Double Acting
-  hint: "56.5 \xD7 40.8 \xD7 16.4 mm  \xB7  84.2 g  \xB7  hold to pick up"
+  hint: "56.5 \xD7 40.8 \xD7 16.4 mm  \xB7  84.2 g"
   highlightBrightness: 1.3
 --- !u!1 &4515298355228811975 stripped
 GameObject:

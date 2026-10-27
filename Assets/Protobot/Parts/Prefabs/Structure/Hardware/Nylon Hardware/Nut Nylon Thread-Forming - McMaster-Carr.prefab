@@ -140,7 +140,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: Nut Nylon Thread-Forming - McMaster-Carr
-  hint: "10.1 \xD7 8.7 \xD7 3.6 mm  \xB7  0.5 g  \xB7  hold to pick up"
+  hint: "10.1 \xD7 8.7 \xD7 3.6 mm  \xB7  0.5 g"
   highlightBrightness: 1.3
 --- !u!1 &9163491331353664560 stripped
 GameObject:

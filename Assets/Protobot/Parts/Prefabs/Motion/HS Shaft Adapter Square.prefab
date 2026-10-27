@@ -163,5 +163,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: HS Shaft Adapter Square
-  hint: "12.7 \xD7 6.4 \xD7 6.4 mm  \xB7  2.8 g  \xB7  hold to pick up"
+  hint: "12.7 \xD7 6.4 \xD7 6.4 mm  \xB7  2.8 g"
   highlightBrightness: 1.3

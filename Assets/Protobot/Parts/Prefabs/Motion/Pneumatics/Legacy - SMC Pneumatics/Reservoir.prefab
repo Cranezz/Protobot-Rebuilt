@@ -167,5 +167,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: Reservoir
-  hint: "200 \xD7 39.8 \xD7 39.7 mm  \xB7  1.66 kg  \xB7  hold to pick up"
+  hint: "200 \xD7 39.8 \xD7 39.7 mm  \xB7  1.66 kg"
   highlightBrightness: 1.3

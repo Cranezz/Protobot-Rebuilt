@@ -163,5 +163,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: SScrew Star Smooth 1.750
-  hint: "46.7 \xD7 7.9 \xD7 7.9 mm  \xB7  5.3 g  \xB7  hold to pick up"
+  hint: "46.7 \xD7 7.9 \xD7 7.9 mm  \xB7  5.3 g"
   highlightBrightness: 1.3

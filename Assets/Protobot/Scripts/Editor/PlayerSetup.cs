@@ -4,6 +4,8 @@ using Protobot.InputHandling;
 using Protobot.Menus;
 using Protobot.Parts;
 using Protobot.Player;
+using Protobot.Tools;
+using UnityEngine.Rendering.Universal;
 using TMPro;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -91,8 +93,7 @@ namespace Protobot.Editor
             var cursor = GetOrAdd<CursorController>(player);
             SetFields(cursor, ("viewCamera", camera), ("hud", hud), ("reach", 2.5f));
             SetCursorStyles(cursor);
-            var hands = GetOrAdd<PlayerHands>(player);
-            SetFields(hands, ("cursor", cursor), ("head", head));
+            GameObjectUtility.RemoveMonoBehavioursWithMissingScript(player);  // the old PlayerHands
 
             // ---- spawning
             var spawned = GameObject.Find("SpawnedParts") ?? new GameObject("SpawnedParts");
@@ -108,6 +109,8 @@ namespace Protobot.Editor
             var pause = GetOrAdd<PauseMenu>(Child(ui, "PauseMenu"));
             SetFields(pause, ("theme", theme));
 
+            SetupTools(player, camera, head, cursor, hud, ui, theme);
+
             var events = GameObject.Find("EventSystem") ?? new GameObject("EventSystem");
             GetOrAdd<EventSystem>(events);
             if (events.TryGetComponent(out StandaloneInputModule legacy))
@@ -116,6 +119,136 @@ namespace Protobot.Editor
 
             EditorSceneManager.MarkSceneDirty(player.scene);
             Debug.Log("[Player] Set up: mouse look, WASD, Shift sprint, C crouch, Space jump, hold left click to grab, Esc menu.");
+        }
+
+        // ---------------------------------------------------------------- tools
+
+        const string ToolPrefabFolder = "Assets/Protobot/Prefabs/Tools/";
+        const int ViewModelLayer = 9;
+
+        // How each tool sits in the hand, relative to the view-model anchor (lower right of the view).
+        // Shown smaller than life: they're drawn by their own camera, so this only changes how much
+        // screen they take up.
+        static readonly (string model, float scale, Vector3 position, Vector3 rotation)[] ViewModels =
+        {
+            ("HackSaw", 0.5f, new Vector3(0.1f, 0.11f, 0f), new Vector3(-6f, -32f, -14f)),
+            ("SprayGun", 0.62f, new Vector3(0.08f, 0.12f, 0f), new Vector3(-4f, -28f, 4f)),
+            ("Drill", 0.62f, new Vector3(0.08f, 0.17f, 0f), new Vector3(-4f, -28f, 4f)),
+        };
+
+        static void SetupTools(GameObject player, Camera camera, Transform head, CursorController cursor, Hud hud, GameObject ui, UiTheme theme)
+        {
+            SetLayerName(ViewModelLayer, "ViewModel");
+            IncludeRuntimeShaders();
+
+            // Hand-held tools render in their own overlay camera so they never poke into benches or walls.
+            camera.cullingMask &= ~(1 << ViewModelLayer);
+            var vmCameraGo = camera.transform.Find("ViewModelCamera")?.gameObject ?? new GameObject("ViewModelCamera");
+            vmCameraGo.transform.SetParent(camera.transform, false);
+            var vmCamera = GetOrAdd<Camera>(vmCameraGo);
+            vmCamera.cullingMask = 1 << ViewModelLayer;
+            vmCamera.fieldOfView = 55f;
+            vmCamera.nearClipPlane = 0.01f;
+            vmCamera.farClipPlane = 3f;
+            var vmData = vmCamera.GetUniversalAdditionalCameraData();
+            vmData.renderType = CameraRenderType.Overlay;
+            vmData.renderShadows = false;
+            var mainData = camera.GetUniversalAdditionalCameraData();
+            if (!mainData.cameraStack.Contains(vmCamera))
+                mainData.cameraStack.Add(vmCamera);
+            var anchor = camera.transform.Find("ViewModelAnchor") ?? new GameObject("ViewModelAnchor").transform;
+            anchor.SetParent(camera.transform, false);
+            anchor.localPosition = new Vector3(0.17f, -0.16f, 0.34f);
+            anchor.localRotation = Quaternion.identity;
+            anchor.gameObject.layer = ViewModelLayer;
+
+            var prefabs = new GameObject[ViewModels.Length];
+            System.IO.Directory.CreateDirectory(ToolPrefabFolder);
+            for (var i = 0; i < ViewModels.Length; i++)
+            {
+                var (model, scale, position, rotation) = ViewModels[i];
+                var asset = AssetDatabase.LoadAssetAtPath<GameObject>(EnvironmentImport.ToolModelRoot + model + ".fbx");
+                if (asset == null)
+                    continue;
+                var root = new GameObject("ViewModel_" + model);
+                root.transform.localScale = Vector3.one * scale;
+                var instance = (GameObject)PrefabUtility.InstantiatePrefab(asset, root.transform);
+                // The models point along +Z with +Y up (Blender's +Y forward); keep the FBX's own axis
+                // rotation underneath the pose.
+                instance.transform.SetLocalPositionAndRotation(position, Quaternion.Euler(rotation) * asset.transform.localRotation);
+                foreach (var r in root.GetComponentsInChildren<Renderer>())
+                    r.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+                prefabs[i] = PrefabUtility.SaveAsPrefabAsset(root, ToolPrefabFolder + root.name + ".prefab");
+                Object.DestroyImmediate(root);
+            }
+
+            // Menus the tools open.
+            var sawMenu = GetOrAdd<SawMenu>(Child(ui, "SawMenu"));
+            SetFields(sawMenu, ("theme", theme));
+            var colorMenu = GetOrAdd<ColorPickerMenu>(Child(ui, "ColorPicker"));
+            SetFields(colorMenu, ("theme", theme));
+            var bitMenu = GetOrAdd<DrillBitMenu>(Child(ui, "DrillBitMenu"));
+            SetFields(bitMenu, ("theme", theme));
+
+            var toolsRoot = Child(player, "Tools");
+            var crosshair = Sprite("ui_crosshair");
+            var hands = GetOrAdd<HandsTool>(Child(toolsRoot, "Hands"));
+            SetFields(hands, ("displayName", "Hands"), ("icon", AssetDatabase.LoadAssetAtPath<Sprite>(UiTextureImport.CursorFolder + "cursor_grab.png")), ("head", head));
+            var saw = GetOrAdd<SawTool>(Child(toolsRoot, "HackSaw"));
+            SetFields(saw, ("displayName", "Hack Saw"), ("icon", Sprite("tool_saw")), ("viewModelPrefab", prefabs[0]), ("menu", sawMenu), ("crosshair", crosshair));
+            var paint = GetOrAdd<PaintTool>(Child(toolsRoot, "SprayPaint"));
+            SetFields(paint, ("displayName", "Spray Paint"), ("icon", Sprite("tool_paint")), ("viewModelPrefab", prefabs[1]), ("picker", colorMenu), ("crosshair", crosshair));
+            var drill = GetOrAdd<DrillTool>(Child(toolsRoot, "Drill"));
+            SetFields(drill, ("displayName", "Drill"), ("icon", Sprite("tool_drill")), ("viewModelPrefab", prefabs[2]), ("bitMenu", bitMenu), ("crosshair", crosshair));
+
+            var belt = GetOrAdd<ToolBelt>(player);
+            SetFields(belt, ("cursor", cursor), ("hud", hud), ("viewCamera", camera), ("viewModelAnchor", anchor));
+            var so = new SerializedObject(belt);
+            var list = so.FindProperty("tools");
+            PlayerTool[] tools = { hands, saw, paint, drill };
+            list.arraySize = tools.Length;
+            for (var i = 0; i < tools.Length; i++)
+                list.GetArrayElementAtIndex(i).objectReferenceValue = tools[i];
+            so.ApplyModifiedPropertiesWithoutUndo();
+
+            var toolHud = GetOrAdd<ToolHud>(Child(ui, "ToolHud"));
+            SetFields(toolHud, ("theme", theme), ("belt", belt), ("handsIcon", AssetDatabase.LoadAssetAtPath<Sprite>(UiTextureImport.CursorFolder + "cursor_grab.png")));
+        }
+
+        // The tools make their preview materials at runtime with Shader.Find; a build strips any shader that
+        // no material uses, so these are listed under Project Settings > Graphics > Always Included Shaders.
+        static readonly string[] RuntimeShaders =
+        {
+            "Universal Render Pipeline/Lit",
+            "Universal Render Pipeline/Unlit",
+            "Universal Render Pipeline/Particles/Unlit",
+        };
+
+        static void IncludeRuntimeShaders()
+        {
+            var settings = new SerializedObject(AssetDatabase.LoadAllAssetsAtPath("ProjectSettings/GraphicsSettings.asset")[0]);
+            var list = settings.FindProperty("m_AlwaysIncludedShaders");
+            foreach (var name in RuntimeShaders)
+            {
+                var shader = Shader.Find(name);
+                if (shader == null)
+                    continue;
+                var present = false;
+                for (var i = 0; i < list.arraySize && !present; i++)
+                    present = list.GetArrayElementAtIndex(i).objectReferenceValue == shader;
+                if (present)
+                    continue;
+                list.arraySize++;
+                list.GetArrayElementAtIndex(list.arraySize - 1).objectReferenceValue = shader;
+            }
+            settings.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        static void SetLayerName(int layer, string name)
+        {
+            var tags = new SerializedObject(AssetDatabase.LoadAllAssetsAtPath("ProjectSettings/TagManager.asset")[0]);
+            tags.FindProperty("layers").GetArrayElementAtIndex(layer).stringValue = name;
+            tags.ApplyModifiedPropertiesWithoutUndo();
         }
 
         /// <summary>Creates (once) the UI theme asset with the Barlow Condensed fonts and generated sprites.</summary>
@@ -205,6 +338,7 @@ namespace Protobot.Editor
                     case Object o: p.objectReferenceValue = o; break;
                     case float f: p.floatValue = f; break;
                     case int i: p.intValue = i; break;
+                    case string str: p.stringValue = str; break;
                     case bool b: p.boolValue = b; break;
                 }
             }

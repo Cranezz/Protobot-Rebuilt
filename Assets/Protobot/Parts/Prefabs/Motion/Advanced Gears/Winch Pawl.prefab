@@ -163,5 +163,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Interaction.HoverTarget
   cursor: 2
   title: Winch Pawl
-  hint: "16.8 \xD7 15.8 \xD7 9.9 mm  \xB7  1 g  \xB7  hold to pick up"
+  hint: "16.8 \xD7 15.8 \xD7 9.9 mm  \xB7  1 g"
   highlightBrightness: 1.3
