@@ -13,10 +13,10 @@ namespace Protobot.Menus
 {
     /// <summary>
     /// Precise cut menu (hold right click with the saw on a part). The saw stays frozen on the part while you
-    /// set exact numbers: where to cut (inches from the part's end, typed as "3 1/2", "3.5" or "7/8", snapped
-    /// to the chosen step), the cut's angle about the part's X, Y and Z axes (shown on the part in red, green
-    /// and blue; up to 90° each, typed angles over 360° wrap around), and which side to keep. The preview and
-    /// the summary line update live.
+    /// set exact numbers: where to cut (inches from the part's end for a cut across it, or from its edge along
+    /// X or Y for a lengthwise cut; typed as "3 1/2", "3.5" or "7/8", snapped to the chosen step), the cut's
+    /// angle about the part's X, Y and Z axes (shown on the part in red, green and blue; up to 90° each, typed
+    /// angles over 360° wrap around), and which side to keep. The preview and the summary line update live.
     /// </summary>
     public class SawMenu : MonoBehaviour
     {
@@ -24,12 +24,13 @@ namespace Protobot.Menus
 
         SawTool saw;
         PartBody part;
-        StockProfile profile;
         GameObject root;
         TextMeshProUGUI partName;
         TextMeshProUGUI summary;
         Slider position;
         TMP_InputField positionField;
+        TextMeshProUGUI positionLabel;
+        int shownAxis = -1;
         readonly Slider[] angleSliders = new Slider[3];
         readonly TMP_InputField[] angleFields = new TMP_InputField[3];
         DropdownMenu snap;
@@ -49,18 +50,16 @@ namespace Protobot.Menus
         {
             saw = tool;
             part = target;
-            profile = target.GetComponent<StockProfile>();
             partName.text = target.name;
             position.minValue = 0f;
-            position.maxValue = Units.ToInches(profile.Length);
             root.SetActive(true);
             MenuState.Open(this);
 
             updating = true;
             snap.SetIndex(SawTool.SnapChoice, false);
-            SetPosition(Units.ToInches(saw.LockedT - profile.Start), false);
             for (var i = 0; i < 3; i++)
                 ShowAngle(i, saw.Angles[i]);
+            ShowPositionAxis();
             side.SetIndex(saw.Flip ? 1 : 0, false);
             updating = false;
             Push();
@@ -100,7 +99,7 @@ namespace Protobot.Menus
             var step = SawTool.SnapChoices[snap.Index].inches;
             if (step > 0f)
                 inches = Mathf.Round(inches / step) * step;
-            inches = Mathf.Clamp(inches, 0f, Units.ToInches(profile.Length));
+            inches = Mathf.Clamp(inches, 0f, position.maxValue);
             position.SetValueWithoutNotify(inches);
             positionField.SetTextWithoutNotify(Units.Inches(Units.FromInches(inches), false));
             if (push)
@@ -125,7 +124,28 @@ namespace Protobot.Menus
             if (updating || saw == null)
                 return;
             var angles = new Vector3(angleSliders[0].value, angleSliders[1].value, angleSliders[2].value);
-            saw.SetMenuValues(profile.Start + Units.FromInches(position.value), angles, side.Index == 1);
+            saw.SetMenuValues(Units.FromInches(position.value), angles, side.Index == 1);
+            if (saw.LockedAxis != shownAxis)
+            {
+                // The angles now measure the cut along another axis (it moved to the middle of that one).
+                updating = true;
+                ShowPositionAxis();
+                updating = false;
+                Push();
+            }
+        }
+
+        static readonly string[] AxisNames = { "X", "Y", "Z" };
+        static readonly Color[] AxisColors = { new(0.95f, 0.35f, 0.3f), new(0.4f, 0.85f, 0.4f), new(0.4f, 0.6f, 1f) };
+
+        /// <summary>Label, range and value of the position row for the axis the cut is measured along.</summary>
+        void ShowPositionAxis()
+        {
+            shownAxis = saw.LockedAxis;
+            var letter = $"<color=#{ColorUtility.ToHtmlStringRGB(AxisColors[shownAxis])}>{AxisNames[shownAxis]}</color>";
+            positionLabel.text = shownAxis == 2 ? $"Position from end ({letter}, in)" : $"Position from edge ({letter}, in)";
+            position.maxValue = Mathf.Max(Units.ToInches(saw.LockedSpan), 0.01f);
+            SetPosition(Units.ToInches(saw.LockedPosition), false);
         }
 
         static float WrapAngle(float degrees)
@@ -165,6 +185,7 @@ namespace Protobot.Menus
                 else
                     SetPosition(position.value, false);
             });
+            positionLabel = position.transform.parent.parent.Find("Label").GetComponent<TextMeshProUGUI>();
             snap = DropdownMenu.Create(UiFactory.Row(list, "Snap", theme), theme, System.Array.ConvertAll(SawTool.SnapChoices, c => c.label),
                 SawTool.SnapChoice, i =>
                 {
@@ -174,7 +195,7 @@ namespace Protobot.Menus
                 });
 
             string[] names = { "X angle (°)", "Y angle (°)", "Z angle (°)" };
-            Color[] colors = { new(0.95f, 0.35f, 0.3f), new(0.4f, 0.85f, 0.4f), new(0.4f, 0.6f, 1f) };
+            var colors = AxisColors;
             for (var i = 0; i < 3; i++)
             {
                 var axis = i;

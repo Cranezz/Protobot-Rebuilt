@@ -17,7 +17,10 @@ namespace Protobot.Tools
     /// removed turns see-through red, and left click saws it off; the offcut becomes a part of its own. The
     /// cut can be angled about the part's X, Y and Z axes (up to 90°): the wheel turns Y, Shift + wheel X,
     /// Ctrl + wheel Z, in angle steps that right click changes. F flips which side is kept; holding right
-    /// click opens the precise cut menu. A cut that wouldn't go through any metal isn't allowed.
+    /// click opens the precise cut menu. Where the cut sits is measured along whichever of the part's axes the
+    /// blade faces most: the length for a cut across, the width or thickness for a lengthwise (rip) cut, so a
+    /// rip cut can be slid across the part. A cut that wouldn't go through any metal, would only shave off a
+    /// sliver or would split a sheet down its thickness isn't allowed.
     /// </summary>
     public class SawTool : PlayerTool
     {
@@ -25,6 +28,7 @@ namespace Protobot.Tools
         public const float MaxAngle = 90f;
         const float MinVolume = 2e-9f;                   // 2 mm³: anything less isn't really a cut
         const float MinOffcutVolume = 4e-8f;             // 40 mm³: smaller offcuts are swarf, not a new part
+        const float MinSliver = 0.001f;                  // each side needs ~1/32 in of metal: no shavings, no splitting sheets
         static readonly int[] AngleSteps = { 5, 10, 15, 30, 45 };
 
         /// <summary>Where cuts snap along the part (inches; 0 = no snap). Shared by aiming and the precise cut menu.</summary>
@@ -56,12 +60,17 @@ namespace Protobot.Tools
 
         // Menu mode: the plan is frozen on this part and driven by the menu's numbers.
         PartBody lockedPart;
-        float lockedT;
+        float lockedPosition;
 
         public int AngleStep => AngleSteps[angleStepIndex];
         public Vector3 Angles => angles;
         public bool Flip => flip;
-        public float LockedT => lockedT;
+        /// <summary>The menu's cut position: metres along <see cref="LockedAxis"/> from the metal's end or edge.</summary>
+        public float LockedPosition => lockedPosition;
+        /// <summary>Which axis (0 X, 1 Y, 2 Z = length) the menu's position is measured along.</summary>
+        public int LockedAxis => lockedPart != null ? PositionAxisFor(lockedPart.GetComponent<StockProfile>(), angles) : 2;
+        /// <summary>How far the metal runs along <see cref="LockedAxis"/> (the position's range).</summary>
+        public float LockedSpan => lockedPart != null ? MetalBox(lockedPart).size[LockedAxis] : 0f;
 
         /// <summary>A cut in the part's own space.</summary>
         public struct CutPlan
@@ -70,8 +79,9 @@ namespace Protobot.Tools
             public string problem;
             public Vector3 point;
             public Vector3 keepNormal;
-            public float t;              // position along the part (m, from the profile origin)
-            public float keptLength;     // how long each piece ends up along the part
+            public int axis;             // which axis the position is measured along (0 X, 1 Y, 2 Z = length)
+            public float position;       // m along that axis from the metal's end or edge
+            public float keptLength;     // how far each piece reaches along that axis
             public float removedLength;
         }
 
@@ -132,7 +142,7 @@ namespace Protobot.Tools
                 return;
             }
             lockedPart = part;
-            lockedT = Plan(part, hit.point, false).t;
+            lockedPosition = Plan(part, hit.point, false).position;
             menu.Open(this, part);
         }
 
@@ -200,11 +210,17 @@ namespace Protobot.Tools
         CutPlan Plan(PartBody part, Vector3 worldPoint, bool free)
         {
             var profile = part.GetComponent<StockProfile>();
-            var t = profile.AlongAxis(part.transform.InverseTransformPoint(worldPoint));
-            // Snap along the part, counted from its end, so cuts land through or between holes.
+            var axis = PositionAxisFor(profile, angles);
+            var along = AxisVector(profile, axis);
+            var normal = CutNormal(profile, angles);
+            var box = MetalBox(part);
+            // Where the blade through the aimed point crosses the line along that axis through the middle of
+            // the metal, counted from the metal's end or edge and snapped, so cuts land through or between holes.
+            var aimed = part.transform.InverseTransformPoint(worldPoint);
+            var crossing = Vector3.Dot(aimed - PointAt(profile, box.center), normal) / Vector3.Dot(along, normal);
+            var position = box.center[axis] + crossing - box.min[axis];
             var step = free || SnapStep <= 0f ? 0.0005f : SnapStep;
-            t = profile.Start + Mathf.Round((t - profile.Start) / step) * step;
-            return PlanAt(part, t);
+            return PlanAt(part, Mathf.Round(position / step) * step);
         }
 
         /// <summary>The cut plane's direction: the part's length axis turned by the X, Y, Z angles.</summary>
@@ -212,12 +228,80 @@ namespace Protobot.Tools
             Quaternion.AngleAxis(eulerXYZ.z, profile.Axis) * Quaternion.AngleAxis(eulerXYZ.y, profile.V)
             * Quaternion.AngleAxis(eulerXYZ.x, profile.U) * profile.Axis;
 
-        public CutPlan PlanAt(PartBody part, float t)
+        /// <summary>The part's X (0), Y (1) or Z (2, the length) direction.</summary>
+        public static Vector3 AxisVector(StockProfile profile, int axis) =>
+            axis == 0 ? profile.U : axis == 1 ? profile.V : profile.Axis;
+
+        /// <summary>
+        /// The axis a cut's position is measured along: the one the blade faces most (the length for a cut
+        /// across the part, the width or thickness for a lengthwise one). Ties go to the length.
+        /// </summary>
+        public static int PositionAxisFor(StockProfile profile, Vector3 eulerXYZ)
+        {
+            var normal = CutNormal(profile, eulerXYZ);
+            var best = 2;
+            var bestDot = Mathf.Abs(Vector3.Dot(normal, profile.Axis)) + 1e-4f;
+            for (var i = 0; i < 2; i++)
+            {
+                var d = Mathf.Abs(Vector3.Dot(normal, AxisVector(profile, i)));
+                if (d > bestDot)
+                {
+                    best = i;
+                    bestDot = d;
+                }
+            }
+            return best;
+        }
+
+        static Vector3 PointAt(StockProfile profile, Vector3 xyz) =>
+            profile.Origin + profile.U * xyz.x + profile.V * xyz.y + profile.Axis * xyz.z;
+
+        static readonly Dictionary<int, (int meshes, Bounds box)> boxes = new();
+
+        /// <summary>
+        /// Where the metal is, in the profile's X, Y and Z (length) from its origin: the box positions are
+        /// measured in. Cached until the part's meshes change (a cut or a drilled hole).
+        /// </summary>
+        public static Bounds MetalBox(PartBody part)
         {
             var profile = part.GetComponent<StockProfile>();
-            var cut = new CutPlan { t = t, valid = true };
+            var renderers = PartShape.DetailRenderers(part.gameObject);
+            var meshes = 17;
+            foreach (var r in renderers)
+                meshes = meshes * 31 + r.GetComponent<MeshFilter>().sharedMesh.GetInstanceID();
+            if (boxes.TryGetValue(part.GetInstanceID(), out var cached) && cached.meshes == meshes)
+                return cached.box;
+
+            var min = Vector3.one * float.MaxValue;
+            var max = Vector3.one * float.MinValue;
+            foreach (var r in renderers)
+            {
+                var toPart = part.transform.worldToLocalMatrix * r.transform.localToWorldMatrix;
+                foreach (var vertex in r.GetComponent<MeshFilter>().sharedMesh.vertices)
+                {
+                    var p = toPart.MultiplyPoint3x4(vertex) - profile.Origin;
+                    var xyz = new Vector3(Vector3.Dot(p, profile.U), Vector3.Dot(p, profile.V), Vector3.Dot(p, profile.Axis));
+                    min = Vector3.Min(min, xyz);
+                    max = Vector3.Max(max, xyz);
+                }
+            }
+            var box = new Bounds();
+            if (min.x <= max.x)
+                box.SetMinMax(min, max);
+            boxes[part.GetInstanceID()] = (meshes, box);
+            return box;
+        }
+
+        /// <summary>The cut <paramref name="position"/> metres along its axis from the metal's end or edge.</summary>
+        public CutPlan PlanAt(PartBody part, float position)
+        {
+            var profile = part.GetComponent<StockProfile>();
+            var axis = PositionAxisFor(profile, angles);
+            var box = MetalBox(part);
             var normal = CutNormal(profile, angles);
-            cut.point = profile.Origin + profile.Axis * t;
+            var through = box.center;
+            through[axis] = box.min[axis] + position;
+            var cut = new CutPlan { axis = axis, position = position, valid = true, point = PointAt(profile, through) };
 
             // Keep the side the player is on (the far side is what gets cut off), unless flipped.
             var camLocal = part.transform.InverseTransformPoint(View.transform.position);
@@ -228,14 +312,25 @@ namespace Protobot.Tools
             return cut;
         }
 
-        public void SetMenuValues(float t, Vector3 newAngles, bool flipSide)
+        /// <summary>
+        /// From the precise cut menu. If new angles measure the position along a different axis, the cut moves
+        /// to the middle of that one (e.g. turning a cross cut into a rip cut starts it down the centre).
+        /// </summary>
+        public void SetMenuValues(float position, Vector3 newAngles, bool flipSide)
         {
-            lockedT = t;
+            if (lockedPart != null)
+            {
+                var profile = lockedPart.GetComponent<StockProfile>();
+                var newAxis = PositionAxisFor(profile, newAngles);
+                if (newAxis != PositionAxisFor(profile, angles))
+                    position = MetalBox(lockedPart).size[newAxis] / 2f;
+            }
+            lockedPosition = position;
             angles = newAngles;
             flip = flipSide;
             if (lockedPart != null)
             {
-                plan = PlanAt(lockedPart, lockedT);
+                plan = PlanAt(lockedPart, lockedPosition);
                 ShowPreview(lockedPart);
             }
         }
@@ -248,7 +343,7 @@ namespace Protobot.Tools
         {
             if (lockedPart == null)
                 return;
-            plan = PlanAt(lockedPart, lockedT);
+            plan = PlanAt(lockedPart, lockedPosition);
             ShowPreview(lockedPart);
             var part = lockedPart;
             lockedPart = null;
@@ -284,7 +379,8 @@ namespace Protobot.Tools
         void ShowPreview(PartBody part)
         {
             var cut = plan;
-            var key = $"{part.GetInstanceID()}|{cut.point.x:F5}|{cut.point.y:F5}|{cut.point.z:F5}|{cut.keepNormal.x:F4}|{cut.keepNormal.y:F4}|{cut.keepNormal.z:F4}|{lockedPart != null}";
+            // The plane itself (direction and distance), so moving the aim along the blade rebuilds nothing.
+            var key = $"{part.GetInstanceID()}|{cut.keepNormal.x:F4}|{cut.keepNormal.y:F4}|{cut.keepNormal.z:F4}|{Vector3.Dot(cut.point, cut.keepNormal):F5}|{cut.axis}|{lockedPart != null}";
             if (key != previewKey)
                 BuildPreview(part, cut, key);
             plan.valid = previewValid;
@@ -299,45 +395,68 @@ namespace Protobot.Tools
             previewKey = key;
             previewPart = part;
             var profile = part.GetComponent<StockProfile>();
+            var along = AxisVector(profile, cut.axis);
+            var renderers = PartShape.DetailRenderers(part.gameObject);
 
-            // Slice every full-detail mesh both ways and measure what each side would keep.
-            float keptVolume = 0f, removedVolume = 0f;
-            float keptMin = float.MaxValue, keptMax = float.MinValue, removedMin = float.MaxValue, removedMax = float.MinValue;
-            foreach (var r in PartShape.DetailRenderers(part.gameObject))
+            // How far the metal reaches on each side of the blade, before any slicing: a cut with (almost)
+            // nothing on one side, or one splitting a sheet down its thickness, isn't sawn (or sliced).
+            float keptReach = 0f, removedReach = 0f;
+            foreach (var r in renderers)
             {
-                var mesh = r.GetComponent<MeshFilter>().sharedMesh;
-                var plane = LocalPlane(part.transform, r.transform, cut.point, cut.keepNormal);
-                var kept = MeshSlicer.Slice(mesh, plane);
-                var removed = MeshSlicer.Slice(mesh, plane.flipped);
-                previewMeshes.Add((r, kept, removed));
                 var toPart = part.transform.worldToLocalMatrix * r.transform.localToWorldMatrix;
-                if (kept != null)
+                foreach (var vertex in r.GetComponent<MeshFilter>().sharedMesh.vertices)
                 {
-                    keptVolume += MeshSlicer.Volume(kept);
-                    Extent(kept, toPart, profile, ref keptMin, ref keptMax);
-                }
-                if (removed != null)
-                {
-                    removedVolume += MeshSlicer.Volume(removed);
-                    Extent(removed, toPart, profile, ref removedMin, ref removedMax);
+                    var d = Vector3.Dot(toPart.MultiplyPoint3x4(vertex) - cut.point, cut.keepNormal);
+                    keptReach = Mathf.Max(keptReach, d);
+                    removedReach = Mathf.Max(removedReach, -d);
                 }
             }
-            previewKept = keptMax > keptMin ? keptMax - keptMin : 0f;
-            previewRemoved = removedMax > removedMin ? removedMax - removedMin : 0f;
-            previewRemovedVolume = removedVolume;
-            previewValid = keptVolume >= MinVolume && removedVolume >= MinVolume;
+            previewValid = keptReach >= MinSliver && removedReach >= MinSliver;
             previewProblem = previewValid ? null
-                : keptVolume < MinVolume && removedVolume < MinVolume ? "Can't cut here"
-                : "That cut doesn't go through any metal — move it onto the part";
+                : keptReach < MinSliver && removedReach < MinSliver ? "The blade can't split metal this thin"
+                : keptReach < 1e-5f || removedReach < 1e-5f ? "That cut doesn't go through any metal — move it onto the part"
+                : "That would only shave off a sliver — move the cut further in";
+            previewKept = previewRemoved = previewRemovedVolume = 0f;
+
+            if (previewValid)
+            {
+                // Slice every full-detail mesh (both pieces in one pass) and measure what each side keeps.
+                float keptVolume = 0f, removedVolume = 0f;
+                float keptMin = float.MaxValue, keptMax = float.MinValue, removedMin = float.MaxValue, removedMax = float.MinValue;
+                foreach (var r in renderers)
+                {
+                    var mesh = r.GetComponent<MeshFilter>().sharedMesh;
+                    var plane = LocalPlane(part.transform, r.transform, cut.point, cut.keepNormal);
+                    MeshSlicer.SliceBoth(mesh, plane, true, out var kept, out var removed, out var outline);
+                    previewMeshes.Add((r, kept, removed));
+                    var toPart = part.transform.worldToLocalMatrix * r.transform.localToWorldMatrix;
+                    if (kept != null)
+                    {
+                        keptVolume += MeshSlicer.Volume(kept);
+                        Extent(kept, toPart, profile.Origin, along, ref keptMin, ref keptMax);
+                    }
+                    if (removed != null)
+                    {
+                        removedVolume += MeshSlicer.Volume(removed);
+                        Extent(removed, toPart, profile.Origin, along, ref removedMin, ref removedMax);
+                    }
+                    foreach (var loop in outline)
+                        previewObjects.Add(KerfLine(r.transform, loop.points3D));
+                }
+                previewKept = keptMax > keptMin ? keptMax - keptMin : 0f;
+                previewRemoved = removedMax > removedMin ? removedMax - removedMin : 0f;
+                previewRemovedVolume = removedVolume;
+                if (keptVolume < MinVolume || removedVolume < MinVolume)
+                {
+                    previewValid = false;
+                    previewProblem = "Can't cut here";
+                }
+            }
 
             if (previewValid)
             {
                 foreach (var (r, kept, removed) in previewMeshes)
                 {
-                    var mesh = r.GetComponent<MeshFilter>().sharedMesh;
-                    var plane = LocalPlane(part.transform, r.transform, cut.point, cut.keepNormal);
-                    foreach (var loop in MeshSlicer.Section(mesh.vertices, mesh.triangles, plane))
-                        previewObjects.Add(KerfLine(r.transform, loop.points3D));
                     if (kept != null)
                         previewObjects.Add(PreviewObject(r, kept, r.sharedMaterials, true));
                     if (removed != null)
@@ -352,16 +471,25 @@ namespace Protobot.Tools
                     if (!r.name.StartsWith(PartShape.PreviewName))
                         r.forceRenderingOff = true;
             }
+            else
+            {
+                // Only the red blade shows; drop the kerf lines of a cut that won't happen.
+                foreach (var go in previewObjects)
+                    if (go != null)
+                        Destroy(go);
+                previewObjects.Clear();
+                previewMeshes.Clear();
+            }
             previewObjects.Add(CutPlane(part, cut, previewValid));
             if (lockedPart != null)
                 previewObjects.Add(AxisGizmo(part, cut));
         }
 
-        static void Extent(Mesh mesh, Matrix4x4 toPart, StockProfile profile, ref float min, ref float max)
+        static void Extent(Mesh mesh, Matrix4x4 toPart, Vector3 origin, Vector3 direction, ref float min, ref float max)
         {
             foreach (var v in mesh.vertices)
             {
-                var along = profile.AlongAxis(toPart.MultiplyPoint3x4(v));
+                var along = Vector3.Dot(toPart.MultiplyPoint3x4(v) - origin, direction);
                 min = Mathf.Min(min, along);
                 max = Mathf.Max(max, along);
             }
@@ -580,7 +708,7 @@ namespace Protobot.Tools
             var profile = piece.GetComponent<StockProfile>();
             float min = float.MaxValue, max = float.MinValue;
             foreach (var r in PartShape.DetailRenderers(piece))
-                Extent(r.GetComponent<MeshFilter>().sharedMesh, piece.transform.worldToLocalMatrix * r.transform.localToWorldMatrix, profile, ref min, ref max);
+                Extent(r.GetComponent<MeshFilter>().sharedMesh, piece.transform.worldToLocalMatrix * r.transform.localToWorldMatrix, profile.Origin, profile.Axis, ref min, ref max);
             profile.AddCut(point, keepNormal, min < max ? min : profile.Start, min < max ? max : profile.End);
             PartModifications.On(piece).cuts.Add(new PartModifications.Cut { point = point, keepNormal = keepNormal });
             PartShape.AfterEdit(piece, volumeBefore);

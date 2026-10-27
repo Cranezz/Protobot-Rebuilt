@@ -37,22 +37,69 @@ namespace Protobot.Geometry
         /// </summary>
         public static Mesh Slice(Mesh source, Plane plane)
         {
+            SliceBoth(source, plane, false, out var kept, out _, out _);
+            return kept;
+        }
+
+        /// <summary>
+        /// Both pieces of one cut in a single pass: <paramref name="positive"/> is the side the plane normal points
+        /// to, <paramref name="negative"/> the other (only built when <paramref name="bothSides"/>; null when nothing
+        /// is on that side). The outline is found and triangulated once and caps both pieces; it's returned too
+        /// (e.g. to draw the kerf).
+        /// </summary>
+        public static void SliceBoth(Mesh source, Plane plane, bool bothSides, out Mesh positive, out Mesh negative, out List<Loop> outline)
+        {
             var srcVerts = source.vertices;
             var srcNormals = source.normals;
             var hasNormals = srcNormals != null && srcNormals.Length == srcVerts.Length;
             var distances = new float[srcVerts.Length];
             for (var i = 0; i < srcVerts.Length; i++)
                 distances[i] = plane.GetDistanceToPoint(srcVerts[i]);
+            var triangles = new int[source.subMeshCount][];
+            for (var s = 0; s < triangles.Length; s++)
+                triangles[s] = source.GetTriangles(s);
 
-            var verts = new List<Vector3>(srcVerts.Length);
-            var normals = new List<Vector3>(srcVerts.Length);
-            var remap = new Dictionary<int, int>();
-            var submeshes = new List<List<int>>();
             var segments = new List<(Vector3 a, Vector3 b)>();
-
-            int Keep(int index)
+            var positiveSide = new Side(srcVerts.Length);
+            positiveSide.Clip(srcVerts, srcNormals, hasNormals, distances, 1f, triangles, plane.normal, segments);
+            Side negativeSide = null;
+            if (bothSides)
             {
-                if (remap.TryGetValue(index, out var mapped))
+                negativeSide = new Side(srcVerts.Length);
+                negativeSide.Clip(srcVerts, srcNormals, hasNormals, distances, -1f, triangles, plane.normal, null);
+            }
+
+            // Cap each cut with the triangulated outline, facing out of its piece.
+            outline = BuildLoops(segments, plane.normal);
+            List<Vector3> capPoints = null;
+            List<int> capTriangles = null;
+            if (outline.Count > 0)
+                (_, capPoints, capTriangles) = Triangulate(outline);
+            positive = positiveSide.Build(source.name + " (cut)", capPoints, capTriangles, -plane.normal);
+            negative = negativeSide?.Build(source.name + " (cut)", capPoints, capTriangles, plane.normal);
+        }
+
+        /// <summary>One piece of a cut while it's being built.</summary>
+        class Side
+        {
+            readonly List<Vector3> verts;
+            readonly List<Vector3> normals;
+            readonly int[] remap;
+            readonly List<List<int>> submeshes = new();
+
+            public Side(int sourceVertexCount)
+            {
+                verts = new List<Vector3>(sourceVertexCount);
+                normals = new List<Vector3>(sourceVertexCount);
+                remap = new int[sourceVertexCount];
+                for (var i = 0; i < remap.Length; i++)
+                    remap[i] = -1;
+            }
+
+            int Keep(int index, Vector3[] srcVerts, Vector3[] srcNormals, bool hasNormals)
+            {
+                var mapped = remap[index];
+                if (mapped >= 0)
                     return mapped;
                 mapped = verts.Count;
                 verts.Add(srcVerts[index]);
@@ -61,116 +108,134 @@ namespace Protobot.Geometry
                 return mapped;
             }
 
-            int AddNew(Vector3 position, Vector3 normal)
+            /// <summary>
+            /// Keeps the triangles on the <paramref name="sign"/> side of the plane, clipping those that cross it.
+            /// When <paramref name="segments"/> isn't null, collects the cut outline's pieces there.
+            /// </summary>
+            public void Clip(Vector3[] srcVerts, Vector3[] srcNormals, bool hasNormals, float[] distances, float sign,
+                int[][] triangles, Vector3 planeNormal, List<(Vector3 a, Vector3 b)> segments)
             {
-                verts.Add(position);
-                normals.Add(normal);
-                return verts.Count - 1;
-            }
-
-            var poly = new List<(Vector3 pos, Vector3 normal, int original, bool onPlane)>(4);
-            for (var s = 0; s < source.subMeshCount; s++)
-            {
-                var tris = source.GetTriangles(s);
-                var output = new List<int>(tris.Length);
-                for (var t = 0; t < tris.Length; t += 3)
+                var poly = new List<(Vector3 pos, Vector3 normal, int original, bool onPlane)>(4);
+                var corner = new int[3];
+                var indices = new int[4];
+                foreach (var tris in triangles)
                 {
-                    int i0 = tris[t], i1 = tris[t + 1], i2 = tris[t + 2];
-                    float d0 = distances[i0], d1 = distances[i1], d2 = distances[i2];
-                    var along = Along(plane.normal, srcVerts[i0], srcVerts[i1], srcVerts[i2]);
-                    var in0 = d0 >= -OnPlaneEpsilon;
-                    var in1 = d1 >= -OnPlaneEpsilon;
-                    var in2 = d2 >= -OnPlaneEpsilon;
-                    var all0 = Mathf.Abs(d0) <= OnPlaneEpsilon && Mathf.Abs(d1) <= OnPlaneEpsilon && Mathf.Abs(d2) <= OnPlaneEpsilon;
-                    if (all0)
-                        continue;  // lies in the cut plane: the cap replaces it
-
-                    if (in0 && in1 && in2)
+                    var output = new List<int>(tris.Length);
+                    for (var t = 0; t < tris.Length; t += 3)
                     {
-                        output.Add(Keep(i0));
-                        output.Add(Keep(i1));
-                        output.Add(Keep(i2));
-                        // An edge lying exactly on the plane is part of the cut outline.
-                        AddOnPlaneEdge(srcVerts, distances, i0, i1, along, segments);
-                        AddOnPlaneEdge(srcVerts, distances, i1, i2, along, segments);
-                        AddOnPlaneEdge(srcVerts, distances, i2, i0, along, segments);
-                        continue;
-                    }
-                    if (!in0 && !in1 && !in2)
-                        continue;
-
-                    // Clip the triangle against the plane (Sutherland-Hodgman, one plane).
-                    poly.Clear();
-                    var corner = new[] { i0, i1, i2 };
-                    for (var k = 0; k < 3; k++)
-                    {
-                        int a = corner[k], b = corner[(k + 1) % 3];
-                        float da = distances[a], db = distances[b];
-                        var aIn = da >= -OnPlaneEpsilon;
-                        var bIn = db >= -OnPlaneEpsilon;
-                        if (aIn)
-                            poly.Add((srcVerts[a], hasNormals ? srcNormals[a] : Vector3.up, a, Mathf.Abs(da) <= OnPlaneEpsilon));
-                        if (aIn != bIn && Mathf.Abs(da) > OnPlaneEpsilon && Mathf.Abs(db) > OnPlaneEpsilon)
-                        {
-                            var pos = EdgeCrossing(srcVerts[a], srcVerts[b], da, db, out var f, out var swapped);
-                            var nrm = Vector3.up;
-                            if (hasNormals)
-                            {
-                                nrm = (swapped ? Vector3.Lerp(srcNormals[b], srcNormals[a], f) : Vector3.Lerp(srcNormals[a], srcNormals[b], f)).normalized;
-                                if (nrm == Vector3.zero)
-                                    nrm = srcNormals[a];  // the two normals cancel out
-                            }
-                            poly.Add((pos, nrm, -1, true));
-                        }
-                    }
-                    if (poly.Count < 3)
-                        continue;
-
-                    var indices = new int[poly.Count];
-                    for (var k = 0; k < poly.Count; k++)
-                        indices[k] = poly[k].original >= 0 ? Keep(poly[k].original) : AddNew(poly[k].pos, poly[k].normal);
-                    for (var k = 1; k < poly.Count - 1; k++)
-                    {
-                        output.Add(indices[0]);
-                        output.Add(indices[k]);
-                        output.Add(indices[k + 1]);
-                    }
-
-                    // The two on-plane points of the clipped polygon form one segment of the cut outline.
-                    Vector3? first = null;
-                    foreach (var p in poly)
-                    {
-                        if (!p.onPlane)
+                        int i0 = tris[t], i1 = tris[t + 1], i2 = tris[t + 2];
+                        float d0 = distances[i0] * sign, d1 = distances[i1] * sign, d2 = distances[i2] * sign;
+                        var in0 = d0 >= -OnPlaneEpsilon;
+                        var in1 = d1 >= -OnPlaneEpsilon;
+                        var in2 = d2 >= -OnPlaneEpsilon;
+                        if (!in0 && !in1 && !in2)
                             continue;
-                        if (first == null)
-                            first = p.pos;
-                        else if (p.pos != first.Value)
+                        if (Mathf.Abs(d0) <= OnPlaneEpsilon && Mathf.Abs(d1) <= OnPlaneEpsilon && Mathf.Abs(d2) <= OnPlaneEpsilon)
+                            continue;  // lies in the cut plane: the cap replaces it
+
+                        var along = segments != null ? Along(planeNormal, srcVerts[i0], srcVerts[i1], srcVerts[i2]) : Vector3.zero;
+                        if (in0 && in1 && in2)
                         {
-                            segments.Add(Oriented(first.Value, p.pos, along));
-                            break;
+                            output.Add(Keep(i0, srcVerts, srcNormals, hasNormals));
+                            output.Add(Keep(i1, srcVerts, srcNormals, hasNormals));
+                            output.Add(Keep(i2, srcVerts, srcNormals, hasNormals));
+                            if (segments != null)
+                            {
+                                // An edge lying exactly on the plane is part of the cut outline.
+                                AddOnPlaneEdge(srcVerts, distances, i0, i1, along, segments);
+                                AddOnPlaneEdge(srcVerts, distances, i1, i2, along, segments);
+                                AddOnPlaneEdge(srcVerts, distances, i2, i0, along, segments);
+                            }
+                            continue;
+                        }
+
+                        // Clip the triangle against the plane (Sutherland-Hodgman, one plane).
+                        poly.Clear();
+                        corner[0] = i0;
+                        corner[1] = i1;
+                        corner[2] = i2;
+                        for (var k = 0; k < 3; k++)
+                        {
+                            int a = corner[k], b = corner[(k + 1) % 3];
+                            float da = distances[a] * sign, db = distances[b] * sign;
+                            var aIn = da >= -OnPlaneEpsilon;
+                            var bIn = db >= -OnPlaneEpsilon;
+                            if (aIn)
+                                poly.Add((srcVerts[a], hasNormals ? srcNormals[a] : Vector3.up, a, Mathf.Abs(da) <= OnPlaneEpsilon));
+                            if (aIn != bIn && Mathf.Abs(da) > OnPlaneEpsilon && Mathf.Abs(db) > OnPlaneEpsilon)
+                            {
+                                // From the plane's own distances, so both pieces get bit-identical points.
+                                var pos = EdgeCrossing(srcVerts[a], srcVerts[b], distances[a], distances[b], out var f, out var swapped);
+                                var nrm = Vector3.up;
+                                if (hasNormals)
+                                {
+                                    nrm = (swapped ? Vector3.Lerp(srcNormals[b], srcNormals[a], f) : Vector3.Lerp(srcNormals[a], srcNormals[b], f)).normalized;
+                                    if (nrm == Vector3.zero)
+                                        nrm = srcNormals[a];  // the two normals cancel out
+                                }
+                                poly.Add((pos, nrm, -1, true));
+                            }
+                        }
+                        if (poly.Count < 3)
+                            continue;
+
+                        for (var k = 0; k < poly.Count; k++)
+                        {
+                            if (poly[k].original >= 0)
+                            {
+                                indices[k] = Keep(poly[k].original, srcVerts, srcNormals, hasNormals);
+                                continue;
+                            }
+                            verts.Add(poly[k].pos);
+                            normals.Add(poly[k].normal);
+                            indices[k] = verts.Count - 1;
+                        }
+                        for (var k = 1; k < poly.Count - 1; k++)
+                        {
+                            output.Add(indices[0]);
+                            output.Add(indices[k]);
+                            output.Add(indices[k + 1]);
+                        }
+
+                        if (segments == null)
+                            continue;
+                        // The two on-plane points of the clipped polygon form one segment of the cut outline.
+                        Vector3? first = null;
+                        foreach (var p in poly)
+                        {
+                            if (!p.onPlane)
+                                continue;
+                            if (first == null)
+                                first = p.pos;
+                            else if (p.pos != first.Value)
+                            {
+                                segments.Add(Oriented(first.Value, p.pos, along));
+                                break;
+                            }
                         }
                     }
+                    submeshes.Add(output);
                 }
-                submeshes.Add(output);
             }
 
-            if (verts.Count == 0)
-                return null;
-
-            // Cap the cut with the triangulated outline, facing out of the kept side.
-            var loops = BuildLoops(segments, plane.normal);
-            AddCap(loops, -plane.normal, verts, normals, submeshes[0]);
-
-            var mesh = new Mesh { name = source.name + " (cut)" };
-            if (verts.Count > 65000)
-                mesh.indexFormat = IndexFormat.UInt32;
-            mesh.SetVertices(verts);
-            mesh.SetNormals(normals);
-            mesh.subMeshCount = submeshes.Count;
-            for (var s = 0; s < submeshes.Count; s++)
-                mesh.SetTriangles(submeshes[s], s);
-            mesh.RecalculateBounds();
-            return mesh;
+            /// <summary>The finished mesh with its cap (null if nothing was on this side).</summary>
+            public Mesh Build(string name, List<Vector3> capPoints, List<int> capTriangles, Vector3 outward)
+            {
+                if (verts.Count == 0)
+                    return null;
+                if (capPoints != null && capTriangles.Count >= 3)
+                    AddCap(capPoints, capTriangles, outward, verts, normals, submeshes[0]);
+                var mesh = new Mesh { name = name };
+                if (verts.Count > 65000)
+                    mesh.indexFormat = IndexFormat.UInt32;
+                mesh.SetVertices(verts);
+                mesh.SetNormals(normals);
+                mesh.subMeshCount = submeshes.Count;
+                for (var s = 0; s < submeshes.Count; s++)
+                    mesh.SetTriangles(submeshes[s], s);
+                mesh.RecalculateBounds();
+                return mesh;
+            }
         }
 
         /// <summary>
@@ -556,13 +621,8 @@ namespace Protobot.Geometry
             return (points, points3D, triangles);
         }
 
-        static void AddCap(List<Loop> loops, Vector3 outward, List<Vector3> verts, List<Vector3> normals, List<int> output)
+        static void AddCap(List<Vector3> points3D, List<int> triangles, Vector3 outward, List<Vector3> verts, List<Vector3> normals, List<int> output)
         {
-            if (loops.Count == 0)
-                return;
-            var (_, points3D, triangles) = Triangulate(loops);
-            if (triangles.Count < 3)
-                return;
             var start = verts.Count;
             foreach (var p in points3D)
             {
