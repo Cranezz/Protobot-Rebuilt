@@ -5,11 +5,25 @@ namespace Protobot.Player
     /// <summary>
     /// First-person body: walks, sprints, crouches and jumps with a CharacterController, and turns the head.
     /// It knows nothing about devices; an input component (desktop now, VR later) feeds it.
+    ///
+    /// Build view: the body stays put and the head floats free (slowly, for precise work), so you can get
+    /// your eyes right up to small parts on the bench, look under an assembly, or over the top of it. It
+    /// can't pass through things, and it can't wander more than a few metres from the body.
     /// </summary>
     [RequireComponent(typeof(CharacterController))]
     public class PlayerMotor : MonoBehaviour
     {
+        // Things the floating head bumps into: not the player, the tool in hand, a held part, or the UI.
+        const int HeadBlockers = ~((1 << 2) | (1 << 5) | (1 << Parts.PartLayers.ViewModel) | (1 << Parts.PartLayers.Held) | (1 << Parts.PartLayers.Fastened));
+
         [SerializeField] Transform head;
+
+        [Header("Build view")]
+        [SerializeField] float flySpeed = 0.3f;
+        [SerializeField] float flyFastSpeed = 1.1f;
+        [SerializeField] float flyAcceleration = 3f;
+        [SerializeField] float maxHeadReach = 3f;
+        [SerializeField] float headRadius = 0.012f;
 
         [Header("Speed (m/s)")]
         [SerializeField] float walkSpeed = 1.8f;
@@ -37,9 +51,52 @@ namespace Protobot.Player
         float yaw;
         float pitch;
         float currentHeight;
+        bool buildView;
+        Vector3 headOffset;   // world space, from where the eyes would be
+        Vector3 flyInput;
+        bool flyFast;
+        Vector3 flyVelocity;
 
         public Transform Head => head;
-        public bool IsCrouching => crouchInput || !CanStandUp();
+        public bool IsCrouching => !buildView && (crouchInput || !CanStandUp());
+        public bool BuildView => buildView;
+
+        /// <summary>Build view on or off (off brings the head back to the body).</summary>
+        public void SetBuildView(bool on)
+        {
+            buildView = on;
+            flyVelocity = Vector3.zero;
+            flyInput = Vector3.zero;
+        }
+
+        /// <summary>Turns the view to look at a point.</summary>
+        public void Face(Vector3 point)
+        {
+            var from = head != null ? head.position : transform.position;
+            var dir = (point - from).normalized;
+            yaw = Mathf.Atan2(dir.x, dir.z) * Mathf.Rad2Deg;
+            pitch = Mathf.Clamp(-Mathf.Asin(Mathf.Clamp(dir.y, -1f, 1f)) * Mathf.Rad2Deg, -85f, 85f);
+            transform.rotation = Quaternion.Euler(0f, yaw, 0f);
+            if (head != null)
+                head.localRotation = Quaternion.Euler(pitch, 0f, 0f);
+        }
+
+        /// <summary>Build view: puts the floating head at a point (within reach of the body).</summary>
+        public void PlaceHead(Vector3 point)
+        {
+            buildView = true;
+            flyVelocity = Vector3.zero;
+            headOffset = Vector3.ClampMagnitude(point - EyePosition, maxHeadReach);
+            if (head != null)
+                head.position = EyePosition + headOffset;
+        }
+
+        /// <summary>Build view movement: x = right, y = up, z = forward (where the player faces, kept level).</summary>
+        public void SetFlyInput(Vector3 move, bool fast)
+        {
+            flyInput = Vector3.ClampMagnitude(move, 1f);
+            flyFast = fast;
+        }
 
         void Awake()
         {
@@ -76,6 +133,8 @@ namespace Protobot.Player
             pitch = Mathf.Clamp(newPitch, -85f, 85f);
             horizontalVelocity = Vector3.zero;
             verticalVelocity = 0f;
+            headOffset = Vector3.zero;
+            flyVelocity = Vector3.zero;
         }
 
         void Update()
@@ -84,7 +143,7 @@ namespace Protobot.Player
 
             var speed = IsCrouching ? crouchSpeed : sprintInput ? sprintSpeed : walkSpeed;
             transform.rotation = Quaternion.Euler(0f, yaw, 0f);
-            var target = (transform.right * moveInput.x + transform.forward * moveInput.y) * speed;
+            var target = buildView ? Vector3.zero : (transform.right * moveInput.x + transform.forward * moveInput.y) * speed;
             horizontalVelocity = Vector3.MoveTowards(horizontalVelocity, target, acceleration * Time.deltaTime);
 
             if (body.isGrounded)
@@ -99,7 +158,10 @@ namespace Protobot.Player
             body.Move((horizontalVelocity + Vector3.up * verticalVelocity) * Time.deltaTime);
 
             if (head != null)
+            {
                 head.localRotation = Quaternion.Euler(pitch, 0f, 0f);
+                UpdateHeadOffset();
+            }
         }
 
         void UpdateHeight()
@@ -108,8 +170,39 @@ namespace Protobot.Player
             currentHeight = Mathf.MoveTowards(currentHeight, targetHeight, crouchTransitionSpeed * Time.deltaTime);
             body.height = currentHeight;
             body.center = new Vector3(0f, currentHeight / 2f, 0f);
-            if (head != null)
-                head.localPosition = new Vector3(0f, currentHeight - eyeBelowTop, 0f);
+        }
+
+        Vector3 EyePosition => transform.position + Vector3.up * (currentHeight - eyeBelowTop);
+
+        /// <summary>Build view flying (or drifting back to the body when it's off).</summary>
+        void UpdateHeadOffset()
+        {
+            var eye = EyePosition;
+            if (buildView)
+            {
+                var level = Quaternion.Euler(0f, yaw, 0f);
+                var wanted = (level * new Vector3(flyInput.x, 0f, flyInput.z) + Vector3.up * flyInput.y) * (flyFast ? flyFastSpeed : flySpeed);
+                flyVelocity = Vector3.MoveTowards(flyVelocity, wanted, flyAcceleration * (flyFast ? 3f : 1f) * Time.deltaTime);
+                var step = flyVelocity * Time.deltaTime;
+                var from = eye + headOffset;
+                if (step.sqrMagnitude > 1e-10f)
+                {
+                    if (Physics.SphereCast(from, headRadius, step.normalized, out var hit, step.magnitude, HeadBlockers, QueryTriggerInteraction.Ignore))
+                    {
+                        // Slide along what's in the way instead of stopping dead.
+                        step = Vector3.ProjectOnPlane(step, hit.normal);
+                        if (Physics.SphereCast(from, headRadius, step.normalized, out _, step.magnitude, HeadBlockers, QueryTriggerInteraction.Ignore))
+                            step = Vector3.zero;
+                        flyVelocity = Vector3.ProjectOnPlane(flyVelocity, hit.normal);
+                    }
+                    headOffset = Vector3.ClampMagnitude(headOffset + step, maxHeadReach);
+                }
+            }
+            else
+            {
+                headOffset = Vector3.MoveTowards(headOffset, Vector3.zero, Mathf.Max(3f, headOffset.magnitude * 6f) * Time.deltaTime);
+            }
+            head.position = eye + headOffset;
         }
 
         /// <summary>False when something is right above a crouching player (e.g. under the build table).</summary>

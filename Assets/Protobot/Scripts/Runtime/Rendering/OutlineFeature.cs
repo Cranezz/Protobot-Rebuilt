@@ -8,15 +8,30 @@ using UnityEngine.Rendering.Universal;
 namespace Protobot.Rendering
 {
     /// <summary>
-    /// Draws an outline around whatever is on the outline rendering layer (<see cref="Layer"/>): the part or bin
-    /// under the cursor. The objects are drawn as a white silhouette into a mask, then a full-screen pass
-    /// paints a coloured edge just outside the silhouette. Added to each URP renderer by Tools > Protobot >
-    /// Setup Player; only game cameras draw it.
+    /// Draws an outline around whatever is on the outline rendering layer (<see cref="Layer"/>). The objects are
+    /// drawn as flat silhouettes into a mask, each in its own outline colour (<see cref="SetColor"/>, a
+    /// MaterialPropertyBlock value; objects without one use the feature's colour), then a full-screen pass
+    /// paints that colour just outside the silhouette. Added to each URP renderer; only game cameras draw it.
     /// </summary>
     public class OutlineFeature : ScriptableRendererFeature
     {
         /// <summary>The rendering layer bit that marks objects to outline.</summary>
         public const uint Layer = 1u << 20;
+
+        /// <summary>The per-renderer outline colour (MaterialPropertyBlock), read by the mask shader.</summary>
+        public static readonly int ObjectColorId = Shader.PropertyToID("_OutlineObjectColor");
+
+        /// <summary>Outlines a renderer in <paramref name="color"/>, or stops outlining it.</summary>
+        public static void SetOutline(Renderer renderer, bool on, Color color = default)
+        {
+            if (!on && (renderer.renderingLayerMask & Layer) == 0)
+                return;  // not outlined: leave it without a property block (keeps it SRP-batched)
+            renderer.renderingLayerMask = on ? renderer.renderingLayerMask | Layer : renderer.renderingLayerMask & ~Layer;
+            var block = new MaterialPropertyBlock();
+            renderer.GetPropertyBlock(block);
+            block.SetColor(ObjectColorId, on ? color : Color.clear);
+            renderer.SetPropertyBlock(block);
+        }
 
         [SerializeField] Shader maskShader;
         [SerializeField] Shader compositeShader;
@@ -50,7 +65,7 @@ namespace Protobot.Rendering
                 maskMaterial = CoreUtils.CreateEngineMaterial(maskShader);
             if (compositeMaterial == null)
                 compositeMaterial = CoreUtils.CreateEngineMaterial(compositeShader);
-            compositeMaterial.SetColor(ColorId, color);
+            maskMaterial.SetColor(ObjectColorId, color);
             compositeMaterial.SetFloat(WidthId, width * Mathf.Max(1f, renderingData.cameraData.camera.pixelHeight / 1080f));
             pass.Setup(maskMaterial, compositeMaterial);
             renderer.EnqueuePass(pass);
@@ -62,7 +77,6 @@ namespace Protobot.Rendering
             CoreUtils.Destroy(compositeMaterial);
         }
 
-        static readonly int ColorId = Shader.PropertyToID("_OutlineColor");
         static readonly int WidthId = Shader.PropertyToID("_OutlineWidth");
         static readonly int TexelId = Shader.PropertyToID("_OutlineTexel");
 
@@ -101,7 +115,7 @@ namespace Protobot.Rendering
                 desc.depthBufferBits = 0;
                 desc.depthStencilFormat = GraphicsFormat.None;
                 desc.msaaSamples = 1;
-                desc.graphicsFormat = GraphicsFormat.R8_UNorm;
+                desc.graphicsFormat = GraphicsFormat.R8G8B8A8_UNorm;
                 var maskTexture = UniversalRenderer.CreateRenderGraphTexture(renderGraph, desc, "_OutlineMask", true, FilterMode.Bilinear);
                 composite.SetVector(TexelId, new Vector4(1f / desc.width, 1f / desc.height, 0f, 0f));
 
@@ -116,7 +130,11 @@ namespace Protobot.Rendering
                     data.list = list;
                     builder.UseRendererList(list);
                     builder.SetRenderAttachment(maskTexture, 0, AccessFlags.Write);
-                    builder.SetRenderFunc((MaskData d, RasterGraphContext context) => context.cmd.DrawRendererList(d.list));
+                    builder.SetRenderFunc((MaskData d, RasterGraphContext context) =>
+                    {
+                        context.cmd.ClearRenderTarget(false, true, Color.clear);
+                        context.cmd.DrawRendererList(d.list);
+                    });
                 }
 
                 using (var builder = renderGraph.AddRasterRenderPass<CompositeData>("Outline Composite", out var data))

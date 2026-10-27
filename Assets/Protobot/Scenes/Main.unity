@@ -662,6 +662,53 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1 &46543414
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 46543416}
+  - component: {fileID: 46543415}
+  m_Layer: 0
+  m_Name: BuildManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &46543415
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 46543414}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 64020f8cccc29e34aa6a43ca327f920c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Protobot.Runtime::Protobot.Saving.BuildManager
+  catalog: {fileID: 11400000, guid: 802b0ad1fcb6ce8408a6066d30d657b9, type: 2}
+  partsParent: {fileID: 1813186186}
+  hud: {fileID: 362423551}
+--- !u!4 &46543416
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 46543414}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &49992821
 GameObject:
   m_ObjectHideFlags: 0
@@ -3182,7 +3229,7 @@ MonoBehaviour:
   icon: {fileID: 21300000, guid: 8b9eca88854e54f42bbfa52459c2f6ea, type: 3}
   viewModelPrefab: {fileID: 0}
   head: {fileID: 1355143614}
-  minHoldDistance: 0.25
+  minHoldDistance: 0.08
   maxHoldDistance: 1.6
   scrollStep: 0.04
   followStrength: 0.5
@@ -3190,6 +3237,9 @@ MonoBehaviour:
   maxTurnSpeed: 15
   breakDistance: 0.8
   freeTurnSpeed: 0.35
+  snapReach: 2.2
+  snapRadius: 0.012
+  holeGrabRadius: 0.03
 --- !u!114 &483406396
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10662,6 +10712,7 @@ MonoBehaviour:
   motor: {fileID: 2074316040}
   viewCamera: {fileID: 330585545}
   actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  hud: {fileID: 362423551}
 --- !u!114 &2074316040
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10675,6 +10726,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Protobot.Runtime::Protobot.Player.PlayerMotor
   head: {fileID: 1355143614}
+  flySpeed: 0.3
+  flyFastSpeed: 1.1
+  flyAcceleration: 3
+  maxHeadReach: 3
+  headRadius: 0.012
   walkSpeed: 1.8
   sprintSpeed: 3.4
   crouchSpeed: 0.9
@@ -11165,3 +11221,4 @@ SceneRoots:
   - {fileID: 966199879}
   - {fileID: 2111141084}
   - {fileID: 1694274010}
+  - {fileID: 46543416}

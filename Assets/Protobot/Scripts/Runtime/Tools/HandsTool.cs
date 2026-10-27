@@ -1,9 +1,11 @@
+using System.Collections;
 using System.Collections.Generic;
 using Protobot.Audio;
 using Protobot.Building;
 using Protobot.Core;
 using Protobot.Interaction;
 using Protobot.Parts;
+using Protobot.Saving;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -11,24 +13,27 @@ namespace Protobot.Tools
 {
     /// <summary>
     /// Empty hands. Click a part to pick it up, click again to drop it. A held part is pulled towards a point
-    /// in front of the camera with physics, so it still bumps into things; let go and it falls (or flies, if you
-    /// swung it). While holding: the mouse wheel moves it closer or further, holding the wheel down turns it
-    /// freely with the mouse, right click gives it a quarter turn, and F freezes it in mid air (F on a frozen
-    /// part, or picking it up, unfreezes it). R opens rotate mode for the held part or the one you aim at.
+    /// in front of the camera (never past the surface you look at); it passes through everything, so it can't
+    /// knock other parts about, and when dropped inside something it's lifted out. While holding: the mouse
+    /// wheel moves it closer or further, holding the wheel
+    /// down turns it freely with the mouse, right click gives it a quarter turn, and F freezes it in mid air
+    /// (F on a frozen part, or picking it up, unfreezes it). R turns the held part or the one you aim at.
     ///
-    /// Building: the hole nearest where you grabbed a part is the one it attaches by (Q/E pick another). Aim at
-    /// a hole on another part and the held part snaps there, faces flush and the two hole grids lined up; the
-    /// wheel turns it about the hole, right click flips it over, click places it. A placed part is tacked on
-    /// (it stays, but pulls off when you grab it) until a screw and nut fasten it. Hold a screw over a hole to
-    /// seat it and click to put it in; hold a nut over a screw to thread it on. Fastened parts are one piece:
-    /// grabbing any of them picks up the lot (Shift + click always picks up the whole assembly).
+    /// Building is done by holes. Aim at a hole and it's outlined; click and the part is held by that hole
+    /// (Q/E hold it by the next one). H switches hole grab on, so parts can only be picked up by a hole and
+    /// the nearest hole is always the one taken. Bring the held hole to a hole on another part and the part
+    /// snaps there, faces flush and the hole grids lined up; the wheel turns it about the hole, right click
+    /// flips it over, click places it. A placed part is tacked on: it stays, R turns it on its hole, and
+    /// grabbing it pulls it off. A screw put through it and a nut (or a threaded hole) fasten it for good:
+    /// fastened parts are one piece and grabbing any of them picks up the lot. Hold right click on a nut to
+    /// unscrew it.
     /// </summary>
     public class HandsTool : PlayerTool
     {
         [SerializeField] Transform head;
 
         [Header("Holding")]
-        [SerializeField] float minHoldDistance = 0.25f;
+        [SerializeField] float minHoldDistance = 0.08f;
         [SerializeField] float maxHoldDistance = 1.6f;
         [SerializeField] float scrollStep = 0.04f;
         [Tooltip("How quickly the part follows the cursor (higher = snappier).")]
@@ -44,7 +49,10 @@ namespace Protobot.Tools
         [SerializeField] float snapReach = 2.2f;
         [Tooltip("How close to a hole the aim has to be for a part to snap to it (m).")]
         [SerializeField] float snapRadius = 0.012f;
+        [Tooltip("With hole grab on, the nearest hole within this distance of the aim is the one taken (m).")]
+        [SerializeField] float holeGrabRadius = 0.03f;
 
+        const string HoleModeKey = "Protobot.HoleGrab";
         static readonly Color TargetColor = new(1f, 0.82f, 0.2f);
         static readonly Color AnchorColor = new(0.3f, 0.85f, 1f);
 
@@ -53,6 +61,7 @@ namespace Protobot.Tools
         Rigidbody held;
         HoverTarget heldTarget;
         Vector3 localGrabPoint;
+        bool heldByHole;
         Quaternion rotationFromView;
         float holdDistance;
         bool heldUsedGravity;
@@ -60,6 +69,7 @@ namespace Protobot.Tools
         float heldAngularDrag;
         bool freeTurning;
         PartRotator rotator;
+        List<(GameObject go, int layer)> heldLayers;
 
         // Building
         PartBody heldPart;
@@ -71,6 +81,7 @@ namespace Protobot.Tools
         SnapKind snapKind;
         PartBody snapPart;
         ScrewJoint snapScrew;
+        HoleAt snapHole;
         Vector3 snapPosition;
         Quaternion snapRotation;
         bool snapFlip;
@@ -81,13 +92,20 @@ namespace Protobot.Tools
         public bool IsHolding => held != null;
         bool Snapped => snapKind != SnapKind.None;
 
+        /// <summary>Hole grab: parts are only picked up by a hole (H turns it on and off; remembered).</summary>
+        public static bool HoleMode
+        {
+            get => PlayerPrefs.GetInt(HoleModeKey, 0) == 1;
+            set => PlayerPrefs.SetInt(HoleModeKey, value ? 1 : 0);
+        }
+
         public override string ControlsHint => !IsHolding
-            ? "Left click: pick up (Shift: whole assembly)   ·   R: rotate a part   ·   F: unfreeze a frozen part"
+            ? $"Left click: pick up (Shift: whole assembly)   ·   R: turn   ·   Hold right click: take apart   ·   H: hole grab {(HoleMode ? "ON" : "off")}   ·   B: build view"
             : snapKind == SnapKind.Part
                 ? "Left click: place   ·   Wheel: turn 45° (Shift: 15°)   ·   Right click: flip   ·   Q/E: other hole   ·   F: freeze"
                 : snapKind == SnapKind.Screw ? "Left click: put the screw in"
                 : snapKind == SnapKind.Nut ? "Left click: thread the nut on"
-                : "Left click: drop   ·   Wheel: closer / further   ·   Hold wheel: turn   ·   Q/E: hole to attach by   ·   R: rotate mode   ·   F: freeze   ·   Right click: 90°";
+                : "Left click: drop   ·   Wheel: closer / further   ·   Hold wheel: turn   ·   Q/E: hold by another hole   ·   R: turn   ·   F: freeze   ·   Right click: 90°";
 
         public override void PrimaryDown()
         {
@@ -113,38 +131,89 @@ namespace Protobot.Tools
             if (target.Cursor != CursorKind.Grab)
                 return;
             var part = target.GetComponentInParent<PartBody>();
+            var byHole = FindHoveredHole(out var hole) && hole.part == part;
+            if (HoleMode && part != null && !byHole)
+            {
+                Hud.ShowError(part.TryGetComponent(out PartHoles _)
+                    ? "Hole grab is on: aim at a hole   ·   H picks parts up anywhere"
+                    : "This part has no holes   ·   H turns hole grab off");
+                return;
+            }
+            var whole = part != null && Assembly.Of(part) != null && (Keyboard.current.shiftKey.isPressed || Assembly.IsFastened(part));
+            BuildManager.Record(whole ? "Move assembly" : "Move " + (part != null ? part.name : target.Title));
             if (part != null && Assembly.Of(part) != null && !Keyboard.current.shiftKey.isPressed)
                 TakeOff(part);
             if (target.GetComponentInParent<Rigidbody>() is not { } body)
                 return;
             if (body.isKinematic)
                 Unfreeze(body, false);  // picking up a frozen part unfreezes it
-            Grab(body, target, Cursor.CurrentHit.point, Cursor.CurrentHit.distance);
+            var grabPoint = Cursor.CurrentHit.point;
+            if (byHole)
+                HoleSnap.NearFace(hole, head.position, out grabPoint, out _);
+            Grab(body, target, grabPoint, Vector3.Distance(head.position, grabPoint), byHole);
             Sounds.Play(Sounds.Pickup, 0.45f);
         }
 
         /// <summary>
-        /// Grabbing a part that's in an assembly: a nut unscrews, a screw without a nut comes out, a tacked part
-        /// pulls off. A fastened part stays, and the whole assembly is picked up.
+        /// Clicking a part that's in an assembly: a loose screw comes out, a tacked part pulls off. A fastened
+        /// part (a nut and screw too) stays, and the whole assembly is picked up.
         /// </summary>
         void TakeOff(PartBody part)
         {
-            if (FindNutJoint(part) is { } nutJoint)
-            {
-                nutJoint.RemoveNut();
-                Hud.ShowToast("Nut off: the screw only holds the parts lined up now", 2f);
+            if (Assembly.IsFastened(part))
                 return;
-            }
             if (part.TryGetComponent(out ScrewJoint screw))
             {
-                if (screw.Nut != null)
-                    return;  // take the nut off first; meanwhile it's part of the assembly
                 screw.Remove();
                 Hud.ShowToast("Screw out", 1.2f);
                 return;
             }
             if (Assembly.Detach(part))
                 Hud.ShowToast("Pulled off", 1f);
+        }
+
+        /// <summary>Hold right click on a part in an assembly: unscrew a nut, pull a screw, take a part off.</summary>
+        public override void SecondaryHold()
+        {
+            if (held != null)
+                return;
+            var target = Cursor.Current;
+            var part = target != null && Cursor.CurrentInReach ? target.GetComponentInParent<PartBody>() : null;
+            if (part == null || Assembly.Of(part) == null)
+                return;
+            BuildManager.Record("Take apart");
+            if (FindNutJoint(part) is { } nutJoint)
+            {
+                nutJoint.RemoveNut();
+                Sounds.Play(Sounds.Drill, 0.25f);
+                Hud.ShowToast("Unscrewed the nut: the screw only holds the parts lined up now", 2.5f);
+                return;
+            }
+            if (part.TryGetComponent(out ScrewJoint screw))
+            {
+                // The nut first (the screw's tip is easier to aim at than a small nut), then the screw.
+                if (screw.Nut != null)
+                {
+                    screw.RemoveNut();
+                    Sounds.Play(Sounds.Drill, 0.25f);
+                    Hud.ShowToast("Unscrewed the nut   ·   Hold right click again to pull the screw", 2.5f);
+                    return;
+                }
+                screw.Remove();
+                Sounds.Play(Sounds.Release, 0.4f);
+                Hud.ShowToast("Screw out", 1.2f);
+                return;
+            }
+            if (Assembly.IsFastened(part))
+            {
+                Hud.ShowError("Fastened: hold right click on its screw (or nut) to unscrew it first");
+                return;
+            }
+            if (Assembly.Detach(part))
+            {
+                Sounds.Play(Sounds.Release, 0.4f);
+                Hud.ShowToast("Took it off", 1.2f);
+            }
         }
 
         static ScrewJoint FindNutJoint(PartBody nut)
@@ -180,7 +249,7 @@ namespace Protobot.Tools
                 Sounds.Play(Sounds.Tick, 0.25f);
                 return;
             }
-            holdDistance = Mathf.Clamp(holdDistance + notches * scrollStep, minHoldDistance, maxHoldDistance);
+            holdDistance = Mathf.Clamp(holdDistance + notches * scrollStep * Mathf.Clamp(holdDistance / 0.4f, 0.25f, 1f), minHoldDistance, maxHoldDistance);
         }
 
         public override void SecondaryTap()
@@ -212,12 +281,20 @@ namespace Protobot.Tools
                 rotationFromView = Quaternion.AngleAxis(-delta.x, Vector3.up) * Quaternion.AngleAxis(delta.y, Vector3.right) * rotationFromView;
             }
 
-            if (held != null && anchors.Count > 1 && (keyboard.qKey.wasPressedThisFrame || keyboard.eKey.wasPressedThisFrame))
+            if (held != null && anchors.Count > 0 && (keyboard.qKey.wasPressedThisFrame || keyboard.eKey.wasPressedThisFrame))
             {
-                anchorIndex = (anchorIndex + (keyboard.eKey.wasPressedThisFrame ? 1 : anchors.Count - 1)) % anchors.Count;
+                if (heldByHole || anchorIndex < 0)
+                    anchorIndex = (anchorIndex + (keyboard.eKey.wasPressedThisFrame ? 1 : anchors.Count - 1)) % anchors.Count;
+                HoldByAnchor();
                 Sounds.Play(Sounds.Tick, 0.3f);
             }
 
+            if (keyboard.hKey.wasPressedThisFrame)
+            {
+                HoleMode = !HoleMode;
+                Sounds.Play(Sounds.Tick, 0.4f);
+                Hud.ShowToast(HoleMode ? "Hole grab ON: parts are picked up by the hole you aim at   ·   H turns it off" : "Hole grab off: parts are picked up anywhere", 2.5f);
+            }
             if (keyboard.fKey.wasPressedThisFrame)
                 ToggleFreeze();
             if (keyboard.rKey.wasPressedThisFrame)
@@ -236,28 +313,45 @@ namespace Protobot.Tools
             var part = target.GetComponentInParent<PartBody>();
             if (part == null)
                 return false;
+            string action = null;
             if (Assembly.Of(part) != null)
             {
-                view.hint = (string.IsNullOrEmpty(view.hint) ? "" : view.hint + "   ·   ")
-                    + (part.TryGetComponent(out ScrewJoint screw) ? screw.Nut != null ? "Screw (take the nut off first)" : "Click: take the screw out"
-                        : FindNutJoint(part) != null ? "Click: unscrew the nut"
-                        : Assembly.IsFastened(part) ? "Fastened: click picks up the whole assembly" : "Tacked on: click pulls it off");
-                return true;
+                action = part.TryGetComponent(out ScrewJoint screw)
+                    ? screw.Nut != null ? "Fastened   ·   Click: pick up the assembly   ·   Hold right click: unscrew its nut" : "Loose screw   ·   Click: pull it out"
+                    : FindNutJoint(part) != null ? "Fastened   ·   Click: pick up the assembly   ·   Hold right click: unscrew"
+                    : Assembly.IsFastened(part) ? "Fastened   ·   Click: pick up the whole assembly   ·   Hold right click on a screw: unscrew"
+                    : "Tacked on   ·   Click: pull it off   ·   R: turn it on its hole";
             }
-            if (target.GetComponentInParent<Rigidbody>() is not { isKinematic: true })
+            else if (target.GetComponentInParent<Rigidbody>() is { isKinematic: true })
+            {
+                action = "Frozen in place (F unfreezes)";
+            }
+            if (FindHoveredHole(out var hole) && hole.part == part)
+                action = "Click: pick it up by this hole" + (action != null ? "   ·   " + action : "");
+            else if (HoleMode && part.TryGetComponent(out PartHoles _))
+                action = "Hole grab: aim at a hole to pick it up";
+            if (action == null)
                 return false;
-            view.hint = (string.IsNullOrEmpty(view.hint) ? "" : view.hint + "   ·   ") + "Frozen in place (F unfreezes)";
+            view.hint = (string.IsNullOrEmpty(view.hint) ? "" : view.hint + "   ·   ") + action;
             return true;
         }
 
         // ---------------------------------------------------------------- building
 
+        /// <summary>The hole under the aim (any distance for a hole grab, close for a normal one).</summary>
+        bool FindHoveredHole(out HoleAt hole)
+        {
+            hole = default;
+            var target = Cursor.Current;
+            if (target == null || !Cursor.CurrentInReach || target.GetComponentInParent<PartHoles>() is not { } holes)
+                return false;
+            return holes.TryNearest(Cursor.CurrentHit.point, HoleMode ? holeGrabRadius : snapRadius * 0.7f, out hole);
+        }
+
         /// <summary>Not holding anything: outline the hole under the aim, so holes read as things you can use.</summary>
         void ShowHoveredHole()
         {
-            var target = Cursor.Current;
-            if (target != null && Cursor.CurrentInReach && target.GetComponentInParent<PartHoles>() is { } holes
-                && holes.TryNearest(Cursor.CurrentHit.point, snapRadius * 0.7f, out var hole))
+            if (FindHoveredHole(out var hole))
             {
                 HoleSnap.NearFace(hole, head.position, out var face, out var outward);
                 Marker(ref targetMarker, "Hole Marker", TargetColor).Show(hole, face, outward);
@@ -321,7 +415,11 @@ namespace Protobot.Tools
                 EndSnap();
                 targetMarker?.Hide();
                 ShowAnchor();
-                Cursor.HoldingHint = snapProblem;
+                Cursor.HoldingHint = snapProblem
+                    ?? (PartRoles.IsScrew(heldRole) ? "Aim at a hole to put the screw in   ·   Click: drop"
+                        : heldRole == PartRole.Nut ? "Aim at a screw to thread the nut on   ·   Click: drop"
+                        : anchorIndex >= 0 ? "Aim at a hole on another part: the blue hole goes there   ·   Click: drop"
+                        : null);
                 return;
             }
             if (!Snapped)
@@ -329,6 +427,7 @@ namespace Protobot.Tools
             BeginSnap();
             snapKind = kind;
             snapScrew = screw;
+            snapHole = targetHole;
             snapPosition = position;
             snapRotation = rotation;
             if (kind == SnapKind.Nut)
@@ -399,6 +498,16 @@ namespace Protobot.Tools
             return best;
         }
 
+        HoleAt AnchorInWorld()
+        {
+            var anchor = anchors[anchorIndex];
+            return new HoleAt
+            {
+                part = heldPart, local = anchor,
+                center = held.transform.TransformPoint(anchor.center), axis = held.transform.TransformDirection(anchor.axis).normalized,
+            };
+        }
+
         void ShowAnchor()
         {
             if (anchorIndex < 0 || held == null || heldRole == PartRole.Nut || PartRoles.IsScrew(heldRole))
@@ -406,14 +515,19 @@ namespace Protobot.Tools
                 anchorMarker?.Hide();
                 return;
             }
-            var anchor = anchors[anchorIndex];
-            var hole = new HoleAt
-            {
-                part = heldPart, local = anchor,
-                center = held.transform.TransformPoint(anchor.center), axis = held.transform.TransformDirection(anchor.axis).normalized,
-            };
+            var hole = AnchorInWorld();
             HoleSnap.NearFace(hole, head.position, out var face, out var outward);
             Marker(ref anchorMarker, "Anchor Marker", AnchorColor).Show(hole, face, outward);
+        }
+
+        /// <summary>Holds the part by its current anchor hole (the face towards you comes to the hand).</summary>
+        void HoldByAnchor()
+        {
+            if (anchorIndex < 0 || held == null)
+                return;
+            HoleSnap.NearFace(AnchorInWorld(), head.position, out var face, out _);
+            localGrabPoint = held.transform.InverseTransformPoint(face);
+            heldByHole = true;
         }
 
         /// <summary>Snapped: the held thing goes exactly where it'll be placed, and passes through what it touches.</summary>
@@ -457,7 +571,8 @@ namespace Protobot.Tools
             var body = held;
             var position = snapPosition;
             var rotation = snapRotation;
-            Release();
+            var hole = snapHole;
+            Release(false);
             body.position = position;
             body.rotation = rotation;
             body.transform.SetPositionAndRotation(position, rotation);
@@ -468,9 +583,10 @@ namespace Protobot.Tools
             switch (kind)
             {
                 case SnapKind.Part:
-                    Assembly.Join(part, target, LinkKind.Tack);
+                    HoleSnap.NearFace(hole, head.position, out var face, out var outward);
+                    Assembly.Join(part, target, LinkKind.Tack, face, outward);
                     Sounds.Play(Sounds.Clack, 0.45f);
-                    Hud.ShowToast("Tacked on: it stays put until you screw it (grab it to pull it off)", 2.5f);
+                    Hud.ShowToast("Tacked on: screw it to fasten it   ·   R turns it on its hole   ·   Ctrl+Z undoes", 2.5f);
                     break;
                 case SnapKind.Screw:
                     var joint = ScrewJoint.Insert(part);
@@ -482,17 +598,46 @@ namespace Protobot.Tools
                     else
                     {
                         Hud.ShowToast(joint.Fastened
-                            ? $"Screwed into a threaded hole: {joint.StackParts.Count} parts fastened"
-                            : $"Screw through {joint.StackParts.Count} {(joint.StackParts.Count == 1 ? "part" : "parts")}: thread a nut on the end to fasten", 2.5f);
+                            ? $"Screwed into a threaded hole: {joint.StackParts.Count + 1} parts fastened"
+                            : $"Screw through {Names(joint.StackParts)}: thread a nut on the end to fasten", 3f);
                     }
                     Sounds.Play(Sounds.Drill, 0.25f);
                     break;
                 case SnapKind.Nut:
                     screw.AddNut(part);
                     Sounds.Play(Sounds.Drill, 0.3f);
-                    Hud.ShowSuccess($"Fastened: {screw.StackParts.Count + 2} parts are one piece now");
+                    Hud.ShowSuccess($"Fastened: {Names(screw.StackParts)} held for good");
                     break;
             }
+            if (Assembly.Of(part) is { } assembly)
+                StartCoroutine(Flash(assembly.Parts()));
+        }
+
+        static string Names(IReadOnlyList<PartBody> parts)
+        {
+            if (parts.Count == 0)
+                return "nothing";
+            if (parts.Count == 1)
+                return parts[0].name;
+            if (parts.Count == 2)
+                return $"{parts[0].name} and {parts[1].name}";
+            return $"{parts.Count} parts";
+        }
+
+        /// <summary>Outlines everything that's now one piece for a moment, so you can see what got joined.</summary>
+        IEnumerator Flash(List<PartBody> parts)
+        {
+            var targets = new List<HoverTarget>();
+            foreach (var part in parts)
+                if (part != null && part.TryGetComponent(out HoverTarget hover))
+                {
+                    hover.SetHighlighted(true);
+                    targets.Add(hover);
+                }
+            yield return new WaitForSeconds(0.6f);
+            foreach (var hover in targets)
+                if (hover != null && hover != Cursor.Current)
+                    hover.SetHighlighted(false);
         }
 
         HoleMarker Marker(ref HoleMarker marker, string name, Color color) => marker ??= new HoleMarker(name, color);
@@ -553,7 +698,7 @@ namespace Protobot.Tools
             if (held != null)
             {
                 var body = held;
-                Release();
+                Release(false);
                 body.linearVelocity = Vector3.zero;
                 body.angularVelocity = Vector3.zero;
                 body.isKinematic = true;
@@ -565,6 +710,7 @@ namespace Protobot.Tools
             if (target != null && Cursor.CurrentInReach && target.GetComponentInParent<PartBody>() != null
                 && target.GetComponentInParent<Rigidbody>() is { isKinematic: true } frozen)
             {
+                BuildManager.Record("Unfreeze " + target.Title);
                 Unfreeze(frozen, true);
                 return;
             }
@@ -585,40 +731,85 @@ namespace Protobot.Tools
 
         void StartRotateMode()
         {
-            var wasHeld = held != null;
-            Rigidbody body = held;
-            HoverTarget target = heldTarget;
-            if (body == null)
-            {
-                target = Cursor.Current;
-                if (target != null && Cursor.CurrentInReach && target.GetComponentInParent<PartBody>() != null)
-                    body = target.GetComponentInParent<Rigidbody>();
-            }
-            if (body == null)
-            {
-                Hud.ShowError("Hold a part or aim at one, then press R to rotate it");
-                return;
-            }
-            var distance = holdDistance;
-            var localGrab = localGrabPoint;
-            Release();
             if (rotator == null && !TryGetComponent(out rotator))
                 rotator = gameObject.AddComponent<PartRotator>();
-            rotator.Begin(body, View, Hud, part =>
+
+            if (held != null)
             {
-                // Back into the hand if it was being carried.
-                if (wasHeld && part != null && isActiveAndEnabled && Belt.Current == this)
-                    Grab(part, target, part.transform.TransformPoint(localGrab), distance);
-            });
+                // About where it's held: the hole it hangs from, if it's held by one.
+                var body = held;
+                var target = heldTarget;
+                var distance = holdDistance;
+                var localGrab = localGrabPoint;
+                var byHole = heldByHole;
+                var request = new PartRotator.Request
+                {
+                    body = body, pivotSpace = body.transform, pivot = localGrab,
+                    about = byHole ? "about the hole you hold it by" : "about where you hold it",
+                };
+                if (byHole && anchorIndex >= 0)
+                {
+                    request.axis = anchors[anchorIndex].axis;
+                    request.hasAxis = true;
+                }
+                Release(false);
+                rotator.Begin(request, View, Hud, () =>
+                {
+                    // Back into the hand.
+                    if (body != null && isActiveAndEnabled && Belt.Current == this)
+                        Grab(body, target, body.transform.TransformPoint(localGrab), distance, byHole);
+                });
+                return;
+            }
+
+            var aimed = Cursor.Current;
+            var part = aimed != null && Cursor.CurrentInReach ? aimed.GetComponentInParent<PartBody>() : null;
+            if (part == null)
+            {
+                Hud.ShowError("Hold a part or aim at one, then press R to turn it");
+                return;
+            }
+            var assembly = Assembly.Of(part);
+            var onHole = FindHoveredHole(out var hole) && hole.part == part;
+            if (assembly != null && !Keyboard.current.shiftKey.isPressed && assembly.TryHinge(part, out var hinge, out var turning))
+            {
+                BuildManager.Record("Turn " + part.name);
+                rotator.Begin(new PartRotator.Request
+                {
+                    assembly = assembly, parts = turning, pivotSpace = part.transform,
+                    pivot = part == hinge.a ? hinge.pointA : hinge.pointB, axis = part == hinge.a ? hinge.axisA : hinge.axisB,
+                    hasAxis = true, hingeOnly = true, about = "on the hole it's placed on",
+                }, View, Hud, null);
+                return;
+            }
+            var whole = assembly != null ? assembly.Body : part.Body;
+            if (whole == null)
+                return;
+            BuildManager.Record(assembly != null ? "Turn assembly" : "Turn " + part.name);
+            var free = new PartRotator.Request { body = whole };
+            if (onHole)
+            {
+                free.pivotSpace = part.transform;
+                free.pivot = hole.local.center;
+                free.axis = hole.local.axis;
+                free.hasAxis = true;
+                free.about = assembly != null ? "the whole assembly, about the hole you aimed at" : "about the hole you aimed at";
+            }
+            else if (assembly != null)
+            {
+                free.about = Assembly.IsFastened(part) ? "the whole assembly (it's fastened)" : "the whole assembly";
+            }
+            rotator.Begin(free, View, Hud, null);
         }
 
         // ---------------------------------------------------------------- carrying
 
-        void Grab(Rigidbody body, HoverTarget target, Vector3 grabPoint, float distance)
+        void Grab(Rigidbody body, HoverTarget target, Vector3 grabPoint, float distance, bool byHole)
         {
             held = body;
             heldTarget = target;
             localGrabPoint = body.transform.InverseTransformPoint(grabPoint);
+            heldByHole = byHole;
             holdDistance = Mathf.Clamp(distance, minHoldDistance, maxHoldDistance);
             rotationFromView = Quaternion.Inverse(ViewYaw()) * body.rotation;
 
@@ -630,11 +821,17 @@ namespace Protobot.Tools
             body.angularDamping = 6f;
             body.interpolation = RigidbodyInterpolation.Interpolate;
             body.WakeUp();
+            // In the hand it passes through other parts (it would knock them flying), but not the bench.
+            heldLayers = PartLayers.Move(body.gameObject, PartLayers.Held);
             Cursor.Holding = target;
             PrepareAnchors(body, grabPoint);
         }
 
-        public void Release()
+        /// <summary>Lets go of whatever is held (it drops where it is).</summary>
+        public void Release() => Release(true);
+
+        /// <param name="unstick">Lift it out of anything it's inside (not when it's being put exactly somewhere).</param>
+        void Release(bool unstick)
         {
             if (freeTurning)
             {
@@ -645,6 +842,11 @@ namespace Protobot.Tools
             HideMarkers();
             if (Cursor != null)
                 Cursor.HoldingHint = null;
+            if (heldLayers != null)
+            {
+                PartLayers.Restore(heldLayers);
+                heldLayers = null;
+            }
             if (held == null)
                 return;
             if (held)
@@ -654,10 +856,13 @@ namespace Protobot.Tools
                 held.angularDamping = heldAngularDrag;
                 // Don't let a fast swing launch parts across the room.
                 held.linearVelocity = Vector3.ClampMagnitude(held.linearVelocity, 2.5f);
+                if (unstick && !held.isKinematic)
+                    PartLayers.Unstick(held);
             }
             held = null;
             heldTarget = null;
             heldPart = null;
+            heldByHole = false;
             anchors.Clear();
             anchorIndex = -1;
             Cursor.Holding = null;
@@ -679,8 +884,9 @@ namespace Protobot.Tools
                 return;
             }
 
-            // Move the grabbed point towards the spot in front of the camera.
-            var target = head.position + head.forward * holdDistance;
+            // Move the grabbed point towards the spot in front of the camera, but not into what's behind it: a
+            // held part passes through things, so it would disappear into the bench.
+            var target = head.position + head.forward * HoldDistanceNow();
             var grabPoint = held.transform.TransformPoint(localGrabPoint);
             var offset = target - grabPoint;
             if (offset.magnitude > breakDistance)
@@ -689,9 +895,6 @@ namespace Protobot.Tools
                 Hud.ShowError("Dropped it: something was in the way");
                 return;
             }
-            var velocity = offset / Time.fixedDeltaTime * followStrength;
-            held.linearVelocity = Vector3.ClampMagnitude(velocity, maxCarrySpeed);
-
             // Keep the part's orientation relative to where the player faces (it turns with you).
             var wanted = ViewYaw() * rotationFromView;
             var delta = wanted * Quaternion.Inverse(held.rotation);
@@ -702,6 +905,23 @@ namespace Protobot.Tools
                 held.angularVelocity = Vector3.ClampMagnitude(axis * (angle * Mathf.Deg2Rad / Time.fixedDeltaTime * followStrength), maxTurnSpeed);
             else
                 held.angularVelocity = Vector3.zero;
+
+            // Physics turns a body about its centre of mass; take that swing out so it turns about the point
+            // it's held by (the hole, when held by one).
+            var velocity = offset / Time.fixedDeltaTime * followStrength
+                - Vector3.Cross(held.angularVelocity, grabPoint - held.worldCenterOfMass);
+            held.linearVelocity = Vector3.ClampMagnitude(velocity, maxCarrySpeed);
+        }
+
+        /// <summary>How far ahead the held point goes: the wheel's distance, or just short of a surface in the way.</summary>
+        float HoldDistanceNow()
+        {
+            var hits = Physics.RaycastAll(head.position, head.forward, holdDistance + 0.01f, PartLayers.Solid, QueryTriggerInteraction.Ignore);
+            var distance = holdDistance;
+            foreach (var hit in hits)
+                if (hit.rigidbody != held || held == null)
+                    distance = Mathf.Min(distance, hit.distance - 0.006f);
+            return Mathf.Max(distance, 0.03f);
         }
 
         Quaternion ViewYaw() => Quaternion.Euler(0f, head.eulerAngles.y, 0f);

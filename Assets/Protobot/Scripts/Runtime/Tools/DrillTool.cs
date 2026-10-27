@@ -347,29 +347,73 @@ namespace Protobot.Tools
 
             if (part != null && renderer != null)
             {
-                var volumeBefore = PartShape.Volume(part.gameObject);
-                var filter = renderer.GetComponent<MeshFilter>();
-                var result = HoleDrilling.Drill(filter.sharedMesh, target, radius, targetWalls);
-                if (result == null)
-                {
-                    Hud.ShowError("Nothing to drill here");
-                }
-                else
-                {
-                    filter.sharedMesh = result;
-                    PartShape.DropLods(part.gameObject);
-                    var partSpaceCenter = part.transform.InverseTransformPoint(renderer.transform.TransformPoint(target.center));
-                    var partSpaceNormal = part.transform.InverseTransformDirection(renderer.transform.TransformDirection(target.normal));
-                    PartModifications.On(part.gameObject).holes.Add(new PartModifications.DrilledHole
-                    {
-                        center = partSpaceCenter, normal = partSpaceNormal, diameter = radius * 2f, depth = target.thickness,
-                    });
-                    PartShape.AfterEdit(part.gameObject, volumeBefore);
+                Saving.BuildManager.Record("Drill " + part.name);
+                if (Apply(part, renderer, target, radius, targetWalls))
                     Hud.ShowToast($"Drilled a {Bits[bitIndex].name} hole");
-                }
+                else
+                    Hud.ShowError("Nothing to drill here");
             }
             ClearAim();
             drilling = false;
+        }
+
+        /// <summary>Drills the hole into the mesh and records it (part space) so it can be made again.</summary>
+        static bool Apply(PartBody part, MeshRenderer renderer, HoleInfo target, float radius, bool[] targetWalls)
+        {
+            var volumeBefore = PartShape.Volume(part.gameObject);
+            var filter = renderer.GetComponent<MeshFilter>();
+            var result = HoleDrilling.Drill(filter.sharedMesh, target, radius, targetWalls);
+            if (result == null)
+                return false;
+            filter.sharedMesh = result;
+            PartShape.DropLods(part.gameObject);
+            var partSpaceCenter = part.transform.InverseTransformPoint(renderer.transform.TransformPoint(target.center));
+            var partSpaceNormal = part.transform.InverseTransformDirection(renderer.transform.TransformDirection(target.normal));
+            PartModifications.On(part.gameObject).AddHole(partSpaceCenter, partSpaceNormal, radius * 2f, target.thickness);
+            PartShape.AfterEdit(part.gameObject, volumeBefore);
+            return true;
+        }
+
+        /// <summary>
+        /// Drills a recorded hole again (loading a save, undo): finds the hole at the recorded spot (part space)
+        /// the same way aiming the drill there would, and drills it with the recorded bit.
+        /// </summary>
+        public static bool Replay(PartBody part, Vector3 center, Vector3 normal, float diameter)
+        {
+            MeshRenderer best = null;
+            var bestDistance = float.MaxValue;
+            foreach (var r in PartShape.DetailRenderers(part.gameObject))
+            {
+                var mesh = r.GetComponent<MeshFilter>().sharedMesh;
+                if (!mesh.isReadable)
+                    continue;
+                var distance = mesh.bounds.SqrDistance(r.transform.InverseTransformPoint(part.transform.TransformPoint(center)));
+                if (distance < bestDistance)
+                {
+                    bestDistance = distance;
+                    best = r;
+                }
+            }
+            if (best == null)
+                return false;
+            var local = best.transform.InverseTransformPoint(part.transform.TransformPoint(center));
+            var localNormal = best.transform.InverseTransformDirection(part.transform.TransformDirection(normal)).normalized;
+            var region = new HoleDrilling.Region(best.GetComponent<MeshFilter>().sharedMesh, local, 0.03f);
+            if (!TryDrilledHole(part, best, local, out var hole))
+                hole = HoleDrilling.Find(region, local, localNormal);
+            if (!hole.found)
+                return false;
+            var radius = diameter / 2f;
+            if (!Apply(part, best, hole, radius, HoleDrilling.WallSegments(region, hole, radius)))
+                return false;
+            // Keep the record exactly as it was (finding the hole again can land a hair away from it), so
+            // undoing and redoing many times never drifts.
+            var mods = part.GetComponent<PartModifications>();
+            var made = mods.holes[^1];
+            made.center = center;
+            made.normal = normal;
+            mods.holes[^1] = made;
+            return true;
         }
 
         void ShowBitOnDrill()

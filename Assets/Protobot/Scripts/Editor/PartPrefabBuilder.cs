@@ -17,7 +17,7 @@ namespace Protobot.Editor
     /// </summary>
     public static class PartPrefabBuilder
     {
-        public const int PartsLayer = 8;
+        public const int PartsLayer = Protobot.Parts.PartLayers.Parts;
         const string PrefabFolder = "Assets/Protobot/Parts/Prefabs/";
         const string PhysicsFolder = "Assets/Protobot/Parts/Physics/";
         public const string ThumbnailFolder = "Assets/Protobot/Parts/Thumbnails/";

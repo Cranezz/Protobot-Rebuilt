@@ -60,3 +60,7 @@ desktop.ini
 # Python bytecode from the Blender/texture scripts
 __pycache__/
 *.pyc
+
+# Builds saved while running in the editor (the original Protobot saves to Application.dataPath/Builds)
+/[Aa]ssets/Builds/
+/[Aa]ssets/Builds.meta

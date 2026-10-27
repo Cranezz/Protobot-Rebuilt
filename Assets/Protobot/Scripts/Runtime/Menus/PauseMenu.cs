@@ -12,7 +12,8 @@ using ShadowQuality = Protobot.GraphicsQuality.ShadowQuality;
 namespace Protobot.Menus
 {
     /// <summary>
-    /// Esc menu: Resume, Settings, Quit. Pauses the game (physics stops) while open.
+    /// Esc menu: Resume, Builds, Settings, Quit. Pauses the game (physics stops) while open.
+    /// Builds saves the workshop under a name, and lists saved builds to load or delete (and the autosave).
     /// Settings has a Graphics tab (preset and each individual option, applied instantly and saved)
     /// and a Controls tab (mouse sensitivity, invert Y, field of view).
     /// </summary>
@@ -23,6 +24,13 @@ namespace Protobot.Menus
         GameObject root;
         GameObject mainPage;
         GameObject settingsPage;
+        GameObject buildsPage;
+        TMP_InputField nameField;
+        TextMeshProUGUI saveLabel;
+        TextMeshProUGUI currentLabel;
+        RectTransform buildList;
+        TextMeshProUGUI newBuildLabel;
+        string confirming;   // what the next click confirms: a file to delete or replace, or "new"
         GameObject graphicsTab;
         GameObject controlsTab;
         Button graphicsTabButton;
@@ -56,7 +64,7 @@ namespace Protobot.Menus
 
             if (IsOpen)
             {
-                if (settingsPage.activeSelf)
+                if (settingsPage.activeSelf || buildsPage.activeSelf)
                     ShowMain();
                 else
                     Close();
@@ -87,6 +95,7 @@ namespace Protobot.Menus
         {
             mainPage.SetActive(true);
             settingsPage.SetActive(false);
+            buildsPage.SetActive(false);
         }
 
         void ShowSettings()
@@ -95,6 +104,16 @@ namespace Protobot.Menus
             settingsPage.SetActive(true);
             ShowTab(true);
             RefreshAll();
+        }
+
+        public void ShowBuilds()
+        {
+            if (!IsOpen)
+                Open();
+            mainPage.SetActive(false);
+            buildsPage.SetActive(true);
+            nameField.text = Saving.BuildManager.CurrentName ?? "";
+            RefreshBuilds();
         }
 
         void ShowTab(bool graphics)
@@ -132,14 +151,17 @@ namespace Protobot.Menus
 
             // Main page: title + three buttons.
             var main = UiFactory.Panel(dim.transform, "Main", theme, theme.panel, true).rectTransform;
-            main.Place(new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(520f, 470f));
+            main.Place(new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(520f, 560f));
             mainPage = main.gameObject;
             Header(main, "PAUSED");
             var buttons = UiFactory.Rect("Buttons", main).Fill(48f, 40f, 48f, 120f);
             UiFactory.VerticalList(buttons, 16f);
             AddListButton(buttons, "RESUME", Close, true);
+            AddListButton(buttons, "SAVE / LOAD", ShowBuilds, false);
             AddListButton(buttons, "SETTINGS", ShowSettings, false);
             AddListButton(buttons, "QUIT TO DESKTOP", Quit, false);
+
+            BuildBuildsPage(dim.transform);
 
             // Settings page: tabs + rows.
             var settings = UiFactory.Panel(dim.transform, "Settings", theme, theme.panel, true).rectTransform;
@@ -182,6 +204,165 @@ namespace Protobot.Menus
         {
             var button = UiFactory.Button(parent, label, theme, label, action, accent, 30f);
             button.gameObject.AddComponent<LayoutElement>().preferredHeight = 74f;
+        }
+
+        // ---------------------------------------------------------------- builds (save / load)
+
+        void BuildBuildsPage(Transform dim)
+        {
+            var page = UiFactory.Panel(dim, "Builds", theme, theme.panel, true).rectTransform;
+            page.Place(new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(900f, 860f));
+            buildsPage = page.gameObject;
+            Header(page, "SAVE / LOAD");
+
+            // Save: a name and a button.
+            nameField = UiFactory.InputField(page, "Name", theme, "Name this build (e.g. Push Back drivetrain)", 26f);
+            nameField.characterLimit = 60;
+            ((RectTransform)nameField.transform).Place(new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(40f, -110f), new Vector2(600f, 60f));
+            nameField.onValueChanged.AddListener(_ => ResetConfirm());
+            nameField.onSubmit.AddListener(_ => SaveClicked());
+            var save = UiFactory.Button(page, "Save", theme, "SAVE", SaveClicked, true, 28f);
+            ((RectTransform)save.transform).Place(new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(-40f, -110f), new Vector2(200f, 60f));
+            saveLabel = save.GetComponentInChildren<TextMeshProUGUI>();
+            currentLabel = UiFactory.Text(page, "Current", theme, "", 20f, theme.textDim);
+            currentLabel.rectTransform.Place(new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(44f, -176f), new Vector2(800f, 28f));
+
+            // Saved builds, newest first, in a scrolling list.
+            var listBack = UiFactory.Image(page, "List", theme.panelInset, theme.rounded).rectTransform;
+            listBack.Fill(40f, 110f, 40f, 216f);
+            var scroll = listBack.gameObject.AddComponent<ScrollRect>();
+            scroll.horizontal = false;
+            scroll.movementType = ScrollRect.MovementType.Clamped;
+            scroll.scrollSensitivity = 30f;
+            var viewport = UiFactory.Rect("Viewport", listBack).Fill(10f, 10f, 10f, 10f);
+            viewport.gameObject.AddComponent<RectMask2D>();
+            viewport.gameObject.AddComponent<Image>().color = Color.clear;  // so the wheel scrolls over gaps too
+            buildList = UiFactory.Rect("Content", viewport);
+            buildList.anchorMin = new Vector2(0f, 1f);
+            buildList.anchorMax = new Vector2(1f, 1f);
+            buildList.pivot = new Vector2(0.5f, 1f);
+            buildList.offsetMin = buildList.offsetMax = Vector2.zero;
+            UiFactory.VerticalList(buildList, 8f);
+            buildList.gameObject.AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+            scroll.viewport = viewport;
+            scroll.content = buildList;
+
+            var newBuild = UiFactory.Button(page, "New", theme, "NEW BUILD", NewBuildClicked, false, 24f);
+            ((RectTransform)newBuild.transform).Place(new Vector2(0f, 0f), new Vector2(0f, 0f), new Vector2(40f, 30f), new Vector2(330f, 56f));
+            newBuildLabel = newBuild.GetComponentInChildren<TextMeshProUGUI>();
+            var back = UiFactory.Button(page, "Back", theme, "BACK", ShowMain, true, 24f);
+            ((RectTransform)back.transform).Place(new Vector2(1f, 0f), new Vector2(1f, 0f), new Vector2(-40f, 30f), new Vector2(200f, 56f));
+            buildsPage.SetActive(false);
+        }
+
+        void RefreshBuilds()
+        {
+            ResetConfirm();
+            var current = Saving.BuildManager.CurrentName;
+            currentLabel.text = current != null
+                ? $"Working on \"{current}\"   ·   Ctrl+S saves it   ·   The workshop is also autosaved every minute"
+                : "Not saved yet   ·   The workshop is autosaved every minute and when you quit";
+            for (var i = buildList.childCount - 1; i >= 0; i--)
+                Destroy(buildList.GetChild(i).gameObject);
+            var files = Saving.BuildFiles.List();
+            if (files.Count == 0)
+            {
+                var empty = UiFactory.Text(buildList, "Empty", theme, "No saved builds yet: name this one above and press SAVE.", 24f, theme.textDim, false, TextAlignmentOptions.Center);
+                empty.gameObject.AddComponent<LayoutElement>().preferredHeight = 80f;
+                return;
+            }
+            foreach (var file in files)
+                AddBuildRow(file);
+        }
+
+        void AddBuildRow(Saving.BuildFile file)
+        {
+            var row = UiFactory.Image(buildList, file.name, theme.panel, theme.rounded).rectTransform;
+            row.gameObject.AddComponent<LayoutElement>().preferredHeight = 76f;
+            var title = UiFactory.Text(row, "Name", theme, file.autosave ? "Autosave (last session)" : file.name, 28f, theme.text, true, TextAlignmentOptions.MidlineLeft);
+            title.rectTransform.Fill(18f, 30f, 300f, 4f);
+            var info = UiFactory.Text(row, "Info", theme,
+                $"{(file.parts == 1 ? "1 part" : file.parts + " parts")}   ·   {file.saved.ToString("MMM d, h:mm tt", System.Globalization.CultureInfo.InvariantCulture)}",
+                20f, theme.textDim, false, TextAlignmentOptions.MidlineLeft);
+            info.rectTransform.Fill(18f, 6f, 300f, 42f);
+
+            var load = UiFactory.Button(row, "Load", theme, "LOAD", () =>
+            {
+                Saving.BuildManager.Load(file);
+                Close();
+            }, true, 22f);
+            ((RectTransform)load.transform).Place(new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(-150f, 0f), new Vector2(130f, 50f));
+            var delete = UiFactory.Button(row, "Delete", theme, "DELETE", null, false, 22f);
+            ((RectTransform)delete.transform).Place(new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(-12f, 0f), new Vector2(130f, 50f));
+            var deleteLabel = delete.GetComponentInChildren<TextMeshProUGUI>();
+            delete.onClick.AddListener(() =>
+            {
+                if (confirming != file.path)
+                {
+                    ResetConfirm();
+                    confirming = file.path;
+                    deleteLabel.text = "SURE?";
+                    deleteLabel.color = new Color(0.95f, 0.4f, 0.35f);
+                    return;
+                }
+                Saving.BuildFiles.Delete(file.path);
+                Audio.Sounds.Play(Audio.Sounds.Trash, 0.4f);
+                RefreshBuilds();
+            });
+        }
+
+        void SaveClicked()
+        {
+            var name = nameField.text.Trim();
+            if (name.Length == 0)
+                name = Saving.BuildManager.FreeName("My Robot");
+            // Saving over a different build than the one you're working on needs a second click.
+            var path = Saving.BuildFiles.PathFor(name);
+            if (Saving.BuildFiles.Exists(name) && name != Saving.BuildManager.CurrentName && confirming != path)
+            {
+                ResetConfirm();
+                confirming = path;
+                saveLabel.text = "REPLACE?";
+                return;
+            }
+            Saving.BuildManager.Save(name);
+            nameField.text = name;
+            RefreshBuilds();
+        }
+
+        void NewBuildClicked()
+        {
+            if (confirming != "new")
+            {
+                ResetConfirm();
+                confirming = "new";
+                newBuildLabel.text = "CLEAR THE WORKSHOP?";
+                newBuildLabel.color = new Color(0.95f, 0.4f, 0.35f);
+                return;
+            }
+            Saving.BuildManager.NewBuild();
+            Close();
+        }
+
+        void ResetConfirm()
+        {
+            confirming = null;
+            if (saveLabel != null)
+                saveLabel.text = "SAVE";
+            if (newBuildLabel != null)
+            {
+                newBuildLabel.text = "NEW BUILD";
+                newBuildLabel.color = theme.text;
+            }
+            if (buildList == null)
+                return;
+            foreach (var label in buildList.GetComponentsInChildren<TextMeshProUGUI>())
+            {
+                if (label.text != "SURE?")
+                    continue;
+                label.text = "DELETE";
+                label.color = theme.text;
+            }
         }
 
         // ---------------------------------------------------------------- graphics
@@ -300,7 +481,9 @@ namespace Protobot.Menus
             });
 
             var help = UiFactory.Text(list, "Help", theme,
-                "Move: WASD   ·   Sprint: Shift   ·   Crouch: C   ·   Jump: Space\nLook: mouse   ·   Use / grab: hold left click   ·   Move held part: scroll\nMenu: Esc",
+                "Move: WASD   ·   Sprint: Shift   ·   Crouch: C   ·   Jump: Space   ·   Build view (float up close): B\n" +
+                "Look: mouse   ·   Use / grab: left click   ·   Move held part: scroll   ·   Hole grab on/off: H   ·   Turn: R\n" +
+                "Undo: Ctrl+Z   ·   Redo: Ctrl+Y   ·   Save: Ctrl+S   ·   Tools: 1-4 or hold Tab   ·   Menu: Esc",
                 20f, theme.textDim);
             help.textWrappingMode = TextWrappingModes.Normal;
             help.gameObject.AddComponent<LayoutElement>().preferredHeight = 110f;

@@ -108,6 +108,17 @@ namespace Protobot.Editor
             SetFields(picker, ("theme", theme), ("catalog", AssetDatabase.LoadAssetAtPath<PartCatalog>(CatalogPath)), ("spawner", spawner), ("hud", hud));
             var pause = GetOrAdd<PauseMenu>(Child(ui, "PauseMenu"));
             SetFields(pause, ("theme", theme));
+            SetFields(input, ("hud", hud));
+
+            // ---- undo, saving
+            var buildGo = GameObject.Find("BuildManager") ?? new GameObject("BuildManager");
+            var builds = GetOrAdd<Protobot.Saving.BuildManager>(buildGo);
+            SetFields(builds, ("catalog", AssetDatabase.LoadAssetAtPath<PartCatalog>(CatalogPath)), ("partsParent", spawned.transform), ("hud", hud));
+
+            // Held parts pass through other parts; screws and nuts in an assembly touch nothing.
+            SetLayerName(PartLayers.Held, "HeldPart");
+            SetLayerName(PartLayers.Fastened, "Fastened");
+            PartLayers.ApplyCollisionRules();
 
             SetupTools(player, camera, head, cursor, hud, ui, theme);
             SetupScrapBins();
@@ -127,8 +138,8 @@ namespace Protobot.Editor
 
         const string RendererFolder = "Assets/Protobot/Settings/Rendering/";
 
-        /// <summary>Adds the hover outline (Protobot.Rendering.OutlineFeature) to every URP renderer, once.</summary>
-        static void SetupOutline()
+        /// <summary>Adds the outline (Protobot.Rendering.OutlineFeature) to every URP renderer, once.</summary>
+        internal static void SetupOutline()
         {
             var mask = Shader.Find("Hidden/Protobot/OutlineMask");
             var composite = Shader.Find("Hidden/Protobot/Outline");
@@ -209,7 +220,7 @@ namespace Protobot.Editor
         // ---------------------------------------------------------------- tools
 
         const string ToolPrefabFolder = "Assets/Protobot/Prefabs/Tools/";
-        const int ViewModelLayer = 9;
+        const int ViewModelLayer = Protobot.Parts.PartLayers.ViewModel;
 
         // How each tool sits in the hand, relative to the view-model anchor (lower right of the view).
         // Shown smaller than life: they're drawn by their own camera, so this only changes how much
@@ -278,7 +289,8 @@ namespace Protobot.Editor
             var toolsRoot = Child(player, "Tools");
             var crosshair = Sprite("ui_crosshair");
             var hands = GetOrAdd<HandsTool>(Child(toolsRoot, "Hands"));
-            SetFields(hands, ("displayName", "Hands"), ("icon", AssetDatabase.LoadAssetAtPath<Sprite>(UiTextureImport.CursorFolder + "cursor_grab.png")), ("head", head));
+            SetFields(hands, ("displayName", "Hands"), ("icon", AssetDatabase.LoadAssetAtPath<Sprite>(UiTextureImport.CursorFolder + "cursor_grab.png")), ("head", head),
+                ("minHoldDistance", 0.08f));
             var saw = GetOrAdd<SawTool>(Child(toolsRoot, "HackSaw"));
             SetFields(saw, ("displayName", "Hack Saw"), ("icon", Sprite("tool_saw")), ("viewModelPrefab", prefabs[0]), ("menu", sawMenu), ("crosshair", crosshair));
             var paint = GetOrAdd<PaintTool>(Child(toolsRoot, "SprayPaint"));

@@ -95,9 +95,10 @@ not yet), **Skip** (not worth it here).
 
 ## 4. Decisions: what we build, in order
 
-**Phase 1: put parts together** (first version done: 7,122 holes found on 492 parts; snap, tack, screw, nut,
-assemblies; still to do: snapping parts by their side faces, standoffs/spacers stacking on screw ends, the
-assembly's own name in the tooltip)
+**Phase 1: put parts together** (done: 7,122 holes found on 492 parts; grab by a hole, hole grab mode (H),
+snap, tack, turn a tacked part on its hole, screw, nut, permanent fastened assemblies, held parts pass through
+everything, build view (B) to get close; still to do: snapping parts by their side faces, standoffs/spacers
+stacking on screw ends, the assembly's own name in the tooltip)
 1. Holes on every part, found automatically from the models (`HoleScanner`, `PartHoles`), updated by cuts and
    the drill.
 2. Aim at a hole: it highlights. Grab a part by a hole and bring it to another part's hole: it snaps, flush,
@@ -111,7 +112,8 @@ assembly's own name in the tooltip)
 5. Shafts through holes; collars, gears and wheels lock onto shafts; bearings; shaft spins in its bearings.
 6. Motors drive shafts (simulation goal: gears mesh, then drive the robot).
 
-**Phase 3: trust and output**
+**Phase 3: trust and output** (undo/redo, save/load with connections and autosave done, ahead of phase 2,
+as asked; they're state snapshots rather than commands, so every tool is covered by one `Record` call)
 7. Undo/redo, save/load with connections, parts list with weight and plastic check, tape measure, duplicate,
    mirror, inspect view, exact offsets and angles between parts.
 

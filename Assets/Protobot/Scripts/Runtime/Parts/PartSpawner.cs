@@ -19,6 +19,7 @@ namespace Protobot.Parts
             var prefab = part.prefab != null ? part.prefab : part.model;
             if (prefab == null)
                 return null;
+            Saving.BuildManager.Record("Get " + part.displayName);
 
             var jitter = new Vector3(Random.Range(-spread.x, spread.x), 0f, Random.Range(-spread.y, spread.y));
             var position = dropPoint.position + dropPoint.rotation * jitter;

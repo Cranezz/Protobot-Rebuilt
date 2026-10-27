@@ -15,6 +15,9 @@ namespace Protobot.Parts
     {
         [SerializeField] string partId;
 
+        static int nextUid = 1;
+        int uid;  // not serialized: a copy (a saw offcut) gets its own
+
         Rigidbody body;
         float size;
         float lastSound = -1f;
@@ -27,6 +30,25 @@ namespace Protobot.Parts
         Vector3 localCenterOfMass;
 
         public string PartId => partId;
+
+        /// <summary>Identifies this part in undo history and save files.</summary>
+        public int Uid
+        {
+            get
+            {
+                if (uid == 0)
+                    uid = nextUid++;
+                return uid;
+            }
+        }
+
+        /// <summary>A part rebuilt from a save (or undo) keeps the id it had.</summary>
+        public void SetUid(int value)
+        {
+            uid = value;
+            nextUid = Mathf.Max(nextUid, value + 1);
+        }
+
         /// <summary>The part's own Rigidbody (null while it's part of an assembly).</summary>
         public Rigidbody Body => body;
         public float Mass => body != null ? body.mass : mass;
@@ -63,6 +85,7 @@ namespace Protobot.Parts
             body.angularDamping = angularDamping;
             body.interpolation = interpolation;
             body.collisionDetectionMode = collisionMode;
+            body.maxDepenetrationVelocity = Depenetration;
             return body;
         }
 
@@ -75,9 +98,17 @@ namespace Protobot.Parts
                 mass = newMass;
         }
 
+        /// <summary>
+        /// How fast overlapping parts are pushed apart (m/s). Physics' default (10) makes a part let go inside
+        /// another one shoot off; this slides them apart.
+        /// </summary>
+        public const float Depenetration = 0.6f;
+
         void Awake()
         {
             body = GetComponent<Rigidbody>();
+            if (body != null)
+                body.maxDepenetrationVelocity = Depenetration;
             foreach (var r in GetComponentsInChildren<MeshRenderer>())
                 size = Mathf.Max(size, r.bounds.size.magnitude);
         }

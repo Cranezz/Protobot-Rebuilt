@@ -646,6 +646,7 @@ namespace Protobot.Tools
 
         void ApplyCut(PartBody part)
         {
+            Saving.BuildManager.Record("Cut " + part.name);
             var volumeBefore = PartShape.Volume(part.gameObject);
             var cut = plan;
             var offcutVolume = previewRemovedVolume;
@@ -665,7 +666,10 @@ namespace Protobot.Tools
                     if (copy == null)
                         continue;
                     if (removed == null)
+                    {
+                        copy.gameObject.SetActive(false);
                         Destroy(copy.gameObject);
+                    }
                     else
                         copy.GetComponent<MeshFilter>().sharedMesh = removed;
                 }
@@ -676,9 +680,14 @@ namespace Protobot.Tools
                 if (source == null)
                     continue;
                 if (kept == null)
+                {
+                    source.gameObject.SetActive(false);
                     Destroy(source.gameObject);
+                }
                 else
+                {
                     source.GetComponent<MeshFilter>().sharedMesh = kept;
+                }
             }
             FinishPiece(part.gameObject, cut.point, cut.keepNormal, volumeBefore);
 
@@ -711,9 +720,31 @@ namespace Protobot.Tools
             foreach (var r in PartShape.DetailRenderers(piece))
                 Extent(r.GetComponent<MeshFilter>().sharedMesh, piece.transform.worldToLocalMatrix * r.transform.localToWorldMatrix, profile.Origin, profile.Axis, ref min, ref max);
             profile.AddCut(point, keepNormal, min < max ? min : profile.Start, min < max ? max : profile.End);
-            PartModifications.On(piece).cuts.Add(new PartModifications.Cut { point = point, keepNormal = keepNormal });
+            PartModifications.On(piece).AddCut(point, keepNormal);
             PartShape.AfterEdit(piece, volumeBefore);
             Rename(piece, profile.Length);
+        }
+
+        /// <summary>
+        /// Makes a recorded cut again (loading a save, undo): keeps the side of the plane (part space) that
+        /// <paramref name="keepNormal"/> points to, exactly as the saw did.
+        /// </summary>
+        public static void Replay(GameObject piece, Vector3 point, Vector3 keepNormal)
+        {
+            var volumeBefore = PartShape.Volume(piece);
+            foreach (var r in PartShape.DetailRenderers(piece))
+            {
+                var filter = r.GetComponent<MeshFilter>();
+                var kept = MeshSlicer.Slice(filter.sharedMesh, LocalPlane(piece.transform, r.transform, point, keepNormal));
+                if (kept != null)
+                {
+                    filter.sharedMesh = kept;
+                    continue;
+                }
+                r.gameObject.SetActive(false);  // out of DetailRenderers right away (Destroy waits for the frame's end)
+                Destroy(r.gameObject);
+            }
+            FinishPiece(piece, point, keepNormal, volumeBefore);
         }
 
         /// <summary>

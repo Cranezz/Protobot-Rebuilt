@@ -49,6 +49,7 @@ namespace Protobot.Tools
             var part = target != null && Cursor.CurrentInReach ? target.GetComponentInParent<PartBody>() : null;
             if (part != null && part.TryGetComponent(out HoverTarget hover))
             {
+                Saving.BuildManager.Record("Repaint " + part.name);
                 picker.OpenForPart(hover, PartShape.DetailRenderers(part.gameObject), recent, painted =>
                 {
                     PartModifications.On(part.gameObject).RecordPaint(painted);
@@ -81,6 +82,7 @@ namespace Protobot.Tools
             }
 
             var strip = Keyboard.current.shiftKey.isPressed;
+            Saving.BuildManager.Record((strip ? "Strip paint off " : "Paint ") + part.name);
             hover.SetPaint(strip ? null : color);
             PartModifications.On(part.gameObject).RecordPaint(hover);
             if (!strip)

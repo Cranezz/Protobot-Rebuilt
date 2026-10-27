@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Protobot.Parts;
+using Protobot.Saving;
 using UnityEngine;
 
 namespace Protobot.Building
@@ -16,8 +17,21 @@ namespace Protobot.Building
         public PartBody a, b;
         public LinkKind kind;
 
+        // The hole line the two parts meet on (each in its own part's space), if they were put together by a
+        // hole: a tacked part turns about it.
+        public bool hasPivot;
+        public Vector3 pointA, axisA, pointB, axisB;
+
         public bool Has(PartBody part) => a == part || b == part;
         public PartBody Other(PartBody part) => a == part ? b : a;
+
+        /// <summary>The pivot in the world, seen from <paramref name="part"/>'s side.</summary>
+        public void Pivot(PartBody part, out Vector3 point, out Vector3 axis)
+        {
+            var t = part.transform;
+            point = t.TransformPoint(part == a ? pointA : pointB);
+            axis = t.TransformDirection(part == a ? axisA : axisB).normalized;
+        }
     }
 
     /// <summary>
@@ -60,9 +74,10 @@ namespace Protobot.Building
 
         /// <summary>
         /// Joins two parts (and whatever each is already joined to). The result keeps moving the way the
-        /// first assembly did; it's frozen if either side was frozen.
+        /// first assembly did; it's frozen if either side was frozen. <paramref name="pivot"/> and
+        /// <paramref name="axis"/> (world) are the hole line they meet on, if any.
         /// </summary>
-        public static Assembly Join(PartBody a, PartBody b, LinkKind kind)
+        public static Assembly Join(PartBody a, PartBody b, LinkKind kind, Vector3? pivot = null, Vector3? axis = null)
         {
             if (a == null || b == null || a == b)
                 return Of(a);
@@ -93,20 +108,38 @@ namespace Protobot.Building
                     result.Absorb(assemblyA);
             }
 
+            var link = new Link { a = a, b = b, kind = kind };
+            if (pivot != null && axis != null)
+            {
+                link.hasPivot = true;
+                link.pointA = a.transform.InverseTransformPoint(pivot.Value);
+                link.axisA = a.transform.InverseTransformDirection(axis.Value).normalized;
+                link.pointB = b.transform.InverseTransformPoint(pivot.Value);
+                link.axisB = b.transform.InverseTransformDirection(axis.Value).normalized;
+            }
+
             // Upgrade an existing link rather than adding a second one.
             var found = false;
             for (var i = 0; i < result.links.Count; i++)
             {
-                var link = result.links[i];
-                if (!(link.Has(a) && link.Has(b)))
+                var existing = result.links[i];
+                if (!(existing.Has(a) && existing.Has(b)))
                     continue;
                 found = true;
                 if (kind == LinkKind.Clamp)
-                    link.kind = LinkKind.Clamp;
-                result.links[i] = link;
+                    existing.kind = LinkKind.Clamp;
+                if (!existing.hasPivot && link.hasPivot)
+                {
+                    existing.hasPivot = true;
+                    existing.pointA = existing.a == a ? link.pointA : link.pointB;
+                    existing.axisA = existing.a == a ? link.axisA : link.axisB;
+                    existing.pointB = existing.a == a ? link.pointB : link.pointA;
+                    existing.axisB = existing.a == a ? link.axisB : link.axisA;
+                }
+                result.links[i] = existing;
             }
             if (!found)
-                result.links.Add(new Link { a = a, b = b, kind = kind });
+                result.links.Add(link);
             result.body.isKinematic |= frozen;
             result.Recompute();
             return result;
@@ -127,6 +160,7 @@ namespace Protobot.Building
             assembly.body = go.AddComponent<Rigidbody>();
             assembly.body.interpolation = RigidbodyInterpolation.Interpolate;
             assembly.body.collisionDetectionMode = CollisionDetectionMode.ContinuousSpeculative;
+            assembly.body.maxDepenetrationVelocity = PartBody.Depenetration;
             return assembly;
         }
 
@@ -188,6 +222,53 @@ namespace Protobot.Building
             }
         }
 
+        /// <summary>
+        /// The hole a part can be turned about without coming off: its one link to the rest of the assembly
+        /// that has a pivot and isn't clamped, and the parts that turn with it (those only held on through
+        /// it). False if it's fastened or held at more than one place.
+        /// </summary>
+        public bool TryHinge(PartBody part, out Link hinge, out List<PartBody> turning)
+        {
+            hinge = default;
+            turning = null;
+            var found = false;
+            foreach (var link in links)
+            {
+                if (!link.Has(part) || link.kind != LinkKind.Tack || !link.hasPivot)
+                    continue;
+                var side = SideOf(part, link);
+                if (side.Contains(link.Other(part)))
+                    continue;  // still held on another way round: turning would tear it off
+                // The part that was put onto the other is the one that turns: prefer its own placing link,
+                // then the smaller side.
+                if (!found || (link.a == part && hinge.a != part) || ((link.a == part) == (hinge.a == part) && side.Count < turning.Count))
+                {
+                    hinge = link;
+                    turning = side;
+                    found = true;
+                }
+            }
+            return found;
+        }
+
+        /// <summary>The parts still joined to <paramref name="part"/> if <paramref name="cut"/> were gone.</summary>
+        List<PartBody> SideOf(PartBody part, Link cut)
+        {
+            var side = new List<PartBody> { part };
+            for (var i = 0; i < side.Count; i++)
+            {
+                foreach (var link in links)
+                {
+                    if (!link.Has(side[i]) || (link.a == cut.a && link.b == cut.b))
+                        continue;
+                    var other = link.Other(side[i]);
+                    if (other != null && !side.Contains(other))
+                        side.Add(other);
+                }
+            }
+            return side;
+        }
+
         /// <summary>Re-forms the assembly from its links: groups that still hold together stay joined.</summary>
         void Split()
         {
@@ -238,6 +319,7 @@ namespace Protobot.Building
             {
                 var part = group[0];
                 part.transform.SetParent(transform.parent, true);
+                PartLayers.SetFastened(part, false);
                 var partBody = part.RestoreBody();
                 partBody.isKinematic = frozen;
                 if (!frozen)
@@ -271,6 +353,75 @@ namespace Protobot.Building
             body.centerOfMass = centre / total;
             body.ResetInertiaTensor();
             body.WakeUp();
+        }
+
+        // ---------------------------------------------------------------- saving
+
+        public AssemblyData Save()
+        {
+            var data = new AssemblyData { position = body.position, rotation = body.rotation, frozen = body.isKinematic };
+            foreach (var part in Parts())
+                data.parts.Add(part.Uid);
+            foreach (var link in links)
+            {
+                if (link.a == null || link.b == null)
+                    continue;
+                data.links.Add(new LinkData
+                {
+                    a = link.a.Uid, b = link.b.Uid, kind = link.kind, hasPivot = link.hasPivot,
+                    pointA = link.pointA, axisA = link.axisA, pointB = link.pointB, axisB = link.axisB,
+                });
+            }
+            return data;
+        }
+
+        /// <summary>Joins parts (already where they belong, each with its own body) back into an assembly.</summary>
+        public static Assembly Restore(AssemblyData data, Dictionary<int, PartBody> parts, Transform parent)
+        {
+            var members = new List<PartBody>();
+            foreach (var uid in data.parts)
+                if (parts.TryGetValue(uid, out var part) && part != null)
+                    members.Add(part);
+            if (members.Count < 2)
+                return null;
+            var go = new GameObject("Assembly") { layer = members[0].gameObject.layer };
+            go.transform.SetParent(parent, false);
+            go.transform.SetPositionAndRotation(data.position, data.rotation);
+            var assembly = go.AddComponent<Assembly>();
+            assembly.body = go.AddComponent<Rigidbody>();
+            assembly.body.interpolation = RigidbodyInterpolation.Interpolate;
+            assembly.body.collisionDetectionMode = CollisionDetectionMode.ContinuousSpeculative;
+            assembly.body.maxDepenetrationVelocity = PartBody.Depenetration;
+            assembly.body.position = data.position;
+            assembly.body.rotation = data.rotation;
+            foreach (var part in members)
+            {
+                part.RemoveBody();
+                part.transform.SetParent(go.transform, true);
+            }
+            foreach (var link in data.links)
+            {
+                if (!parts.TryGetValue(link.a, out var a) || !parts.TryGetValue(link.b, out var b) || a == null || b == null)
+                    continue;
+                assembly.links.Add(new Link
+                {
+                    a = a, b = b, kind = link.kind, hasPivot = link.hasPivot,
+                    pointA = link.pointA, axisA = link.axisA, pointB = link.pointB, axisB = link.axisB,
+                });
+            }
+            assembly.body.isKinematic = data.frozen;
+            assembly.Recompute();
+            return assembly;
+        }
+
+        /// <summary>Lets go of every part (they keep where they are, without bodies) and goes away.</summary>
+        public void Dissolve(Transform parent)
+        {
+            foreach (var part in Parts())
+                part.transform.SetParent(parent, true);
+            links.Clear();
+            gameObject.SetActive(false);
+            Destroy(gameObject);
         }
     }
 }

@@ -89,36 +89,74 @@ namespace Protobot.Building
             position = screw.WorldSeat + axis * along - rotation * nut.Seat;
         }
 
+        /// <summary>How far off a loose part's hole can be for a screw to pull it into line (m).</summary>
+        const float NudgeDistance = 0.004f;
+
         /// <summary>
         /// The parts a screw passes through between its head and tip: those with a hole on its line. Each comes
-        /// with the hole and how far down the screw that hole's far face is.
+        /// with the hole and how far down the screw that hole's far face is. A loose part whose hole is a
+        /// little off the screw's line is pulled into line (as wiggling it onto the screw would), so a part
+        /// that was dropped roughly in place still gets fastened.
         /// </summary>
-        public static List<(PartBody part, HoleAt hole, float far)> Stack(Vector3 seat, Vector3 axis, float length, PartBody screw)
+        public static List<(PartBody part, HoleAt hole, float far)> Stack(Vector3 seat, Vector3 axis, float length, float diameter, PartBody screw)
         {
             var result = new List<(PartBody, HoleAt, float)>();
             var seen = new HashSet<PartBody>();
-            foreach (var collider in Physics.OverlapCapsule(seat, seat + axis * length, 0.004f, ~0, QueryTriggerInteraction.Ignore))
+            foreach (var collider in Physics.OverlapCapsule(seat, seat + axis * length, 0.004f + NudgeDistance, ~0, QueryTriggerInteraction.Ignore))
             {
                 var part = collider.GetComponentInParent<PartBody>();
                 if (part == null || part == screw || !seen.Add(part) || !part.TryGetComponent(out PartHoles holes))
                     continue;
+                HoleAt best = default;
+                var bestOffset = float.MaxValue;
                 foreach (var hole in holes.WorldHoles())
                 {
                     if (Mathf.Abs(Vector3.Dot(hole.axis, axis)) < 0.97f)
                         continue;
                     var offset = hole.center - seat;
                     var along = Vector3.Dot(offset, axis);
-                    if ((offset - axis * along).magnitude > 0.0015f)
-                        continue;
                     var half = hole.Depth / 2f;
                     if (along + half < -0.0005f || along - half > length + 0.0005f)
                         continue;
-                    result.Add((part, hole, along + half));
-                    break;
+                    var lateral = (offset - axis * along).magnitude;
+                    if (lateral < bestOffset)
+                    {
+                        bestOffset = lateral;
+                        best = hole;
+                    }
                 }
+                if (best.part == null)
+                    continue;
+                // A hole bigger than the screw takes it a little off centre.
+                var tolerance = Mathf.Max(0.0015f, (best.Size - diameter) / 2f + 0.0008f);
+                if (bestOffset > tolerance && !(bestOffset <= tolerance + NudgeDistance && Nudge(part, best, seat, axis)))
+                    continue;
+                var far = Vector3.Dot(best.center - seat, axis) + best.Depth / 2f;
+                result.Add((part, best, far));
             }
             result.Sort((x, y) => x.Item3.CompareTo(y.Item3));
             return result;
+        }
+
+        /// <summary>Lines a loose part's hole up with the screw (straightening it if it's a little tilted).</summary>
+        static bool Nudge(PartBody part, HoleAt hole, Vector3 seat, Vector3 axis)
+        {
+            var body = part.Body;
+            if (body == null)
+                return false;  // in an assembly: it can't be moved on its own
+            var along = Vector3.Dot(hole.center - seat, axis);
+            var onLine = seat + axis * along;
+            var holeAxis = Vector3.Dot(hole.axis, axis) < 0f ? -hole.axis : hole.axis;
+            var turn = Quaternion.FromToRotation(holeAxis, axis);
+            var rotation = turn * body.rotation;
+            var position = onLine + turn * (body.position - hole.center);
+            body.position = position;
+            body.rotation = rotation;
+            part.transform.SetPositionAndRotation(position, rotation);
+            body.linearVelocity = Vector3.zero;
+            body.angularVelocity = Vector3.zero;
+            Physics.SyncTransforms();
+            return true;
         }
     }
 }

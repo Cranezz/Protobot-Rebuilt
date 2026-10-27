@@ -260,8 +260,8 @@ namespace Protobot.GraphicsQuality
         }
 
         /// <summary>
-        /// What each shadow quality level means. Distances are in meters and kept short on purpose:
-        /// robot parts are only centimeters big, and a shorter distance packs more shadow detail near the camera.
+        /// What each shadow quality level means. Distances are in scene units, which are inches in the Protobot
+        /// scene (the original Protobot Rebuilt drew shadows out to 150); shorter packs more detail near the camera.
         /// </summary>
         readonly struct ShadowSettings
         {
@@ -280,12 +280,12 @@ namespace Protobot.GraphicsQuality
 
             public static ShadowSettings For(ShadowQuality quality) => quality switch
             {
-                ShadowQuality.Low => new ShadowSettings(4f, 1, 1024, SoftShadowQuality.Low),
-                ShadowQuality.Medium => new ShadowSettings(6f, 2, 2048, SoftShadowQuality.Medium),
-                ShadowQuality.High => new ShadowSettings(8f, 3, 2048, SoftShadowQuality.High),
-                ShadowQuality.Ultra => new ShadowSettings(12f, 4, 4096, SoftShadowQuality.High),
+                ShadowQuality.Low => new ShadowSettings(40f, 1, 1024, SoftShadowQuality.Low),
+                ShadowQuality.Medium => new ShadowSettings(75f, 2, 2048, SoftShadowQuality.Medium),
+                ShadowQuality.High => new ShadowSettings(110f, 3, 2048, SoftShadowQuality.High),
+                ShadowQuality.Ultra => new ShadowSettings(150f, 4, 4096, SoftShadowQuality.High),
                 // Off: shadows are turned off on the camera; these values just keep the asset valid.
-                _ => new ShadowSettings(4f, 1, 256, SoftShadowQuality.Low),
+                _ => new ShadowSettings(40f, 1, 256, SoftShadowQuality.Low),
             };
         }
     }

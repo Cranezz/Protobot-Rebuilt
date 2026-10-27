@@ -3,7 +3,20 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 3
-  tags: []
+  tags:
+  - Plane
+  - Screw
+  - Object
+  - Shaft
+  - Motion
+  - Group
+  - Hole
+  - Nut
+  - Pivot
+  - HoverHole
+  - HoleCollider
+  - PartGroup
+  - PartType
   layers:
   - Default
   - TransparentFX
@@ -13,16 +26,16 @@ TagManager:
   - UI
   - 
   - 
+  - Orbit UI
+  - Plane
+  - WorldSpaceUI
+  - HoleCollisions
+  - Deleted
   - Parts
+  - Placement
   - ViewModel
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
+  - HeldPart
+  - Fastened
   - 
   - 
   - 

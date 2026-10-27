@@ -44,19 +44,26 @@ namespace Protobot.Editor
 
         // Entering Play mode reloads scripts, so the restore is hooked up again on every load.
         [InitializeOnLoadMethod]
-        static void RestoreAfterPlay() => EditorApplication.playModeStateChanged += change =>
+        static void RestoreAfterPlay()
         {
-            if (change != PlayModeStateChange.EnteredEditMode || !EditorPrefs.GetBool(RestoreKey, false))
+            // Unity writes the play session's value back after this event, so restore a moment later.
+            EditorApplication.playModeStateChanged += change =>
+            {
+                if (change == PlayModeStateChange.EnteredEditMode)
+                    EditorApplication.delayCall += RestoreRunInBackground;
+            };
+            // Scripts reloading right after Play mode ends drops that delayed call: finish it on the next load.
+            EditorApplication.delayCall += RestoreRunInBackground;
+        }
+
+        static void RestoreRunInBackground()
+        {
+            if (EditorApplication.isPlayingOrWillChangePlaymode || !EditorPrefs.GetBool(RestoreKey, false))
                 return;
             EditorPrefs.DeleteKey(RestoreKey);
-            var previous = EditorPrefs.GetBool(PreviousKey, false);
-            // Unity writes the play session's value back after this event, so restore a moment later.
-            EditorApplication.delayCall += () =>
-            {
-                PlayerSettings.runInBackground = previous;
-                AssetDatabase.SaveAssets();
-            };
-        };
+            PlayerSettings.runInBackground = EditorPrefs.GetBool(PreviousKey, false);
+            AssetDatabase.SaveAssets();
+        }
 
         public static PlayerMotor Motor => Object.FindFirstObjectByType<PlayerMotor>();
         public static ToolBelt Belt => Object.FindFirstObjectByType<ToolBelt>();
@@ -98,6 +105,60 @@ namespace Protobot.Editor
             body.rotation = rotation;
             Physics.SyncTransforms();
             return go;
+        }
+
+        /// <summary>
+        /// Runs the game <paramref name="count"/> frames (pausing it in between). When the editor window isn't
+        /// on screen it stops running Play mode frames by itself; this steps them, and keeps a test in
+        /// lockstep with its input. Returns the frame number.
+        /// </summary>
+        public static int Frames(int count)
+        {
+            EditorApplication.isPaused = true;
+            for (var i = 0; i < count; i++)
+                EditorApplication.Step();
+            return Time.frameCount;
+        }
+
+        /// <summary>Clicks a mouse button: down for one frame, then up.</summary>
+        public static void Click(MouseButton button = MouseButton.Left)
+        {
+            Mouse(button, true);
+            Frames(1);
+            Mouse(button, false);
+            Frames(1);
+        }
+
+        /// <summary>Taps a key: down for one frame, then up.</summary>
+        public static void Tap(Key key)
+        {
+            Key(key, true);
+            Frames(1);
+            Key(key, false);
+            Frames(1);
+        }
+
+        /// <summary>Build view with the eyes at <paramref name="eye"/>, looking at <paramref name="target"/>.</summary>
+        public static void FloatAndLook(Vector3 eye, Vector3 target)
+        {
+            var motor = Motor;
+            motor.PlaceHead(eye);
+            motor.Face(target);
+        }
+
+        /// <summary>Turns the view (wherever the eyes are) to look at a point.</summary>
+        public static void LookAt(Vector3 target) => Motor.Face(target);
+
+        /// <summary>
+        /// Saves what the player sees (the game view with its HUD) as a PNG at the end of this frame, in
+        /// Assets/Screenshots (git-ignored). Returns the path.
+        /// </summary>
+        public static string Screenshot(string name)
+        {
+            System.IO.Directory.CreateDirectory("Assets/Screenshots");
+            var path = "Assets/Screenshots/" + name + ".png";
+            ScreenCapture.CaptureScreenshot(path);
+            return path;
         }
 
         public static void Equip(int index) => Belt.Equip(Belt.Tools[index]);

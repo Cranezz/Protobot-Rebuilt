@@ -31,6 +31,10 @@ namespace Protobot.Menus
         Image wheelCentre;
         TextMeshProUGUI wheelCentreLabel;
         CanvasGroup group;
+        Image modesBack;
+        TextMeshProUGUI modesText;
+        string shownModes = "";
+        Player.PlayerMotor motor;
 
         void Awake()
         {
@@ -63,6 +67,7 @@ namespace Protobot.Menus
                 controlsBack.rectTransform.sizeDelta = new Vector2(controls.preferredWidth + 36f, 38f);
             }
 
+            ShowModes();
             wheel.SetActive(belt.WheelOpen);
             if (!belt.WheelOpen)
                 return;
@@ -93,6 +98,26 @@ namespace Protobot.Menus
         }
 
         Sprite IconFor(PlayerTool tool) => tool.Icon != null ? tool.Icon : handsIcon;
+
+        /// <summary>Modes that change what the keys do (build view, hole grab), beside the hotbar while they're on.</summary>
+        void ShowModes()
+        {
+            if (motor == null)
+                motor = FindFirstObjectByType<Player.PlayerMotor>();
+            var accent = ColorUtility.ToHtmlStringRGB(theme.accent);
+            var modes = "";
+            if (motor != null && motor.BuildView)
+                modes += $"<color=#{accent}>BUILD VIEW</color> (B)";
+            if (HandsTool.HoleMode && belt.Current is HandsTool)
+                modes += (modes.Length > 0 ? "     " : "") + $"<color=#{accent}>HOLE GRAB</color> (H)";
+            if (modes == shownModes)
+                return;
+            shownModes = modes;
+            modesBack.gameObject.SetActive(modes.Length > 0);
+            modesText.text = modes;
+            modesText.ForceMeshUpdate();
+            modesBack.rectTransform.sizeDelta = new Vector2(modesText.preferredWidth + 32f, 36f);
+        }
 
         /// <summary>"Left click: cut · Wheel: angle" → the input names in the accent colour, the actions in white.</summary>
         string Format(string hint)
@@ -137,6 +162,12 @@ namespace Protobot.Menus
             tabBack.rectTransform.Place(new Vector2(0.5f, 0f), new Vector2(0f, 0.5f), new Vector2(width / 2f + 14f, 24f + (SlotSize + 8f) / 2f), new Vector2(170f, 36f));
             var tabHint = UiFactory.Text(tabBack.transform, "TabHint", theme, Format("Hold Tab: tool wheel"), 19f, theme.text, false, TextAlignmentOptions.Center);
             tabHint.rectTransform.Fill();
+
+            modesBack = UiFactory.Image(transform, "ModesBack", new Color(0.05f, 0.05f, 0.06f, 0.62f), theme.rounded);
+            modesBack.rectTransform.Place(new Vector2(0.5f, 0f), new Vector2(1f, 0.5f), new Vector2(-width / 2f - 14f, 24f + (SlotSize + 8f) / 2f), new Vector2(200f, 36f));
+            modesText = UiFactory.Text(modesBack.transform, "Modes", theme, "", 19f, theme.text, true, TextAlignmentOptions.Center);
+            modesText.rectTransform.Fill();
+            modesBack.gameObject.SetActive(false);
         }
 
         void BuildWheel()

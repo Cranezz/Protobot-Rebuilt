@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Protobot.Parts;
+using Protobot.Saving;
 using UnityEngine;
 
 namespace Protobot.Building
@@ -7,7 +8,8 @@ namespace Protobot.Building
     /// <summary>
     /// A screw that's been put in: the parts it passes through (head first), and its nut. Without a nut the
     /// screw only holds the stack lined up (tacked); a nut, or a threaded hole in the stack (a standoff, a
-    /// motor), clamps the stack into one rigid piece.
+    /// motor), clamps the stack into one rigid piece. Screws and nuts in an assembly don't touch anything
+    /// else (see <see cref="PartLayers"/>).
     /// </summary>
     public class ScrewJoint : MonoBehaviour
     {
@@ -30,7 +32,7 @@ namespace Protobot.Building
         {
             if (!screw.TryGetComponent(out Fastener fastener))
                 return null;
-            var found = HoleSnap.Stack(fastener.WorldSeat, fastener.WorldAxis, fastener.Length, screw);
+            var found = HoleSnap.Stack(fastener.WorldSeat, fastener.WorldAxis, fastener.Length, fastener.Diameter, screw);
             if (found.Count == 0)
                 return null;
             var joint = screw.gameObject.GetComponent<ScrewJoint>() ?? screw.gameObject.AddComponent<ScrewJoint>();
@@ -62,7 +64,10 @@ namespace Protobot.Building
             var nut = Nut;
             Nut = null;
             if (nut != null)
+            {
                 Assembly.Unlink(nut);
+                PartLayers.SetFastened(nut, false);
+            }
             Rejoin();
         }
 
@@ -70,8 +75,12 @@ namespace Protobot.Building
         public void Remove()
         {
             if (Nut != null)
+            {
+                PartLayers.SetFastened(Nut, false);
                 Assembly.Unlink(Nut);
+            }
             Nut = null;
+            PartLayers.SetFastened(Part, false);
             Assembly.Unlink(Part);
             stack.Clear();
             Destroy(this);
@@ -80,11 +89,16 @@ namespace Protobot.Building
         void Rejoin()
         {
             var kind = Fastened ? LinkKind.Clamp : LinkKind.Tack;
+            var screw = Screw;
             foreach (var part in stack)
                 if (part != null)
-                    Assembly.Join(Part, part, kind);
+                    Assembly.Join(Part, part, kind, screw.WorldSeat, screw.WorldAxis);
             if (Nut != null)
-                Assembly.Join(Nut, Part, LinkKind.Clamp);
+            {
+                Assembly.Join(Nut, Part, LinkKind.Clamp, screw.WorldSeat, screw.WorldAxis);
+                PartLayers.SetFastened(Nut, true);
+            }
+            PartLayers.SetFastened(Part, true);
             if (kind == LinkKind.Tack)
                 Downgrade();
         }
@@ -95,6 +109,35 @@ namespace Protobot.Building
             var assembly = Assembly.Of(Part);
             if (assembly != null)
                 assembly.Loosen(Part);
+        }
+
+        // ---------------------------------------------------------------- saving
+
+        public ScrewData Save()
+        {
+            var data = new ScrewData { screw = Part.Uid, nut = Nut != null ? Nut.Uid : 0, threaded = threaded, stackEnd = stackEnd };
+            foreach (var part in stack)
+                if (part != null)
+                    data.stack.Add(part.Uid);
+            return data;
+        }
+
+        /// <summary>Puts a saved screw joint back (the assembly and its links are restored separately).</summary>
+        public static void Restore(ScrewData data, Dictionary<int, PartBody> parts)
+        {
+            if (!parts.TryGetValue(data.screw, out var screw) || screw == null)
+                return;
+            var joint = screw.gameObject.GetComponent<ScrewJoint>() ?? screw.gameObject.AddComponent<ScrewJoint>();
+            joint.stack.Clear();
+            foreach (var uid in data.stack)
+                if (parts.TryGetValue(uid, out var part) && part != null)
+                    joint.stack.Add(part);
+            joint.Nut = data.nut != 0 && parts.TryGetValue(data.nut, out var nut) ? nut : null;
+            joint.threaded = data.threaded;
+            joint.stackEnd = data.stackEnd;
+            PartLayers.SetFastened(screw, true);
+            if (joint.Nut != null)
+                PartLayers.SetFastened(joint.Nut, true);
         }
     }
 }

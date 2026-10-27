@@ -1,6 +1,10 @@
-// Draws an object as plain white into the outline mask (Protobot.Rendering.OutlineFeature).
+// Draws an object into the outline mask in its outline colour, alpha 1 (Protobot.Rendering.OutlineFeature).
 Shader "Hidden/Protobot/OutlineMask"
 {
+    Properties
+    {
+        _OutlineObjectColor ("Color", Color) = (1, 0.82, 0.2, 1)
+    }
     SubShader
     {
         Tags { "RenderPipeline" = "UniversalPipeline" }
@@ -15,6 +19,8 @@ Shader "Hidden/Protobot/OutlineMask"
             #pragma vertex Vert
             #pragma fragment Frag
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+
+            float4 _OutlineObjectColor;  // per renderer (MaterialPropertyBlock), else the material's
 
             struct Attributes
             {
@@ -39,7 +45,7 @@ Shader "Hidden/Protobot/OutlineMask"
 
             half4 Frag(Varyings input) : SV_Target
             {
-                return 1;
+                return half4(_OutlineObjectColor.rgb, 1);
             }
             ENDHLSL
         }
