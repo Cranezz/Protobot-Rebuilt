@@ -3,22 +3,7 @@ guid: adecea212135772468da13447b8af2b9
 ModelImporter:
   serializedVersion: 24300
   internalIDToNameTable: []
-  externalObjects:
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Plastic_-_Glossy_(Green)
-    second: {fileID: 2100000, guid: 19f7f698d9af3404687de612318c574a, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Smooth_-_Dark_Gray
-    second: {fileID: 2100000, guid: 2fb8aac72e0afaa4bac733617013f227, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Smooth_-_Dark_Sea_Green
-    second: {fileID: 2100000, guid: dd2703cec8255a54c873d1017aee2bbc, type: 2}
+  externalObjects: {}
   materials:
     materialImportMode: 2
     materialName: 0
@@ -46,7 +31,7 @@ ModelImporter:
     extraExposedTransformPaths: []
     extraUserProperties: []
     clipAnimations: []
-    isReadable: 0
+    isReadable: 1
   meshes:
     lODScreenPercentages:
     - 0.25

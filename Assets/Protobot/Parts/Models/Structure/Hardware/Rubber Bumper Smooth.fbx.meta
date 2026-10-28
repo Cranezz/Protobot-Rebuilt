@@ -3,22 +3,7 @@ guid: 072b4c8b03cf57d4894c52279e413a44
 ModelImporter:
   serializedVersion: 24300
   internalIDToNameTable: []
-  externalObjects:
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Default
-    second: {fileID: 2100000, guid: 46ef9795e3dc43d478743f08722631f5, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Smooth_-_Black
-    second: {fileID: 2100000, guid: a15196749b208dc41908ca54b0f388b3, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: VEX_Steel
-    second: {fileID: 2100000, guid: 14b2fc0e62a81dc4aacd62246e05ca1e, type: 2}
+  externalObjects: {}
   materials:
     materialImportMode: 2
     materialName: 0

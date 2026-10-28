@@ -1,3 +1,7 @@
+> **Legacy (2026-10-27):** written for the first-person workshop version, which was removed. The app is now the
+> original Protobot Rebuilt with V2 features (see `CLAUDE.md`). Kept for the mechanics research (shafts, pivots,
+> gears, pneumatics, physics) that the next phases build on.
+
 # Protobot Rebuilt V2 — Planned Mechanics
 
 Taken from the original VR design doc. **Only the mechanics apply for now** — the app is desktop first,

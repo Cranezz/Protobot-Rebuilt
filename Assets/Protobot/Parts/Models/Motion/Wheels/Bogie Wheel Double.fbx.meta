@@ -3,22 +3,7 @@ guid: 43d2cdc6ce7820440a8de9cfc1001315
 ModelImporter:
   serializedVersion: 24300
   internalIDToNameTable: []
-  externalObjects:
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Chrome_-_Polished_1
-    second: {fileID: 2100000, guid: b7769195189361341b3939546e1eabe7, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Glossy_-_Black_1
-    second: {fileID: 2100000, guid: ac5b1b7da79b6554fb2a980791120ad0, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Gray_1
-    second: {fileID: 2100000, guid: 60f22a93f704789409f3fdb2a4e9cf8c, type: 2}
+  externalObjects: {}
   materials:
     materialImportMode: 2
     materialName: 0
@@ -46,7 +31,7 @@ ModelImporter:
     extraExposedTransformPaths: []
     extraUserProperties: []
     clipAnimations: []
-    isReadable: 0
+    isReadable: 1
   meshes:
     lODScreenPercentages:
     - 0.25

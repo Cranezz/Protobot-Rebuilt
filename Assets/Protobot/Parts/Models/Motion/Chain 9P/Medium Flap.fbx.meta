@@ -3,17 +3,7 @@ guid: 80afee327edc82d4591cb4f52387d40f
 ModelImporter:
   serializedVersion: 24300
   internalIDToNameTable: []
-  externalObjects:
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Rubber_-_Black_-_Version_1.1
-    second: {fileID: 2100000, guid: 9a983bcfa2805b048bbad2df841b3952, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Smooth_-_Dark_Gray
-    second: {fileID: 2100000, guid: 2fb8aac72e0afaa4bac733617013f227, type: 2}
+  externalObjects: {}
   materials:
     materialImportMode: 2
     materialName: 0
@@ -41,7 +31,7 @@ ModelImporter:
     extraExposedTransformPaths: []
     extraUserProperties: []
     clipAnimations: []
-    isReadable: 0
+    isReadable: 1
   meshes:
     lODScreenPercentages:
     - 0.25

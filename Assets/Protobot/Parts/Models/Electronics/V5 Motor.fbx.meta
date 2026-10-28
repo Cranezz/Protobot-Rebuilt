@@ -3,62 +3,7 @@ guid: 0165a9b23ac19804cb9ada05a6076d2e
 ModelImporter:
   serializedVersion: 24300
   internalIDToNameTable: []
-  externalObjects:
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: 0,150,57
-    second: {fileID: 2100000, guid: 5bc7fd31b006a2745b96e863abd9316b, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: 165,132,0
-    second: {fileID: 2100000, guid: 3baeec10ebab519439e225fb04cb1f3a, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: 192,192,192
-    second: {fileID: 2100000, guid: 80113a569ee2fda4eb4d35d44725c16f, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: 198,198,208
-    second: {fileID: 2100000, guid: 950c7e7ef9cfa0c429952cc6ae356eec, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: 255,0,0
-    second: {fileID: 2100000, guid: 69a424bbe928a1747bcb1391a478f10b, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: 255,255,192
-    second: {fileID: 2100000, guid: 73b0ca0f530423d44a4dca4e3fb0410e, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: 37,40,42
-    second: {fileID: 2100000, guid: 5dd8634421bfca043be4a991c50aea17, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: 37,40,42(2)
-    second: {fileID: 2100000, guid: 93c6f3b2b753343438043d4fc4676024, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: 37,40,42(3)
-    second: {fileID: 2100000, guid: 7a50584136501be4182766e70ae8860f, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: 37,40,42(4)
-    second: {fileID: 2100000, guid: 0d470ec7eb460be41bc69615cc7c7d47, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: 64,64,64
-    second: {fileID: 2100000, guid: 192759df5aa1c3f4b9ceb9e67dfc0f59, type: 2}
+  externalObjects: {}
   materials:
     materialImportMode: 2
     materialName: 0
@@ -86,7 +31,7 @@ ModelImporter:
     extraExposedTransformPaths: []
     extraUserProperties: []
     clipAnimations: []
-    isReadable: 0
+    isReadable: 1
   meshes:
     lODScreenPercentages:
     - 0.25

@@ -3,32 +3,7 @@ guid: 123a52c0699a6994584203f666c5e7d2
 ModelImporter:
   serializedVersion: 24300
   internalIDToNameTable: []
-  externalObjects:
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Body
-    second: {fileID: 2100000, guid: b1863fa22fce49741b94b1ce540b2157, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Body(1)
-    second: {fileID: 2100000, guid: 0df6008f02e784043b2117e6cb0043de, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Body(2)
-    second: {fileID: 2100000, guid: 941f61afa4655ad47942345538f4464c, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Power_Indicator
-    second: {fileID: 2100000, guid: f9520391e9286ef419c921d43ab8dc7e, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: VEX_Steel
-    second: {fileID: 2100000, guid: 14b2fc0e62a81dc4aacd62246e05ca1e, type: 2}
+  externalObjects: {}
   materials:
     materialImportMode: 2
     materialName: 0
@@ -56,7 +31,7 @@ ModelImporter:
     extraExposedTransformPaths: []
     extraUserProperties: []
     clipAnimations: []
-    isReadable: 0
+    isReadable: 1
   meshes:
     lODScreenPercentages:
     - 0.25

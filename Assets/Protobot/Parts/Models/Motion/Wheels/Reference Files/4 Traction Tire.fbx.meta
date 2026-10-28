@@ -3,17 +3,7 @@ guid: 21fe2c3f3b50b46478063be454dce6f0
 ModelImporter:
   serializedVersion: 24300
   internalIDToNameTable: []
-  externalObjects:
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Smooth_-_Black_1
-    second: {fileID: 2100000, guid: 278a89c84e133644e8055055755c2a0d, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Smooth_-_Dark_Forest_Green_1
-    second: {fileID: 2100000, guid: f7e9d2a3d55c69842b77b7ef49444661, type: 2}
+  externalObjects: {}
   materials:
     materialImportMode: 2
     materialName: 0
@@ -41,7 +31,7 @@ ModelImporter:
     extraExposedTransformPaths: []
     extraUserProperties: []
     clipAnimations: []
-    isReadable: 0
+    isReadable: 1
   meshes:
     lODScreenPercentages:
     - 0.25

@@ -3,32 +3,7 @@ guid: 800157c3f5ed98943a22114810e6561a
 ModelImporter:
   serializedVersion: 24300
   internalIDToNameTable: []
-  externalObjects:
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Cool_White_1
-    second: {fileID: 2100000, guid: 2a262f210a1492041a50138ff0a88e2d, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Cool_White_1(1)
-    second: {fileID: 2100000, guid: 60932097063ff214d890f7827129eacb, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Iron_Gray
-    second: {fileID: 2100000, guid: 13e127bb69cca614b8687e0c9c4bc23b, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Machined_-_Aluminum_1
-    second: {fileID: 2100000, guid: 3ca103734eb8ff4468f89aec01402a89, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Steel
-    second: {fileID: 2100000, guid: 6ae06179011b45445aefbb32b89043c8, type: 2}
+  externalObjects: {}
   materials:
     materialImportMode: 2
     materialName: 0
@@ -56,7 +31,7 @@ ModelImporter:
     extraExposedTransformPaths: []
     extraUserProperties: []
     clipAnimations: []
-    isReadable: 0
+    isReadable: 1
   meshes:
     lODScreenPercentages:
     - 0.25

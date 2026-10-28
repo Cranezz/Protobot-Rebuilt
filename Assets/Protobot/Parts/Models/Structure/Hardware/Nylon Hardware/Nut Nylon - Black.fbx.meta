@@ -3,12 +3,7 @@ guid: e9f7ded03028f784899c550c28f4fc2b
 ModelImporter:
   serializedVersion: 24300
   internalIDToNameTable: []
-  externalObjects:
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Nylon_6
-    second: {fileID: 2100000, guid: 0155a15fdcd3ab64fbc375168a600efe, type: 2}
+  externalObjects: {}
   materials:
     materialImportMode: 2
     materialName: 0

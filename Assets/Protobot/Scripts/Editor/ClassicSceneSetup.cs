@@ -66,7 +66,7 @@ namespace Protobot.Editor
                 EditorUtility.SetDirty(mainData);
             }
 
-            PlayerSetup.SetupOutline();
+            SetupOutline();
 
             var list = EditorBuildSettings.scenes.Where(s => s.path != ScenePath).ToList();
             list.Insert(0, new EditorBuildSettingsScene(ScenePath, true));
@@ -75,6 +75,40 @@ namespace Protobot.Editor
             EditorSceneManager.MarkSceneDirty(scene);
             EditorSceneManager.SaveScene(scene);
             Debug.Log($"[Classic] Scene set up for URP: removed {removed} old components; UI camera stacked on the main camera.");
+        }
+
+        const string RendererFolder = "Assets/Protobot/Settings/Rendering/";
+
+        /// <summary>Adds the outline (Protobot.Rendering.OutlineFeature) to every URP renderer, once.</summary>
+        internal static void SetupOutline()
+        {
+            var mask = Shader.Find("Hidden/Protobot/OutlineMask");
+            var composite = Shader.Find("Hidden/Protobot/Outline");
+            foreach (var guid in AssetDatabase.FindAssets("t:UniversalRendererData", new[] { RendererFolder }))
+            {
+                var data = AssetDatabase.LoadAssetAtPath<UniversalRendererData>(AssetDatabase.GUIDToAssetPath(guid));
+                var feature = data.rendererFeatures.Find(f => f is Protobot.Rendering.OutlineFeature) as Protobot.Rendering.OutlineFeature;
+                if (feature == null)
+                {
+                    // The same steps as the renderer's "Add Renderer Feature" button: a sub-asset, listed with its file id.
+                    feature = ScriptableObject.CreateInstance<Protobot.Rendering.OutlineFeature>();
+                    feature.name = "Outline";
+                    AssetDatabase.AddObjectToAsset(feature, data);
+                    AssetDatabase.TryGetGUIDAndLocalFileIdentifier(feature, out _, out long localId);
+                    var so = new SerializedObject(data);
+                    var features = so.FindProperty("m_RendererFeatures");
+                    var map = so.FindProperty("m_RendererFeatureMap");
+                    features.arraySize++;
+                    features.GetArrayElementAtIndex(features.arraySize - 1).objectReferenceValue = feature;
+                    map.arraySize++;
+                    map.GetArrayElementAtIndex(map.arraySize - 1).longValue = localId;
+                    so.ApplyModifiedPropertiesWithoutUndo();
+                }
+                feature.SetShaders(mask, composite);
+                EditorUtility.SetDirty(feature);
+                EditorUtility.SetDirty(data);
+            }
+            AssetDatabase.SaveAssets();
         }
     }
 }

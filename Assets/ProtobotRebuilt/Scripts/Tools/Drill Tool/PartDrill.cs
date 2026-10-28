@@ -39,7 +39,7 @@ namespace Protobot.Tools {
                 return;
             }
             if (part == null || !PartDrilling.IsDrillable(part)) {
-                feedback.Show("Only metal parts can be drilled", FeedbackDisplay.DisplayType.alert);
+                feedback.Show("This part can't be drilled", FeedbackDisplay.DisplayType.alert);
                 return;
             }
             if (PartDrilling.IsRound(hole)) {

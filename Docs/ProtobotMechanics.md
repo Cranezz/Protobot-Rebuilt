@@ -1,3 +1,7 @@
+> **Legacy (2026-10-27):** written for the first-person workshop version, which was removed. The app is now the
+> original Protobot Rebuilt with V2 features (see `CLAUDE.md`). Kept for the mechanics research (shafts, pivots,
+> gears, pneumatics, physics) that the next phases build on.
+
 # Protobot Rebuilt: mechanics review and plan
 
 What the original Protobot Rebuilt (GPL-3.0, Unity 2021, by BreadSoup, continuing davegersh's Protobot) does,

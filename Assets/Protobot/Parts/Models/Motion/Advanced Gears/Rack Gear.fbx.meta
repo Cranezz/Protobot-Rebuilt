@@ -3,17 +3,7 @@ guid: 07988d11f99d79542b28198a9fb1be6e
 ModelImporter:
   serializedVersion: 24300
   internalIDToNameTable: []
-  externalObjects:
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Smooth_-_Dark_Sea_Green
-    second: {fileID: 2100000, guid: dd2703cec8255a54c873d1017aee2bbc, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Titanium_-_Polished_1
-    second: {fileID: 2100000, guid: 6a1e0030a76a553479c42bb45a8143f9, type: 2}
+  externalObjects: {}
   materials:
     materialImportMode: 2
     materialName: 0
@@ -41,7 +31,7 @@ ModelImporter:
     extraExposedTransformPaths: []
     extraUserProperties: []
     clipAnimations: []
-    isReadable: 0
+    isReadable: 1
   meshes:
     lODScreenPercentages:
     - 0.25

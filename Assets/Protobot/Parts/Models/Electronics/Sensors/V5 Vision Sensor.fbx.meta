@@ -3,87 +3,7 @@ guid: d9738a2c8d6645d418b77ab7c3ab8066
 ModelImporter:
   serializedVersion: 24300
   internalIDToNameTable: []
-  externalObjects:
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: 0,255,0
-    second: {fileID: 2100000, guid: f527a2d1cdf7b5f429c0238216b6a6c8, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: 175,155,135
-    second: {fileID: 2100000, guid: 19f46163e12b60442b7d4c7b3dd4ede8, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: 192,192,192
-    second: {fileID: 2100000, guid: 80113a569ee2fda4eb4d35d44725c16f, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: 202,209,238
-    second: {fileID: 2100000, guid: 12e29e8f7995c7c49a64a3f7b3027a19, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: 250,250,250
-    second: {fileID: 2100000, guid: d2e715f9afc482d4cb46b68b4a99c8d2, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: 252,188,132
-    second: {fileID: 2100000, guid: b05965877310c3e48b294d5e699fe284, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: 255,206,127
-    second: {fileID: 2100000, guid: 3d72f09c71eda8b4ca63b4661828af34, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: 255,242,232
-    second: {fileID: 2100000, guid: 8698e3e5411071f44ab23c19e817a325, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: 255,255,0
-    second: {fileID: 2100000, guid: 0919a5fb135a51e4e87b85f323ebc174, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: 255,255,255
-    second: {fileID: 2100000, guid: 0f1e93fb9b2b01a488a64d93883d01fd, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: 60,60,60
-    second: {fileID: 2100000, guid: e2426539a78f5c94d84e40ce61e5321a, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: 64,64,64
-    second: {fileID: 2100000, guid: 192759df5aa1c3f4b9ceb9e67dfc0f59, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Body
-    second: {fileID: 2100000, guid: b1863fa22fce49741b94b1ce540b2157, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Body(1)
-    second: {fileID: 2100000, guid: 0df6008f02e784043b2117e6cb0043de, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Body(2)
-    second: {fileID: 2100000, guid: 941f61afa4655ad47942345538f4464c, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Button
-    second: {fileID: 2100000, guid: 4007b73071371db42b3ae62d90079dc9, type: 2}
+  externalObjects: {}
   materials:
     materialImportMode: 2
     materialName: 0
@@ -111,7 +31,7 @@ ModelImporter:
     extraExposedTransformPaths: []
     extraUserProperties: []
     clipAnimations: []
-    isReadable: 0
+    isReadable: 1
   meshes:
     lODScreenPercentages:
     - 0.25

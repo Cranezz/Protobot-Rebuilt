@@ -3,17 +3,7 @@ guid: ae55d5d82c563e0468b6ef8e86b14f5d
 ModelImporter:
   serializedVersion: 24300
   internalIDToNameTable: []
-  externalObjects:
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Screws
-    second: {fileID: 2100000, guid: 54ed4db9c79e5874f86792655a88a4a5, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: VEX_Green
-    second: {fileID: 2100000, guid: abe49559d647a884390232f018319372, type: 2}
+  externalObjects: {}
   materials:
     materialImportMode: 2
     materialName: 0

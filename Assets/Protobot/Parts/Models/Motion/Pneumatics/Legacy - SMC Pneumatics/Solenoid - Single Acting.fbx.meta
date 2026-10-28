@@ -3,22 +3,7 @@ guid: f31d2ba4d4216c445bc5dd77f68725c3
 ModelImporter:
   serializedVersion: 24300
   internalIDToNameTable: []
-  externalObjects:
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Cool_White_1
-    second: {fileID: 2100000, guid: 2a262f210a1492041a50138ff0a88e2d, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Cool_White_1(1)
-    second: {fileID: 2100000, guid: 60932097063ff214d890f7827129eacb, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Machined_-_Aluminum
-    second: {fileID: 2100000, guid: 71109092f27e1cf4e85e8b317981a60c, type: 2}
+  externalObjects: {}
   materials:
     materialImportMode: 2
     materialName: 0
@@ -46,7 +31,7 @@ ModelImporter:
     extraExposedTransformPaths: []
     extraUserProperties: []
     clipAnimations: []
-    isReadable: 0
+    isReadable: 1
   meshes:
     lODScreenPercentages:
     - 0.25

@@ -3,12 +3,7 @@ guid: 9ecea0f925803924996b6c6ab59e7c77
 ModelImporter:
   serializedVersion: 24300
   internalIDToNameTable: []
-  externalObjects:
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Black-Oxide_Stainless_Steel
-    second: {fileID: 2100000, guid: a5f75ce25c128ac40b5c8ca14eeea071, type: 2}
+  externalObjects: {}
   materials:
     materialImportMode: 2
     materialName: 0

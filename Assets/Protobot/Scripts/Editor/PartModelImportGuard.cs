@@ -31,9 +31,9 @@ namespace Protobot.Editor
             importer.optimizeMeshPolygons = true;
             importer.importNormals = ModelImporterNormals.Import;
 
-            // The saw and drill reshape metal structure parts and shafts on the CPU, so those meshes stay
-            // readable. Everything else skips the extra memory.
-            importer.isReadable = IsEditable(assetPath);
+            // The part importer (Tools > Protobot > Import VEX Parts) reads every model to bake the inch-scaled
+            // meshes parts use and to scan their holes. The models themselves aren't used at runtime.
+            importer.isReadable = true;
 
             // Parts are static meshes: no rigs, animations or cameras/lights from the file.
             importer.animationType = ModelImporterAnimationType.None;
@@ -43,9 +43,6 @@ namespace Protobot.Editor
             importer.materialImportMode = ModelImporterMaterialImportMode.ImportViaMaterialDescription;
             importer.materialLocation = ModelImporterMaterialLocation.InPrefab;
         }
-
-        public static bool IsEditable(string modelPath) =>
-            modelPath.StartsWith(PartModelsFolder + "Structure/") || modelPath.StartsWith(PartModelsFolder + "Motion/Shaft");
 
         // Screen-height thresholds for the LOD levels written by convert_parts.py (_LOD0/_LOD1/_LOD2).
         // The graphics preset's Model Detail scales these through QualitySettings.lodBias.

@@ -31,3 +31,6 @@
 *.ttf filter=lfs diff=lfs merge=lfs -text
 *.otf filter=lfs diff=lfs merge=lfs -text
 *.mp4 filter=lfs diff=lfs merge=lfs -text
+
+# Baked VEX part meshes (text-serialized, large)
+Assets/ProtobotRebuilt/VEX[[:space:]]Parts/Meshes/*.asset filter=lfs diff=lfs merge=lfs -text

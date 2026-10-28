@@ -3,27 +3,7 @@ guid: 0baee5b5888103a4a91d49be77baa665
 ModelImporter:
   serializedVersion: 24300
   internalIDToNameTable: []
-  externalObjects:
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Glossy_-_Black_1
-    second: {fileID: 2100000, guid: ac5b1b7da79b6554fb2a980791120ad0, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Gray
-    second: {fileID: 2100000, guid: 67a42445cb4e08d4cbf47715c0f13dd6, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Red_1
-    second: {fileID: 2100000, guid: aa7edd43c073bcf4ead512a68b107482, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Rubber_-_Black
-    second: {fileID: 2100000, guid: 1654b7d3a1dda76448a3fc5d3ac43bb8, type: 2}
+  externalObjects: {}
   materials:
     materialImportMode: 2
     materialName: 0
@@ -51,7 +31,7 @@ ModelImporter:
     extraExposedTransformPaths: []
     extraUserProperties: []
     clipAnimations: []
-    isReadable: 0
+    isReadable: 1
   meshes:
     lODScreenPercentages:
     - 0.25

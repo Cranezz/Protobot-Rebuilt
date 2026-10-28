@@ -33,10 +33,11 @@ public static class ClassicToolsBuilder {
         var feedback = roots.SelectMany(r => r.GetComponentsInChildren<FeedbackDisplay>(true)).First();
         var red = AssetDatabase.LoadAssetAtPath<Material>("Assets/ProtobotRebuilt/Materials/Pure Red.mat");
 
-        var saw = AddTool<PartSaw>("Saw", "Saw (cut between holes)", "SawIcon.png", "4", -145.5f, sidebar, toggles, keybindings);
+        var saw = AddTool<PartSaw>("Saw", "Saw (cut any part)", "SawIcon.png", "4", -145.5f, sidebar, toggles, keybindings);
         Wire(saw, camera, feedback, red, "planeMaterial");
         var drill = AddTool<PartDrill>("Drill", "Drill (1/4\" round hole)", "DrillIcon.png", "5", -187f, sidebar, toggles, keybindings);
         Wire(drill, camera, feedback, red, "previewMaterial");
+        BuildPreferences(roots.First(r => r.name == "Preferences Canvas").transform, keybindings);
 
         EditorSceneManager.MarkSceneDirty(scene);
         EditorSceneManager.SaveScene(scene);
@@ -45,9 +46,11 @@ public static class ClassicToolsBuilder {
 
     private static T AddTool<T>(string name, string tooltip, string icon, string key, float y,
                                 Transform sidebar, Transform toggles, Transform keybindings) where T : MonoBehaviour {
-        foreach (var old in new[] { sidebar.Find(name + " Tool"), toggles.Find(name + " Tool Toggle"), keybindings.Find("Enable " + name + " Tool") })
+        foreach (var old in new[] { sidebar.Find(name + " Tool"), toggles.Find(name + " Tool Toggle") })
             if (old != null)
                 Object.DestroyImmediate(old.gameObject);
+        foreach (var old in keybindings.GetComponentsInChildren<InputEvent>(true).Where(e => e.name == "Enable " + name + " Tool").ToList())
+            Object.DestroyImmediate(old.gameObject);
 
         // Keybind: a copy of "Enable Move Tool" on another key.
         var moveKey = keybindings.GetComponentsInChildren<InputEvent>(true).First(e => e.name == "Enable Move Tool");
@@ -103,6 +106,61 @@ public static class ClassicToolsBuilder {
         Clear(buttonToggle.onValueChanged);
         UnityEventTools.AddPersistentListener(buttonToggle.onValueChanged, toolToggle.Toggle);
         return tool;
+    }
+
+    // Preferences > Tools: rebindable keys for the two tools (rows like the General page's) and how the saw works.
+    private static void BuildPreferences(Transform canvas, Transform keybindings) {
+        const string pageName = "Tools Prefs Menu", tabName = "Tools Toggle";
+        var tabs = canvas.Find("Preferences/Category Selection");
+        var pages = canvas.Find("Preferences/Category Container");
+        foreach (var old in new[] { tabs.Find(tabName), pages.Find(pageName) })
+            if (old != null)
+                Object.DestroyImmediate(old.gameObject);
+
+        var general = pages.Find("General Prefs Menu");
+        var page = Object.Instantiate(general.gameObject, pages);
+        page.name = pageName;
+        foreach (Transform child in page.transform.Cast<Transform>().ToList())
+            if (child.name != "Keybinds Title" && child.name != "Shortcut Container (7)")
+                Object.DestroyImmediate(child.gameObject);
+        var template = page.transform.Find("Shortcut Container (7)").gameObject;
+        var y = -40f;
+        foreach (var tool in new[] { "Saw", "Drill" }) {
+            var row = Object.Instantiate(template, page.transform);
+            row.name = tool + " Shortcut";
+            ((RectTransform)row.transform).anchoredPosition = new Vector2(((RectTransform)template.transform).anchoredPosition.x, y);
+            y -= 35f;
+            var rebind = row.GetComponent<RebindUI>();
+            var serialized = new SerializedObject(rebind);
+            serialized.FindProperty("inputEvent").objectReferenceValue =
+                keybindings.GetComponentsInChildren<InputEvent>(true).First(e => e.name == "Enable " + tool + " Tool");
+            serialized.ApplyModifiedPropertiesWithoutUndo();
+            row.transform.Find("Shortcut Title").GetComponent<Text>().text = "Enable " + tool + " Tool";
+        }
+        Object.DestroyImmediate(template);
+
+        // The Game Elements page's help text style, under the rows.
+        var helpSource = pages.Find("Game Elements Menu/Game Elements Help");
+        var help = Object.Instantiate(helpSource.gameObject, page.transform);
+        help.name = "Tools Help";
+        var helpRect = (RectTransform)help.transform;
+        helpRect.anchoredPosition = new Vector2(helpRect.anchoredPosition.x, y - 10f);
+        helpRect.sizeDelta = new Vector2(helpRect.sizeDelta.x, 150f);
+        help.GetComponent<Text>().text =
+            "Saw: click a part to cut it. Channels, angles and plates cut between holes; shafts in 1/8\" steps; " +
+            "anything else cuts across its longest side. R: cut across the next side. Hold Shift: cut anywhere (1/16\" steps).\n\n" +
+            "Drill: click a hole to drill it out to a 1/4\" round hole.";
+        page.SetActive(false);
+
+        var graphicsTab = tabs.Find("Graphics Toggle") ?? tabs.Find("Game Elements Toggle");
+        var tab = Object.Instantiate(graphicsTab.gameObject, tabs);
+        tab.name = tabName;
+        ((RectTransform)tab.transform).anchoredPosition = ((RectTransform)graphicsTab).anchoredPosition + new Vector2(0f, -35f);
+        tab.GetComponentInChildren<Text>().text = "Tools";
+        var toggle = tab.GetComponent<Toggle>();
+        toggle.SetIsOnWithoutNotify(false);
+        Clear(toggle.onValueChanged);
+        UnityEventTools.AddPersistentListener(toggle.onValueChanged, page.SetActive);
     }
 
     private static UnityAction<bool> Setter(Behaviour behaviour) =>

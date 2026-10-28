@@ -3,32 +3,7 @@ guid: d7b180b1436489a4ea0cee34068c61fe
 ModelImporter:
   serializedVersion: 24300
   internalIDToNameTable: []
-  externalObjects:
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: 137,141,141
-    second: {fileID: 2100000, guid: 7ada99914bd86d74d8208cf8977c848f, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Black-Oxide_Stainless_Steel
-    second: {fileID: 2100000, guid: a5f75ce25c128ac40b5c8ca14eeea071, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: V5
-    second: {fileID: 2100000, guid: 7318ca4351f28684683c1f3b10665d9e, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: VEX_Steel
-    second: {fileID: 2100000, guid: 14b2fc0e62a81dc4aacd62246e05ca1e, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Wheel_Rubber
-    second: {fileID: 2100000, guid: ce9d7a8aac9676c4294f2ce7d2b38e00, type: 2}
+  externalObjects: {}
   materials:
     materialImportMode: 2
     materialName: 0
@@ -56,7 +31,7 @@ ModelImporter:
     extraExposedTransformPaths: []
     extraUserProperties: []
     clipAnimations: []
-    isReadable: 0
+    isReadable: 1
   meshes:
     lODScreenPercentages:
     - 0.25

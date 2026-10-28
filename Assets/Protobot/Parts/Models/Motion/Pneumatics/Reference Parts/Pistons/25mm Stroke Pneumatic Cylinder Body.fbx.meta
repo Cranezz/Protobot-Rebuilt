@@ -3,17 +3,7 @@ guid: 32289d4abee2e5f4fac808f52aa46515
 ModelImporter:
   serializedVersion: 24300
   internalIDToNameTable: []
-  externalObjects:
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Aluminum_-_Polished
-    second: {fileID: 2100000, guid: 1712dfaa2c34d994395ecaf445707121, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Steel_-_Polished
-    second: {fileID: 2100000, guid: 8ff71ce1cf13680459955c20afa5c900, type: 2}
+  externalObjects: {}
   materials:
     materialImportMode: 2
     materialName: 0
@@ -41,7 +31,7 @@ ModelImporter:
     extraExposedTransformPaths: []
     extraUserProperties: []
     clipAnimations: []
-    isReadable: 0
+    isReadable: 1
   meshes:
     lODScreenPercentages: []
     globalScale: 1

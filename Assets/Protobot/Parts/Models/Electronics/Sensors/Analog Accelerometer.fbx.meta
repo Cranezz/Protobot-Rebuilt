@@ -3,32 +3,7 @@ guid: d618d2d2580c428458a75f1bc947b9b7
 ModelImporter:
   serializedVersion: 24300
   internalIDToNameTable: []
-  externalObjects:
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Aluminum_-_VEX
-    second: {fileID: 2100000, guid: 429a40162b8814442bdb348b70f75e54, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Glossy_-_Black
-    second: {fileID: 2100000, guid: 664c09840264e7548b90f44aff4be121, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Smooth_-_Black
-    second: {fileID: 2100000, guid: a15196749b208dc41908ca54b0f388b3, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Smooth_-_Ivory
-    second: {fileID: 2100000, guid: 8dd0f31a5571acf4e9ddc7c0818aa584, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Titanium_-_Polished_-_Version_1.1
-    second: {fileID: 2100000, guid: d7b2b41d94508ef4f988433cdaf1496b, type: 2}
+  externalObjects: {}
   materials:
     materialImportMode: 2
     materialName: 0
@@ -56,7 +31,7 @@ ModelImporter:
     extraExposedTransformPaths: []
     extraUserProperties: []
     clipAnimations: []
-    isReadable: 0
+    isReadable: 1
   meshes:
     lODScreenPercentages: []
     globalScale: 1

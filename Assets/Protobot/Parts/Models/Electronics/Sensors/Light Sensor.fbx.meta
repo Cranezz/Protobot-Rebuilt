@@ -3,47 +3,7 @@ guid: 65ce07f9365f18a4c90b9149c092193b
 ModelImporter:
   serializedVersion: 24300
   internalIDToNameTable: []
-  externalObjects:
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Ceramic
-    second: {fileID: 2100000, guid: daea6d0668a230242814992b8233555a, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Rubber_-_Black
-    second: {fileID: 2100000, guid: 1654b7d3a1dda76448a3fc5d3ac43bb8, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Smooth_-_Black
-    second: {fileID: 2100000, guid: a15196749b208dc41908ca54b0f388b3, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Smooth_-_Dark_Gray
-    second: {fileID: 2100000, guid: 2fb8aac72e0afaa4bac733617013f227, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Smooth_-_Ivory
-    second: {fileID: 2100000, guid: 8dd0f31a5571acf4e9ddc7c0818aa584, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Smooth_-_Red
-    second: {fileID: 2100000, guid: 20b78750125b5574bb6c76f2f3743262, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Smooth_-_White
-    second: {fileID: 2100000, guid: 0b1dfc5b0bf35be43bea8404d63cd969, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Titanium_-_Polished
-    second: {fileID: 2100000, guid: 88d112e495dcb6943adece5b996edbb5, type: 2}
+  externalObjects: {}
   materials:
     materialImportMode: 2
     materialName: 0
@@ -71,7 +31,7 @@ ModelImporter:
     extraExposedTransformPaths: []
     extraUserProperties: []
     clipAnimations: []
-    isReadable: 0
+    isReadable: 1
   meshes:
     lODScreenPercentages:
     - 0.25

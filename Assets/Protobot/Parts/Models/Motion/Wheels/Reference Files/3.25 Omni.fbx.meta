@@ -3,27 +3,7 @@ guid: 544364b15c29bfa459e8570a301f7bb6
 ModelImporter:
   serializedVersion: 24300
   internalIDToNameTable: []
-  externalObjects:
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Wheel_Pins
-    second: {fileID: 2100000, guid: 68d92557dc717d545a70f3e2eef802d9, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Wheel_Plastic
-    second: {fileID: 2100000, guid: 4588402aa492d664787bb05a96f53f66, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Wheel_Rubber
-    second: {fileID: 2100000, guid: ce9d7a8aac9676c4294f2ce7d2b38e00, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Wheel_Rubber_2
-    second: {fileID: 2100000, guid: ad530e770981d954387ca3bd30266acd, type: 2}
+  externalObjects: {}
   materials:
     materialImportMode: 2
     materialName: 0
@@ -51,7 +31,7 @@ ModelImporter:
     extraExposedTransformPaths: []
     extraUserProperties: []
     clipAnimations: []
-    isReadable: 0
+    isReadable: 1
   meshes:
     lODScreenPercentages:
     - 0.25

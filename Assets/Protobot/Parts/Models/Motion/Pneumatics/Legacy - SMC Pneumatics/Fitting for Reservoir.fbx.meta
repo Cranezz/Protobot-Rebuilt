@@ -3,22 +3,7 @@ guid: 2ab803686398a6346a13539808e94489
 ModelImporter:
   serializedVersion: 24300
   internalIDToNameTable: []
-  externalObjects:
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Brass_-_Satin
-    second: {fileID: 2100000, guid: ec9890730bd789441a7ffebc8ec5c3a3, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Smooth_-_Light_Orange
-    second: {fileID: 2100000, guid: 4910a654542b6684097712b2de61e987, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Titanium_-_Polished
-    second: {fileID: 2100000, guid: 88d112e495dcb6943adece5b996edbb5, type: 2}
+  externalObjects: {}
   materials:
     materialImportMode: 2
     materialName: 0
@@ -46,7 +31,7 @@ ModelImporter:
     extraExposedTransformPaths: []
     extraUserProperties: []
     clipAnimations: []
-    isReadable: 0
+    isReadable: 1
   meshes:
     lODScreenPercentages:
     - 0.25

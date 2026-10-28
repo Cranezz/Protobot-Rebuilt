@@ -21,18 +21,8 @@ namespace Protobot.Tools {
             return round != null && hole.GetComponent<MeshCollider>().sharedMesh == round;
         }
 
-        /// <summary>Whether the part is metal this drill can cut (C-channels, angles, plates...).</summary>
-        public static bool IsDrillable(GameObject part) {
-            if (!part.TryGetComponent(out SavedObject saved) || string.IsNullOrEmpty(saved.id))
-                return false;
-            var type = PartsManager.GetPartType(saved.id);
-            if (type == null)
-                return false;
-            var generator = type.GetComponent<PartGenerator>();
-            var filter = part.GetComponent<MeshFilter>();
-            return (generator is AluminumPartGenerator || generator is PlatePartGenerator)
-                   && filter != null && filter.sharedMesh != null && filter.sharedMesh.isReadable;
-        }
+        /// <summary>Whether the drill can cut this part (any part whose mesh can be edited: people drill most things).</summary>
+        public static bool IsDrillable(GameObject part) => PartCutting.IsCuttable(part);
 
         /// <summary>Cuts hole <paramref name="index"/> of the part round. False if there was nothing to cut.</summary>
         public static bool Drill(GameObject part, int index, float diameter) {
@@ -78,11 +68,20 @@ namespace Protobot.Tools {
             saved.state += Prefix + index + "," + diameter.ToString(CultureInfo.InvariantCulture) + ";";
         }
 
-        /// <summary>Drills the holes listed in the part's saved state (after loading a build).</summary>
+        /// <summary>
+        /// Makes the edits listed in the part's saved state again (after loading a build): drilled holes and saw
+        /// cuts, in the order they were made (a drilled hole's index counts the holes the part had then).
+        /// </summary>
         public static void ApplySaved(GameObject part) {
             if (!part.TryGetComponent(out SavedObject saved) || string.IsNullOrEmpty(saved.state))
                 return;
             foreach (var entry in saved.state.Split(';')) {
+                if (PartCutting.TryParse(entry, out var point, out var normal)) {
+                    if (PartCutting.Cut(part, point, normal) && part.TryGetComponent(out Parts_List.PartName partName)
+                        && !partName.name.EndsWith("(cut)"))
+                        partName.name += " (cut)";
+                    continue;
+                }
                 if (!entry.StartsWith(Prefix))
                     continue;
                 var values = entry.Substring(Prefix.Length).Split(',');

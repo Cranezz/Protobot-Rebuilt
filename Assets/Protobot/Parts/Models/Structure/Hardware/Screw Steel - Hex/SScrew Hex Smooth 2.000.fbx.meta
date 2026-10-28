@@ -3,12 +3,7 @@ guid: d719c093c9b017f4dbcf3ac52cc61f53
 ModelImporter:
   serializedVersion: 24300
   internalIDToNameTable: []
-  externalObjects:
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Screws
-    second: {fileID: 2100000, guid: 54ed4db9c79e5874f86792655a88a4a5, type: 2}
+  externalObjects: {}
   materials:
     materialImportMode: 2
     materialName: 0

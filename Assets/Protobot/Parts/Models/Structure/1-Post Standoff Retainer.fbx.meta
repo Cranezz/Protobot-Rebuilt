@@ -3,12 +3,7 @@ guid: 65792f82f362f7446bd63dde1cf25b9a
 ModelImporter:
   serializedVersion: 24300
   internalIDToNameTable: []
-  externalObjects:
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Acetal
-    second: {fileID: 2100000, guid: 745fc42b1cd6e1544b588c04e3d235f5, type: 2}
+  externalObjects: {}
   materials:
     materialImportMode: 2
     materialName: 0

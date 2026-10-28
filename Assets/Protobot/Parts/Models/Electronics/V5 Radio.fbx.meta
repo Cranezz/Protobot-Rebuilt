@@ -3,27 +3,7 @@ guid: 0b2b7923a3d299448816b048551e8bc1
 ModelImporter:
   serializedVersion: 24300
   internalIDToNameTable: []
-  externalObjects:
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: 165,132,0
-    second: {fileID: 2100000, guid: 3baeec10ebab519439e225fb04cb1f3a, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: 192,192,192
-    second: {fileID: 2100000, guid: 80113a569ee2fda4eb4d35d44725c16f, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: 202,209,238
-    second: {fileID: 2100000, guid: 12e29e8f7995c7c49a64a3f7b3027a19, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: 64,64,64
-    second: {fileID: 2100000, guid: 192759df5aa1c3f4b9ceb9e67dfc0f59, type: 2}
+  externalObjects: {}
   materials:
     materialImportMode: 2
     materialName: 0
@@ -51,7 +31,7 @@ ModelImporter:
     extraExposedTransformPaths: []
     extraUserProperties: []
     clipAnimations: []
-    isReadable: 0
+    isReadable: 1
   meshes:
     lODScreenPercentages:
     - 0.25

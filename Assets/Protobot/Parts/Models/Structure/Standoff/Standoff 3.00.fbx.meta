@@ -3,12 +3,7 @@ guid: 5484c775cd98b9e47aa0f94b54a6b936
 ModelImporter:
   serializedVersion: 24300
   internalIDToNameTable: []
-  externalObjects:
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Standoffs
-    second: {fileID: 2100000, guid: be21f68148e1c7e448431d19bbd5cf40, type: 2}
+  externalObjects: {}
   materials:
     materialImportMode: 2
     materialName: 0

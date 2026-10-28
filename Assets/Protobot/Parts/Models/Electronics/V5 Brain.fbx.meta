@@ -3,87 +3,7 @@ guid: 7bbe93a11f203d64387ecdd01abdcfd2
 ModelImporter:
   serializedVersion: 24300
   internalIDToNameTable: []
-  externalObjects:
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: 126,126,126
-    second: {fileID: 2100000, guid: 660d5bf0a0661854fb3100cae8fba2d2, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: 202,209,238
-    second: {fileID: 2100000, guid: 12e29e8f7995c7c49a64a3f7b3027a19, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: 229,229,229
-    second: {fileID: 2100000, guid: 973a0ea77b6aa8943b4f36fb092810a0, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: 255,0,0
-    second: {fileID: 2100000, guid: 69a424bbe928a1747bcb1391a478f10b, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: 255,242,232
-    second: {fileID: 2100000, guid: 8698e3e5411071f44ab23c19e817a325, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Battery_Micro_USB_Ports
-    second: {fileID: 2100000, guid: c317b78cf3deb99438fc1050d2fb806f, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Button_Board
-    second: {fileID: 2100000, guid: cf98f8ebfe004d04481473fbcc7504c8, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Button_Board_Part_Two
-    second: {fileID: 2100000, guid: a8c78ff393db76e4bbdcc124b3e0b784, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Main_Body
-    second: {fileID: 2100000, guid: f46fa1c90af50c84eb5bfa0bb6023af5, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Micro_USB_Contact_Points
-    second: {fileID: 2100000, guid: 2333a14151e72de489c16b855ead761f, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Port_21
-    second: {fileID: 2100000, guid: 66e2ab39948afb641a79065fc8209ea5, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Port_Contact_Points
-    second: {fileID: 2100000, guid: 482cf69e71a79314896b3f007094fc5a, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Power_Button_Logo
-    second: {fileID: 2100000, guid: ac0af10b159436f4e88c28bdffc3b3ed, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: SD_Slot
-    second: {fileID: 2100000, guid: 444e33098dc63aa4f9deff83de8c6936, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Screen
-    second: {fileID: 2100000, guid: 9676f03ee3cc1b64c855137b0085a5a8, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Screen_Border
-    second: {fileID: 2100000, guid: f31699703d103c14796ed425337d6a69, type: 2}
+  externalObjects: {}
   materials:
     materialImportMode: 2
     materialName: 0
@@ -111,7 +31,7 @@ ModelImporter:
     extraExposedTransformPaths: []
     extraUserProperties: []
     clipAnimations: []
-    isReadable: 0
+    isReadable: 1
   meshes:
     lODScreenPercentages:
     - 0.25
