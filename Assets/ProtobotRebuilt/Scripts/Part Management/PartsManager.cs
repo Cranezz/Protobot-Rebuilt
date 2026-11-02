@@ -10,7 +10,10 @@ namespace Protobot {
 
         [RuntimeInitializeOnLoadMethod]
         public static void LoadPartTypes() {
-            partTypes = Resources.LoadAll("Part Prefabs").Select(p => (p as GameObject)?.GetComponent<PartType>()).ToArray();
+            // V2: the VEX-CAD families (ids "VX...") first, so the parts list (which stacks bottom-up) shows the
+            // original's parts at the top, in the original's order, and the VEX families below them.
+            partTypes = Resources.LoadAll("Part Prefabs").Select(p => (p as GameObject)?.GetComponent<PartType>())
+                .OrderBy(p => !p.id.StartsWith("VX")).ToArray();
             foreach (var p in partTypes)
                 p.GetComponent<PartGenerator>().InitParamValues();
         }

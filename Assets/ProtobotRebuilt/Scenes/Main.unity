@@ -40745,6 +40745,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   linkMatch: {fileID: 561845619}
   transformToolCanvas: {fileID: 561845618}
+  snappingToggle: {fileID: 799905693}
 --- !u!1 &1575280962 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 2148295964463810837, guid: cfecc8065ab748f43a2824eab2029e29, type: 3}

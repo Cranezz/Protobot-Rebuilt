@@ -21,6 +21,10 @@ public class PartListOutput : MonoBehaviour
     public delegate void WeightUpdated(float newWeight);
     public event WeightUpdated OnWeightUpdated;
 
+    // V2: undo and redo change which parts exist without telling the weight display; recount after every change.
+    private void OnEnable() => Protobot.StateSystems.StateSystem.OnChangeState += CalculatePartsList;
+    private void OnDisable() => Protobot.StateSystems.StateSystem.OnChangeState -= CalculatePartsList;
+
     public void CalculatePartsList()
     {
         //finds all of parts loaded in the scene

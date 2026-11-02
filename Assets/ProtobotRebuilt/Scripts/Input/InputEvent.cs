@@ -35,6 +35,10 @@ namespace Protobot.InputEvents {
             if (rebindAction.IsEmpty) {
                 defaultAction.Enable();
             }
+
+            defaultAction.TrackTaps(); // V2
+            rebindAction.action.TrackTaps();
+            rebindAction.OnCompleteRebind += () => rebindAction.action.TrackTaps();
         }
 
         public void Update() {
@@ -47,6 +51,13 @@ namespace Protobot.InputEvents {
                     performed?.Invoke();
                 else
                     canceled?.Invoke();
+            }
+            // V2: the original only polled, so a click pressed and let go between two frames did nothing.
+            else if (!IsPressed && (defaultAction.AllControlsTappedThisFrame() || rebindAction.action.AllControlsTappedThisFrame())) {
+                IsPressed = true;
+                performed?.Invoke();
+                IsPressed = false;
+                canceled?.Invoke();
             }
 
             prevPressStatus = IsPressed;

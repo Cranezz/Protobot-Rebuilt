@@ -79,6 +79,9 @@ namespace Protobot.UI {
 
         public void EnableMenu() {
             gameObject.SetActive(true);
+            // V2: lay the menu out now; the first time it opened it had no size yet, so the cursor counted as
+            // outside it and it closed straight away.
+            LayoutRebuilder.ForceRebuildLayoutImmediate(rectTransform);
 
             if (enableAtMousePos) {
                 rectTransform.sizeDelta = new Vector2(rectTransform.sizeDelta.x, rectTransform.sizeDelta.y);

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Controls;
 using System.Linq;
 using UnityEngine.Rendering;
 
@@ -65,6 +66,39 @@ namespace Protobot {
             }
 
             return false;
+        }
+
+        // V2: a press too quick for polling: every control of the action is down or went down since the last frame,
+        // and one of them was let go again before this frame (a quick click, or a quick Z while Ctrl is held).
+        public static bool AllControlsTappedThisFrame(this InputAction action) {
+            if (!action.enabled)
+                return false;
+
+            var tapped = false;
+            for (int i = 0; i < action.controls.Count; i++) {
+                var control = action.controls[i];
+                if (control.path == "")
+                    continue;
+                if (control is ButtonControl button) {
+                    if (button.isPressed)
+                        continue;
+                    if (!button.wasPressedThisFrame || !button.wasReleasedThisFrame)
+                        return false;
+                    tapped = true;
+                }
+                else if (!control.IsPressed())
+                    return false;
+            }
+
+            return tapped;
+        }
+
+        // V2: buttons only start keeping presses made between frames once they are first asked about; asking early
+        // keeps the first quick click from being missed.
+        public static void TrackTaps(this InputAction action) {
+            for (int i = 0; i < action.controls.Count; i++)
+                if (action.controls[i] is ButtonControl button)
+                    _ = button.wasPressedThisFrame;
         }
 
         //STRINGS
