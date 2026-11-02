@@ -9,6 +9,7 @@ namespace Protobot.Tools {
     
         public Vector3 finalPosition = Vector3.zero;
         public override Vector3 FinalPosition => finalPosition;
+        protected override Vector3? SnapAxis => normal.Vector; // V2
 
         public override void Move() {
             if (planeCast.hasHit) {
@@ -21,7 +22,7 @@ namespace Protobot.Tools {
 
         public override void Initialize() {
             planeCast.GetComponent<LookAt>().vectorLink = normal;
-            initObjPos = refObj.transform.position;
+            initObjPos = GizmoPosition; // V2: the gizmo, which may be a group's middle
         }
     }
 }

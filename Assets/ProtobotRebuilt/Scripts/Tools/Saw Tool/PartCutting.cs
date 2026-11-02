@@ -55,6 +55,21 @@ namespace Protobot.Tools {
             return true;
         }
 
+        /// <summary>
+        /// A copy of a mesh (in inches) cut along a plane and capped, keeping the side the normal points to;
+        /// null if nothing is left. Used to make parts from full-length stock.
+        /// </summary>
+        public static Mesh Slice(Mesh source, Vector3 point, Vector3 normal) {
+            var metres = Scaled(source, MetresPerUnit);
+            var kept = MeshSlicer.Slice(metres, new Plane(normal.normalized, point * MetresPerUnit));
+            Object.DestroyImmediate(metres);
+            if (kept == null || kept.vertexCount == 0)
+                return null;
+            var mesh = Scaled(kept, 1f / MetresPerUnit);
+            Object.DestroyImmediate(kept);
+            return mesh;
+        }
+
         public static void Record(SavedObject saved, Vector3 point, Vector3 normal) {
             saved.state += Prefix + string.Join(",", new[] { point.x, point.y, point.z, normal.x, normal.y, normal.z }
                 .Select(v => v.ToString("R", CultureInfo.InvariantCulture))) + ";";

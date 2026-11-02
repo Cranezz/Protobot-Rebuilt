@@ -35,8 +35,13 @@ public static class ClassicToolsBuilder {
 
         var saw = AddTool<PartSaw>("Saw", "Saw (cut any part)", "SawIcon.png", "4", -145.5f, sidebar, toggles, keybindings);
         Wire(saw, camera, feedback, red, "planeMaterial");
-        var drill = AddTool<PartDrill>("Drill", "Drill (1/4\" round hole)", "DrillIcon.png", "5", -187f, sidebar, toggles, keybindings);
+        var drill = AddTool<PartDrill>("Drill", "Drill (round holes, 1/16\" to 1\")", "DrillIcon.png", "5", -187f, sidebar, toggles, keybindings);
         Wire(drill, camera, feedback, red, "previewMaterial");
+        // V2: the measure tool (key 6), with the ruler icon.
+        var measure = AddTool<MeasureTool>("Measure", "Measure", "ruler.png", "6", -228f, sidebar, toggles, keybindings);
+        var serializedMeasure = new SerializedObject(measure);
+        serializedMeasure.FindProperty("feedback").objectReferenceValue = feedback;
+        serializedMeasure.ApplyModifiedPropertiesWithoutUndo();
         BuildPreferences(roots.First(r => r.name == "Preferences Canvas").transform, keybindings);
 
         EditorSceneManager.MarkSceneDirty(scene);
@@ -44,7 +49,7 @@ public static class ClassicToolsBuilder {
         Debug.Log("[Classic] Built the Saw and Drill tools.");
     }
 
-    private static T AddTool<T>(string name, string tooltip, string icon, string key, float y,
+    public static T AddTool<T>(string name, string tooltip, string icon, string key, float y,
                                 Transform sidebar, Transform toggles, Transform keybindings) where T : MonoBehaviour {
         foreach (var old in new[] { sidebar.Find(name + " Tool"), toggles.Find(name + " Tool Toggle") })
             if (old != null)
@@ -125,7 +130,7 @@ public static class ClassicToolsBuilder {
                 Object.DestroyImmediate(child.gameObject);
         var template = page.transform.Find("Shortcut Container (7)").gameObject;
         var y = -40f;
-        foreach (var tool in new[] { "Saw", "Drill" }) {
+        foreach (var tool in new[] { "Saw", "Drill", "Measure" }) {
             var row = Object.Instantiate(template, page.transform);
             row.name = tool + " Shortcut";
             ((RectTransform)row.transform).anchoredPosition = new Vector2(((RectTransform)template.transform).anchoredPosition.x, y);
@@ -145,11 +150,12 @@ public static class ClassicToolsBuilder {
         help.name = "Tools Help";
         var helpRect = (RectTransform)help.transform;
         helpRect.anchoredPosition = new Vector2(helpRect.anchoredPosition.x, y - 10f);
-        helpRect.sizeDelta = new Vector2(helpRect.sizeDelta.x, 150f);
+        helpRect.sizeDelta = new Vector2(helpRect.sizeDelta.x, 190f);
         help.GetComponent<Text>().text =
-            "Saw: click a part to cut it. Channels, angles and plates cut between holes; shafts in 1/8\" steps; " +
-            "anything else cuts across its longest side. R: cut across the next side. Hold Shift: cut anywhere (1/16\" steps).\n\n" +
-            "Drill: click a hole to drill it out to a 1/4\" round hole.";
+            "Saw: click a part to place a cut plane. Drag the arrow (1/16\" steps, Shift: free) or click the dimension to type " +
+            "a distance; click its dot to measure from a hole, corner or face. R: tilt the plane. Enter cuts, Esc goes back.\n\n" +
+            "Drill: pick a bit (1/16\" to 1\") in the tool options, then click a hole.\n\n" +
+            "Measure: click two holes, corners or faces to see the distance between them.";
         page.SetActive(false);
 
         var graphicsTab = tabs.Find("Graphics Toggle") ?? tabs.Find("Game Elements Toggle");

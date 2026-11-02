@@ -34,17 +34,21 @@ namespace Protobot.Tools {
             // The hole collider sits in the middle of the wall, its forward along the hole.
             var normal = (hole.localRotation * Vector3.forward).normalized;
             var depth = Mathf.Abs(hole.localScale.z);
+            var filter = part.GetComponent<MeshFilter>();
+            // V2: the wall can be thicker than its hole collider (then the back face kept its square hole);
+            // cut through the metal the mesh actually has around the hole.
+            var (front, back) = WallExtent(filter.sharedMesh, hole.localPosition, normal, depth,
+                Mathf.Max(diameter, Mathf.Max(hole.localScale.x, hole.localScale.y)) * 0.75f + 0.02f);
             const float margin = 0.002f;
             var info = new HoleInfo {
                 found = true,
-                center = hole.localPosition + normal * (depth / 2f + margin),
+                center = hole.localPosition + normal * (front + margin),
                 normal = normal,
-                thickness = depth + 2f * margin,
+                thickness = front - back + 2f * margin,
                 holeRadius = diameter / 2f,
                 round = true,
             };
 
-            var filter = part.GetComponent<MeshFilter>();
             var drilled = HoleDrilling.Drill(filter.sharedMesh, info, diameter / 2f);
             if (drilled == null)
                 return false;
@@ -62,6 +66,22 @@ namespace Protobot.Tools {
             holeData.shape = holeCollider.sharedMesh;
             holeData.size = new Vector2(diameter, diameter);
             return true;
+        }
+
+        // How far the wall goes in front of and behind the hole's centre (along its axis), from the mesh's
+        // vertices around the hole; at least the hole collider's own depth, at most a little more than it.
+        private static (float front, float back) WallExtent(Mesh mesh, Vector3 center, Vector3 axis, float depth, float radius) {
+            float front = depth / 2f, back = -depth / 2f;
+            var reach = Mathf.Max(depth * 1.5f, 0.1f);
+            foreach (var vertex in mesh.vertices) {
+                var offset = vertex - center;
+                var along = Vector3.Dot(offset, axis);
+                if (Mathf.Abs(along) > reach || (offset - axis * along).sqrMagnitude > radius * radius)
+                    continue;
+                front = Mathf.Max(front, along);
+                back = Mathf.Min(back, along);
+            }
+            return (front, back);
         }
 
         public static void Record(SavedObject saved, int index, float diameter) {

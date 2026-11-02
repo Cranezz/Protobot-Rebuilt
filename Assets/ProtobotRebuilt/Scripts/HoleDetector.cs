@@ -65,17 +65,23 @@ namespace Protobot {
         //Returns true if a hole is intersecting any other hole current detected by holeDetector
         public bool IsHoleIntersecting(HoleCollider otherHole) {
             if (!holes.Contains(otherHole)) {
-                var otherHoleBounds = otherHole.GetComponent<MeshCollider>().bounds;
-                otherHoleBounds.Expand(-0.01f);
-
+                // V2: the original compared world-aligned bounds, which grow on turned parts, so stacked holes
+                // (a plate's and then a nut's) counted as overlapping and a copied screw never connected.
+                // Holes overlap when one's centre is inside the other.
                 foreach (HoleCollider hole in holes) {
-                    var holeBounds = hole.GetComponent<MeshCollider>().bounds;
-                    if (holeBounds.Intersects(otherHoleBounds))
+                    if (Contains(hole.transform, otherHole.transform.position) || Contains(otherHole.transform, hole.transform.position))
                         return true;
                 }
             }
 
             return false;
+        }
+
+        // Whether a point is inside a hole collider's box (its mesh spans -0.5..0.5, scaled by the transform).
+        private static bool Contains(Transform hole, Vector3 point) {
+            var local = hole.InverseTransformPoint(point);
+            const float inside = 0.49f;
+            return Mathf.Abs(local.x) < inside && Mathf.Abs(local.y) < inside && Mathf.Abs(local.z) < inside;
         }
 
         private void OnTriggerStay(Collider other) {

@@ -16,7 +16,7 @@ namespace Protobot.Tools {
 
         public void EnablePlaneObj() {
             planeCast.gameObject.SetActive(true);
-            planeCast.transform.position = refObj.transform.position;
+            planeCast.transform.position = GizmoPosition; // V2: the gizmo, which may be a group's middle
         }
 
         public override void OnPointerDown() {

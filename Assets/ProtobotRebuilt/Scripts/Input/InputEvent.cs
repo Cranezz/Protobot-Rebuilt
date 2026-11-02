@@ -43,7 +43,13 @@ namespace Protobot.InputEvents {
 
         public void Update() {
             if (RebindAction.Rebinding) return;
-            
+
+            // V2: keyboard shortcuts (1-5 for the tools, Delete, R...) do nothing while a text box is being typed in.
+            if (TextInput.IsTyping && IsKeyboardShortcut) {
+                prevPressStatus = IsPressed = false;
+                return;
+            }
+
             IsPressed = defaultAction.AllControlsPressed() || rebindAction.action.AllControlsPressed();
 
             if (IsPressed != prevPressStatus) {
@@ -61,6 +67,20 @@ namespace Protobot.InputEvents {
             }
 
             prevPressStatus = IsPressed;
+        }
+
+        // Bound only to keys (not the mouse), and not Escape, which still closes things while typing.
+        private bool IsKeyboardShortcut {
+            get {
+                var action = rebindAction.IsEmpty ? defaultAction : rebindAction.action;
+                var any = false;
+                foreach (var control in action.controls) {
+                    if (!(control.device is Keyboard) || control.name == "escape")
+                        return false;
+                    any = true;
+                }
+                return any;
+            }
         }
 
         public void OnDisable() {

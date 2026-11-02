@@ -29,6 +29,7 @@ namespace Protobot.Rendering
             renderer.renderingLayerMask = on ? renderer.renderingLayerMask | Layer : renderer.renderingLayerMask & ~Layer;
             var block = new MaterialPropertyBlock();
             renderer.GetPropertyBlock(block);
+            color.a = 1f;  // the mask leaves out alpha 0 (no colour given)
             block.SetColor(ObjectColorId, on ? color : Color.clear);
             renderer.SetPropertyBlock(block);
         }
@@ -65,7 +66,7 @@ namespace Protobot.Rendering
                 maskMaterial = CoreUtils.CreateEngineMaterial(maskShader);
             if (compositeMaterial == null)
                 compositeMaterial = CoreUtils.CreateEngineMaterial(compositeShader);
-            maskMaterial.SetColor(ObjectColorId, color);
+            maskMaterial.SetColor(ObjectColorId, Color.clear);  // only objects given a colour are outlined
             compositeMaterial.SetFloat(WidthId, width * Mathf.Max(1f, renderingData.cameraData.camera.pixelHeight / 1080f));
             pass.Setup(maskMaterial, compositeMaterial);
             renderer.EnqueuePass(pass);

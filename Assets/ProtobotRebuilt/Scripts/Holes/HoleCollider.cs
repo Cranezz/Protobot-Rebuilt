@@ -53,6 +53,7 @@ namespace Protobot {
         }
 
         public void RemoveDeletedDetectors() {
+            detectors.RemoveAll(detector => detector == null); // V2: destroyed ones (not only deleted) free the hole
             var deleteList = detectors.Where(detector => detector.gameObject.IsDeleted()).ToList();
 
             foreach (var detector in deleteList) {

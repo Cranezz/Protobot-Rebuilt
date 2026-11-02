@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using DG.Tweening;
@@ -51,7 +51,13 @@ namespace Protobot {
         private Vector3 MouseVector => (MouseInput.Position - refCamera.WorldToScreenPoint(transform.position)).normalized;
         private Quaternion initRot; //the intiial rotation of the selection
         
+        // V2: the rotate ring (a child of the placement ghost) used to spin with the part; it stays put now.
+        private Transform rotateRing;
+        private Quaternion ringRotation;
+        private Vector3 ringPosition;
+
         private void Awake() {
+            rotateRing = transform.Find("Rotate Ring Canvas");
             placing = false;
             rotating = false;
             
@@ -119,6 +125,8 @@ namespace Protobot {
                     }*/
                     
                     Rotate();
+                    if (rotateRing != null)
+                        rotateRing.SetPositionAndRotation(ringPosition, ringRotation);
                 }
                 else {
                     foreach (PlaceDisplacement placePosition in placePositions) {
@@ -218,6 +226,10 @@ namespace Protobot {
         }
         public void InitRotation() {
             initMouseVector = MouseVector;
+            if (rotateRing != null) {
+                ringRotation = rotateRing.rotation;
+                ringPosition = rotateRing.position;
+            }
 
             initRot = transform.rotation;
             initRotVector = transform.forward;

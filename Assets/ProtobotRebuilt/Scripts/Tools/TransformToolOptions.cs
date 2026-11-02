@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -19,9 +19,34 @@ namespace Protobot.Tools {
             RotateRing.snapping = snapping;
         }
 
+        private static TransformToolOptions instance;
+
         private void Awake() {
+            instance = this;
             if (snappingToggle != null)
                 snappingToggle.SetIsOnWithoutNotify(PositionTool.snapping);
+        }
+
+        // V2: the same settings in the tool options bar (the right-click menu was hard to find).
+        [RuntimeInitializeOnLoadMethod]
+        private static void RegisterOptions() => Protobot.Interface.ToolRail.RegisterOptions("Transform", BuildOptions);
+
+        private static void BuildOptions(RectTransform bar) {
+            if (instance == null)
+                instance = FindFirstObjectByType<TransformToolOptions>(FindObjectsInactive.Include);
+            if (instance == null)
+                return;
+            var local = instance.linkMatch.matchRotation;
+            Protobot.Interface.ToolOptions.Segmented(bar, new[] { "Global", "Local" }, local ? 1 : 0, i => {
+                if (i == 0) instance.OrientGlobal();
+                else instance.OrientLocal();
+                Protobot.Interface.ToolOptions.Rebuild();
+            });
+            Protobot.Interface.ToolOptions.Switch(bar, "Snap 1/8\" and 5°", PositionTool.snapping, on => {
+                instance.SetSnapping(on);
+                if (instance.snappingToggle != null)
+                    instance.snappingToggle.SetIsOnWithoutNotify(on);
+            });
         }
 
         public void OrientGlobal() {

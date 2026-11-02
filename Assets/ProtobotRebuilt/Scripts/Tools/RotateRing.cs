@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -18,6 +18,7 @@ namespace Protobot.Tools {
         private Vector3 initMouseVector; //the initial Vector between the mouse position and the selection position
         private Vector3 MouseVector => (MouseInput.Position - refCamera.WorldToScreenPoint(transform.position)).normalized;
         private Quaternion initRot; //the intiial rotation of the selection
+        private Vector3 initPos, initOffset; // V2: where the part and the gizmo were when the drag started
 
         private Quaternion finalRotation = Quaternion.identity;
         public override Quaternion FinalRotation => finalRotation;
@@ -35,7 +36,10 @@ namespace Protobot.Tools {
             float camDot = Vector3.Dot(refCamera.transform.forward, initRotVector); //finds the dot product between the camera direction vs. the look direction of this rotate ring
             Quaternion newRot = Quaternion.AngleAxis(angle, -initRotVector * Mathf.Sign(camDot)) * initRot;
             
-            movementManager.RotateTo(newRot);
+            // V2: turn about the gizmo (a group's middle), not only about the clicked part's own middle.
+            var center = initPos + initOffset;
+            var newPos = center + newRot * Quaternion.Inverse(initRot) * (initPos - center);
+            movementManager.DisplaceTo(new Protobot.Transformations.Displacement(newPos, newRot));
 
             finalRotation = newRot;
         }
@@ -44,6 +48,9 @@ namespace Protobot.Tools {
             initMouseVector = MouseVector;
 
             initRot = refObj.transform.rotation;
+            initPos = refObj.transform.position;
+            var canvas = GetComponentInParent<MatchObjectLinkTransform>();
+            initOffset = canvas != null && canvas.centerOnGroup ? TransformGizmo.Offset : Vector3.zero;
             initRotVector = rotVectorLink.Vector;
         }
 

@@ -1,9 +1,10 @@
 // Draws an object into the outline mask in its outline colour, alpha 1 (Protobot.Rendering.OutlineFeature).
+// Objects without a colour of their own (MaterialPropertyBlock) are left out.
 Shader "Hidden/Protobot/OutlineMask"
 {
     Properties
     {
-        _OutlineObjectColor ("Color", Color) = (1, 0.82, 0.2, 1)
+        _OutlineObjectColor ("Color", Color) = (0, 0, 0, 0)
     }
     SubShader
     {
@@ -45,6 +46,8 @@ Shader "Hidden/Protobot/OutlineMask"
 
             half4 Frag(Varyings input) : SV_Target
             {
+                // No colour given (alpha 0): a copy that kept the outline bit without its colour. Draw nothing.
+                clip(_OutlineObjectColor.a - 0.5);
                 return half4(_OutlineObjectColor.rgb, 1);
             }
             ENDHLSL

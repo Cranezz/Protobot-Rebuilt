@@ -13,7 +13,47 @@ namespace Protobot {
         [SerializeField] private GameObject end;
         [SerializeField] private Material material;
         [SerializeField] private int maxHoleCount = 35;
+
+        // V2: a part is cut from full-length stock (maxHoleCount holes), the way the saw cuts, instead of being
+        // put together from segments: every length gets a clean, capped end (the original only had the end
+        // segment on full-length parts). Cut meshes are kept per length.
+        [NonSerialized] private Mesh stock;
+        [NonSerialized] private readonly System.Collections.Generic.Dictionary<int, Mesh> cutMeshes = new();
+
         public Mesh GetMesh(int holeCount) {
+            holeCount = Mathf.Clamp(holeCount, 1, maxHoleCount);
+            if (cutMeshes.TryGetValue(holeCount, out var cached) && cached != null)
+                return cached;
+            var full = Stock();
+            if (holeCount == maxHoleCount)
+                return full;
+
+            // Keep the first holeCount holes: cut in the middle of the gap after the last one, then centre them.
+            var cutAt = GetXPos(holeCount - 1, maxHoleCount) + 0.25f;
+            var mesh = Tools.PartCutting.Slice(full, new Vector3(cutAt, 0f, 0f), Vector3.left);
+            if (mesh == null)
+                return Segments(holeCount);
+            var shift = 0.25f * (maxHoleCount - holeCount);
+            var vertices = mesh.vertices;
+            for (var i = 0; i < vertices.Length; i++)
+                vertices[i].x += shift;
+            mesh.vertices = vertices;
+            mesh.RecalculateBounds();
+            mesh.name = name + " (" + holeCount + ")";
+            cutMeshes[holeCount] = mesh;
+            return mesh;
+        }
+
+        private Mesh Stock() {
+            if (stock == null) {
+                stock = Segments(maxHoleCount);
+                stock.name = name + " (" + maxHoleCount + ")";
+            }
+            return stock;
+        }
+
+        // The original's way: one segment per hole.
+        private Mesh Segments(int holeCount) {
             CombineInstance[] combine = new CombineInstance[holeCount];
 
             for (int i = 0; i < holeCount; i++) {
