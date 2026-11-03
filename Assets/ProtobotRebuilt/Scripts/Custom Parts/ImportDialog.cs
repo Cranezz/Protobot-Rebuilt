@@ -13,14 +13,16 @@ using UnityEngine.UI;
 
 namespace Protobot.Custom {
     // V2: importing your own part. "+" in the parts browser opens the computer's file window (STL, OBJ, 3MF, GLB,
-    // glTF, PLY, OFF); the model then shows here turning slowly (drag to turn it, scroll to zoom) with its
-    // settings: name, the file's units and up axis, a quality preset (fewer triangles keeps big models fast),
-    // material (weight) and "Part has holes", which finds the holes (round and square, square to the part's
-    // sides) and marks them; click a marker to select it and delete it, or "Add hole" and click the model to put
-    // one there. "Add to parts" saves it to the library, puts it in the parts browser and starts placing it.
+    // glTF, PLY, OFF); the model then shows here at full detail (a warning when it has so many triangles it may
+    // slow the app), turning slowly until you touch it; it turns and pans with the same mouse buttons as the scene
+    // (or a left drag) and zooms with the wheel, and the scene behind holds still. Settings: name, the file's units
+    // and up axis, material (weight) and "Part has holes", which finds the holes and outlines them in blue. Point
+    // at any outline in a flat face (a circle, a filleted slot, any shape with an inside) and click: it becomes a
+    // hole of exactly that shape (screws slide around in it when it's bigger than them); click a hole to select it,
+    // Delete removes it. "Add to parts" saves it to the library and starts placing it. Edit (Select tool, or a
+    // right-click on the part) opens a part again to change its holes; every copy in the build updates.
     public class ImportDialog : MonoBehaviour {
-        private static readonly string[] Qualities = { "Original", "High", "Medium", "Low" };
-        private static readonly float[] QualityShare = { 1f, 0.5f, 0.2f, 0.08f };
+        private const int DetailWarning = 60000;
         private static readonly string[] MaterialNames = { "Aluminum", "Steel", "Plastic" };
         private const int PreviewLayer = 15;
         private const int MaxTriangles = 600000;
@@ -35,12 +37,10 @@ namespace Protobot.Custom {
         private string partName;
         private ModelImport.Unit unit;
         private bool zUp;
-        private int quality = 1;
         private int material;
         private bool hasHoles;
-        private int holeSize;
-        private bool addingHole;
-        private int selectedHole = -1;
+        private int selectedHole = -1, hoverHole = -1;
+        private CustomPartData editing;  // the library part being edited (null: a new import)
 
         // The model in inches, Y up, centred: full detail (for holes) and as it will be saved.
         private List<Vector3> fullVertices = new(), vertices = new();
@@ -52,9 +52,12 @@ namespace Protobot.Custom {
         private Camera previewCamera;
         private RenderTexture texture;
         private Mesh previewMesh;
-        private readonly List<GameObject> markers = new();
-        private Material markerMaterial, markerSelected;
+        private ShapeGraphic shapes;
+        private Facets facets;
+        private Facets.Loop hoverLoop;
+        private TextMeshProUGUI modeHint;
         private float yaw = 30f, pitch = 25f, distance = 10f;
+        private Vector3 target;  // what the preview camera turns around (panned)
         private bool spinning = true;
         private Vector2 lastMouse;
         private bool dragging, pressedOnPreview;
@@ -63,6 +66,7 @@ namespace Protobot.Custom {
         public static void Choose() {
             var filters = new[] { new ExtensionFilter("3D models", ModelImport.Extensions), new ExtensionFilter("All files", "*") };
             var paths = StandaloneFileBrowser.OpenFilePanel("Import a part", "", filters, false);
+            InputEvents.TextInput.AfterFileWindow();
             if (paths == null || paths.Length == 0 || string.IsNullOrEmpty(paths[0])) {
                 Interface.Interface.Say("Import cancelled", false);
                 return;
@@ -86,10 +90,34 @@ namespace Protobot.Custom {
             import.file = result;
             import.path = path;
             import.Build();
+            if (result.triangles.Count / 3 > DetailWarning)
+                Interface.Interface.Say("This model has " + (result.triangles.Count / 3).ToString("N0") + " triangles: lots of copies of it may slow things down", false);
+        }
+
+        /// <summary>Opens a part from the library again, to change its name, material and holes.</summary>
+        public static void Edit(CustomPartData part) {
+            if (part == null || !CustomParts.ReadMesh(part, out var meshVertices, out var meshTriangles)) {
+                Interface.Interface.Say("Couldn't open that part", false);
+                return;
+            }
+            var result = new ModelImport.Result { unit = ModelImport.Unit.Inches, unitKnown = true };
+            result.vertices.AddRange(meshVertices);
+            result.triangles.AddRange(meshTriangles);
+            var dialog = Dialog.Open("Edit part", new Vector2(1000f, 700f));
+            var import = dialog.gameObject.AddComponent<ImportDialog>();
+            import.dialog = dialog;
+            import.file = result;
+            import.path = part.source ?? part.name;
+            import.editing = part;
+            import.partName = part.name;
+            import.material = Mathf.Max(0, System.Array.IndexOf(MaterialNames, part.material));
+            import.hasHoles = part.holes != null && part.holes.Length > 0;
+            import.holes.AddRange(part.holes ?? new CustomHole[0]);
+            import.Build();
         }
 
         private void Build() {
-            partName = Path.GetFileNameWithoutExtension(path);
+            if (editing == null) partName = Path.GetFileNameWithoutExtension(path);
             unit = file.unit;
             zUp = file.zUp;
             dialog.OnClose += Cleanup;
@@ -103,8 +131,17 @@ namespace Protobot.Custom {
             previewFrame.rectTransform.anchoredPosition = Vector2.zero;
             previewImage = Ui.Rect("Image", previewFrame.transform).Fill(2, 2, 2, 2).gameObject.AddComponent<RawImage>();
             previewImage.raycastTarget = true;
-            var hint = Ui.Hint(previewFrame.transform, "Drag", "turn", "Scroll", "zoom");
-            hint.Place(new Vector2(0f, 0f), new Vector2(0f, 0f), new Vector2(12f, 10f), new Vector2(300f, 22f));
+            shapes = ShapeGraphic.Create(previewImage.transform);
+            var hint = Ui.Hint(previewFrame.transform, "Drag", "turn", "Middle drag", "pan", "Wheel", "zoom", "Click", "a shape: hole");
+            hint.Place(new Vector2(0f, 0f), new Vector2(0f, 0f), new Vector2(12f, 10f), new Vector2(520f, 22f));
+            // What a click on the model does now (adding a hole, picking a shape).
+            modeHint = Ui.Text(previewFrame.transform, "Mode", "", Theme.FontSmall, Theme.Text);
+            modeHint.alignment = TextAlignmentOptions.Center;
+            modeHint.rectTransform.anchorMin = new Vector2(0f, 1f);
+            modeHint.rectTransform.anchorMax = new Vector2(1f, 1f);
+            modeHint.rectTransform.pivot = new Vector2(0.5f, 1f);
+            modeHint.rectTransform.sizeDelta = new Vector2(-24f, 26f);
+            modeHint.rectTransform.anchoredPosition = new Vector2(0f, -10f);
 
             // The settings scroll when they don't fit (holes add rows).
             var scroll = Ui.Rect("Settings", dialog.Body);
@@ -130,7 +167,7 @@ namespace Protobot.Custom {
 
             var cancel = Ui.Button(dialog.Footer, "Cancel", "Cancel", dialog.Close, false, 6f);
             cancel.Size(-1f, 36f);
-            var add = Ui.Button(dialog.Footer, "Add", "Add to parts", Finish, true, 6f);
+            var add = Ui.Button(dialog.Footer, "Add", editing != null ? "Save changes" : "Add to parts", Finish, true, 6f);
             add.Size(-1f, 36f);
 
             MakeStage();
@@ -142,6 +179,13 @@ namespace Protobot.Custom {
         // ------------------------------------------------------------------ the mesh
 
         private void Process() {
+            if (editing != null) {
+                // Already in inches, Y up and centred; its holes are kept as they were.
+                fullVertices = new List<Vector3>(file.vertices);
+                fullTriangles = new List<int>(file.triangles);
+                Simplify();
+                return;
+            }
             // Units and axes.
             var scale = ModelImport.InchesPer(unit);
             fullVertices = file.vertices.Select(v => (zUp ? new Vector3(v.x, v.z, v.y) : new Vector3(v.x, v.y, -v.z)) * scale).ToList();
@@ -168,14 +212,12 @@ namespace Protobot.Custom {
             return volume;
         }
 
+        // Full detail (the quality presets lost the shapes holes are picked from); hard edges kept sharp.
         private void Simplify() {
             vertices = new List<Vector3>(fullVertices);
             triangles = new List<int>(fullTriangles);
-            var count = triangles.Count / 3;
-            var target = Mathf.Max(300, Mathf.RoundToInt(count * QualityShare[quality]));
-            if (target < count)
-                MeshTools.Simplify(vertices, triangles, target);
             MeshTools.SplitHardEdges(vertices, triangles, 30f);
+            facets = null;
             UpdatePreviewMesh();
         }
 
@@ -196,13 +238,36 @@ namespace Protobot.Custom {
             foreach (var hole in found) {
                 var size = hole.size / m;
                 if (size < 0.1f) continue;  // smaller than an 8-32 screw: nothing goes in it
-                holes.Add(new CustomHole {
+                var found1 = new CustomHole {
                     center = (hole.entry + hole.axis * (hole.depth / 2f)) / m,
                     axis = hole.axis.normalized, size = size, depth = hole.depth / m, square = hole.square,
                     threaded = !hole.square && size <= 0.168f && size >= 0.125f && !hole.through,
-                });
+                    up = hole.side.normalized, size2 = hole.size2 / m,
+                };
+                // V2: a shape that isn't a circle or a plain square/slot (a hexagon, a D) gets its exact outline,
+                // as clicking it would.
+                var exact = ExactShape(found1);
+                if (exact != null) {
+                    exact.threaded = false;
+                    found1 = exact;
+                }
+                holes.Add(found1);
             }
-            UpdateMarkers();
+        }
+
+        // The outline in a flat face around a found hole, as an exact hole, when it isn't round or a plain box.
+        private CustomHole ExactShape(CustomHole found) {
+            if (vertices.Count == 0) return null;
+            facets ??= new Facets(vertices, triangles);
+            foreach (var loop in facets.innerLoops) {
+                if (Mathf.Abs(Vector3.Dot(loop.normal.normalized, found.axis)) < 0.98f) continue;
+                if (Vector3.ProjectOnPlane(loop.center - found.center, found.axis).magnitude > Mathf.Max(0.05f, found.size * 0.25f)) continue;
+                var hole = HoleFrom(loop, out var fit);
+                if (hole == null || hole.outline == null) return null;          // round
+                if (loop.points.Count == 4) return null;                        // a plain square or slot: the scanner's box is it
+                return hole;
+            }
+            return null;
         }
 
         // ------------------------------------------------------------------ settings column
@@ -220,6 +285,7 @@ namespace Protobot.Custom {
             fileText.Size(-1, 24f, 1f);
 
             Dialog.Heading(settings, "Size");
+            if (editing == null) {
             var unitRow = Dialog.Row(settings, "Units");
             ToolOptions.Segmented(unitRow, new[] { "mm", "cm", "m", "in" }, (int)unit, i => {
                 unit = (ModelImport.Unit)i;
@@ -233,6 +299,7 @@ namespace Protobot.Custom {
                 Process();
                 BuildSettings();
             }, 70f);
+            }
             var size = ModelBounds.size;
             var sizeRow = Dialog.Row(settings, "Size", 24f);
             Ui.Text(sizeRow, "Size", Inch.Format(size.x) + " × " + Inch.Format(size.y) + " × " + Inch.Format(size.z), Theme.FontBody, Theme.Text)
@@ -242,16 +309,15 @@ namespace Protobot.Custom {
                 warn.Size(-1, 20f);
             }
 
-            Dialog.Heading(settings, "Quality");
-            var qualityRow = Dialog.Row(settings, "Detail");
-            ToolOptions.Segmented(qualityRow, Qualities, quality, i => {
-                quality = i;
-                Simplify();
-                BuildSettings();
-            }, 60f);
-            var trianglesRow = Dialog.Row(settings, "", 22f);
-            Ui.Text(trianglesRow, "Triangles", (triangles.Count / 3).ToString("N0") + " triangles (file: " + (file.triangles.Count / 3).ToString("N0") + ")", Theme.FontSmall, Theme.TextFaint)
+            var detailRow = Dialog.Row(settings, "Detail", 22f);
+            var triangleCount = triangles.Count / 3;
+            Ui.Text(detailRow, "Triangles", triangleCount.ToString("N0") + " triangles (full detail)", Theme.FontSmall, Theme.TextFaint)
                 .Size(-1, 22f, 1f);
+            if (triangleCount > DetailWarning) {
+                var heavy = Ui.Text(settings, "Detail Warning", "Lots of detail: many copies of this part may make the app lag. A simpler model (fewer triangles) from your CAD program helps.", Theme.FontSmall, Theme.Warning);
+                heavy.textWrappingMode = TextWrappingModes.Normal;
+                heavy.Size(-1, 36f);
+            }
 
             Dialog.Heading(settings, "Material");
             var materialRow = Dialog.Row(settings, "Made of");
@@ -270,27 +336,18 @@ namespace Protobot.Custom {
                 hasHoles = on;
                 if (on) {
                     FindHoles();
-                    Interface.Interface.Say(holes.Count == 0 ? "No holes found: add them with Add hole" : "Found " + holes.Count + (holes.Count == 1 ? " hole" : " holes"), holes.Count > 0);
+                    Interface.Interface.Say(holes.Count == 0 ? "No holes found: click a shape on the model to make it a hole" : "Found " + holes.Count + (holes.Count == 1 ? " hole" : " holes"), holes.Count > 0);
                 }
-                else {
+                else
                     holes.Clear();
-                    addingHole = false;
-                    UpdateMarkers();
-                }
                 BuildSettings();
             });
             if (hasHoles) {
                 var count = Ui.Text(settings, "Count", holes.Count + (holes.Count == 1 ? " hole" : " holes") + (selectedHole >= 0 ? " · one selected" : ""), Theme.FontSmall, Theme.TextDim);
                 count.Size(-1, 20f);
-                var addRow = Dialog.Row(settings, "");
-                var add = Ui.Button(addRow, "Add Hole", addingHole ? "Click the model…" : "Add hole", () => {
-                    addingHole = !addingHole;
-                    BuildSettings();
-                }, addingHole, 5f, Theme.FontSmall);
-                add.Size(-1, 30f);
-                Ui.Tip(add, "Add hole", null, "Then click the model where the hole goes: it goes through the wall there, square to the face.");
-                var sizes = Popup.Choice(addRow, HoleSizes.Labels, holeSize, i => holeSize = i, 196f);
-                sizes.Size(196f, 30f);
+                var how = Ui.Text(settings, "How", "Point at any shape in a face (a circle, a slot, a filleted rectangle...) and click it to make it a hole of that exact shape. Click a hole to select it.", Theme.FontSmall, Theme.TextFaint);
+                how.textWrappingMode = TextWrappingModes.Normal;
+                how.Size(-1, 54f);
                 var editRow = Dialog.Row(settings, "");
                 var delete = Ui.Button(editRow, "Delete", "Delete selected", DeleteSelected, false, 5f, Theme.FontSmall);
                 delete.Size(-1, 30f);
@@ -299,7 +356,6 @@ namespace Protobot.Custom {
                 var clear = Ui.Button(editRow, "Clear", "Remove all", () => {
                     holes.Clear();
                     selectedHole = -1;
-                    UpdateMarkers();
                     BuildSettings();
                     Interface.Interface.Say("Removed all holes", false);
                 }, false, 5f, Theme.FontSmall);
@@ -311,7 +367,6 @@ namespace Protobot.Custom {
             if (selectedHole < 0 || selectedHole >= holes.Count) return;
             holes.RemoveAt(selectedHole);
             selectedHole = -1;
-            UpdateMarkers();
             BuildSettings();
             Interface.Interface.Say("Deleted the hole");
         }
@@ -321,6 +376,18 @@ namespace Protobot.Custom {
         private void Finish() {
             if (vertices.Count == 0) {
                 Interface.Interface.Say("There's nothing to import", false);
+                return;
+            }
+            if (editing != null) {
+                editing.name = partName;
+                editing.material = MaterialNames[material];
+                editing.holes = holes.ToArray();
+                editing.weightGrams = CustomParts.Weight(fullVertices, fullTriangles, MaterialNames[material]);
+                CustomParts.Add(editing);
+                Thumbnails.Forget(editing.key);
+                var copies = CustomParts.UpdateInScene(editing);
+                dialog.Close();
+                Interface.Interface.Say("Saved " + editing.name + (copies > 0 ? ": " + copies + (copies == 1 ? " copy" : " copies") + " in the build updated" : ""));
                 return;
             }
             var part = new CustomPartData {
@@ -371,11 +438,6 @@ namespace Protobot.Custom {
             light.intensity = 1.1f;
             light.transform.rotation = Quaternion.Euler(40f, -30f, 0f);
 
-            var holeBase = Interface.Interface.Instance.polycarbMaterial;
-            markerMaterial = new Material(holeBase) { color = new Color(Theme.Accent.r, Theme.Accent.g, Theme.Accent.b, 0.6f) };
-            if (markerMaterial.HasProperty("_BaseColor")) markerMaterial.SetColor("_BaseColor", markerMaterial.color);
-            markerSelected = new Material(holeBase) { color = new Color(Theme.Warning.r, Theme.Warning.g, Theme.Warning.b, 0.8f) };
-            if (markerSelected.HasProperty("_BaseColor")) markerSelected.SetColor("_BaseColor", markerSelected.color);
             FrameModel();
         }
 
@@ -396,32 +458,11 @@ namespace Protobot.Custom {
             var collider = model.GetComponent<MeshCollider>();
             collider.sharedMesh = null;
             collider.sharedMesh = previewMesh;
-            UpdateMarkers();
         }
 
         private void FrameModel() {
             var size = ModelBounds.size.magnitude;
             distance = Mathf.Max(size * 1.9f, 0.5f);
-        }
-
-        private void UpdateMarkers() {
-            foreach (var marker in markers) Destroy(marker);
-            markers.Clear();
-            if (model == null) return;
-            for (var i = 0; i < holes.Count; i++) {
-                var hole = holes[i];
-                var marker = GameObject.CreatePrimitive(hole.square ? PrimitiveType.Cube : PrimitiveType.Cylinder);
-                Destroy(marker.GetComponent<Collider>());
-                marker.layer = PreviewLayer;
-                marker.transform.SetParent(model.transform, false);
-                marker.transform.localPosition = hole.center;
-                // Cylinders stand along their y; cubes are a unit across.
-                var depth = Mathf.Max(hole.depth, 0.05f) + 0.04f;
-                marker.transform.localRotation = Quaternion.FromToRotation(Vector3.up, hole.axis);
-                marker.transform.localScale = hole.square ? new Vector3(hole.size, depth, hole.size) : new Vector3(hole.size, depth / 2f, hole.size);
-                marker.GetComponent<Renderer>().sharedMaterial = i == selectedHole ? markerSelected : markerMaterial;
-                markers.Add(marker);
-            }
         }
 
         private void Update() {
@@ -430,6 +471,7 @@ namespace Protobot.Custom {
             var over = mouse != null && RectTransformUtility.RectangleContainsScreenPoint(previewImage.rectTransform, mouse.position.ReadValue());
             if (mouse != null) {
                 var position = mouse.position.ReadValue();
+                var delta = mouse.delta.ReadValue();
                 if (mouse.leftButton.wasPressedThisFrame && over && !Popup.IsOpen) {
                     pressedOnPreview = true;
                     dragging = false;
@@ -437,12 +479,7 @@ namespace Protobot.Custom {
                 }
                 if (pressedOnPreview && mouse.leftButton.isPressed) {
                     if (Vector2.Distance(position, pressMouse) > 4f) dragging = true;
-                    if (dragging) {
-                        var delta = position - lastMouse;
-                        yaw += delta.x * 0.4f;
-                        pitch = Mathf.Clamp(pitch - delta.y * 0.4f, -85f, 85f);
-                        spinning = false;
-                    }
+                    if (dragging) Orbit(position - lastMouse);
                     lastMouse = position;
                 }
                 if (pressedOnPreview && mouse.leftButton.wasReleasedThisFrame) {
@@ -450,20 +487,44 @@ namespace Protobot.Custom {
                     if (!dragging) ClickPreview(position);
                     dragging = false;
                 }
+                // The scene's own buttons (turn, pan) work here too; the scene behind holds still meanwhile.
+                if (over || orbiting || panning) {
+                    orbiting = MousePivotCameraInput.OrbitPressed && (orbiting || over);
+                    panning = MousePivotCameraInput.PanPressed && (panning || over);
+                    if (orbiting) Orbit(delta);
+                    if (panning) {
+                        var scale = distance * 0.0015f;
+                        target -= (previewCamera.transform.right * delta.x + previewCamera.transform.up * delta.y) * scale;
+                        spinning = false;
+                    }
+                }
                 if (over) {
                     var wheel = mouse.scroll.ReadValue().y;
-                    if (Mathf.Abs(wheel) > 0.01f) distance *= wheel > 0f ? 0.88f : 1.12f;
+                    if (Mathf.Abs(wheel) > 0.01f) {
+                        distance *= wheel > 0f ? 0.88f : 1.12f;
+                        spinning = false;
+                    }
                 }
             }
             if (Keyboard.current != null && !InputEvents.TextInput.IsTyping
                 && (Keyboard.current.deleteKey.wasPressedThisFrame || Keyboard.current.backspaceKey.wasPressedThisFrame))
                 DeleteSelected();
-            if (spinning) yaw += Time.unscaledDeltaTime * 18f;
+            // It turns slowly on its own until you turn it, and holds still under the mouse (to click holes).
+            if (spinning && !over) yaw += Time.unscaledDeltaTime * 18f;
 
             var rotation = Quaternion.Euler(pitch, yaw, 0f);
-            previewCamera.transform.position = stage.transform.position + rotation * new Vector3(0f, 0f, -distance);
+            previewCamera.transform.position = stage.transform.position + target + rotation * new Vector3(0f, 0f, -distance);
             previewCamera.transform.rotation = rotation;
             previewCamera.Render();
+            DrawHoles(mouse != null && over && !dragging ? mouse.position.ReadValue() : (Vector2?)null);
+        }
+
+        private bool orbiting, panning;
+
+        private void Orbit(Vector2 delta) {
+            yaw += delta.x * 0.4f;
+            pitch = Mathf.Clamp(pitch - delta.y * 0.4f, -85f, 85f);
+            spinning = false;
         }
 
         private void ClickPreview(Vector2 screen) {
@@ -472,45 +533,28 @@ namespace Protobot.Custom {
             var viewport = new Vector2((local.x - rect.xMin) / rect.width, (local.y - rect.yMin) / rect.height);
             var ray = previewCamera.ViewportPointToRay(viewport);
 
-            if (addingHole) {
-                if (!Physics.Raycast(ray, out var hit, 1000f, 1 << PreviewLayer)) {
-                    Interface.Interface.Say("Click on the model to put the hole there", false);
-                    return;
+            // A hole under the mouse: select it. Otherwise the shape under it becomes a hole.
+            var best = HoleAt(screen);
+            if (best >= 0) {
+                if (best != selectedHole) {
+                    selectedHole = best;
+                    BuildSettings();
+                    Interface.Interface.Say("Selected a hole: Delete removes it");
                 }
-                var localPoint = model.transform.InverseTransformPoint(hit.point);
-                var normal = model.transform.InverseTransformDirection(hit.normal).normalized;
-                var depth = WallThickness(localPoint, -normal);
-                var choice = HoleSizes.Common[holeSize];
-                holes.Add(new CustomHole {
-                    center = localPoint - normal * (depth / 2f), axis = -normal, size = choice.inches, depth = depth,
-                    square = choice.square, threaded = choice.threaded,
-                });
-                selectedHole = holes.Count - 1;
-                addingHole = false;
-                UpdateMarkers();
-                BuildSettings();
-                Interface.Interface.Say("Added a " + choice.label.Split('(')[0].Trim() + " hole");
                 return;
             }
-
-            // Select the marker nearest the click.
-            var best = -1;
-            var bestDistance = 0.04f;
-            for (var i = 0; i < holes.Count; i++) {
-                var center = model.transform.TransformPoint(holes[i].center);
-                var along = Vector3.Dot(center - ray.origin, ray.direction);
-                var distanceToRay = Vector3.Distance(center, ray.origin + ray.direction * along);
-                var allowed = Mathf.Max(holes[i].size * 0.75f, holes[i].depth * 0.6f);
-                if (distanceToRay < allowed && (best < 0 || distanceToRay / allowed < bestDistance)) {
-                    best = i;
-                    bestDistance = distanceToRay / allowed;
-                }
+            var loop = LoopAt(MouseLocal(screen));
+            if (loop != null) {
+                if (!hasHoles) hasHoles = true;
+                MakeHole(loop);
+                return;
             }
-            if (best != selectedHole) {
-                selectedHole = best;
-                UpdateMarkers();
+            if (selectedHole >= 0) {
+                selectedHole = -1;
                 BuildSettings();
             }
+            else
+                Interface.Interface.Say("Point at a shape with an inside (a circle, a slot...) in a flat face, then click it", false);
         }
 
         // How far the mesh goes from a surface point inwards (both sides of every triangle count).
@@ -543,12 +587,229 @@ namespace Protobot.Custom {
         }
 
         private void Cleanup() {
-            foreach (var marker in markers) if (marker != null) Destroy(marker);
             if (stage != null) Destroy(stage);
             if (texture != null) texture.Release();
             if (previewMesh != null) Destroy(previewMesh);
-            if (markerMaterial != null) Destroy(markerMaterial);
-            if (markerSelected != null) Destroy(markerSelected);
+        }
+
+        // ------------------------------------------------------------------ holes drawn over the preview
+
+        private static readonly Color HoleBlue = new(0.25f, 0.62f, 1f, 1f);
+        private static readonly Color PickBlue = new(0.45f, 0.78f, 1f, 1f);
+
+        private Vector2? ToPreview(Vector3 local) {
+            var world = model.transform.TransformPoint(local);
+            var viewport = previewCamera.WorldToViewportPoint(world);
+            if (viewport.z <= 0f) return null;
+            var rect = shapes.rectTransform.rect;
+            return rect.min + new Vector2(viewport.x * rect.width, viewport.y * rect.height);
+        }
+
+        private Vector2 MouseLocal(Vector2 screen) {
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(shapes.rectTransform, screen, null, out var local);
+            return local;
+        }
+
+        /// <summary>The outline of one end of a hole (end -1 or 1), in the model's space.</summary>
+        private static List<Vector3> Rim(CustomHole hole, float end) {
+            var axis = hole.axis.normalized;
+            var up = Vector3.ProjectOnPlane(hole.up, axis);
+            if (up.sqrMagnitude < 0.25f) up = Vector3.ProjectOnPlane(Mathf.Abs(axis.y) < 0.9f ? Vector3.up : Vector3.right, axis);
+            up.Normalize();
+            var right = Vector3.Cross(up, axis).normalized;
+            var center = hole.center + axis * (end * hole.depth / 2f);
+            var points = new List<Vector3>();
+            if (hole.outline != null && hole.outline.Length >= 3) {
+                foreach (var p in hole.outline) points.Add(center + right * p.x + up * p.y);
+            }
+            else if (hole.square) {
+                var hx = hole.size / 2f;
+                var hy = (hole.size2 > 0f ? hole.size2 : hole.size) / 2f;
+                points.Add(center - right * hx - up * hy);
+                points.Add(center + right * hx - up * hy);
+                points.Add(center + right * hx + up * hy);
+                points.Add(center - right * hx + up * hy);
+            }
+            else
+                for (var i = 0; i < 32; i++) {
+                    var a = i * Mathf.PI * 2f / 32f;
+                    points.Add(center + (right * Mathf.Cos(a) + up * Mathf.Sin(a)) * (hole.size / 2f));
+                }
+            return points;
+        }
+
+        private static Vector3 End(CustomHole hole, float end) => hole.center + hole.axis.normalized * (end * hole.depth / 2f);
+
+        // Whether the model hides a point (in its space) from the preview camera.
+        private bool Hidden(Vector3 local) {
+            var world = model.transform.TransformPoint(local);
+            var from = previewCamera.transform.position;
+            var toPoint = world - from;
+            return Physics.Raycast(from, toPoint.normalized, toPoint.magnitude - 0.01f, 1 << PreviewLayer);
+        }
+
+        private List<Vector2> Project(List<Vector3> points) {
+            var result = new List<Vector2>(points.Count);
+            foreach (var p in points) {
+                var q = ToPreview(p);
+                if (!q.HasValue) return null;
+                result.Add(q.Value);
+            }
+            return result;
+        }
+
+        // Each hole: a blue outline at both ends with a see-through blue fill (fainter where the model hides it);
+        // the selected one orange, the one under the mouse lighter. While picking a shape, the outline under the
+        // mouse.
+        private void DrawHoles(Vector2? mouseScreen) {
+            shapes.Clear();
+            hoverLoop = null;
+            hoverHole = -1;
+            if (mouseScreen.HasValue) {
+                hoverHole = HoleAt(mouseScreen.Value);
+                if (hoverHole < 0) hoverLoop = LoopAt(MouseLocal(mouseScreen.Value));
+            }
+
+            for (var i = 0; i < holes.Count; i++) {
+                var color = i == selectedHole ? Theme.Warning : i == hoverHole ? PickBlue : HoleBlue;
+                for (var end = -1; end <= 1; end += 2) {
+                    var points = Project(Rim(holes[i], end));
+                    if (points == null) continue;
+                    var hidden = Hidden(End(holes[i], end));
+                    if (!hidden) Fan(points, new Color(color.r, color.g, color.b, 0.3f));
+                    shapes.Polyline(points, hidden ? new Color(color.r, color.g, color.b, 0.35f) : color, hidden ? 1.2f : 2.2f, true);
+                }
+            }
+
+            if (hoverLoop != null) {
+                var points = Project(hoverLoop.points);
+                if (points != null && points.Count >= 3) {
+                    Fan(points, new Color(PickBlue.r, PickBlue.g, PickBlue.b, 0.35f));
+                    shapes.Polyline(points, PickBlue, 3f, true);
+                }
+            }
+
+            modeHint.text = hoverLoop != null ? "Click to make this shape a hole" : hoverHole >= 0 ? "Click to select this hole" : "";
+        }
+
+        // A filled outline, as a fan from its middle (a hole's end is convex; a picked shape is close enough).
+        private void Fan(List<Vector2> points, Color color) {
+            var center = Vector2.zero;
+            foreach (var p in points) center += p;
+            center /= points.Count;
+            for (var i = 0; i < points.Count; i++)
+                shapes.Triangle(center, points[i], points[(i + 1) % points.Count], color);
+        }
+
+        /// <summary>The hole whose outline is under the mouse (the nearest to the camera), or -1.</summary>
+        private int HoleAt(Vector2 screen) {
+            var mouse = MouseLocal(screen);
+            var best = -1;
+            var bestDepth = float.MaxValue;
+            for (var i = 0; i < holes.Count; i++) {
+                for (var end = -1; end <= 1; end += 2) {
+                    var points = Project(Rim(holes[i], end));
+                    if (points == null) continue;
+                    if (!Geometry.MeshSlicer.Contains(points, mouse) && !NearOutline(points, mouse, 6f)) continue;
+                    var depth = Vector3.Distance(previewCamera.transform.position, model.transform.TransformPoint(End(holes[i], end)));
+                    if (depth < bestDepth) {
+                        bestDepth = depth;
+                        best = i;
+                    }
+                }
+            }
+            return best;
+        }
+
+        private static bool NearOutline(List<Vector2> points, Vector2 p, float pixels) {
+            for (var i = 0; i < points.Count; i++) {
+                var a = points[i];
+                var ab = points[(i + 1) % points.Count] - a;
+                var t = ab.sqrMagnitude > 1e-6f ? Mathf.Clamp01(Vector2.Dot(p - a, ab) / ab.sqrMagnitude) : 0f;
+                if ((a + ab * t - p).sqrMagnitude < pixels * pixels) return true;
+            }
+            return false;
+        }
+
+        // ------------------------------------------------------------------ picking a shape as a hole
+
+        /// <summary>The outline in a flat face (facing the camera) under the mouse, or null.</summary>
+        private Facets.Loop LoopAt(Vector2 mouse) {
+            facets ??= new Facets(vertices, triangles);
+            var view = model.transform.InverseTransformPoint(previewCamera.transform.position);
+            Facets.Loop best = null;
+            var bestScore = float.MaxValue;
+            foreach (var loop in facets.innerLoops) {
+                if (Vector3.Dot(loop.normal, view - loop.center) <= 0f) continue;  // its face looks away
+                var points = Project(loop.points);
+                if (points == null) continue;
+                var depth = (view - loop.center).magnitude;
+                // Inside it (the nearest to the camera wins), or else right on its edge.
+                float score;
+                if (Geometry.MeshSlicer.Contains(points, mouse)) score = depth;
+                else if (NearOutline(points, mouse, 8f)) score = 1e4f + depth;
+                else continue;
+                if (score < bestScore) {
+                    bestScore = score;
+                    best = loop;
+                }
+            }
+            return best;
+        }
+
+        // The picked outline as a hole: round when it's a circle, otherwise the smallest box around it (a square,
+        // or a slot the screw can slide along), through the wall the face is on.
+        private void MakeHole(Facets.Loop loop) {
+            var hole = HoleFrom(loop, out var fit);
+            if (hole == null) {
+                Interface.Interface.Say("That shape is too small to be a hole", false);
+                return;
+            }
+            var round = hole.outline == null;
+            foreach (var other in holes)
+                if (Vector3.Distance(other.center, hole.center) < 0.03f && Mathf.Abs(Vector3.Dot(other.axis.normalized, hole.axis)) > 0.98f) {
+                    Interface.Interface.Say("That shape is already a hole", false);
+                    return;
+                }
+            holes.Add(hole);
+            selectedHole = holes.Count - 1;
+            BuildSettings();
+            Interface.Interface.Say((round ? "Made a " + fit.Describe() + " hole" : "Made a hole of that exact shape (" + Inch.Format(fit.size) + " × " + Inch.Format(fit.size2 > 0f ? fit.size2 : fit.size) + ")") + (fit.Slides ? ": a screw slides around in it" : ""));
+        }
+
+        // A hole from an outline in a flat face (null: too small).
+        private CustomHole HoleFrom(Facets.Loop loop, out Polycarb.PolyPart.HoleFit fit) {
+            var n = loop.normal.normalized;
+            var axis = -n;
+            var u = Vector3.ProjectOnPlane(Mathf.Abs(n.y) < 0.9f ? Vector3.up : Vector3.right, n).normalized;
+            var v = Vector3.Cross(n, u);
+            var origin = loop.center;
+            var flat = loop.points.Select(p => new Vector2(Vector3.Dot(p - origin, u), Vector3.Dot(p - origin, v))).ToList();
+            fit = Polycarb.PolyPart.FitHole(flat);
+            if (!fit.valid) return null;
+            var middle = origin + u * fit.center.x + v * fit.center.y;
+            var sideY = (u * fit.side.x + v * fit.side.y).normalized;
+
+            // How thick the wall is: just outside the shape, into the material.
+            var edge = loop.points[0];
+            var outward = Vector3.ProjectOnPlane(edge - middle, n).normalized;
+            var depth = WallThickness(edge + outward * 0.03f, axis);
+            if (depth > 4f) depth = 0.125f;
+
+            // V2: only a true circle (drawn with many sides) is a round hole; anything else, a 12-sided hole
+            // included, is the exact shape clicked.
+            var round = fit.round && loop.points.Count >= 24;
+            var hole = new CustomHole {
+                axis = axis, depth = depth, center = middle + axis * (depth / 2f),
+                square = !round, size = fit.size, size2 = round ? 0f : fit.size2, up = round ? Vector3.zero : (sideY.sqrMagnitude > 0.5f ? sideY : v),
+            };
+            // Its exact shape, in the hole's own right/up (as its collider is turned: right = up x axis).
+            if (!round) {
+                var up = hole.up;
+                var right = Vector3.Cross(up, axis).normalized;
+                hole.outline = loop.points.Select(p => new Vector2(Vector3.Dot(p - middle, right), Vector3.Dot(p - middle, up))).ToArray();
+            }
+            return hole;
         }
     }
 }

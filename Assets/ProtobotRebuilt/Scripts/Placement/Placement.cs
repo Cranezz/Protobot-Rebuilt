@@ -17,6 +17,8 @@ namespace Protobot {
         [SerializeField] private MovementManager movementManager;
 
         public bool placing;
+        public static Placement Instance { get; private set; }  // V2
+        public static bool IsPlacing => Instance != null && Instance.placing;  // V2
         public bool rotating;
 
         private PlacementData currentPlacementData;
@@ -56,8 +58,16 @@ namespace Protobot {
         private Quaternion ringRotation;
         private Vector3 ringPosition;
 
+        // V2: the part's own turn (where it started, plus the user's turns away from holes): a hole turns the part
+        // to fit while it's over it, and moving off the hole gives the part its own turn back. T sets it back to
+        // where placing began.
+        private Quaternion freeRotation, startRotation;
+        private bool snappedTurn;
+
         private void Awake() {
+            Instance = this;  // V2
             rotateRing = transform.Find("Rotate Ring Canvas");
+            ThreadPlaceDisplacement.AddTo(this, placePositions);  // V2: a cylinder held by its thread
             placing = false;
             rotating = false;
             
@@ -102,6 +112,7 @@ namespace Protobot {
         }
 
         void Update() {
+            ThreadPlaceDisplacement.WatchClicks(this);  // V2
             if (placing) {
                 if (rotating) {
                     /*
@@ -125,16 +136,25 @@ namespace Protobot {
                     }*/
                     
                     Rotate();
+                    if (!snappedTurn) freeRotation = currentDisplacement.rotation.Orientation;  // V2
                     if (rotateRing != null)
                         rotateRing.SetPositionAndRotation(ringPosition, ringRotation);
                 }
                 else {
+                    // V2: T: back to the turn placing began with.
+                    if (UnityEngine.InputSystem.Keyboard.current != null && UnityEngine.InputSystem.Keyboard.current.tKey.wasPressedThisFrame
+                        && !InputEvents.TextInput.IsTyping && !InputEvents.TextInput.ShortcutsPaused) {
+                        freeRotation = startRotation;
+                        currentDisplacement = new Displacement(currentDisplacement.translation.Position, freeRotation);
+                        Interface.Interface.Say("Turn reset");
+                    }
                     foreach (PlaceDisplacement placePosition in placePositions) {
                         if (placePosition.TryGetDisplacement(currentPlacementData, out Displacement displacement)) {
                             var newDisplacement = displacement;
+                            snappedTurn = placePosition.ModifyRotation;  // V2
                             if (!placePosition.ModifyRotation) {
-                                newDisplacement = new Displacement(displacement.translation.Position,
-                                                                   currentDisplacement.rotation.Orientation);
+                                // V2: the part's own turn, not the one the last hole gave it.
+                                newDisplacement = new Displacement(displacement.translation.Position, freeRotation);
                             }
 
                             currentDisplacement = newDisplacement;
@@ -153,12 +173,15 @@ namespace Protobot {
             placing = true;
             rotating = false;
             meshFilter.mesh = newPlacementData.GetDisplayMesh();
+            freeRotation = startRotation = Quaternion.identity;  // V2
+            snappedTurn = false;
 
             if (currentPlacementData.TryParse(out GameObjectPlacementData objPlaceData)) {
                 var objTransform = objPlaceData.GetGameObject().transform;
                 transform.rotation = objTransform.rotation;
                 transform.position = objTransform.position;
                 currentDisplacement = new Displacement(transform);
+                freeRotation = startRotation = objTransform.rotation;  // V2
                 
                 SetPlacementLayer(objPlaceData.GetGameObject(), true);
             }
@@ -183,6 +206,7 @@ namespace Protobot {
         }
 
         public void StopPlacing() {
+            ThreadPlaceDisplacement.Grabbed = null;  // V2
             if (currentPlacementData.TryParse(out GameObjectPlacementData objPlaceData))
                 SetPlacementLayer(objPlaceData.GetGameObject(), false);
             
@@ -228,7 +252,9 @@ namespace Protobot {
             initMouseVector = MouseVector;
             if (rotateRing != null) {
                 ringRotation = rotateRing.rotation;
-                ringPosition = rotateRing.position;
+                // V2: on the point the part turns about (the hole it's held by), so the ring stays on the part
+                // while it turns instead of being left where the part's middle was.
+                ringPosition = transform.position;
             }
 
             initRot = transform.rotation;

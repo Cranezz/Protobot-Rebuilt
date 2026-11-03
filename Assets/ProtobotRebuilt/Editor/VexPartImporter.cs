@@ -31,7 +31,6 @@ public static class VexPartImporter {
     private const string MeshFolder = "Assets/ProtobotRebuilt/VEX Parts/Meshes/";
     private const string ProgressPath = "Temp/VexImport.txt";
     private const float Inch = 39.3701f;          // inches per metre
-    private const int TriangleBudget = 30000;    // per part: the most detailed LOD under this
 
     private static readonly string[] OriginalPrefabs = {
         "Assets/ProtobotRebuilt/Resources/Part Prefabs/5Structure/Gussets.prefab",
@@ -270,8 +269,8 @@ public static class VexPartImporter {
         // Smaller than an 8-32 screw (set screw sockets, vents): nothing goes in them.
         found.RemoveAll(h => h.size * Inch < MinUsableHole);
 
-        // The render mesh: the most detailed level under the budget.
-        var chosen = lods.FirstOrDefault(l => TriangleCount(l) <= TriangleBudget) ?? lods[lods.Count - 1];
+        // The render mesh: the full-detail model, as VEX made it (never a reduced level).
+        var chosen = lods[0];
         mesh = BakeMesh(chosen, model.transform, out var materials);
         mesh.name = option.Trim();
 
@@ -353,8 +352,9 @@ public static class VexPartImporter {
             var collider = Object.Instantiate(hole.square ? squareTemplate : roundTemplate, part.transform);
             collider.name = "HoleCollider";
             collider.transform.localPosition = center;
-            collider.transform.localRotation = Quaternion.LookRotation(hole.axis);
-            collider.transform.localScale = new Vector3(size, size, depth);
+            // V2: a square hole turned in its face (the scanner finds those now) is turned the same way.
+            collider.transform.localRotation = hole.side.sqrMagnitude > 0.5f ? Quaternion.LookRotation(hole.axis, hole.side) : Quaternion.LookRotation(hole.axis);
+            collider.transform.localScale = new Vector3(size, hole.size2 > 0f ? hole.size2 * Inch : size, depth);  // V2: slots are longer along side
             var holeCollider = collider.GetComponent<HoleCollider>();
             holeCollider.holeType = type;
             holeCollider.twoSided = type == HoleCollider.HoleType.Threaded && hole.through;
@@ -502,15 +502,6 @@ public static class VexPartImporter {
         else
             result.Add(model.GetComponentsInChildren<MeshRenderer>(true));
         return result;
-    }
-
-    private static int TriangleCount(Renderer[] renderers) {
-        var count = 0;
-        foreach (var renderer in renderers)
-            if (renderer.TryGetComponent(out MeshFilter filter) && filter.sharedMesh != null)
-                for (var s = 0; s < filter.sharedMesh.subMeshCount; s++)
-                    count += (int)filter.sharedMesh.GetIndexCount(s) / 3;
-        return count;
     }
 
     private static void Gather(Renderer[] renderers, Transform root, float scale, out List<Vector3> vertices, out List<int> triangles, out List<Material> materials) {

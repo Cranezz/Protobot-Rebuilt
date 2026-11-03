@@ -18,6 +18,8 @@ namespace Protobot {
                 p.GetComponent<PartGenerator>().InitParamValues();
             // V2: imported models and polycarbonate pieces (Custom Parts), with ids like the others.
             partTypes = partTypes.Concat(Custom.CustomPartGenerator.CreateTypes()).ToArray();
+            // V2: chains (made round sprockets by the chain tool).
+            partTypes = partTypes.Append(Motion.ChainPartGenerator.CreateType()).ToArray();
         }
 
         public static PartType GetPartType(string id) {

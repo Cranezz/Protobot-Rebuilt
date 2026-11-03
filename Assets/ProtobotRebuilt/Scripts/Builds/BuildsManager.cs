@@ -97,14 +97,6 @@ namespace Protobot.Builds {
 
             var sceneBuildData = SceneBuild.ToBuildData();
 
-            // V2: a file kept in the old format can't hold custom parts: say so before leaving them out.
-            if (BuildFile.KeepsOldFormat(buildPath) && BuildFile.CustomPartCount(sceneBuildData) > 0 && !confirmedOldSave) {
-                UpgradePrompt.WarnCustomParts(BuildFile.CustomPartCount(sceneBuildData), true,
-                    () => { confirmedOldSave = true; SaveThen(then); confirmedOldSave = false; },
-                    () => { BuildFile.UseNewFormat(buildPath); SaveThen(then); });
-                return;
-            }
-
             // V2: a zip with the build and the custom parts it uses (BuildFile).
             try {
                 BuildFile.Write(buildPath, sceneBuildData);
@@ -121,35 +113,6 @@ namespace Protobot.Builds {
             then?.Invoke();
         }
 
-        private bool confirmedOldSave;
-
-        /// <summary>
-        /// V2: File > Save for Older Versions: a copy in the original's format, which Protobot 1.3.7 and before
-        /// open. Custom parts can't go in it: a warning says how many are left out first.
-        /// </summary>
-        public void SaveForOlderVersions() {
-            var build = SceneBuild.ToBuildData();
-            var custom = BuildFile.CustomPartCount(build);
-            void Write() {
-                var path = StandaloneFileBrowser.SaveFilePanel("Save for older versions of Protobot", "",
-                    Path.GetFileNameWithoutExtension(GetFileName()) + " (old format)", "pbb");
-                if (string.IsNullOrEmpty(path)) {
-                    Interface.Interface.Say("Not saved", false);
-                    return;
-                }
-                try {
-                    BuildFile.WriteOld(path, build);
-                    Interface.Interface.Say("Saved " + PathToFileName(path) + " for older versions" + (custom > 0 ? " (without its " + custom + " custom parts)" : ""));
-                }
-                catch (Exception e) {
-                    Debug.LogError("Couldn't save " + path + ": " + e);
-                    Interface.Interface.Say("Couldn't save the file: " + e.Message, false);
-                }
-            }
-            if (custom > 0) UpgradePrompt.WarnCustomParts(custom, false, Write, null);
-            else Write();
-        }
-
         /// <summary>V2: what's in the scene now counts as saved (after the file was written elsewhere).</summary>
         public void MarkSaved() {
             savedBuildData = SceneBuild.ToBuildData();
@@ -158,6 +121,7 @@ namespace Protobot.Builds {
 
         public void SaveAs() {
             var path = StandaloneFileBrowser.SaveFilePanel("Save Build File", "", "", "pbb");
+            InputEvents.TextInput.AfterFileWindow();  // V2
 
             if (path == "") return;
 
@@ -183,7 +147,7 @@ namespace Protobot.Builds {
             Application.Quit();
         }
 
-        private bool HasUnsavedChanges() {
+        public bool HasUnsavedChanges() { // V2: public (autosave and its reminders ask)
             var sceneBuild = SceneBuild.ToBuildData();
             
             if (IsNotSaved) {
@@ -195,6 +159,7 @@ namespace Protobot.Builds {
 
         public void OpenBuild() {
             var paths = StandaloneFileBrowser.OpenFilePanel("Open Build File", "", "pbb", false);
+            InputEvents.TextInput.AfterFileWindow();  // V2
 
             if (paths.Length == 0 || paths[0] == "") return;
 

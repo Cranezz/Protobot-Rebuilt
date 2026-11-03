@@ -15,7 +15,7 @@ namespace Protobot.Interface {
         public string typeId;           // a part: its type...
         public string p1, p2;           // ...and the sizes it starts with (null: the type's own)
         public string iconType;         // whose icon a group shows
-        public string action;           // "import", "polycarb", "sheets"
+        public string action;           // "import", "polycarb", "sheets", "chain"
         public string customId;         // a custom part
         public List<CatalogNode> children;
         public string tip;
@@ -53,6 +53,13 @@ namespace Protobot.Interface {
             }
         }
 
+        /// <summary>A rendered picture for a VEX-CAD part, or a group led by one (null: use the type's icon).</summary>
+        public static UnityEngine.Texture2D ModelIcon(CatalogNode node) {
+            if (node == null || node.IconType == null || !IsVex(node.IconType)) return null;
+            var leaf = node.IsGroup ? node.Leaves().FirstOrDefault(l => l.typeId == node.IconType && l.p1 != null) : node;
+            return leaf != null && leaf.p1 != null && IsVex(leaf.typeId) ? Protobot.Custom.Thumbnails.ForVexPart(leaf.typeId, leaf.p1) : null;
+        }
+
         public static PartType Type(string id) => types != null && id != null && types.TryGetValue(id, out var type) ? type : null;
 
         private static void Build() {
@@ -68,7 +75,7 @@ namespace Protobot.Interface {
             // Anything not placed above (a new part type) still shows, at the end of its group's section.
             var used = new HashSet<string>(nodes.SelectMany(n => n.Leaves()).Select(l => l.typeId).Where(t => t != null));
             foreach (var type in types.Values) {
-                if (used.Contains(type.id) || type.id == Protobot.Custom.CustomParts.Imported || type.id == Protobot.Custom.CustomParts.Polycarbonate) continue;
+                if (used.Contains(type.id) || Hidden.Contains(type.id) || type.id == Protobot.Custom.CustomParts.Imported || type.id == Protobot.Custom.CustomParts.Polycarbonate) continue;
                 var section = type.group switch {
                     PartType.PartGroup.Structure => "Structure",
                     PartType.PartGroup.Motion => "Motion",
@@ -110,6 +117,8 @@ namespace Protobot.Interface {
         private static CatalogNode Group(string section, string name, string iconType, params CatalogNode[] children) {
             var list = children.Where(c => c != null && (!c.IsGroup || c.children.Count > 0) && (c.IsGroup || c.typeId != null || c.action != null)).ToList();
             if (list.Count == 0) return null;
+            if (list.Count == 1 && !list[0].IsGroup && list[0].typeId != null && name != "Retainers")
+                return list[0];  // V2: a menu of one is just that part
             return new CatalogNode { section = section, name = name, iconType = iconType, children = list };
         }
 
@@ -136,111 +145,135 @@ namespace Protobot.Interface {
 
         // ------------------------------------------------------------------ the sections
 
+        // V2 (catalog audit): each part shows once. Where the original has a part (with its screw/nut/shaft
+        // behaviour), the VEX-CAD model of the same part is left out; VEX models only add what the original lacks
+        // (other sizes, materials, kinds). Generic template models ("Nylon Spacer (5/16" OD)" with no length),
+        // "threads shown" copies, VEX IQ parts and full-length stock (every channel is cut from full length with
+        // the saw) are left out too; Hidden keeps them from coming back at the end of a section.
+        private static readonly HashSet<string> Hidden = new() {
+            "CHAN", "VXCCHANNELSTOCK", "VXANGLESTOCK", "VXPLATESTOCK", "VXSLIDEASSEMBLYP", "VXSTANDOFFVEX", "VXV5ELECTRONICS",
+        };
+
+        private static bool Template(string o) => Regex.IsMatch(o, @"^(Nylon Spacer|Spacer|Washer) ") || Regex.IsMatch(o, @"^[\d.]+"" Flex Wheel$");
+        private static bool Duplicate(string o) => Contains(o, "threads shown", "VEX IQ", "IQ Chain", "(old)");
+
+        /// <summary>VEX family parts (minus templates and copies), each with a friendly name.</summary>
+        private static IEnumerable<CatalogNode> Vex(string section, string typeId, Func<string, bool> filter = null, Func<string, string> label = null) =>
+            Each(section, typeId, label ?? (o => o), o => !Template(o) && !Duplicate(o) && (filter == null || filter(o)));
+
         private static void Hardware() {
             const string s = "Hardware";
             Add(Group(s, "Screws", "SCRW", Each(s, "SCRW", o => Pretty(o) + " screw")));
             Add(Group(s, "Nuts", "NUT", Each(s, "NUT", o => o + " nut")));
-            Add(Group(s, "Standoffs", "SNDF", Each(s, "SNDF", o => Pretty(o) + " standoff")
-                .Concat(new[] { Family(s, "VEX standoff models", "VXSTANDOFFVEX") })));
+            Add(Group(s, "Standoffs", "SNDF", Each(s, "SNDF", o => Pretty(o) + " standoff")));
             Add(Group(s, "Spacers", "SPCR",
-                Group(s, "Nylon", "SPCR", Sizes(s, "SPCR", "Nylon", o => Pretty(o) + " nylon spacer")),
+                Group(s, "Nylon (3/8\" OD)", "SPCR", Sizes(s, "SPCR", "Nylon", o => Pretty(o) + " nylon spacer")),
                 Group(s, "Plastic", "SPCR", Sizes(s, "SPCR", "Plastic", o => Pretty(o) + " plastic spacer")),
                 Group(s, "High strength", "SPCR", Sizes(s, "SPCR", "High Strength", o => Pretty(o) + " HS spacer")),
-                Family(s, "5/16\" OD nylon", "VXSPACERS", o => Contains(o, "5/16\" OD")),
-                Family(s, "3/8\" OD nylon", "VXSPACERS", o => Contains(o, "3/8\" OD") && Contains(o, "Nylon")),
-                Family(s, "1/2\" OD nylon", "VXSPACERS", o => Contains(o, "1/2\" OD") && Contains(o, "Nylon")),
-                Family(s, "Click-on", "VXSPACERS", o => Contains(o, "Click On")),
-                Family(s, "Plastic (VEX)", "VXSPACERS", o => Contains(o, "Plastic Spacer", "Spacer Plastic"))));
+                Group(s, "Nylon (5/16\" OD)", "VXSPACERS", Vex(s, "VXSPACERS", o => Contains(o, "5/16\" OD"), o => o.Replace(" (5/16\" OD)", ""))),
+                Group(s, "Nylon (1/2\" OD)", "VXSPACERS", Vex(s, "VXSPACERS", o => Contains(o, "1/2\" OD") && Contains(o, "Nylon"), o => o.Replace(" (1/2\" OD)", ""))),
+                Group(s, "Click-on", "VXSPACERS", Vex(s, "VXSPACERS", o => Contains(o, "Click On")))));
             Add(Group(s, "Washers", "WSHR",
                 Leaf(s, "Steel washer", "WSHR", "Steel"),
                 Leaf(s, "Teflon washer", "WSHR", "Teflon"),
-                Family(s, "VEX washer models", "VXSPACERS", o => Contains(o, "Washer"))));
+                Group(s, "Other thicknesses", "VXSPACERS", Vex(s, "VXSPACERS", o => Contains(o, "Washer")))));
             Add(Group(s, "Shaft collars", "CLMP",
                 Leaf(s, "Shaft collar", "CLMP", "Normal"),
                 Leaf(s, "Clamping shaft collar", "CLMP", "Clamping"),
-                Family(s, "VEX collar models", "VXSHAFTPARTS", o => Contains(o, "Collar")),
-                Family(s, "High strength collars", "VXHIGHSTRENGTHSH", o => Contains(o, "Collar"))));
+                Group(s, "Rubber shaft collar", "VXSHAFTPARTS", Vex(s, "VXSHAFTPARTS", o => Contains(o, "Rubber Shaft Collar"))),
+                Group(s, "High strength collars", "VXHIGHSTRENGTHSH", Vex(s, "VXHIGHSTRENGTHSH", o => Contains(o, "Collar")))));
+            Add(Group(s, "Retainers", "HexNR",
+                Each(s, "HexNR", o => o)
+                    .Concat(Vex(s, "VXSTRUCTUREPARTS", o => Contains(o, "Retainer")))
+                    .Concat(Vex(s, "VXMOTIONPARTS", o => Contains(o, "Retainer") && !Contains(o, "Shaft Collar Retainer")))));
             Add(Group(s, "Couplers & links", "VXHARDWARE",
-                Each(s, "VXHARDWARE", o => o, o => !Contains(o, "Screw", "Pin"))));
-            Add(Family(s, "Shoulder screws", "VXHARDWARE", o => Contains(o, "Shoulder") && !Contains(o, "threads shown")));
+                Vex(s, "VXHARDWARE", o => !Contains(o, "Screw", "Pin", "Rubber Bumper"))));
+            Add(Group(s, "Shoulder screws", "VXHARDWARE", Vex(s, "VXHARDWARE", o => Contains(o, "Shoulder"))));
         }
 
         private static void Structure() {
             const string s = "Structure";
             Add(Group(s, "C-Channels", "CCHL",
-                Each(s, "CCHL", o => o + " C-channel").Append(Leaf(s, "U-Channel", "UCHL"))
-                    .Append(Family(s, "Full-length models", "VXCCHANNELSTOCK"))));
+                Each(s, "CCHL", o => o + " C-channel").Append(Leaf(s, "2x2 U-channel", "UCHL"))));
             Add(Group(s, "Angles", "ANGL",
                 Each(s, "ANGL", o => o + " angle")
-                    .Append(Family(s, "Full-length models", "VXANGLESTOCK"))
-                    .Append(Family(s, "Slotted angle", "VXSLOTTEDANGLE"))
-                    .Append(Family(s, "Segmented angle", "VXSEGMENTEDANGLE"))));
-            Add(Group(s, "Plates", "PLTE",
-                Leaf(s, "Plate", "PLTE"), Leaf(s, "Base plate", "BSPT"), Family(s, "Full-length models", "VXPLATESTOCK")));
+                    .Append(Group(s, "Slotted angle", "VXSLOTTEDANGLE", Vex(s, "VXSLOTTEDANGLE")))
+                    .Append(Group(s, "Segmented angle", "VXSEGMENTEDANGLE", Vex(s, "VXSEGMENTEDANGLE")))));
+            Add(Group(s, "Plates", "PLTE", Leaf(s, "Plate", "PLTE"), Leaf(s, "Base plate", "BSPT")));
             Add(Group(s, "Rails", "RAILS",
                 Leaf(s, "Rail", "RAIL"), Group(s, "Rail stock", "RAILS", Each(s, "RAILS", o => o + " rail")),
-                Family(s, "Chassis rails", "VXCHASSISRAILS")));
+                Group(s, "Other chassis rails", "VXCHASSISRAILS", Vex(s, "VXCHASSISRAILS", o => !Contains(o, "(25)", "(35)") || Contains(o, "3x2")))));
             Add(Group(s, "Gussets", "GSET",
-                Each(s, "GSET", o => o + " gusset").Append(Family(s, "VEX gusset models", "VXGUSSETSVEX"))));
-            Add(Family(s, "Brackets", "VXBRACKETS"));
-            Add(Group(s, "Retainers", "HexNR",
-                Each(s, "HexNR", o => o).Concat(Each(s, "VXSTRUCTUREPARTS", o => o, o => Contains(o, "Retainer")))));
-            Add(Family(s, "License plates", "VXMISCELLANEOUS"));
+                Each(s, "GSET", o => o + " gusset")
+                    .Concat(Vex(s, "VXGUSSETSVEX", o => !Contains(o, "Bent", "C Channel Coupler"), GussetName))));
+            Add(Group(s, "Brackets", "VXBRACKETS", Vex(s, "VXBRACKETS")));
+            Add(Group(s, "License plates", "VXMISCELLANEOUS", Vex(s, "VXMISCELLANEOUS", o => Contains(o, "License"))));
+        }
+
+        // "45 Degree Flat" -> "45° flat gusset", "Plus Gusset" -> "Plus gusset".
+        private static string GussetName(string o) {
+            var name = Regex.Replace(o, @"(\d+) Degree ", "$1° ");
+            name = name.Substring(0, 1) + name.Substring(1).ToLowerInvariant();
+            return name.Contains("gusset") || name.Contains("coupler") || name.Contains("corner") ? name : name + " gusset";
         }
 
         private static void Motion() {
             const string s = "Motion";
             Add(Group(s, "Shafts", "SHFT",
                 Leaf(s, "Shaft", "SHFT", "Normal"), Leaf(s, "High strength shaft", "SHFT", "High Strength"),
-                Family(s, "VEX shaft models", "VXSHAFTPARTS", o => Contains(o, "Shaft") && !Contains(o, "Collar"))));
+                Group(s, "Capped shaft", "VXSHAFTPARTS", Vex(s, "VXSHAFTPARTS", o => Contains(o, "Capped")))));
             Add(Group(s, "Bearings", "BRNG",
                 Group(s, "Flat bearings", "BRNG", Each(s, "BRNG", o => o + " bearing flat")),
                 Group(s, "Block bearings", "BLCK", Each(s, "BLCK", o => o + " block bearing")),
-                Family(s, "Ball bearings", "VXBALLBEARINGS")));
+                Group(s, "Ball bearings", "VXBALLBEARINGS", Vex(s, "VXBALLBEARINGS", o => !Contains(o, "Set Screw", "Collar"))),
+                Group(s, "HS bushings", "VXHIGHSTRENGTHSH", Vex(s, "VXHIGHSTRENGTHSH", o => Contains(o, "Bushing")))));
             Add(Wheels());
             Add(Group(s, "Gears", "GEAR",
                 Group(s, "Normal", "GEAR", Sizes(s, "GEAR", "Normal", o => o + " gear")),
                 Group(s, "High strength", "GEAR", Sizes(s, "GEAR", "High Strength", o => o + " HS gear")),
                 Group(s, "High strength v2", "GEAR", Sizes(s, "GEAR", "High Strength v2", o => o + " HS gear v2")),
-                Family(s, "VEX gear models", "VXGEARS")));
+                Group(s, "Steel", "VXGEARS", Vex(s, "VXGEARS", o => Contains(o, "Steel")))));
             Add(Group(s, "Sprockets & chain", "SPKT",
                 Group(s, "Normal sprockets", "SPKT", Sizes(s, "SPKT", "Normal", o => o + " sprocket")),
                 Group(s, "High strength sprockets", "SPKT", Sizes(s, "SPKT", "High Strength", o => o + " HS sprocket")),
-                Family(s, "VEX sprocket models", "VXSPROCKETS"),
-                Family(s, "Chain & tank tread", "VXCHAIN9P")));
+                Group(s, "6P sprockets", "VXSPROCKETS", Vex(s, "VXSPROCKETS", o => Contains(o, "6P"))),
+                Group(s, "Tank tread drive", "VXSPROCKETS", Vex(s, "VXSPROCKETS", o => Contains(o, "9P"))),
+                new CatalogNode { section = s, name = "Chain (round sprockets)", action = "chain", iconType = "VXCHAIN9P",
+                                  tip = "Make a chain: click the sprockets it goes round, in order; click one again to wrap it from the other side." },
+                Group(s, "Chain & tank tread", "VXCHAIN9P", Vex(s, "VXCHAIN9P"))));
             Add(Group(s, "Lock bars", "LKBR",
-                Each(s, "LKBR", o => o + " lock bar").Concat(Each(s, "VXHIGHSTRENGTHSH", o => o, o => Contains(o, "Lock Bar")))));
-            // The Advanced Gear Kit stays together, as VEX sells it.
-            Add(Family(s, "Advanced Gear Kit", "VXADVANCEDGEARS"));
-            Add(Group(s, "Mechanisms", "MCMS", Each(s, "MCMS")));
-            Add(Group(s, "Linear motion", "LMTK", Each(s, "LMTK").Append(Family(s, "Slide assembly", "VXSLIDEASSEMBLYP"))));
+                Each(s, "LKBR", o => o + " lock bar").Concat(Vex(s, "VXHIGHSTRENGTHSH", o => Contains(o, "Lock Bar")))));
+            // The Advanced Gear Kit stays together, as VEX sells it: the original's mechanisms, then the kit's
+            // other parts (its gearbox brackets are under Brackets).
+            Add(Group(s, "Advanced Gear Kit", "MCMS",
+                Each(s, "MCMS").Concat(Vex(s, "VXADVANCEDGEARS",
+                    o => !Contains(o, "Gearbox Bracket", "Winch Bracket", "Drop Off Cam", "Hand Crank", "Rack Gear") && o != "Cam Follower"))));
+            Add(Group(s, "Linear motion", "LMTK", Each(s, "LMTK")));
             Add(Group(s, "Hinges", "VXHINGES",
-                Family(s, "2 hole", "VXHINGES", o => o.StartsWith("2 ")), Family(s, "3 hole", "VXHINGES", o => o.StartsWith("3 ")),
-                Family(s, "4 hole", "VXHINGES", o => o.StartsWith("4 ")), Family(s, "5 hole", "VXHINGES", o => o.StartsWith("5 "))));
+                Group(s, "2 hole", "VXHINGES", Vex(s, "VXHINGES", o => o.StartsWith("2 "))), Group(s, "3 hole", "VXHINGES", Vex(s, "VXHINGES", o => o.StartsWith("3 "))),
+                Group(s, "4 hole", "VXHINGES", Vex(s, "VXHINGES", o => o.StartsWith("4 "))), Group(s, "5 hole", "VXHINGES", Vex(s, "VXHINGES", o => o.StartsWith("5 ")))));
             Add(Leaf(s, "Rubber bumper", "RBMP"));
-            Add(Group(s, "Motion parts", "VXMOTIONPARTS",
-                Each(s, "VXMOTIONPARTS", o => o)
-                    .Concat(Each(s, "VXHIGHSTRENGTHSH", o => o, o => !Contains(o, "Collar", "Lock Bar")))));
+            Add(Group(s, "Inserts & adapters", "VXMOTIONPARTS",
+                Vex(s, "VXMOTIONPARTS", o => !Contains(o, "Retainer"))));  // the collar retainer is the original's flat bearing
         }
 
         private static CatalogNode Wheels() {
             const string s = "Motion";
-            var vex = Options1("VXWHEELS");
-            CatalogNode VexWheels(string name, Func<string, bool> filter) => Family(s, name, "VXWHEELS", filter);
+            CatalogNode VexWheels(string name, Func<string, bool> filter) => Group(s, name, "VXWHEELS", Vex(s, "VXWHEELS", filter));
             var flexSizes = new[] { "1.625\"", "2\"", "3\"", "4\"" };
             return Group(s, "Wheels", "OMNI",
                 Group(s, "Omni wheels", "OMNI",
                     Sizes(s, "OMNI", "V2", o => Pretty(o) + " omni wheel")
                         .Append(Group(s, "Older (V1)", "OMNI", Sizes(s, "OMNI", "V1", o => Pretty(o) + " omni wheel (V1)")))
                         .Append(VexWheels("Anti-static", o => Contains(o, "Omni") && Contains(o, "Anti Static")))
-                        .Append(VexWheels("Other omni models", o => Contains(o, "Omni") && !Contains(o, "Anti Static")))),
+                        .Append(VexWheels("Locked", o => Contains(o, "Omni") && Contains(o, "locked")))),
                 Group(s, "Traction wheels", "TWHL",
                     Sizes(s, "TWHL", "V2", o => Pretty(o) + " traction wheel")
                         .Append(Group(s, "Older (V1)", "TWHL", Sizes(s, "TWHL", "V1", o => Pretty(o) + " traction wheel (V1)")))
                         .Append(VexWheels("Anti-static", o => Contains(o, "Traction") && Contains(o, "Anti Static")))
-                        .Append(VexWheels("Other traction models", o => Contains(o, "Traction") && !Contains(o, "Anti Static")))),
+                        .Append(VexWheels("Other sizes", o => Contains(o, "Traction") && !Contains(o, "Anti Static", "2.75\"", "3.25\"") && o != "4\" Traction Wheel"))),
                 Group(s, "Mecanum wheels", "MECN",
-                    new[] { Leaf(s, "Mecanum wheel", "MECN") }.Concat(Each(s, "VXWHEELS", o => o, o => Contains(o, "Mecanum")))),
+                    new[] { Leaf(s, "4\" mecanum wheel", "MECN") }.Concat(Vex(s, "VXWHEELS", o => Contains(o, "Mecanum") && o.StartsWith("2\"")))),
                 Group(s, "Flex wheels", "FWHL",
                     new[] {
                         Group(s, "With adapters", "FWHL", Sizes(s, "FWHL", "With Adapters", o => Pretty(o) + " flex wheel")),
@@ -256,25 +289,28 @@ namespace Protobot.Interface {
             Add(Leaf(s, "Battery", "BTRY"));
             Add(Leaf(s, "Radio", "RDIO"));
             Add(Leaf(s, "Battery clip", "BTCL"));
+            Add(Group(s, "Brain mounts", "VXV5ELECTRONICS", Vex(s, "VXV5ELECTRONICS", o => Contains(o, "Brain Mount"))));
             Add(Group(s, "Sensors", "SNSR",
-                Each(s, "SNSR", o => o + " sensor").Append(Family(s, "VEX sensor models", "VXSENSORS"))));
+                Each(s, "SNSR", o => o + " sensor").Concat(Vex(s, "VXSENSORS", o => !Contains(o, "Bumper Switch", "Limit Switch", "3 Wire Expander")
+                    && o != "Potentiometer" && o != "Line Tracker" && !Regex.IsMatch(o, "^(Distance|Rotation|Optical|Vision|Inertial) Sensor$")))));
             Add(Group(s, "Switches", "SWCH",
                 Group(s, "V5", "SWCH", Options1("SWCH").Select(o => Leaf(s, o + " switch", "SWCH", o, "V5"))),
                 Group(s, "Cortex", "SWCH", Options1("SWCH").Select(o => Leaf(s, o + " switch (Cortex)", "SWCH", o, "Cortex")))));
-            Add(Family(s, "V5 electronics models", "VXV5ELECTRONICS"));
+            Add(Group(s, "3-wire expander", "VXSENSORS", Vex(s, "VXSENSORS", o => Contains(o, "3 Wire Expander"))));
         }
 
         private static void Pneumatics() {
             const string s = "Pneumatics";
+            // V2: one cylinder per stroke: it's placed retracted and extends (right-click), so the original's
+            // separate "extended" models (still loaded from old builds) and VEX's body and rod aren't listed.
             Add(Group(s, "Cylinders", "PNMT",
-                Options1("PNMT").Select(size => Group(s, size, "PNMT", Sizes(s, "PNMT", size, o => size + " " + o.ToLowerInvariant() + " cylinder")))));
+                Options1("PNMT").Select(size => Leaf(s, size + " cylinder", "PNMT", size, "Normal", "Pneumatic cylinder, " + size + " stroke: right-click it to extend or retract"))));
             Add(Group(s, "Reservoirs", "TANK", Each(s, "TANK", o => o + " reservoir")));
-            // The pneumatics kit, kept together by kind.
+            // The pneumatics kit, kept together by kind (its reservoirs are the original's above).
             Add(Group(s, "Pneumatics kit", "VXPNEUMATICS",
-                Family(s, "Pistons", "VXPNEUMATICS", o => Contains(o, "Piston") && !Contains(o, "Nut")),
-                Family(s, "Fittings & tubing", "VXPNEUMATICS", o => Contains(o, "Fitting", "Tee", "Plug")),
-                Family(s, "Valves & solenoids", "VXPNEUMATICS", o => Contains(o, "Valve", "Solenoid", "Switch", "Manifold", "Regulator", "Flow")),
-                Family(s, "Mounts & other", "VXPNEUMATICS", o => !Contains(o, "Piston", "Fitting", "Tee", "Plug", "Valve", "Solenoid", "Switch", "Manifold", "Regulator", "Flow") || Contains(o, "Piston Nut"))));
+                Group(s, "Fittings", "VXPNEUMATICS", Vex(s, "VXPNEUMATICS", o => Contains(o, "Fitting", "Tee", "Plug"))),
+                Group(s, "Valves & solenoids", "VXPNEUMATICS", Vex(s, "VXPNEUMATICS", o => Contains(o, "Valve", "Solenoid", "Switch", "Manifold", "Regulator", "Flow"))),
+                Group(s, "Mounts & other", "VXPNEUMATICS", Vex(s, "VXPNEUMATICS", o => !Contains(o, "Piston", "Fitting", "Tee", "Plug", "Valve", "Solenoid", "Switch", "Manifold", "Regulator", "Flow", "Reservoir") || Contains(o, "Piston Nut")))));
         }
 
         private static void Field() {

@@ -11,7 +11,10 @@ namespace Protobot.SelectionSystem {
         private GameObject prevObj;
 
         public void Update() {
-            GameObject mouseCastObj = mouseCast.gameObject;
+            // V2: the mouse cast goes through the interface, so parts behind the parts list lit up and stayed lit;
+            // over the interface nothing is hovered.
+            GameObject mouseCastObj = MouseInput.overUI ? null : mouseCast.gameObject;
+            mouseCastObj = SelectAs.Resolve(mouseCastObj);  // V2: a cylinder's rod and thread select the cylinder
 
             if (mouseCastObj != null) {
                 if (prevObj != mouseCastObj || !checkPrevObj) {
@@ -27,6 +30,12 @@ namespace Protobot.SelectionSystem {
                 clearEvent?.Invoke();
 
             prevObj = mouseCastObj;
+        }
+
+        // V2: a hover manager switched off (placing, another tool) let go of its outline.
+        private void OnDisable() {
+            clearEvent?.Invoke();
+            prevObj = null;
         }
     }
 }

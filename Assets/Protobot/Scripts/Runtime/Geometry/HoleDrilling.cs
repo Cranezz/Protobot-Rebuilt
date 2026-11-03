@@ -331,7 +331,10 @@ namespace Protobot.Geometry
         public const int DrillSegments = 32;
 
         /// <summary>Cuts a round hole of <paramref name="radius"/> through the wall. Returns null if nothing changed.</summary>
-        public static Mesh Drill(Mesh source, HoleInfo hole, float radius, bool[] walls = null, int segments = DrillSegments)
+        /// <param name="spans">V2: for each side, how far the new round wall runs along the hole (top, bottom; 0 at
+        /// the hole's top face, negative into the wall): where there's material just outside the hole, so the wall
+        /// never stands out past the part (a flange beside the hole doesn't make it taller all the way round).</param>
+        public static Mesh Drill(Mesh source, HoleInfo hole, float radius, bool[] walls = null, int segments = DrillSegments, Vector2[] spans = null)
         {
             var n = hole.normal;
             Basis(n, out var a, out var b);
@@ -406,10 +409,18 @@ namespace Protobot.Geometry
                     continue;  // no metal on this side (the hole breaks through an edge)
                 var c0 = corners[i];
                 var c1 = corners[(i + 1) % segments];
-                var f0 = hole.center + a * c0.x + b * c0.y;
-                var f1 = hole.center + a * c1.x + b * c1.y;
-                var b0 = f0 - n * depth;
-                var b1 = f1 - n * depth;
+                float top = 0f, bottom = -depth;
+                if (spans != null && i < spans.Length)
+                {
+                    top = Mathf.Clamp(spans[i].x, -depth, 0f);
+                    bottom = Mathf.Clamp(spans[i].y, -depth, 0f);
+                    if (top - bottom < 0.0005f)
+                        continue;
+                }
+                var f0 = hole.center + a * c0.x + b * c0.y + n * top;
+                var f1 = hole.center + a * c1.x + b * c1.y + n * top;
+                var b0 = f0 - n * (top - bottom);
+                var b1 = f1 - n * (top - bottom);
                 var inward = -(a * edgeNormals[i].x + b * edgeNormals[i].y);
                 var start = verts.Count;
                 verts.AddRange(new[] { f0, f1, b1, b0 });

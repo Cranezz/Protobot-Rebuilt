@@ -19,17 +19,41 @@ namespace Protobot.Custom {
 
         public static void Forget(string key) => cache.Remove(key);
 
+        /// <summary>V2: the icon of one part of a VEX-CAD family (each part its own picture, not the family's).</summary>
+        public static Texture2D ForVexPart(string typeId, string p1) {
+            var key = typeId + "|" + p1;
+            if (cache.TryGetValue(key, out var texture) && texture != null)
+                return texture;
+            texture = null;
+            var type = Interface.PartsCatalog.Type(typeId);
+            if (type != null) {
+                foreach (var data in type.GetComponentsInChildren<PartData>(true)) {
+                    if (data.param1Value != p1 || !data.TryGetComponent(out MeshFilter filter) || filter.sharedMesh == null) continue;
+                    var materials = data.TryGetComponent(out MeshRenderer source) ? source.sharedMaterials : null;
+                    texture = Render(filter.sharedMesh, materials, p1, false);
+                    break;
+                }
+            }
+            cache[key] = texture;
+            return texture;
+        }
+
         private static Texture2D Render(CustomPartData part) {
+            var mesh = CustomParts.MeshOf(part);
+            return Render(mesh, new[] { CustomParts.MaterialFor(part) }, part.name, part.kind == CustomParts.Polycarbonate);
+        }
+
+        private static Texture2D Render(Mesh mesh, Material[] materials, string name, bool clear) {
             var root = new GameObject("Thumbnail Stage");
             root.transform.position = new Vector3(0f, -6000f, 0f);
             var model = new GameObject("Model") { layer = Layer };
             model.transform.SetParent(root.transform, false);
-            var mesh = CustomParts.MeshOf(part);
             model.AddComponent<MeshFilter>().sharedMesh = mesh;
             var renderer = model.AddComponent<MeshRenderer>();
-            renderer.sharedMaterial = CustomParts.MaterialFor(part);
+            renderer.sharedMaterials = materials;
+            var original = renderer.sharedMaterial;
             // Polycarbonate is nearly clear: show it a little more solid in its icon.
-            if (part.kind == CustomParts.Polycarbonate && renderer.sharedMaterial != null) {
+            if (clear && renderer.sharedMaterial != null) {
                 var tinted = new Material(renderer.sharedMaterial);
                 var c = tinted.color;
                 c.a = 0.85f;
@@ -65,15 +89,17 @@ namespace Protobot.Custom {
             camera.Render();
             var previous = RenderTexture.active;
             RenderTexture.active = target;
-            var texture = new Texture2D(Size, Size, TextureFormat.RGBA32, false) { name = part.name };
+            var texture = new Texture2D(Size, Size, TextureFormat.RGBA32, false) { name = name };
             texture.ReadPixels(new Rect(0, 0, Size, Size), 0, 0);
             texture.Apply();
             RenderTexture.active = previous;
             camera.targetTexture = null;
             RenderTexture.ReleaseTemporary(target);
-            if (renderer.sharedMaterial != null && renderer.sharedMaterial != CustomParts.MaterialFor(part))
+            if (renderer.sharedMaterial != null && renderer.sharedMaterial != original)
                 Object.Destroy(renderer.sharedMaterial);
-            Object.Destroy(root);
+            // Gone at once: Destroy waits for the end of the frame, and the next icon made in this frame would
+            // show this model too.
+            Object.DestroyImmediate(root);
             return texture;
         }
     }

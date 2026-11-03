@@ -94,7 +94,16 @@ namespace Protobot.Interface {
 
                 var icon = PartsCatalog.Type(child.IconType)?.icon;
                 var textLeft = 10f;
-                if (icon != null) {
+                // V2: a VEX-CAD part shows a picture of itself (its family's icon is some other part).
+                var model = PartsCatalog.ModelIcon(child);
+                if (model != null) {
+                    var picture = Ui.Rect("Icon", item.transform).Place(new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(6f, 0f), new Vector2(22f, 22f))
+                        .gameObject.AddComponent<RawImage>();
+                    picture.raycastTarget = false;
+                    picture.texture = model;
+                    textLeft = 34f;
+                }
+                else if (icon != null) {
                     var image = Ui.Image(item.transform, "Icon", Theme.TextDim);
                     image.sprite = icon;
                     image.preserveAspect = true;

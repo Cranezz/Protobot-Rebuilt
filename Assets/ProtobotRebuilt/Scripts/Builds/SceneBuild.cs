@@ -94,6 +94,16 @@ namespace Protobot.Builds {
                 var color = objectData.GetColor();
                 color.a = renderer.material.color.a;
                 renderer.material.color = color;
+                // V2: the other colors of a part made of several.
+                if (!string.IsNullOrEmpty(objectData.colors)) {
+                    var codes = objectData.colors.Split(',');
+                    var materials = renderer.materials;
+                    for (var m = 0; m < materials.Length && m < codes.Length; m++)
+                        if (ColorUtility.TryParseHtmlString("#" + codes[m], out var partColor)) {
+                            partColor.a = materials[m].color.a;
+                            materials[m].color = partColor;
+                        }
+                }
             }
             // V2: edits kept in the part's state (drilled holes) are made again.
             if (!string.IsNullOrEmpty(objectData.states) && generatedObject.TryGetComponent(out SavedObject savedObject)) {
@@ -170,6 +180,9 @@ namespace Protobot.Builds {
                     rColor = savedColor.material.color.r,
                     bColor = savedColor.material.color.b,
                     gColor = savedColor.material.color.g,
+                    colors = savedColor.sharedMaterials.Length > 1
+                        ? string.Join(",", savedColor.sharedMaterials.Select(m => m != null ? ColorUtility.ToHtmlStringRGB(m.color) : "FFFFFF"))
+                        : null,
                 };
             }
 

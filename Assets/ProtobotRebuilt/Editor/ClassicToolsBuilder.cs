@@ -42,16 +42,22 @@ public static class ClassicToolsBuilder {
         var serializedMeasure = new SerializedObject(measure);
         serializedMeasure.FindProperty("feedback").objectReferenceValue = feedback;
         serializedMeasure.ApplyModifiedPropertiesWithoutUndo();
-        // V2: the join tool (key 7): face, edge, corner or hole to another part's.
-        var join = AddTool<JoinTool>("Join", "Join (face, edge, corner, hole)", "Assets/ProtobotRebuilt/Sprites/V2 Icons/JoinIcon.png", "7", -269.5f, sidebar, toggles, keybindings);
-        var serializedJoin = new SerializedObject(join);
-        serializedJoin.FindProperty("feedback").objectReferenceValue = feedback;
-        serializedJoin.ApplyModifiedPropertiesWithoutUndo();
+        // V2: the Join tool was removed (its objects go); the Select tool (key V, the cursor) takes its place.
+        RemoveTool("Join", sidebar, toggles, keybindings);
+        AddTool<SelectTool>("Select", "Select", "Assets/ProtobotRebuilt/Sprites/V2 Icons/SelectIcon.png", "v", -269.5f, sidebar, toggles, keybindings);
         BuildPreferences(roots.First(r => r.name == "Preferences Canvas").transform, keybindings);
 
         EditorSceneManager.MarkSceneDirty(scene);
         EditorSceneManager.SaveScene(scene);
         Debug.Log("[Classic] Built the Saw and Drill tools.");
+    }
+
+    public static void RemoveTool(string name, Transform sidebar, Transform toggles, Transform keybindings) {
+        foreach (var old in new[] { sidebar.Find(name + " Tool"), toggles.Find(name + " Tool Toggle") })
+            if (old != null)
+                Object.DestroyImmediate(old.gameObject);
+        foreach (var old in keybindings.GetComponentsInChildren<InputEvent>(true).Where(e => e.name == "Enable " + name + " Tool").ToList())
+            Object.DestroyImmediate(old.gameObject);
     }
 
     public static T AddTool<T>(string name, string tooltip, string icon, string key, float y,
@@ -135,7 +141,7 @@ public static class ClassicToolsBuilder {
                 Object.DestroyImmediate(child.gameObject);
         var template = page.transform.Find("Shortcut Container (7)").gameObject;
         var y = -40f;
-        foreach (var tool in new[] { "Saw", "Drill", "Measure", "Join" }) {
+        foreach (var tool in new[] { "Select", "Saw", "Drill", "Measure" }) {
             var row = Object.Instantiate(template, page.transform);
             row.name = tool + " Shortcut";
             ((RectTransform)row.transform).anchoredPosition = new Vector2(((RectTransform)template.transform).anchoredPosition.x, y);
@@ -161,7 +167,7 @@ public static class ClassicToolsBuilder {
             "a distance; drag its dot to measure from a hole, corner, edge or face. R: tilt the plane. Enter cuts, Esc goes back.\n\n" +
             "Drill: pick a bit (1/16\" to 1\") in the tool options, then click a hole.\n\n" +
             "Measure: click two holes, corners, edges or faces to see the distance between them; drag an end to move it.\n\n" +
-            "Join: click a face, edge, corner or hole on one part, then on another part: the first moves to meet it.";
+            "Select: click parts to select them; Esc in any tool comes back here. Right-click a plastic piece or imported part to edit it.";
         page.SetActive(false);
 
         var graphicsTab = tabs.Find("Graphics Toggle") ?? tabs.Find("Game Elements Toggle");

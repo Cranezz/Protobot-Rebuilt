@@ -11,7 +11,7 @@ namespace Protobot.Audio
     {
         const int Rate = 44100;
 
-        static AudioClip saw, drill, spray, clack, tick, error, pop, pickup, release, metalHit, plasticHit, trash, freeze;
+        static AudioClip air, motorLoop, saw, drill, spray, clack, tick, error, pop, pickup, release, metalHit, plasticHit, trash, freeze;
 
         // ---------------------------------------------------------------- tools
 
@@ -50,6 +50,30 @@ namespace Protobot.Audio
             var decay = Mathf.Exp(-t * 38f);
             var ring = Mathf.Sin(t * Mathf.PI * 2f * 1350f) * 0.35f + Mathf.Sin(t * Mathf.PI * 2f * 2470f) * 0.2f;
             return (ring + noise.White() * 0.3f) * decay;
+        });
+
+        // ---------------------------------------------------------------- moving parts
+
+        /// <summary>A pneumatic cylinder firing: a sharp blast of air through the valve, fading as the stroke ends.</summary>
+        public static AudioClip Air => air ??= Make("Air", 0.35f, (t, noise) =>
+        {
+            var envelope = Mathf.Clamp01(t / 0.008f) * Mathf.Exp(-t * 9f);
+            return (noise.High() * 0.9f + noise.Band(0.6f, 0.2f) * 0.4f) * envelope;
+        });
+
+        /// <summary>
+        /// A V5 motor running, one second that loops seamlessly: the electric hum, the whine of the motor and its
+        /// first gear stage (the motor inside turns at 3600 rpm whatever the cartridge), a little bearing noise.
+        /// Played looped with the pitch following the motor's speed.
+        /// </summary>
+        public static AudioClip MotorLoop => motorLoop ??= MakeLoop("Motor", 1f, (t, noise) =>
+        {
+            const float Tau = Mathf.PI * 2f;
+            var hum = Mathf.Sin(Tau * 120f * t) * 0.1f;
+            var whine = Mathf.Sin(Tau * 480f * t) * 0.16f + Mathf.Sin(Tau * 960f * t) * 0.08f + Mathf.Sin(Tau * 1440f * t) * 0.04f;
+            var gears = (Mathf.Repeat(720f * t, 1f) * 2f - 1f) * 0.06f;
+            var flutter = 0.85f + 0.15f * Mathf.Sin(Tau * 60f * t);
+            return (hum + whine * flutter + gears + noise.Band(0.4f, 0.1f) * 0.12f) * 0.8f;
         });
 
         // ---------------------------------------------------------------- interface
@@ -214,6 +238,31 @@ namespace Protobot.Audio
                 previous = w;
                 return h * 0.5f;
             }
+        }
+
+        // A clip whose end runs into its start: made a little long, the extra faded over the beginning.
+        static AudioClip MakeLoop(string name, float seconds, System.Func<float, Noise, float> sample)
+        {
+            var count = Mathf.CeilToInt(seconds * Rate);
+            var fade = Rate / 10;
+            var data = new float[count + fade];
+            var noise = new Noise();
+            for (var i = 0; i < data.Length; i++)
+                data[i] = sample(i / (float)Rate, noise);
+            var loop = new float[count];
+            for (var i = 0; i < count; i++)
+            {
+                var value = data[i];
+                if (i < fade)
+                {
+                    var k = i / (float)fade;
+                    value = value * k + data[count + i] * (1f - k);
+                }
+                loop[i] = Mathf.Clamp(value, -1f, 1f);
+            }
+            var clip = AudioClip.Create(name, count, 1, Rate, false);
+            clip.SetData(loop, 0);
+            return clip;
         }
 
         static AudioClip Make(string name, float seconds, System.Func<float, Noise, float> sample)

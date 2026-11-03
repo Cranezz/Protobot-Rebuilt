@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -42,11 +43,41 @@ namespace Protobot.Tools {
                 else instance.OrientLocal();
                 Protobot.Interface.ToolOptions.Rebuild();
             });
-            Protobot.Interface.ToolOptions.Switch(bar, "Snap 1/8\" and 5°", PositionTool.snapping, on => {
+            Protobot.Interface.ToolOptions.Switch(bar, "Snap", PositionTool.snapping, on => {
                 instance.SetSnapping(on);
                 if (instance.snappingToggle != null)
                     instance.snappingToggle.SetIsOnWithoutNotify(on);
             });
+            // V2: the snap steps are picked from presets (the wheel over one steps through them).
+            StepChoice(bar, "Move", MoveSteps, TransformGizmo.MoveStep, x => Protobot.Interface.Inch.Format(x), value => {
+                TransformGizmo.MoveStep = value;
+                Protobot.Interface.Interface.Say("Moves snap every " + Protobot.Interface.Inch.Format(value));
+            }, "Snap step for the arrows. Scroll over it to step through the sizes.");
+            StepChoice(bar, "Turn", TurnSteps, TransformGizmo.TurnStep, Degrees, value => {
+                TransformGizmo.TurnStep = value;
+                Protobot.Interface.Interface.Say("Turns snap every " + Degrees(value));
+            }, "Snap step for the rings. Scroll over it to step through the angles.");
+        }
+
+        private static readonly float[] MoveSteps = { 1f / 64f, 1f / 32f, 1f / 16f, 1f / 8f, 1f / 4f, 1f / 2f, 1f, 2f };
+        private static readonly float[] TurnSteps = { 1f, 5f, 7.5f, 15f, 22.5f, 30f, 45f, 90f };
+
+        private static string Degrees(float value) => value.ToString("0.#", System.Globalization.CultureInfo.InvariantCulture) + "°";
+
+        private static void StepChoice(RectTransform bar, string label, float[] values, float current, System.Func<float, string> format, System.Action<float> set, string tip) {
+            Protobot.Interface.ToolOptions.Note(bar, label);
+            var index = Protobot.Interface.WheelStep.Next(values, current, 0);
+            var choice = Protobot.Interface.Popup.Choice(bar, values.Select(format).ToArray(), index, i => {
+                set(values[i]);
+                Protobot.Interface.ToolOptions.Rebuild();
+            }, 76f);
+            choice.gameObject.AddComponent<Protobot.Interface.WheelStep>().step = direction => {
+                var next = Protobot.Interface.WheelStep.Next(values, current, direction);
+                if (Mathf.Abs(values[next] - current) < 0.0001f) return;
+                set(values[next]);
+                Protobot.Interface.ToolOptions.Rebuild();
+            };
+            Protobot.Interface.Ui.Tip(choice, label + " step", "Wheel", tip);
         }
 
         public void OrientGlobal() {

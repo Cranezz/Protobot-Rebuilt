@@ -13,7 +13,8 @@ namespace Protobot.Interface {
 
         [SerializeField] private TMP_FontAsset regular, medium, bold;
         public Sprite measureIcon, chevronIcon, closeIcon, searchIcon;
-        public Sprite sawIcon, joinIcon, polycarbIcon, importIcon, sheetsIcon;
+        public Sprite sawIcon, polycarbIcon, importIcon, sheetsIcon;
+        [UnityEngine.Serialization.FormerlySerializedAs("joinIcon")] public Sprite selectIcon;  // V2: the Join tool was removed
         public Material metalMaterial, plasticMaterial, polycarbMaterial;
 
         private FeedbackDisplay feedback;
@@ -52,12 +53,21 @@ namespace Protobot.Interface {
                 rect.anchoredPosition = movement.inactivePos;
             }
 
+            // The original's pop-ups in the new colors.
+            foreach (var other in FindObjectsByType<Canvas>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+                if (other.isRootCanvas && (other.name == "Preferences Canvas" || other.GetComponentInChildren<UnsavedChangesUI>(true) != null))
+                    ClassicRestyle.Apply(other.gameObject);
+
             Overlay.Create(Root);
             TopBar.Create(Root);
             ToolRail.Create(Root);
             ToolOptions.Create(Root);
             PartsBrowser.Create(Root);
             Tooltip.Create(Root);
+            PartMenu.Create(Root);
+            Builds.AutoSave.Create(Root);
+            CameraButtons.Apply();
+            Motion.MotorControls.Create(Root);
             gameObject.AddComponent<Tools.PaintTool>();
         }
 

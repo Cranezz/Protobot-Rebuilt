@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using System;
 using System.Collections;
@@ -13,6 +13,13 @@ namespace Protobot {
         private void Update() {
             var allHoles = new HashSet<HoleCollider>(holes);
             foreach (var holeCollider in allHoles) {
+                // V2: a hole destroyed outright (opening another build) is let go of too.
+                if (holeCollider == null) {
+                    holes.Remove(holeCollider);
+                    TargetHoleCount = holes.Count(h => h != null && IsTargetHole(h));
+                    OnRemoveHole?.Invoke();
+                    continue;
+                }
                 if (holeCollider.gameObject.IsDeleted())
                     RemoveHole(holeCollider);
             }

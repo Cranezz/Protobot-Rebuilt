@@ -8,11 +8,17 @@ using UnityEngine.UI;
 namespace Protobot.Polycarb {
     // V2: the plastic in the build (top bar > Plastic): every polycarbonate piece laid out on stock sheets as
     // tightly as they go (turned to fit; a piece that doesn't fit starts the next sheet), with the counts and the
-    // rules they're checked against. Deleting a piece from the build takes it off the sheets.
+    // rules they're checked against. Deleting a piece from the build takes it off the sheets. V2: the wheel zooms
+    // in on the sheets (about the mouse), a drag pans, F or a double-click fits them again.
     public class SheetsDialog : MonoBehaviour {
         private Dialog dialog;
         private ShapeGraphic shapes;
         private RectTransform view, info;
+        private float viewZoom = 1f;
+        private Vector2 viewPan;
+        private bool dragging;
+        private Vector2 lastMouse;
+        private float lastClick;
 
         public static void Open() {
             var dialog = Dialog.Open("Plastic sheets", new Vector2(1100f, 680f));
@@ -57,6 +63,53 @@ namespace Protobot.Polycarb {
 
         private void OnDestroy() => SheetUsage.Changed -= Rebuild;
 
+        // Where a point of the fitted drawing is after zooming and panning.
+        private Vector2 V(Vector2 p) => (p - view.rect.center) * viewZoom + view.rect.center + viewPan;
+
+        private void Update() {
+            var mouse = UnityEngine.InputSystem.Mouse.current;
+            if (mouse == null || view == null) return;
+            var screen = mouse.position.ReadValue();
+            var over = RectTransformUtility.RectangleContainsScreenPoint(view, screen) && !Popup.IsOpen;
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(view, screen, null, out var local);
+            var changed = false;
+            var wheel = mouse.scroll.ReadValue().y;
+            if (over && Mathf.Abs(wheel) > 0.01f) {
+                var before = (local - view.rect.center - viewPan) / viewZoom;
+                viewZoom = Mathf.Clamp(viewZoom * (wheel > 0f ? 1.15f : 1f / 1.15f), 0.5f, 12f);
+                viewPan = local - view.rect.center - before * viewZoom;
+                changed = true;
+            }
+            var pressed = mouse.leftButton.wasPressedThisFrame || mouse.rightButton.wasPressedThisFrame || mouse.middleButton.wasPressedThisFrame;
+            if (over && pressed) {
+                if (mouse.leftButton.wasPressedThisFrame && Time.unscaledTime - lastClick < 0.3f) {
+                    viewZoom = 1f;
+                    viewPan = Vector2.zero;
+                    changed = true;
+                }
+                lastClick = mouse.leftButton.wasPressedThisFrame ? Time.unscaledTime : lastClick;
+                dragging = true;
+                lastMouse = local;
+            }
+            if (dragging) {
+                if (mouse.leftButton.isPressed || mouse.rightButton.isPressed || mouse.middleButton.isPressed) {
+                    if ((local - lastMouse).sqrMagnitude > 0.01f) {
+                        viewPan += local - lastMouse;
+                        lastMouse = local;
+                        changed = true;
+                    }
+                }
+                else dragging = false;
+            }
+            var keyboard = UnityEngine.InputSystem.Keyboard.current;
+            if (keyboard != null && keyboard.fKey.wasPressedThisFrame && !InputEvents.TextInput.IsTyping) {
+                viewZoom = 1f;
+                viewPan = Vector2.zero;
+                changed = true;
+            }
+            if (changed) DrawSheets(SheetUsage.Plan());
+        }
+
         private void Rebuild() {
             if (this == null || shapes == null) return;
             var layout = SheetUsage.Plan();
@@ -79,27 +132,28 @@ namespace Protobot.Polycarb {
             var origin = new Vector2(rect.xMin + (rect.width - total) / 2f, rect.yMin + 30f);
             for (var s = 0; s < count; s++) {
                 var corner = origin + new Vector2(s * (sheet.x * scale + gap), 0f);
-                shapes.Rect(corner, corner + sheet * scale, new Color(0.2f, 0.24f, 0.29f, 1f));
+                shapes.Quad(V(corner), V(corner + new Vector2(sheet.x * scale, 0f)), V(corner + sheet * scale), V(corner + new Vector2(0f, sheet.y * scale)), new Color(0.2f, 0.24f, 0.29f, 1f));
                 var over = SheetUsage.CurrentRules == SheetUsage.Rules.OneSheet && s > 0;
-                shapes.Polyline(new[] { corner, corner + new Vector2(sheet.x * scale, 0f), corner + sheet * scale, corner + new Vector2(0f, sheet.y * scale) },
+                shapes.Polyline(new[] { V(corner), V(corner + new Vector2(sheet.x * scale, 0f)), V(corner + sheet * scale), V(corner + new Vector2(0f, sheet.y * scale)) },
                     over ? Theme.Danger : new Color(Theme.Accent.r, Theme.Accent.g, Theme.Accent.b, 0.8f), 1.5f, true);
-                Label(corner + new Vector2(sheet.x * scale / 2f, sheet.y * scale + 16f),
+                Label(V(corner + new Vector2(sheet.x * scale / 2f, sheet.y * scale)) + new Vector2(0f, 16f),
                     "Sheet " + (s + 1) + " · " + Inch.Format(sheet.x) + " × " + Inch.Format(sheet.y), over ? Theme.Danger : Theme.TextDim);
             }
             var palette = new[] { new Color(0.55f, 0.75f, 1f, 0.75f), new Color(0.6f, 0.9f, 0.75f, 0.75f), new Color(1f, 0.82f, 0.5f, 0.75f), new Color(0.9f, 0.65f, 0.95f, 0.75f) };
             var keys = layout.pieces.Select(p => p.part.key).Distinct().ToList();
             foreach (var piece in layout.pieces.Where(p => p.sheet >= 0)) {
                 var corner = origin + new Vector2(piece.sheet * (sheet.x * scale + gap), 0f);
-                var points = piece.points.Select(p => corner + SheetUsage.OnSheet(piece, p) * scale).ToList();
+                var points = piece.points.Select(p => V(corner + SheetUsage.OnSheet(piece, p) * scale)).ToList();
                 var color = piece.tooBig && SheetUsage.CurrentRules == SheetUsage.Rules.Current ? new Color(Theme.Danger.r, Theme.Danger.g, Theme.Danger.b, 0.75f) : palette[keys.IndexOf(piece.part.key) % palette.Length];
                 shapes.Triangles(points, piece.top, color);
-                var hull = piece.hull.Select(p => corner + SheetUsage.OnSheet(piece, p) * scale).ToList();
+                var hull = piece.hull.Select(p => V(corner + SheetUsage.OnSheet(piece, p) * scale)).ToList();
                 if (hull.Count > 2) {
                     var center = hull.Aggregate(Vector2.zero, (a, b) => a + b) / hull.Count;
-                    if (piece.size.x * scale > 50f && piece.size.y * scale > 18f) Label(center, piece.part.name, Theme.Text);
+                    if (piece.size.x * scale * viewZoom > 50f && piece.size.y * scale * viewZoom > 18f) Label(center, piece.part.name, Theme.Text);
                 }
             }
             if (layout.pieces.Count == 0) Label(rect.center, "No polycarbonate pieces in this build yet", Theme.TextFaint);
+            else Label(new Vector2(rect.xMin + 150f, rect.yMin + 12f), "Wheel: zoom · drag: pan · F: fit", Theme.TextFaint);
         }
 
         private void Label(Vector2 at, string text, Color color) {

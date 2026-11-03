@@ -21,9 +21,9 @@ namespace Protobot.Interface {
         }
 
         private static readonly (string name, string sidebar, string keyEvent, int group, string description)[] Tools = {
+            ("Select", "Select Tool", "Enable Select Tool", 0, "Click parts to select them. Esc in any tool comes back here. Plastic pieces and imported parts can be edited from here."),
             ("Transform", "Transform Tool", "Enable Transform Tool", 0, "Move and turn parts with the arrows and rings. Snapping and local/global are in the options above."),
             ("Move", "Move Tool", "Enable Move Tool", 0, "Click a hole on a part, then a hole on another part to put them together."),
-            ("Join", "Join Tool", "Enable Join Tool", 0, "Click a face, edge, corner or hole on one part, then on another: the first part moves to meet it."),
             ("Paint", "Color Tool", "Enable Color Tool", 0, "Click parts to paint them. Pick the color in the options above."),
             ("Saw", "Saw Tool", "Enable Saw Tool", 1, "Click a part to place a cut. Drag the plane or type its distance, then press Enter to cut."),
             ("Drill", "Drill Tool", "Enable Drill Tool", 1, "Click a hole to drill it out round. Choose the bit size above."),
@@ -41,6 +41,13 @@ namespace Protobot.Interface {
 
         /// <summary>The active tool's name ("Saw"), or null.</summary>
         public static string Current => Instance != null ? Instance.currentName : null;
+
+        private static readonly Dictionary<string, Func<bool>> busyChecks = new();
+        private bool busyLastFrame;
+        private Placement placement;
+
+        /// <summary>Lets a tool say it has something under way that Esc steps back (then Esc doesn't switch tools).</summary>
+        public static void RegisterBusy(string tool, Func<bool> busy) => busyChecks[tool] = busy;
 
         /// <summary>Lets a tool fill the options bar while it's active.</summary>
         public static void RegisterOptions(string tool, Action<RectTransform> build) => optionBuilders[tool] = build;
@@ -106,8 +113,8 @@ namespace Protobot.Interface {
                 return Interface.Instance.measureIcon;
             if (name == "Saw" && Interface.Instance.sawIcon != null)
                 return Interface.Instance.sawIcon;
-            if (name == "Join" && Interface.Instance.joinIcon != null)
-                return Interface.Instance.joinIcon;
+            if (name == "Select" && Interface.Instance.selectIcon != null)
+                return Interface.Instance.selectIcon;
             var icon = sidebarButton.GetComponentsInChildren<Image>(true).FirstOrDefault(i => i.name.EndsWith("Icon"));
             return icon != null ? icon.sprite : null;
         }
@@ -140,6 +147,12 @@ namespace Protobot.Interface {
             Ui.Tip(tool.background, tool.name, null, tool.description);
         }
 
+        private void LateUpdate() {
+            if (placement == null) placement = FindFirstObjectByType<Placement>(FindObjectsInactive.Include);
+            busyLastFrame = (placement != null && placement.placing) || Popup.IsOpen || PartsFlyout.IsOpen
+                            || (currentName != null && busyChecks.TryGetValue(currentName, out var busy) && busy());
+        }
+
         private void Update() {
             // Below the original top bar, wherever the screen size puts it.
             panel.anchoredPosition = new Vector2(14f, -(Layout.TopBarBottom + 14f));
@@ -162,7 +175,23 @@ namespace Protobot.Interface {
             }
 
             currentName = active?.name;
+            // The app starts in the Select tool (and comes back to it when no tool is on).
+            if (active == null && Time.frameCount > 2 && tools.Any(t => t.name == "Select")) {
+                Select("Select");
+                return;
+            }
+
+            // Esc with nothing under way in the tool (no part being placed, no cut or measurement started, no menu
+            // open) goes back to the Select tool.
+            var keyboard = UnityEngine.InputSystem.Keyboard.current;
+            if (keyboard != null && keyboard.escapeKey.wasPressedThisFrame && !busyLastFrame && currentName != "Select"
+                && !TextInput.IsTyping && !TextInput.ShortcutsPaused) {
+                Select("Select");
+                Interface.Say("Select tool");
+            }
             if (active != shown) {
+                if (shown != null && active != null && placement != null && placement.placing && active.name != "Move")
+                    placement.StopPlacing();
                 shown = active;
                 if (active != null && optionBuilders.TryGetValue(active.name, out var build))
                     ToolOptions.Show(active.name, build);
@@ -176,16 +205,31 @@ namespace Protobot.Interface {
     public class HoverTint : MonoBehaviour, UnityEngine.EventSystems.IPointerEnterHandler, UnityEngine.EventSystems.IPointerExitHandler {
         public Image target;
         public Color hover = Theme.Hover;
-        private bool over;
+        private bool over, tinted;
+        private Color rest;
 
         public void OnPointerEnter(UnityEngine.EventSystems.PointerEventData e) => over = true;
         public void OnPointerExit(UnityEngine.EventSystems.PointerEventData e) => over = false;
 
+        // The colour it had before the mouse came is put back when the mouse leaves.
         private void LateUpdate() {
-            if (target != null && over)
+            if (target == null) return;
+            if (over) {
+                if (!tinted) rest = target.color;
+                tinted = true;
                 target.color = hover;
+            }
+            else Restore();
         }
 
-        private void OnDisable() => over = false;
+        private void Restore() {
+            if (tinted && target != null && target.color == hover) target.color = rest;
+            tinted = false;
+        }
+
+        private void OnDisable() {
+            over = false;
+            Restore();
+        }
     }
 }

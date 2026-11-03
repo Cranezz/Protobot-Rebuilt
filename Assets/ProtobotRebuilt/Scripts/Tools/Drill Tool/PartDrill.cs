@@ -18,7 +18,6 @@ namespace Protobot.Tools {
 
         /// <summary>The bits on offer, in inches.</summary>
         public static readonly float[] Bits = MakeBits();
-        private static readonly float[] QuickBits = { 0.125f, 0.1875f, 0.25f, 0.375f, 0.5f };
 
         private const string BitKey = "V2.DrillBit";
         public static float Diameter {
@@ -38,20 +37,27 @@ namespace Protobot.Tools {
         [RuntimeInitializeOnLoadMethod]
         private static void RegisterOptions() => ToolRail.RegisterOptions("Drill", BuildOptions);
 
+        // V2: one dropdown with every bit (the quick sizes beside it doubled it); the mouse wheel over it steps
+        // through the sizes.
         private static void BuildOptions(RectTransform bar) {
             ToolOptions.Note(bar, "Bit");
-            var quick = System.Array.IndexOf(QuickBits, QuickBits.FirstOrDefault(b => Mathf.Abs(b - Diameter) < 0.0001f));
-            ToolOptions.Segmented(bar, QuickBits.Select(b => Inch.Format(b)).ToArray(), quick, i => {
-                Diameter = QuickBits[i];
-                ToolOptions.Rebuild();
-            }, 52f);
-            var all = Bits.Select(b => Inch.Format(b)).ToArray();
+            var all = Bits.Select(b => Inch.Format(b) + "  (" + b.ToString("0.000", System.Globalization.CultureInfo.InvariantCulture) + "\")").ToArray();
             var index = System.Array.FindIndex(Bits, b => Mathf.Abs(b - Diameter) < 0.0001f);
-            Popup.Choice(bar, all, index, i => {
+            var choice = Popup.Choice(bar, all, index, i => {
                 Diameter = Bits[i];
+                Interface.Interface.Say("Bit: " + Inch.Format(Diameter));
                 ToolOptions.Rebuild();
-            }, 92f);
-            ToolOptions.Note(bar, Inch.Format(Diameter).Replace("\"", "") + "\" = " + Diameter.ToString("0.000") + "\"");
+            }, 150f);
+            choice.gameObject.AddComponent<WheelStep>().step = direction => {
+                var current = System.Array.FindIndex(Bits, b => Mathf.Abs(b - Diameter) < 0.0001f);
+                var next = Mathf.Clamp((current < 0 ? 0 : current) + direction, 0, Bits.Length - 1);
+                if (next == current) return;
+                Diameter = Bits[next];
+                Interface.Interface.Say("Bit: " + Inch.Format(Diameter));
+                ToolOptions.Rebuild();
+            };
+            Ui.Tip(choice, "Drill bit", "Wheel", "1/16\" to 1/2\" by 64ths, then to 1\" by 16ths. Scroll over it to step through the sizes.");
+            Ui.Hint(bar, "Click", "a hole to drill it");
         }
 
         private void OnDisable() {

@@ -107,6 +107,8 @@ public class PartListOutput : MonoBehaviour
         public string GetFileLocation()
         {
             //allows the user to specify the file path to save the txt file to
-            return StandaloneFileBrowser.SaveFilePanel("Save Parts List", "", "Parts", "txt");
+            var path = StandaloneFileBrowser.SaveFilePanel("Save Parts List", "", "Parts", "txt");
+            Protobot.InputEvents.TextInput.AfterFileWindow();  // V2: typing in the file window isn't shortcuts
+            return path;
         }
 }

@@ -17,8 +17,11 @@ namespace Protobot.Custom {
         public Vector3 axis;     // along the hole
         public float size;       // round diameter or square side (inches)
         public float depth;
-        public bool square;
+        public bool square;      // square or rectangular (a slot); otherwise round
         public bool threaded;
+        public Vector3 up;       // along the hole's second side (zero: any way round)
+        public float size2;      // the second side of a rectangular hole (0: the same as size)
+        public Vector2[] outline; // its exact shape, in inches along (right, up) around the centre (null: plain)
     }
 
     [Serializable]
@@ -33,6 +36,7 @@ namespace Protobot.Custom {
         public float weightGrams;
         public float thickness;     // polycarbonate
         public string sketch;       // polycarbonate: the sketch, to edit it again
+        public string finish;       // plastic pieces: what they're cut from (a PlasticMaterials id)
         public long created;
 
         public string Id => kind + "-" + key;
@@ -178,6 +182,8 @@ namespace Protobot.Custom {
             if (ReadMesh(part, out var vertices, out var triangles)) {
                 mesh.vertices = vertices;
                 mesh.triangles = triangles;
+                // Plastic pieces: texture coordinates in inches across the sheet (x, z), for grainy finishes.
+                if (part.kind == Polycarbonate) mesh.uv = vertices.Select(v => new Vector2(v.x, v.z)).ToArray();
                 mesh.RecalculateNormals();
                 mesh.RecalculateBounds();
             }
@@ -203,7 +209,9 @@ namespace Protobot.Custom {
         public static Material MaterialFor(CustomPartData part) {
             var host = Interface.Interface.Instance;
             if (host == null) return null;
-            if (part.kind == Polycarbonate || part.material == "Polycarbonate")
+            if (part.kind == Polycarbonate)
+                return Polycarb.PlasticMaterials.MaterialFor(part.finish ?? Polycarb.PlasticMaterials.Default) ?? host.polycarbMaterial;
+            if (part.material == "Polycarbonate")
                 return host.polycarbMaterial;
             return part.material == "Plastic" ? host.plasticMaterial : host.metalMaterial;
         }
@@ -236,11 +244,14 @@ namespace Protobot.Custom {
                 var collider = UnityEngine.Object.Instantiate(template, obj.transform);
                 collider.name = "HoleCollider";
                 collider.transform.localPosition = hole.center;
-                collider.transform.localRotation = Quaternion.LookRotation(hole.axis.sqrMagnitude > 0.5f ? hole.axis : Vector3.forward);
-                collider.transform.localScale = new Vector3(hole.size, hole.size, Mathf.Max(hole.depth, 0.02f));
+                var axis = hole.axis.sqrMagnitude > 0.5f ? hole.axis : Vector3.forward;
+                var up = Vector3.ProjectOnPlane(hole.up, axis);
+                collider.transform.localRotation = up.sqrMagnitude > 0.25f ? Quaternion.LookRotation(axis, up) : Quaternion.LookRotation(axis);
+                collider.transform.localScale = new Vector3(hole.size, hole.size2 > 0f ? hole.size2 : hole.size, Mathf.Max(hole.depth, 0.02f));
                 var holeCollider = collider.GetComponent<HoleCollider>();
                 holeCollider.holeType = hole.threaded ? HoleCollider.HoleType.Threaded : HoleCollider.HoleType.Normal;
                 holeCollider.twoSided = hole.threaded;
+                holeCollider.Refresh(hole.outline != null && hole.outline.Length >= 3 ? hole.outline : null);
             }
         }
 
@@ -251,6 +262,11 @@ namespace Protobot.Custom {
             foreach (var obj in PartsManager.FindLoadedObjects()) {
                 if (obj.GetComponent<SavedObject>().id != part.Id) continue;
                 obj.GetComponent<MeshFilter>().sharedMesh = mesh;
+                var material = MaterialFor(part);
+                if (material != null && obj.TryGetComponent(out MeshRenderer renderer)) {
+                    renderer.sharedMaterial = material;
+                    if (obj.TryGetComponent(out KeepTranslucent keep)) keep.alpha = material.color.a;
+                }
                 if (obj.TryGetComponent(out MeshCollider collider)) {
                     collider.sharedMesh = null;
                     collider.sharedMesh = mesh;
@@ -276,6 +292,9 @@ namespace Protobot.Custom {
             "Steel" => 7.85f,
             "Plastic" => 1.10f,
             "Polycarbonate" => 1.20f,
+            "ABS" => 1.05f,
+            "Acetal" => 1.41f,
+            "Delrin" => 1.42f,
             _ => 2.70f,  // aluminum
         };
 

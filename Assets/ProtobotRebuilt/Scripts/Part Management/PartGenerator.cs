@@ -57,6 +57,7 @@ namespace Protobot {
                 savedObj = obj.AddComponent<SavedObject>();
             
             savedObj.id = GetId();
+            Motion.Dynamics.Attach(obj, savedObj.id);  // V2: cylinders slide, motors turn
         }
         public abstract Mesh GetMesh();
         public abstract GameObject Generate(Vector3 position, Quaternion rotation);

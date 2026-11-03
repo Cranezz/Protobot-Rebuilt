@@ -23,7 +23,7 @@ namespace Protobot.Tools {
         private Quaternion finalRotation = Quaternion.identity;
         public override Quaternion FinalRotation => finalRotation;
 
-        private const float Increment = 5;
+        private static float Increment => TransformGizmo.TurnStep; // V2: set in the tool options (was 5°)
 
         //Main functions
         public override void Rotate() {
@@ -39,6 +39,7 @@ namespace Protobot.Tools {
             // V2: turn about the gizmo (a group's middle), not only about the clicked part's own middle.
             var center = initPos + initOffset;
             var newPos = center + newRot * Quaternion.Inverse(initRot) * (initPos - center);
+            movementManager.NextKind = Motion.Linkage.MoveKind.Rotate;  // V2: a part on a joint to a grounded one only turns about it
             movementManager.DisplaceTo(new Protobot.Transformations.Displacement(newPos, newRot));
 
             finalRotation = newRot;

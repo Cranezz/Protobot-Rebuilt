@@ -1,5 +1,163 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &115278733610254415
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7533002518010692065}
+  - component: {fileID: 2853535477345180321}
+  - component: {fileID: 6763169674750079279}
+  m_Layer: 11
+  m_Name: HoleCollider
+  m_TagString: HoleCollider
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7533002518010692065
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 115278733610254415}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.0040818923, y: 0.000000022916414, z: 0.0004330652}
+  m_LocalScale: {x: 0.12565117, y: 0.12565117, z: 0.18000007}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 17373717469478220}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!64 &2853535477345180321
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 115278733610254415}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -8866702806410751908, guid: b3742fe5726aee84cb9d067be3423b22, type: 3}
+--- !u!114 &6763169674750079279
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 115278733610254415}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9292031b68cb53740b5f8a3cc6cbbfdc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  holeData:
+    shape: {fileID: -8866702806410751908, guid: b3742fe5726aee84cb9d067be3423b22, type: 3}
+    depth: 0.25
+    size: {x: 0.164, y: 0.164}
+    part: {fileID: 4288159359939511421, guid: d66429db48fb0114d8d32f299a7317cc, type: 3}
+    position: {x: 0, y: 0, z: 0}
+    rotation: {x: -0, y: -0, z: -0, w: 1}
+    forward: {x: 0, y: 0, z: 1}
+    outline: []
+  holeType: 2
+  detectors: []
+  twoSided: 0
+--- !u!1 &204537357516461295
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7048833165756395057}
+  - component: {fileID: 5389370181885751738}
+  - component: {fileID: 2639925427287557107}
+  m_Layer: 11
+  m_Name: HoleCollider
+  m_TagString: HoleCollider
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7048833165756395057
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 204537357516461295}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.2031497, y: 0.1968505, z: -0.063484184}
+  m_LocalScale: {x: 0.1722842, y: 0.1722842, z: 0.12500004}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 414916597332447292}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!64 &5389370181885751738
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 204537357516461295}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -8866702806410751908, guid: b3742fe5726aee84cb9d067be3423b22, type: 3}
+--- !u!114 &2639925427287557107
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 204537357516461295}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9292031b68cb53740b5f8a3cc6cbbfdc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  holeData:
+    shape: {fileID: -8866702806410751908, guid: b3742fe5726aee84cb9d067be3423b22, type: 3}
+    depth: 0.25
+    size: {x: 0.164, y: 0.164}
+    part: {fileID: 4288159359939511421, guid: d66429db48fb0114d8d32f299a7317cc, type: 3}
+    position: {x: 0, y: 0, z: 0}
+    rotation: {x: -0, y: -0, z: -0, w: 1}
+    forward: {x: 0, y: 0, z: 1}
+    outline: []
+  holeType: 0
+  detectors: []
+  twoSided: 0
 --- !u!1 &216254066948645110
 GameObject:
   m_ObjectHideFlags: 0
@@ -35,11 +193,13 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 5932081964151632371}
-  - {fileID: 7786435014430886958}
-  - {fileID: 7554427778984588201}
-  - {fileID: 7140427081553203683}
-  - {fileID: 6361555772548048582}
+  - {fileID: 6953634083558974778}
+  - {fileID: 629165431811266885}
+  - {fileID: 8921300270759537320}
+  - {fileID: 4337290736586541798}
+  - {fileID: 3650315089811756100}
+  - {fileID: 964698770687340361}
+  - {fileID: 1707819016089693533}
   m_Father: {fileID: 3999360260535100182}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &6918747328677833327
@@ -49,7 +209,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 216254066948645110}
-  m_Mesh: {fileID: 1859747451341188798, guid: 21a56f56e5232c348a74c696937598b6, type: 2}
+  m_Mesh: {fileID: -272467911888751194, guid: 21a56f56e5232c348a74c696937598b6, type: 2}
 --- !u!23 &7754059586077119173
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -120,7 +280,7 @@ MeshCollider:
   serializedVersion: 5
   m_Convex: 0
   m_CookingOptions: 30
-  m_Mesh: {fileID: 1859747451341188798, guid: 21a56f56e5232c348a74c696937598b6, type: 2}
+  m_Mesh: {fileID: -272467911888751194, guid: 21a56f56e5232c348a74c696937598b6, type: 2}
 --- !u!114 &5623190165567874647
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -166,7 +326,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Parts_List.PartName
   name: Low Profile Bearing Flat
   weightInGrams: 1.39
---- !u!1 &227882603438450878
+--- !u!1 &377387771536744405
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -174,9 +334,9 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 7554427778984588201}
-  - component: {fileID: 8650991476664310798}
-  - component: {fileID: 2038436133097613191}
+  - component: {fileID: 4227676940595330718}
+  - component: {fileID: 6779585066262374418}
+  - component: {fileID: 5196689665478324644}
   m_Layer: 11
   m_Name: HoleCollider
   m_TagString: HoleCollider
@@ -184,106 +344,28 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &7554427778984588201
+--- !u!4 &4227676940595330718
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 227882603438450878}
+  m_GameObject: {fileID: 377387771536744405}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.49606317, y: 0.003937018, z: -0.1250014}
-  m_LocalScale: {x: 0.18897647, y: 0.18897647, z: 0.2499974}
+  m_LocalRotation: {x: -0.7071068, y: 0, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: 0.0039370055, y: -0.00000001833313, z: 0.0039366204}
+  m_LocalScale: {x: 0.16189021, y: 0.16189021, z: 0.2500001}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 4499283777428268780}
+  m_Father: {fileID: 4679549921718595559}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!64 &8650991476664310798
+--- !u!64 &6779585066262374418
 MeshCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 227882603438450878}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: -22725266747507458, guid: 8c1cf58699f03f04f956b59e833806d6, type: 3}
---- !u!114 &2038436133097613191
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 227882603438450878}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9292031b68cb53740b5f8a3cc6cbbfdc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  holeData:
-    shape: {fileID: -22725266747507458, guid: 8c1cf58699f03f04f956b59e833806d6, type: 3}
-    depth: 0.05
-    size: {x: 0.18, y: 0.18}
-    part: {fileID: 5168579248169057192, guid: 64ee3195f74df474c9cf21c91f168fd9, type: 3}
-    position: {x: -6, y: -0.25, z: 0.025}
-    rotation: {x: -0, y: -0, z: -0, w: 1}
-    forward: {x: 0, y: 0, z: 1}
-  holeType: 0
-  detectors: []
-  twoSided: 0
---- !u!1 &291157567063193670
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 6125539679064142011}
-  - component: {fileID: 7152543055553659365}
-  - component: {fileID: 2701202106031623548}
-  m_Layer: 11
-  m_Name: HoleCollider
-  m_TagString: HoleCollider
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &6125539679064142011
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 291157567063193670}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.0031500175, y: 0.49685067, z: -0.00000005499939}
-  m_LocalScale: {x: 0.16478996, y: 0.16478996, z: 0.2500001}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 4453038912278214970}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!64 &7152543055553659365
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 291157567063193670}
+  m_GameObject: {fileID: 377387771536744405}
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -299,13 +381,13 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: -8866702806410751908, guid: b3742fe5726aee84cb9d067be3423b22, type: 3}
---- !u!114 &2701202106031623548
+--- !u!114 &5196689665478324644
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 291157567063193670}
+  m_GameObject: {fileID: 377387771536744405}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9292031b68cb53740b5f8a3cc6cbbfdc, type: 3}
@@ -319,10 +401,11 @@ MonoBehaviour:
     position: {x: 0, y: 0, z: 0}
     rotation: {x: -0, y: -0, z: -0, w: 1}
     forward: {x: 0, y: 0, z: 1}
-  holeType: 0
+    outline: []
+  holeType: 2
   detectors: []
   twoSided: 0
---- !u!1 &593199744672872781
+--- !u!1 &419498616551683037
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -330,9 +413,9 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 2297151466593408827}
-  - component: {fileID: 6501497222999859484}
-  - component: {fileID: 3609304174933406448}
+  - component: {fileID: 964698770687340361}
+  - component: {fileID: 2380238392127441811}
+  - component: {fileID: 8401398708353225504}
   m_Layer: 11
   m_Name: HoleCollider
   m_TagString: HoleCollider
@@ -340,28 +423,107 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &2297151466593408827
+--- !u!4 &964698770687340361
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 593199744672872781}
+  m_GameObject: {fileID: 419498616551683037}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
-  m_LocalPosition: {x: 0.004724002, y: -0.27480322, z: 0.084720515}
-  m_LocalScale: {x: 0.26771665, y: 0.26771665, z: 0.07944102}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.49606326, y: 0.003937018, z: -0.099214114}
+  m_LocalScale: {x: 0.16189021, y: 0.16189021, z: 0.1992097}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 4453038912278214970}
+  m_Father: {fileID: 4499283777428268780}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!64 &6501497222999859484
+--- !u!64 &2380238392127441811
 MeshCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 593199744672872781}
+  m_GameObject: {fileID: 419498616551683037}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -8866702806410751908, guid: b3742fe5726aee84cb9d067be3423b22, type: 3}
+--- !u!114 &8401398708353225504
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 419498616551683037}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9292031b68cb53740b5f8a3cc6cbbfdc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  holeData:
+    shape: {fileID: -8866702806410751908, guid: b3742fe5726aee84cb9d067be3423b22, type: 3}
+    depth: 0.25
+    size: {x: 0.164, y: 0.164}
+    part: {fileID: 4288159359939511421, guid: d66429db48fb0114d8d32f299a7317cc, type: 3}
+    position: {x: 0, y: 0, z: 0}
+    rotation: {x: -0, y: -0, z: -0, w: 1}
+    forward: {x: 0, y: 0, z: 1}
+    outline: []
+  holeType: 0
+  detectors: []
+  twoSided: 0
+--- !u!1 &746150737470081407
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2082636140171501526}
+  - component: {fileID: 6861049747308934604}
+  - component: {fileID: 7671413416126007788}
+  m_Layer: 11
+  m_Name: HoleCollider
+  m_TagString: HoleCollider
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2082636140171501526
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 746150737470081407}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: -0.7071068, z: -0, w: 0.7071068}
+  m_LocalPosition: {x: 0.15538187, y: 0.24488205, z: -0.05413392}
+  m_LocalScale: {x: 0.11023627, y: 0.2834647, z: 0.08136163}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4453038912278214970}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!64 &6861049747308934604
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 746150737470081407}
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -377,13 +539,13 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: -22725266747507458, guid: 8c1cf58699f03f04f956b59e833806d6, type: 3}
---- !u!114 &3609304174933406448
+--- !u!114 &7671413416126007788
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 593199744672872781}
+  m_GameObject: {fileID: 746150737470081407}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9292031b68cb53740b5f8a3cc6cbbfdc, type: 3}
@@ -397,6 +559,165 @@ MonoBehaviour:
     position: {x: -6, y: -0.25, z: 0.025}
     rotation: {x: -0, y: -0, z: -0, w: 1}
     forward: {x: 0, y: 0, z: 1}
+    outline: []
+  holeType: 0
+  detectors: []
+  twoSided: 0
+--- !u!1 &921769920113693467
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1550399275129843864}
+  - component: {fileID: 9004288398965780633}
+  - component: {fileID: 2758646581142027730}
+  m_Layer: 11
+  m_Name: HoleCollider
+  m_TagString: HoleCollider
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1550399275129843864
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 921769920113693467}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.0031500175, y: -0.5031498, z: -0.00000005499939}
+  m_LocalScale: {x: 0.16951269, y: 0.16951269, z: 0.2500001}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4453038912278214970}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!64 &9004288398965780633
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 921769920113693467}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -8866702806410751908, guid: b3742fe5726aee84cb9d067be3423b22, type: 3}
+--- !u!114 &2758646581142027730
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 921769920113693467}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9292031b68cb53740b5f8a3cc6cbbfdc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  holeData:
+    shape: {fileID: -8866702806410751908, guid: b3742fe5726aee84cb9d067be3423b22, type: 3}
+    depth: 0.25
+    size: {x: 0.164, y: 0.164}
+    part: {fileID: 4288159359939511421, guid: d66429db48fb0114d8d32f299a7317cc, type: 3}
+    position: {x: 0, y: 0, z: 0}
+    rotation: {x: -0, y: -0, z: -0, w: 1}
+    forward: {x: 0, y: 0, z: 1}
+    outline: []
+  holeType: 0
+  detectors: []
+  twoSided: 0
+--- !u!1 &1040922653429184919
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 192106726297498319}
+  - component: {fileID: 2687904679786303279}
+  - component: {fileID: 8843258066622181193}
+  m_Layer: 11
+  m_Name: HoleCollider
+  m_TagString: HoleCollider
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &192106726297498319
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1040922653429184919}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0.5, y: 0.5, z: -0.5, w: 0.5}
+  m_LocalPosition: {x: 0.33149618, y: 0.02952758, z: -0.08464567}
+  m_LocalScale: {x: 0.14173235, y: 0.29921272, z: 0.06594492}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4583533667079428821}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!64 &2687904679786303279
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1040922653429184919}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -22725266747507458, guid: 8c1cf58699f03f04f956b59e833806d6, type: 3}
+--- !u!114 &8843258066622181193
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1040922653429184919}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9292031b68cb53740b5f8a3cc6cbbfdc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  holeData:
+    shape: {fileID: -22725266747507458, guid: 8c1cf58699f03f04f956b59e833806d6, type: 3}
+    depth: 0.05
+    size: {x: 0.18, y: 0.18}
+    part: {fileID: 5168579248169057192, guid: 64ee3195f74df474c9cf21c91f168fd9, type: 3}
+    position: {x: -6, y: -0.25, z: 0.025}
+    rotation: {x: -0, y: -0, z: -0, w: 1}
+    forward: {x: 0, y: 0, z: 1}
+    outline: []
   holeType: 0
   detectors: []
   twoSided: 0
@@ -435,8 +756,8 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 8724635927964968456}
-  - {fileID: 5816520702626721940}
+  - {fileID: 3438840868036290958}
+  - {fileID: 5387132196668719480}
   m_Father: {fileID: 3999360260535100182}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &2881170249424168469
@@ -446,7 +767,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1227072431489884241}
-  m_Mesh: {fileID: 420928465143582296, guid: 21a56f56e5232c348a74c696937598b6, type: 2}
+  m_Mesh: {fileID: -3493615287444425266, guid: 21a56f56e5232c348a74c696937598b6, type: 2}
 --- !u!23 &1771872028429914292
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -518,7 +839,7 @@ MeshCollider:
   serializedVersion: 5
   m_Convex: 0
   m_CookingOptions: 30
-  m_Mesh: {fileID: 420928465143582296, guid: 21a56f56e5232c348a74c696937598b6, type: 2}
+  m_Mesh: {fileID: -3493615287444425266, guid: 21a56f56e5232c348a74c696937598b6, type: 2}
 --- !u!114 &7266400706837106031
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -548,7 +869,7 @@ MonoBehaviour:
   param1Value: Shaft Collar (star screw)
   param2Value: 
   holeData: 
-  primaryHole: {fileID: 1239395782944540141}
+  primaryHole: {fileID: 2671876044406197870}
   allowCenterInserts: 0
 --- !u!114 &3013993471060487287
 MonoBehaviour:
@@ -564,7 +885,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Parts_List.PartName
   name: Shaft Collar (star screw)
   weightInGrams: 4.87
---- !u!1 &1589118590493579173
+--- !u!1 &1449042932045424529
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -572,9 +893,9 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 8724635927964968456}
-  - component: {fileID: 4284940612327586300}
-  - component: {fileID: 1239395782944540141}
+  - component: {fileID: 2758212237896116645}
+  - component: {fileID: 6539330419101699512}
+  - component: {fileID: 1456267757460898605}
   m_Layer: 11
   m_Name: HoleCollider
   m_TagString: HoleCollider
@@ -582,28 +903,265 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &8724635927964968456
+--- !u!4 &2758212237896116645
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1589118590493579173}
+  m_GameObject: {fileID: 1449042932045424529}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.7071068, y: 0, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: -0.00007754914, y: 0.00000001833313, z: -0.093519315}
+  m_LocalScale: {x: 0.12499999, y: 0.12499999, z: 0.3120001}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 637496903678888393}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!64 &6539330419101699512
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1449042932045424529}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -22725266747507458, guid: 8c1cf58699f03f04f956b59e833806d6, type: 3}
+--- !u!114 &1456267757460898605
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1449042932045424529}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9292031b68cb53740b5f8a3cc6cbbfdc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  holeData:
+    shape: {fileID: -22725266747507458, guid: 8c1cf58699f03f04f956b59e833806d6, type: 3}
+    depth: 0.05
+    size: {x: 0.18, y: 0.18}
+    part: {fileID: 5168579248169057192, guid: 64ee3195f74df474c9cf21c91f168fd9, type: 3}
+    position: {x: -6, y: -0.25, z: 0.025}
+    rotation: {x: -0, y: -0, z: -0, w: 1}
+    forward: {x: 0, y: 0, z: 1}
+    outline: []
+  holeType: 2
+  detectors: []
+  twoSided: 0
+--- !u!1 &1508005145949794986
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8769545462404906685}
+  - component: {fileID: 7550449729011839127}
+  - component: {fileID: 3215442646427345588}
+  m_Layer: 11
+  m_Name: HoleCollider
+  m_TagString: HoleCollider
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8769545462404906685
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1508005145949794986}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0.5, y: 0.5, z: -0.5, w: 0.5}
+  m_LocalPosition: {x: -0.32992145, y: 0.02952758, z: -0.08464567}
+  m_LocalScale: {x: 0.14173235, y: 0.29921272, z: 0.06594492}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4583533667079428821}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!64 &7550449729011839127
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1508005145949794986}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -22725266747507458, guid: 8c1cf58699f03f04f956b59e833806d6, type: 3}
+--- !u!114 &3215442646427345588
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1508005145949794986}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9292031b68cb53740b5f8a3cc6cbbfdc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  holeData:
+    shape: {fileID: -22725266747507458, guid: 8c1cf58699f03f04f956b59e833806d6, type: 3}
+    depth: 0.05
+    size: {x: 0.18, y: 0.18}
+    part: {fileID: 5168579248169057192, guid: 64ee3195f74df474c9cf21c91f168fd9, type: 3}
+    position: {x: -6, y: -0.25, z: 0.025}
+    rotation: {x: -0, y: -0, z: -0, w: 1}
+    forward: {x: 0, y: 0, z: 1}
+    outline: []
+  holeType: 0
+  detectors: []
+  twoSided: 0
+--- !u!1 &1559747905030525493
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1374555980279744645}
+  - component: {fileID: 2296690716256884093}
+  - component: {fileID: 3840873248454279506}
+  m_Layer: 11
+  m_Name: HoleCollider
+  m_TagString: HoleCollider
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1374555980279744645
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1559747905030525493}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.7071068, y: 0, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: 0.0039370055, y: -0.00000001833313, z: 0.003932697}
+  m_LocalScale: {x: 0.16189021, y: 0.16189021, z: 0.2500001}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4850257246026689448}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!64 &2296690716256884093
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1559747905030525493}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -8866702806410751908, guid: b3742fe5726aee84cb9d067be3423b22, type: 3}
+--- !u!114 &3840873248454279506
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1559747905030525493}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9292031b68cb53740b5f8a3cc6cbbfdc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  holeData:
+    shape: {fileID: -8866702806410751908, guid: b3742fe5726aee84cb9d067be3423b22, type: 3}
+    depth: 0.25
+    size: {x: 0.164, y: 0.164}
+    part: {fileID: 4288159359939511421, guid: d66429db48fb0114d8d32f299a7317cc, type: 3}
+    position: {x: 0, y: 0, z: 0}
+    rotation: {x: -0, y: -0, z: -0, w: 1}
+    forward: {x: 0, y: 0, z: 1}
+    outline: []
+  holeType: 2
+  detectors: []
+  twoSided: 0
+--- !u!1 &1864588016863967358
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8821335343024043515}
+  - component: {fileID: 6212702072124084910}
+  - component: {fileID: 8063901581103247336}
+  m_Layer: 11
+  m_Name: HoleCollider
+  m_TagString: HoleCollider
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8821335343024043515
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1864588016863967358}
   serializedVersion: 2
   m_LocalRotation: {x: -0.7071068, y: 0, z: 0, w: 0.7071068}
   m_LocalPosition: {x: 0.0039370055, y: 0.0004960762, z: -0.0019605695}
   m_LocalScale: {x: 0.16478996, y: 0.16478996, z: 0.25000006}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 5876634089400434473}
+  m_Father: {fileID: 637496903678888393}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!64 &4284940612327586300
+--- !u!64 &6212702072124084910
 MeshCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1589118590493579173}
+  m_GameObject: {fileID: 1864588016863967358}
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -619,13 +1177,13 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: -8866702806410751908, guid: b3742fe5726aee84cb9d067be3423b22, type: 3}
---- !u!114 &1239395782944540141
+--- !u!114 &8063901581103247336
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1589118590493579173}
+  m_GameObject: {fileID: 1864588016863967358}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9292031b68cb53740b5f8a3cc6cbbfdc, type: 3}
@@ -639,10 +1197,11 @@ MonoBehaviour:
     position: {x: 0, y: 0, z: 0}
     rotation: {x: -0, y: -0, z: -0, w: 1}
     forward: {x: 0, y: 0, z: 1}
+    outline: []
   holeType: 0
   detectors: []
   twoSided: 0
---- !u!1 &2069592607410685323
+--- !u!1 &1908341619871756905
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -650,9 +1209,9 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 8224955774247834194}
-  - component: {fileID: 2948260447434918538}
-  - component: {fileID: 8614627526108583734}
+  - component: {fileID: 3650315089811756100}
+  - component: {fileID: 2454766835925640383}
+  - component: {fileID: 1994582686353756455}
   m_Layer: 11
   m_Name: HoleCollider
   m_TagString: HoleCollider
@@ -660,28 +1219,107 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &8224955774247834194
+--- !u!4 &3650315089811756100
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2069592607410685323}
+  m_GameObject: {fileID: 1908341619871756905}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0.015445892, z: 0, w: 0.99988073}
-  m_LocalPosition: {x: -0.0006497035, y: -0.0005647202, z: -0.14449084}
-  m_LocalScale: {x: 0.136, y: 0.136, z: 0.13509855}
+  m_LocalRotation: {x: -0, y: 0, z: -0.7071068, w: 0.7071068}
+  m_LocalPosition: {x: 0.49606317, y: 0.003937018, z: -0.1250014}
+  m_LocalScale: {x: 0.18897647, y: 0.18897647, z: 0.2499974}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 4850257246026689448}
+  m_Father: {fileID: 4499283777428268780}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!64 &2948260447434918538
+--- !u!64 &2454766835925640383
 MeshCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2069592607410685323}
+  m_GameObject: {fileID: 1908341619871756905}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -22725266747507458, guid: 8c1cf58699f03f04f956b59e833806d6, type: 3}
+--- !u!114 &1994582686353756455
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1908341619871756905}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9292031b68cb53740b5f8a3cc6cbbfdc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  holeData:
+    shape: {fileID: -22725266747507458, guid: 8c1cf58699f03f04f956b59e833806d6, type: 3}
+    depth: 0.05
+    size: {x: 0.18, y: 0.18}
+    part: {fileID: 5168579248169057192, guid: 64ee3195f74df474c9cf21c91f168fd9, type: 3}
+    position: {x: -6, y: -0.25, z: 0.025}
+    rotation: {x: -0, y: -0, z: -0, w: 1}
+    forward: {x: 0, y: 0, z: 1}
+    outline: []
+  holeType: 0
+  detectors: []
+  twoSided: 0
+--- !u!1 &2396934572072314670
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5923338886488601286}
+  - component: {fileID: 4102036984003959939}
+  - component: {fileID: 722274074989294837}
+  m_Layer: 11
+  m_Name: HoleCollider
+  m_TagString: HoleCollider
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5923338886488601286
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2396934572072314670}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.7071068, y: 0, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: 0.4968506, y: -0.00000001833313, z: 0.0019685382}
+  m_LocalScale: {x: 0.18208584, y: 0.18208584, z: 0.12500004}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4583533667079428821}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!64 &4102036984003959939
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2396934572072314670}
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -697,13 +1335,13 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: -8866702806410751908, guid: b3742fe5726aee84cb9d067be3423b22, type: 3}
---- !u!114 &8614627526108583734
+--- !u!114 &722274074989294837
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2069592607410685323}
+  m_GameObject: {fileID: 2396934572072314670}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9292031b68cb53740b5f8a3cc6cbbfdc, type: 3}
@@ -717,10 +1355,11 @@ MonoBehaviour:
     position: {x: 0, y: 0, z: 0}
     rotation: {x: -0, y: -0, z: -0, w: 1}
     forward: {x: 0, y: 0, z: 1}
-  holeType: 1
+    outline: []
+  holeType: 0
   detectors: []
   twoSided: 0
---- !u!1 &2390265177542555978
+--- !u!1 &2525279357207150362
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -728,9 +1367,9 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 4293579848647882435}
-  - component: {fileID: 4852368118631628945}
-  - component: {fileID: 6600122445054096763}
+  - component: {fileID: 6953634083558974778}
+  - component: {fileID: 1702688391325522515}
+  - component: {fileID: 8857365032994417091}
   m_Layer: 11
   m_Name: HoleCollider
   m_TagString: HoleCollider
@@ -738,28 +1377,28 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &4293579848647882435
+--- !u!4 &6953634083558974778
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2390265177542555978}
+  m_GameObject: {fileID: 2525279357207150362}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.47244117, y: 0.25196862, z: -0.023000007}
-  m_LocalScale: {x: 0.12598431, y: 0.12598431, z: 0.046000015}
+  m_LocalRotation: {x: -0, y: 0, z: -0.7071068, w: 0.7071068}
+  m_LocalPosition: {x: -0.25196868, y: -0.09842523, z: -0.16437015}
+  m_LocalScale: {x: 0.11023627, y: 0.26771665, z: 0.1712599}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 2963132228915756977}
+  m_Father: {fileID: 4499283777428268780}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!64 &4852368118631628945
+--- !u!64 &1702688391325522515
 MeshCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2390265177542555978}
+  m_GameObject: {fileID: 2525279357207150362}
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -775,13 +1414,13 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: -22725266747507458, guid: 8c1cf58699f03f04f956b59e833806d6, type: 3}
---- !u!114 &6600122445054096763
+--- !u!114 &8857365032994417091
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2390265177542555978}
+  m_GameObject: {fileID: 2525279357207150362}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9292031b68cb53740b5f8a3cc6cbbfdc, type: 3}
@@ -795,10 +1434,11 @@ MonoBehaviour:
     position: {x: -6, y: -0.25, z: 0.025}
     rotation: {x: -0, y: -0, z: -0, w: 1}
     forward: {x: 0, y: 0, z: 1}
+    outline: []
   holeType: 0
   detectors: []
   twoSided: 0
---- !u!1 &2646755788190498647
+--- !u!1 &2540162184612295035
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -806,9 +1446,9 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 5064239488007903793}
-  - component: {fileID: 6999616542006255196}
-  - component: {fileID: 3914478490825910171}
+  - component: {fileID: 7348971265641869232}
+  - component: {fileID: 6413803721075438386}
+  - component: {fileID: 2768493610501049943}
   m_Layer: 11
   m_Name: HoleCollider
   m_TagString: HoleCollider
@@ -816,28 +1456,28 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &5064239488007903793
+--- !u!4 &7348971265641869232
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2646755788190498647}
+  m_GameObject: {fileID: 2540162184612295035}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
-  m_LocalPosition: {x: 0.004724002, y: 0.27637812, z: 0.08472053}
-  m_LocalScale: {x: 0.26771665, y: 0.26771665, z: 0.07944098}
+  m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: -0.20019697, y: 0.7007877, z: -0.24803151}
+  m_LocalScale: {x: 0.1666951, y: 0.1666951, z: 0.25000015}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 4453038912278214970}
+  m_Father: {fileID: 414916597332447292}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!64 &6999616542006255196
+--- !u!64 &6413803721075438386
 MeshCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2646755788190498647}
+  m_GameObject: {fileID: 2540162184612295035}
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -852,31 +1492,32 @@ MeshCollider:
   serializedVersion: 5
   m_Convex: 0
   m_CookingOptions: 30
-  m_Mesh: {fileID: -22725266747507458, guid: 8c1cf58699f03f04f956b59e833806d6, type: 3}
---- !u!114 &3914478490825910171
+  m_Mesh: {fileID: -8866702806410751908, guid: b3742fe5726aee84cb9d067be3423b22, type: 3}
+--- !u!114 &2768493610501049943
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2646755788190498647}
+  m_GameObject: {fileID: 2540162184612295035}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9292031b68cb53740b5f8a3cc6cbbfdc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   holeData:
-    shape: {fileID: -22725266747507458, guid: 8c1cf58699f03f04f956b59e833806d6, type: 3}
-    depth: 0.05
-    size: {x: 0.18, y: 0.18}
-    part: {fileID: 5168579248169057192, guid: 64ee3195f74df474c9cf21c91f168fd9, type: 3}
-    position: {x: -6, y: -0.25, z: 0.025}
+    shape: {fileID: -8866702806410751908, guid: b3742fe5726aee84cb9d067be3423b22, type: 3}
+    depth: 0.25
+    size: {x: 0.164, y: 0.164}
+    part: {fileID: 4288159359939511421, guid: d66429db48fb0114d8d32f299a7317cc, type: 3}
+    position: {x: 0, y: 0, z: 0}
     rotation: {x: -0, y: -0, z: -0, w: 1}
     forward: {x: 0, y: 0, z: 1}
+    outline: []
   holeType: 0
   detectors: []
   twoSided: 0
---- !u!1 &2698842412452232003
+--- !u!1 &2817765180210977486
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -884,9 +1525,9 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 9082627577579175274}
-  - component: {fileID: 8107066626239240276}
-  - component: {fileID: 1913308734901772478}
+  - component: {fileID: 3343388898421258972}
+  - component: {fileID: 5097551850086785173}
+  - component: {fileID: 5631097173659929289}
   m_Layer: 11
   m_Name: HoleCollider
   m_TagString: HoleCollider
@@ -894,13 +1535,13 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &9082627577579175274
+--- !u!4 &3343388898421258972
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2698842412452232003}
+  m_GameObject: {fileID: 2817765180210977486}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 1.2047249, y: 0.2440946, z: -0.023000007}
@@ -909,13 +1550,13 @@ Transform:
   m_Children: []
   m_Father: {fileID: 2963132228915756977}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!64 &8107066626239240276
+--- !u!64 &5097551850086785173
 MeshCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2698842412452232003}
+  m_GameObject: {fileID: 2817765180210977486}
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -931,13 +1572,13 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: -8866702806410751908, guid: b3742fe5726aee84cb9d067be3423b22, type: 3}
---- !u!114 &1913308734901772478
+--- !u!114 &5631097173659929289
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2698842412452232003}
+  m_GameObject: {fileID: 2817765180210977486}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9292031b68cb53740b5f8a3cc6cbbfdc, type: 3}
@@ -951,6 +1592,7 @@ MonoBehaviour:
     position: {x: 0, y: 0, z: 0}
     rotation: {x: -0, y: -0, z: -0, w: 1}
     forward: {x: 0, y: 0, z: 1}
+    outline: []
   holeType: 0
   detectors: []
   twoSided: 0
@@ -1043,7 +1685,7 @@ MonoBehaviour:
     customUnit: 
     customDefault: 
     customLimits: {x: 0, y: 0}
---- !u!1 &3297307799147891389
+--- !u!1 &3096665686699192950
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1051,9 +1693,9 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 3208229999241207745}
-  - component: {fileID: 605029651059330256}
-  - component: {fileID: 1594061875797119937}
+  - component: {fileID: 5748138617914477116}
+  - component: {fileID: 6838968797691754314}
+  - component: {fileID: 8982447415093398358}
   m_Layer: 11
   m_Name: HoleCollider
   m_TagString: HoleCollider
@@ -1061,28 +1703,28 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &3208229999241207745
+--- !u!4 &5748138617914477116
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3297307799147891389}
+  m_GameObject: {fileID: 3096665686699192950}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.0040818923, y: 0.000000022916414, z: 0.0004330652}
-  m_LocalScale: {x: 0.12565117, y: 0.12565117, z: 0.18000007}
+  m_LocalPosition: {x: 0.1968505, y: 0.2440946, z: -0.023000007}
+  m_LocalScale: {x: 0.17501183, y: 0.17501183, z: 0.046000015}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 17373717469478220}
+  m_Father: {fileID: 2963132228915756977}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!64 &605029651059330256
+--- !u!64 &6838968797691754314
 MeshCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3297307799147891389}
+  m_GameObject: {fileID: 3096665686699192950}
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -1098,13 +1740,13 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: -8866702806410751908, guid: b3742fe5726aee84cb9d067be3423b22, type: 3}
---- !u!114 &1594061875797119937
+--- !u!114 &8982447415093398358
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3297307799147891389}
+  m_GameObject: {fileID: 3096665686699192950}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9292031b68cb53740b5f8a3cc6cbbfdc, type: 3}
@@ -1118,7 +1760,87 @@ MonoBehaviour:
     position: {x: 0, y: 0, z: 0}
     rotation: {x: -0, y: -0, z: -0, w: 1}
     forward: {x: 0, y: 0, z: 1}
-  holeType: 2
+    outline: []
+  holeType: 0
+  detectors: []
+  twoSided: 0
+--- !u!1 &3167847859752239863
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 629165431811266885}
+  - component: {fileID: 7843075564356174077}
+  - component: {fileID: 1035946236286878180}
+  m_Layer: 11
+  m_Name: HoleCollider
+  m_TagString: HoleCollider
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &629165431811266885
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3167847859752239863}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: 0, z: -0.7071068, w: 0.7071068}
+  m_LocalPosition: {x: 0.25196856, y: -0.09842523, z: -0.16437015}
+  m_LocalScale: {x: 0.11023627, y: 0.26771665, z: 0.1712599}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4499283777428268780}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!64 &7843075564356174077
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3167847859752239863}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -22725266747507458, guid: 8c1cf58699f03f04f956b59e833806d6, type: 3}
+--- !u!114 &1035946236286878180
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3167847859752239863}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9292031b68cb53740b5f8a3cc6cbbfdc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  holeData:
+    shape: {fileID: -22725266747507458, guid: 8c1cf58699f03f04f956b59e833806d6, type: 3}
+    depth: 0.05
+    size: {x: 0.18, y: 0.18}
+    part: {fileID: 5168579248169057192, guid: 64ee3195f74df474c9cf21c91f168fd9, type: 3}
+    position: {x: -6, y: -0.25, z: 0.025}
+    rotation: {x: -0, y: -0, z: -0, w: 1}
+    forward: {x: 0, y: 0, z: 1}
+    outline: []
+  holeType: 0
   detectors: []
   twoSided: 0
 --- !u!1 &3344547407496166527
@@ -1156,11 +1878,15 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 773369233668052515}
-  - {fileID: 8094555319558821706}
-  - {fileID: 6125539679064142011}
-  - {fileID: 2297151466593408827}
-  - {fileID: 5064239488007903793}
+  - {fileID: 91489117705336975}
+  - {fileID: 8543003213215793767}
+  - {fileID: 5711538472704155637}
+  - {fileID: 2082636140171501526}
+  - {fileID: 1550399275129843864}
+  - {fileID: 958206927046471177}
+  - {fileID: 6078934962971513654}
+  - {fileID: 2473872432975215108}
+  - {fileID: 1993714814160109656}
   m_Father: {fileID: 3999360260535100182}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &6233271218270005582
@@ -1170,7 +1896,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3344547407496166527}
-  m_Mesh: {fileID: -4034657418291878815, guid: 21a56f56e5232c348a74c696937598b6, type: 2}
+  m_Mesh: {fileID: -7268291640302967155, guid: 21a56f56e5232c348a74c696937598b6, type: 2}
 --- !u!23 &1031177021085421203
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -1241,7 +1967,7 @@ MeshCollider:
   serializedVersion: 5
   m_Convex: 0
   m_CookingOptions: 30
-  m_Mesh: {fileID: -4034657418291878815, guid: 21a56f56e5232c348a74c696937598b6, type: 2}
+  m_Mesh: {fileID: -7268291640302967155, guid: 21a56f56e5232c348a74c696937598b6, type: 2}
 --- !u!114 &4851868829334139153
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1271,7 +1997,7 @@ MonoBehaviour:
   param1Value: Bearing Flat
   param2Value: 
   holeData: 
-  primaryHole: {fileID: 3051233633804258772}
+  primaryHole: {fileID: 8796213300795725833}
   allowCenterInserts: 0
 --- !u!114 &684124881498951475
 MonoBehaviour:
@@ -1287,6 +2013,322 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Parts_List.PartName
   name: Bearing Flat
   weightInGrams: 1.8
+--- !u!1 &3427506833288272966
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 219400744137630897}
+  - component: {fileID: 5865131766083201282}
+  - component: {fileID: 7949677850048872117}
+  m_Layer: 11
+  m_Name: HoleCollider
+  m_TagString: HoleCollider
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &219400744137630897
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3427506833288272966}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.7071068, y: 0, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: 0.0039370055, y: 0.0004960762, z: -0.0019605695}
+  m_LocalScale: {x: 0.16478996, y: 0.16478996, z: 0.25000006}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8122171326760423307}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!64 &5865131766083201282
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3427506833288272966}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -8866702806410751908, guid: b3742fe5726aee84cb9d067be3423b22, type: 3}
+--- !u!114 &7949677850048872117
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3427506833288272966}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9292031b68cb53740b5f8a3cc6cbbfdc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  holeData:
+    shape: {fileID: -8866702806410751908, guid: b3742fe5726aee84cb9d067be3423b22, type: 3}
+    depth: 0.25
+    size: {x: 0.164, y: 0.164}
+    part: {fileID: 4288159359939511421, guid: d66429db48fb0114d8d32f299a7317cc, type: 3}
+    position: {x: 0, y: 0, z: 0}
+    rotation: {x: -0, y: -0, z: -0, w: 1}
+    forward: {x: 0, y: 0, z: 1}
+    outline: []
+  holeType: 0
+  detectors: []
+  twoSided: 0
+--- !u!1 &3469061189469504392
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5598132119342854393}
+  - component: {fileID: 1131703010921955161}
+  - component: {fileID: 4376217845329078503}
+  m_Layer: 11
+  m_Name: HoleCollider
+  m_TagString: HoleCollider
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5598132119342854393
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3469061189469504392}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.7071068, y: 0, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: -0.00007754914, y: 0.00000001833313, z: -0.093519315}
+  m_LocalScale: {x: 0.12499999, y: 0.12499999, z: 0.3117568}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4534413589404346266}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!64 &1131703010921955161
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3469061189469504392}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -22725266747507458, guid: 8c1cf58699f03f04f956b59e833806d6, type: 3}
+--- !u!114 &4376217845329078503
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3469061189469504392}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9292031b68cb53740b5f8a3cc6cbbfdc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  holeData:
+    shape: {fileID: -22725266747507458, guid: 8c1cf58699f03f04f956b59e833806d6, type: 3}
+    depth: 0.05
+    size: {x: 0.18, y: 0.18}
+    part: {fileID: 5168579248169057192, guid: 64ee3195f74df474c9cf21c91f168fd9, type: 3}
+    position: {x: -6, y: -0.25, z: 0.025}
+    rotation: {x: -0, y: -0, z: -0, w: 1}
+    forward: {x: 0, y: 0, z: 1}
+    outline: []
+  holeType: 2
+  detectors: []
+  twoSided: 0
+--- !u!1 &3483268538767059057
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2473872432975215108}
+  - component: {fileID: 7760675322464180913}
+  - component: {fileID: 135659913882853787}
+  m_Layer: 11
+  m_Name: HoleCollider
+  m_TagString: HoleCollider
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2473872432975215108
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3483268538767059057}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0.7071068, y: 0.7071068, z: 0, w: 0}
+  m_LocalPosition: {x: 0.004724002, y: -0.27480322, z: 0.084720515}
+  m_LocalScale: {x: 0.26771665, y: 0.26771665, z: 0.07944102}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4453038912278214970}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!64 &7760675322464180913
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3483268538767059057}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -22725266747507458, guid: 8c1cf58699f03f04f956b59e833806d6, type: 3}
+--- !u!114 &135659913882853787
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3483268538767059057}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9292031b68cb53740b5f8a3cc6cbbfdc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  holeData:
+    shape: {fileID: -22725266747507458, guid: 8c1cf58699f03f04f956b59e833806d6, type: 3}
+    depth: 0.05
+    size: {x: 0.18, y: 0.18}
+    part: {fileID: 5168579248169057192, guid: 64ee3195f74df474c9cf21c91f168fd9, type: 3}
+    position: {x: -6, y: -0.25, z: 0.025}
+    rotation: {x: -0, y: -0, z: -0, w: 1}
+    forward: {x: 0, y: 0, z: 1}
+    outline: []
+  holeType: 0
+  detectors: []
+  twoSided: 0
+--- !u!1 &3570709488609196815
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5711538472704155637}
+  - component: {fileID: 466534521170593775}
+  - component: {fileID: 1003411609023618677}
+  m_Layer: 11
+  m_Name: HoleCollider
+  m_TagString: HoleCollider
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5711538472704155637
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3570709488609196815}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: -0.7071068, z: -0, w: 0.7071068}
+  m_LocalPosition: {x: 0.1545942, y: -0.24330716, z: -0.05413392}
+  m_LocalScale: {x: 0.11023627, y: 0.2834647, z: 0.08293697}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4453038912278214970}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!64 &466534521170593775
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3570709488609196815}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -22725266747507458, guid: 8c1cf58699f03f04f956b59e833806d6, type: 3}
+--- !u!114 &1003411609023618677
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3570709488609196815}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9292031b68cb53740b5f8a3cc6cbbfdc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  holeData:
+    shape: {fileID: -22725266747507458, guid: 8c1cf58699f03f04f956b59e833806d6, type: 3}
+    depth: 0.05
+    size: {x: 0.18, y: 0.18}
+    part: {fileID: 5168579248169057192, guid: 64ee3195f74df474c9cf21c91f168fd9, type: 3}
+    position: {x: -6, y: -0.25, z: 0.025}
+    rotation: {x: -0, y: -0, z: -0, w: 1}
+    forward: {x: 0, y: 0, z: 1}
+    outline: []
+  holeType: 0
+  detectors: []
+  twoSided: 0
 --- !u!1 &3588490266821007716
 GameObject:
   m_ObjectHideFlags: 0
@@ -1322,9 +2364,13 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 4741300036040331566}
-  - {fileID: 4398708889038978435}
-  - {fileID: 5065058308038820958}
+  - {fileID: 3144119123377545235}
+  - {fileID: 8379826204936607555}
+  - {fileID: 5923338886488601286}
+  - {fileID: 8769545462404906685}
+  - {fileID: 4933857473341586178}
+  - {fileID: 192106726297498319}
+  - {fileID: 6770701949983396957}
   m_Father: {fileID: 3999360260535100182}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &4345195792530086233
@@ -1334,7 +2380,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3588490266821007716}
-  m_Mesh: {fileID: 937806283570644643, guid: 21a56f56e5232c348a74c696937598b6, type: 2}
+  m_Mesh: {fileID: -4801442097729253032, guid: 21a56f56e5232c348a74c696937598b6, type: 2}
 --- !u!23 &5611494170822452716
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -1405,7 +2451,7 @@ MeshCollider:
   serializedVersion: 5
   m_Convex: 0
   m_CookingOptions: 30
-  m_Mesh: {fileID: 937806283570644643, guid: 21a56f56e5232c348a74c696937598b6, type: 2}
+  m_Mesh: {fileID: -4801442097729253032, guid: 21a56f56e5232c348a74c696937598b6, type: 2}
 --- !u!114 &3027689336173879425
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1435,7 +2481,7 @@ MonoBehaviour:
   param1Value: Plastic Lock Bar
   param2Value: 
   holeData: 
-  primaryHole: {fileID: 5272461787026459084}
+  primaryHole: {fileID: 3637451226142810141}
   allowCenterInserts: 0
 --- !u!114 &3866703006572429881
 MonoBehaviour:
@@ -1495,7 +2541,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3662225241223771606}
-  m_Mesh: {fileID: -8222307180634471605, guid: 21a56f56e5232c348a74c696937598b6, type: 2}
+  m_Mesh: {fileID: 1770808747021453201, guid: 21a56f56e5232c348a74c696937598b6, type: 2}
 --- !u!23 &8395768030289463699
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -1566,7 +2612,7 @@ MeshCollider:
   serializedVersion: 5
   m_Convex: 0
   m_CookingOptions: 30
-  m_Mesh: {fileID: -8222307180634471605, guid: 21a56f56e5232c348a74c696937598b6, type: 2}
+  m_Mesh: {fileID: 1770808747021453201, guid: 21a56f56e5232c348a74c696937598b6, type: 2}
 --- !u!114 &3303586358529722099
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1612,7 +2658,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Parts_List.PartName
   name: 6" Capped Shaft
   weightInGrams: 12.03
---- !u!1 &3711965145028276760
+--- !u!1 &3858490805879113339
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1620,9 +2666,9 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 3278014841220067077}
-  - component: {fileID: 5523666372818100403}
-  - component: {fileID: 3053608161711870847}
+  - component: {fileID: 3144119123377545235}
+  - component: {fileID: 7912992201368396132}
+  - component: {fileID: 4817213928276729915}
   m_Layer: 11
   m_Name: HoleCollider
   m_TagString: HoleCollider
@@ -1630,28 +2676,28 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &3278014841220067077
+--- !u!4 &3144119123377545235
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3711965145028276760}
+  m_GameObject: {fileID: 3858490805879113339}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.2031497, y: 0.1968505, z: -0.063484184}
-  m_LocalScale: {x: 0.1722842, y: 0.1722842, z: 0.12500004}
+  m_LocalRotation: {x: -0.7071068, y: 0, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: -0.50314987, y: -0.00000001833313, z: 0.0019685382}
+  m_LocalScale: {x: 0.18121669, y: 0.18121669, z: 0.12500004}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 414916597332447292}
+  m_Father: {fileID: 4583533667079428821}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!64 &5523666372818100403
+--- !u!64 &7912992201368396132
 MeshCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3711965145028276760}
+  m_GameObject: {fileID: 3858490805879113339}
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -1667,13 +2713,13 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: -8866702806410751908, guid: b3742fe5726aee84cb9d067be3423b22, type: 3}
---- !u!114 &3053608161711870847
+--- !u!114 &4817213928276729915
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3711965145028276760}
+  m_GameObject: {fileID: 3858490805879113339}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9292031b68cb53740b5f8a3cc6cbbfdc, type: 3}
@@ -1687,7 +2733,87 @@ MonoBehaviour:
     position: {x: 0, y: 0, z: 0}
     rotation: {x: -0, y: -0, z: -0, w: 1}
     forward: {x: 0, y: 0, z: 1}
+    outline: []
   holeType: 0
+  detectors: []
+  twoSided: 0
+--- !u!1 &3893550673024259081
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5387132196668719480}
+  - component: {fileID: 4549777323453345263}
+  - component: {fileID: 7966384905709510133}
+  m_Layer: 11
+  m_Name: HoleCollider
+  m_TagString: HoleCollider
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5387132196668719480
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3893550673024259081}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.7071068, y: 0, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: -0.00007754914, y: 0.00000001833313, z: -0.093519315}
+  m_LocalScale: {x: 0.12499999, y: 0.12499999, z: 0.3120001}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5876634089400434473}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!64 &4549777323453345263
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3893550673024259081}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -22725266747507458, guid: 8c1cf58699f03f04f956b59e833806d6, type: 3}
+--- !u!114 &7966384905709510133
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3893550673024259081}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9292031b68cb53740b5f8a3cc6cbbfdc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  holeData:
+    shape: {fileID: -22725266747507458, guid: 8c1cf58699f03f04f956b59e833806d6, type: 3}
+    depth: 0.05
+    size: {x: 0.18, y: 0.18}
+    part: {fileID: 5168579248169057192, guid: 64ee3195f74df474c9cf21c91f168fd9, type: 3}
+    position: {x: -6, y: -0.25, z: 0.025}
+    rotation: {x: -0, y: -0, z: -0, w: 1}
+    forward: {x: 0, y: 0, z: 1}
+    outline: []
+  holeType: 2
   detectors: []
   twoSided: 0
 --- !u!1 &3894053566665786093
@@ -1725,9 +2851,9 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 6145078349125662138}
-  - {fileID: 3278014841220067077}
-  - {fileID: 3924424603823308024}
+  - {fileID: 7348971265641869232}
+  - {fileID: 7048833165756395057}
+  - {fileID: 1846486378747421128}
   m_Father: {fileID: 3999360260535100182}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &1021607391390491584
@@ -1737,7 +2863,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3894053566665786093}
-  m_Mesh: {fileID: 1832025499502103925, guid: 21a56f56e5232c348a74c696937598b6, type: 2}
+  m_Mesh: {fileID: 3762848616250139422, guid: 21a56f56e5232c348a74c696937598b6, type: 2}
 --- !u!23 &7695114376698306388
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -1808,7 +2934,7 @@ MeshCollider:
   serializedVersion: 5
   m_Convex: 0
   m_CookingOptions: 30
-  m_Mesh: {fileID: 1832025499502103925, guid: 21a56f56e5232c348a74c696937598b6, type: 2}
+  m_Mesh: {fileID: 3762848616250139422, guid: 21a56f56e5232c348a74c696937598b6, type: 2}
 --- !u!114 &473108830464839232
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1854,7 +2980,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Parts_List.PartName
   name: Block Bearing
   weightInGrams: 1.67
---- !u!1 &3981520441439073411
+--- !u!1 &4056440896453007177
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1862,9 +2988,9 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 8094555319558821706}
-  - component: {fileID: 1976874215278227933}
-  - component: {fileID: 3051233633804258772}
+  - component: {fileID: 1707819016089693533}
+  - component: {fileID: 2340497244563201550}
+  - component: {fileID: 7450491507893906233}
   m_Layer: 11
   m_Name: HoleCollider
   m_TagString: HoleCollider
@@ -1872,28 +2998,107 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &8094555319558821706
+--- !u!4 &1707819016089693533
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3981520441439073411}
+  m_GameObject: {fileID: 4056440896453007177}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.0031500175, y: 0.00078744406, z: -0.00000005499939}
-  m_LocalScale: {x: 0.16951269, y: 0.16951269, z: 0.2500001}
+  m_LocalPosition: {x: 0.49606317, y: 0.003937018, z: -0.09921414}
+  m_LocalScale: {x: 0.16189021, y: 0.16189021, z: 0.19920966}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4499283777428268780}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!64 &2340497244563201550
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4056440896453007177}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -8866702806410751908, guid: b3742fe5726aee84cb9d067be3423b22, type: 3}
+--- !u!114 &7450491507893906233
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4056440896453007177}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9292031b68cb53740b5f8a3cc6cbbfdc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  holeData:
+    shape: {fileID: -8866702806410751908, guid: b3742fe5726aee84cb9d067be3423b22, type: 3}
+    depth: 0.25
+    size: {x: 0.164, y: 0.164}
+    part: {fileID: 4288159359939511421, guid: d66429db48fb0114d8d32f299a7317cc, type: 3}
+    position: {x: 0, y: 0, z: 0}
+    rotation: {x: -0, y: -0, z: -0, w: 1}
+    forward: {x: 0, y: 0, z: 1}
+    outline: []
+  holeType: 0
+  detectors: []
+  twoSided: 0
+--- !u!1 &4297372523819734196
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6078934962971513654}
+  - component: {fileID: 698230199690510364}
+  - component: {fileID: 7013415992475746448}
+  m_Layer: 11
+  m_Name: HoleCollider
+  m_TagString: HoleCollider
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6078934962971513654
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4297372523819734196}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.0031500175, y: 0.49685067, z: -0.00000005499939}
+  m_LocalScale: {x: 0.16478996, y: 0.16478996, z: 0.2500001}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4453038912278214970}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!64 &1976874215278227933
+--- !u!64 &698230199690510364
 MeshCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3981520441439073411}
+  m_GameObject: {fileID: 4297372523819734196}
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -1909,13 +3114,13 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: -8866702806410751908, guid: b3742fe5726aee84cb9d067be3423b22, type: 3}
---- !u!114 &3051233633804258772
+--- !u!114 &7013415992475746448
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3981520441439073411}
+  m_GameObject: {fileID: 4297372523819734196}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9292031b68cb53740b5f8a3cc6cbbfdc, type: 3}
@@ -1929,396 +3134,7 @@ MonoBehaviour:
     position: {x: 0, y: 0, z: 0}
     rotation: {x: -0, y: -0, z: -0, w: 1}
     forward: {x: 0, y: 0, z: 1}
-  holeType: 0
-  detectors: []
-  twoSided: 0
---- !u!1 &4134368949277938026
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 575687199831925548}
-  - component: {fileID: 9166263944105231475}
-  - component: {fileID: 7804195914317135283}
-  m_Layer: 11
-  m_Name: HoleCollider
-  m_TagString: HoleCollider
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &575687199831925548
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4134368949277938026}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 0.0039370055, y: 0.0004960762, z: -0.0019605695}
-  m_LocalScale: {x: 0.16478996, y: 0.16478996, z: 0.25000006}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 637496903678888393}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!64 &9166263944105231475
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4134368949277938026}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: -8866702806410751908, guid: b3742fe5726aee84cb9d067be3423b22, type: 3}
---- !u!114 &7804195914317135283
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4134368949277938026}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9292031b68cb53740b5f8a3cc6cbbfdc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  holeData:
-    shape: {fileID: -8866702806410751908, guid: b3742fe5726aee84cb9d067be3423b22, type: 3}
-    depth: 0.25
-    size: {x: 0.164, y: 0.164}
-    part: {fileID: 4288159359939511421, guid: d66429db48fb0114d8d32f299a7317cc, type: 3}
-    position: {x: 0, y: 0, z: 0}
-    rotation: {x: -0, y: -0, z: -0, w: 1}
-    forward: {x: 0, y: 0, z: 1}
-  holeType: 0
-  detectors: []
-  twoSided: 0
---- !u!1 &4137782130803162926
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 5530217269004221327}
-  - component: {fileID: 1322566726081150020}
-  - component: {fileID: 3270401987297733927}
-  m_Layer: 11
-  m_Name: HoleCollider
-  m_TagString: HoleCollider
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &5530217269004221327
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4137782130803162926}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: -0.00007754914, y: 0.00000001833313, z: -0.093519315}
-  m_LocalScale: {x: 0.12499999, y: 0.12499999, z: 0.3120001}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 637496903678888393}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!64 &1322566726081150020
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4137782130803162926}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: -22725266747507458, guid: 8c1cf58699f03f04f956b59e833806d6, type: 3}
---- !u!114 &3270401987297733927
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4137782130803162926}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9292031b68cb53740b5f8a3cc6cbbfdc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  holeData:
-    shape: {fileID: -22725266747507458, guid: 8c1cf58699f03f04f956b59e833806d6, type: 3}
-    depth: 0.05
-    size: {x: 0.18, y: 0.18}
-    part: {fileID: 5168579248169057192, guid: 64ee3195f74df474c9cf21c91f168fd9, type: 3}
-    position: {x: -6, y: -0.25, z: 0.025}
-    rotation: {x: -0, y: -0, z: -0, w: 1}
-    forward: {x: 0, y: 0, z: 1}
-  holeType: 2
-  detectors: []
-  twoSided: 0
---- !u!1 &4253424353207044319
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 4786591156199799184}
-  - component: {fileID: 5495036725064881070}
-  - component: {fileID: 3524503182241574732}
-  m_Layer: 11
-  m_Name: HoleCollider
-  m_TagString: HoleCollider
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &4786591156199799184
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4253424353207044319}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.1968505, y: 0.2440946, z: -0.023000007}
-  m_LocalScale: {x: 0.17501183, y: 0.17501183, z: 0.046000015}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 2963132228915756977}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!64 &5495036725064881070
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4253424353207044319}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: -8866702806410751908, guid: b3742fe5726aee84cb9d067be3423b22, type: 3}
---- !u!114 &3524503182241574732
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4253424353207044319}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9292031b68cb53740b5f8a3cc6cbbfdc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  holeData:
-    shape: {fileID: -8866702806410751908, guid: b3742fe5726aee84cb9d067be3423b22, type: 3}
-    depth: 0.25
-    size: {x: 0.164, y: 0.164}
-    part: {fileID: 4288159359939511421, guid: d66429db48fb0114d8d32f299a7317cc, type: 3}
-    position: {x: 0, y: 0, z: 0}
-    rotation: {x: -0, y: -0, z: -0, w: 1}
-    forward: {x: 0, y: 0, z: 1}
-  holeType: 0
-  detectors: []
-  twoSided: 0
---- !u!1 &4325933805763983981
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 4398708889038978435}
-  - component: {fileID: 1952534318711858050}
-  - component: {fileID: 5272461787026459084}
-  m_Layer: 11
-  m_Name: HoleCollider
-  m_TagString: HoleCollider
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &4398708889038978435
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4325933805763983981}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: -0.0070866486, y: -0.00000001833313, z: 0.0019685382}
-  m_LocalScale: {x: 0.12598431, y: 0.12598431, z: 0.12500004}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 4583533667079428821}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!64 &1952534318711858050
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4325933805763983981}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: -22725266747507458, guid: 8c1cf58699f03f04f956b59e833806d6, type: 3}
---- !u!114 &5272461787026459084
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4325933805763983981}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9292031b68cb53740b5f8a3cc6cbbfdc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  holeData:
-    shape: {fileID: -22725266747507458, guid: 8c1cf58699f03f04f956b59e833806d6, type: 3}
-    depth: 0.05
-    size: {x: 0.18, y: 0.18}
-    part: {fileID: 5168579248169057192, guid: 64ee3195f74df474c9cf21c91f168fd9, type: 3}
-    position: {x: -6, y: -0.25, z: 0.025}
-    rotation: {x: -0, y: -0, z: -0, w: 1}
-    forward: {x: 0, y: 0, z: 1}
-  holeType: 0
-  detectors: []
-  twoSided: 0
---- !u!1 &4569125983238218899
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 4741300036040331566}
-  - component: {fileID: 6661967844013029396}
-  - component: {fileID: 4417132777766623805}
-  m_Layer: 11
-  m_Name: HoleCollider
-  m_TagString: HoleCollider
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &4741300036040331566
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4569125983238218899}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: -0.50314987, y: -0.00000001833313, z: 0.0019685382}
-  m_LocalScale: {x: 0.18121669, y: 0.18121669, z: 0.12500004}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 4583533667079428821}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!64 &6661967844013029396
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4569125983238218899}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: -8866702806410751908, guid: b3742fe5726aee84cb9d067be3423b22, type: 3}
---- !u!114 &4417132777766623805
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4569125983238218899}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9292031b68cb53740b5f8a3cc6cbbfdc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  holeData:
-    shape: {fileID: -8866702806410751908, guid: b3742fe5726aee84cb9d067be3423b22, type: 3}
-    depth: 0.25
-    size: {x: 0.164, y: 0.164}
-    part: {fileID: 4288159359939511421, guid: d66429db48fb0114d8d32f299a7317cc, type: 3}
-    position: {x: 0, y: 0, z: 0}
-    rotation: {x: -0, y: -0, z: -0, w: 1}
-    forward: {x: 0, y: 0, z: 1}
+    outline: []
   holeType: 0
   detectors: []
   twoSided: 0
@@ -2366,7 +3182,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4668927080170966848}
-  m_Mesh: {fileID: 7938155539748901420, guid: 21a56f56e5232c348a74c696937598b6, type: 2}
+  m_Mesh: {fileID: 2354439658934436850, guid: 21a56f56e5232c348a74c696937598b6, type: 2}
 --- !u!23 &156027108278040747
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -2437,7 +3253,7 @@ MeshCollider:
   serializedVersion: 5
   m_Convex: 0
   m_CookingOptions: 30
-  m_Mesh: {fileID: 7938155539748901420, guid: 21a56f56e5232c348a74c696937598b6, type: 2}
+  m_Mesh: {fileID: 2354439658934436850, guid: 21a56f56e5232c348a74c696937598b6, type: 2}
 --- !u!114 &9100364950908320247
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2483,7 +3299,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Parts_List.PartName
   name: 12" Shaft
   weightInGrams: 23.98
---- !u!1 &4939089710770740461
+--- !u!1 &5021546855862234548
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -2491,9 +3307,9 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 8153444437065259825}
-  - component: {fileID: 6548599389980086902}
-  - component: {fileID: 5129417507225985164}
+  - component: {fileID: 5701532714424275179}
+  - component: {fileID: 8286705192719729134}
+  - component: {fileID: 8831621382323207979}
   m_Layer: 11
   m_Name: HoleCollider
   m_TagString: HoleCollider
@@ -2501,28 +3317,28 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &8153444437065259825
+--- !u!4 &5701532714424275179
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4939089710770740461}
+  m_GameObject: {fileID: 5021546855862234548}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 0.0039370055, y: -0.00000001833313, z: 0.0039366204}
-  m_LocalScale: {x: 0.16189021, y: 0.16189021, z: 0.2500001}
+  m_LocalRotation: {x: 0, y: 0.015445892, z: 0, w: 0.99988073}
+  m_LocalPosition: {x: -0.0006497035, y: -0.0005647202, z: -0.14449084}
+  m_LocalScale: {x: 0.136, y: 0.136, z: 0.13509855}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 4679549921718595559}
+  m_Father: {fileID: 4850257246026689448}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!64 &6548599389980086902
+--- !u!64 &8286705192719729134
 MeshCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4939089710770740461}
+  m_GameObject: {fileID: 5021546855862234548}
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -2538,13 +3354,13 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: -8866702806410751908, guid: b3742fe5726aee84cb9d067be3423b22, type: 3}
---- !u!114 &5129417507225985164
+--- !u!114 &8831621382323207979
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4939089710770740461}
+  m_GameObject: {fileID: 5021546855862234548}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9292031b68cb53740b5f8a3cc6cbbfdc, type: 3}
@@ -2558,10 +3374,11 @@ MonoBehaviour:
     position: {x: 0, y: 0, z: 0}
     rotation: {x: -0, y: -0, z: -0, w: 1}
     forward: {x: 0, y: 0, z: 1}
-  holeType: 2
+    outline: []
+  holeType: 1
   detectors: []
   twoSided: 0
---- !u!1 &5674262922880875276
+--- !u!1 &5237791298824715416
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -2569,9 +3386,9 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 3924424603823308024}
-  - component: {fileID: 5510580986722497838}
-  - component: {fileID: 1131620066461100102}
+  - component: {fileID: 958206927046471177}
+  - component: {fileID: 6479853289122957157}
+  - component: {fileID: 8796213300795725833}
   m_Layer: 11
   m_Name: HoleCollider
   m_TagString: HoleCollider
@@ -2579,28 +3396,28 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &3924424603823308024
+--- !u!4 &958206927046471177
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5674262922880875276}
+  m_GameObject: {fileID: 5237791298824715416}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.2031497, y: 1.2047249, z: -0.063484184}
-  m_LocalScale: {x: 0.17410737, y: 0.17410737, z: 0.12500004}
+  m_LocalPosition: {x: -0.0031500175, y: 0.00078744406, z: -0.00000005499939}
+  m_LocalScale: {x: 0.16951269, y: 0.16951269, z: 0.2500001}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 414916597332447292}
+  m_Father: {fileID: 4453038912278214970}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!64 &5510580986722497838
+--- !u!64 &6479853289122957157
 MeshCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5674262922880875276}
+  m_GameObject: {fileID: 5237791298824715416}
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -2616,13 +3433,13 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: -8866702806410751908, guid: b3742fe5726aee84cb9d067be3423b22, type: 3}
---- !u!114 &1131620066461100102
+--- !u!114 &8796213300795725833
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5674262922880875276}
+  m_GameObject: {fileID: 5237791298824715416}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9292031b68cb53740b5f8a3cc6cbbfdc, type: 3}
@@ -2636,10 +3453,11 @@ MonoBehaviour:
     position: {x: 0, y: 0, z: 0}
     rotation: {x: -0, y: -0, z: -0, w: 1}
     forward: {x: 0, y: 0, z: 1}
+    outline: []
   holeType: 0
   detectors: []
   twoSided: 0
---- !u!1 &6067809104931385008
+--- !u!1 &5331994610313409089
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -2647,9 +3465,9 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 7786435014430886958}
-  - component: {fileID: 5807485483718149258}
-  - component: {fileID: 3754909033220917006}
+  - component: {fileID: 8543003213215793767}
+  - component: {fileID: 8041111908112098852}
+  - component: {fileID: 4783027113193023296}
   m_Layer: 11
   m_Name: HoleCollider
   m_TagString: HoleCollider
@@ -2657,28 +3475,28 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &7786435014430886958
+--- !u!4 &8543003213215793767
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6067809104931385008}
+  m_GameObject: {fileID: 5331994610313409089}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.00000005328066, y: 0.003937018, z: -0.12553523}
-  m_LocalScale: {x: 0.18110244, y: 0.18110244, z: 0.24892972}
+  m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: -0.15538241, y: 0.24488205, z: -0.05413392}
+  m_LocalScale: {x: 0.11023627, y: 0.2834647, z: 0.08136219}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 4499283777428268780}
+  m_Father: {fileID: 4453038912278214970}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!64 &5807485483718149258
+--- !u!64 &8041111908112098852
 MeshCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6067809104931385008}
+  m_GameObject: {fileID: 5331994610313409089}
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -2694,13 +3512,13 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: -22725266747507458, guid: 8c1cf58699f03f04f956b59e833806d6, type: 3}
---- !u!114 &3754909033220917006
+--- !u!114 &4783027113193023296
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6067809104931385008}
+  m_GameObject: {fileID: 5331994610313409089}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9292031b68cb53740b5f8a3cc6cbbfdc, type: 3}
@@ -2714,6 +3532,244 @@ MonoBehaviour:
     position: {x: -6, y: -0.25, z: 0.025}
     rotation: {x: -0, y: -0, z: -0, w: 1}
     forward: {x: 0, y: 0, z: 1}
+    outline: []
+  holeType: 0
+  detectors: []
+  twoSided: 0
+--- !u!1 &5845796208802495132
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8921300270759537320}
+  - component: {fileID: 1675444320735788117}
+  - component: {fileID: 1711306556016362187}
+  m_Layer: 11
+  m_Name: HoleCollider
+  m_TagString: HoleCollider
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8921300270759537320
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5845796208802495132}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: 0, z: -0.7071068, w: 0.7071068}
+  m_LocalPosition: {x: -0.49606326, y: 0.003937018, z: -0.1250014}
+  m_LocalScale: {x: 0.18897647, y: 0.18897647, z: 0.2499974}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4499283777428268780}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!64 &1675444320735788117
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5845796208802495132}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -22725266747507458, guid: 8c1cf58699f03f04f956b59e833806d6, type: 3}
+--- !u!114 &1711306556016362187
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5845796208802495132}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9292031b68cb53740b5f8a3cc6cbbfdc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  holeData:
+    shape: {fileID: -22725266747507458, guid: 8c1cf58699f03f04f956b59e833806d6, type: 3}
+    depth: 0.05
+    size: {x: 0.18, y: 0.18}
+    part: {fileID: 5168579248169057192, guid: 64ee3195f74df474c9cf21c91f168fd9, type: 3}
+    position: {x: -6, y: -0.25, z: 0.025}
+    rotation: {x: -0, y: -0, z: -0, w: 1}
+    forward: {x: 0, y: 0, z: 1}
+    outline: []
+  holeType: 0
+  detectors: []
+  twoSided: 0
+--- !u!1 &5943448232947849817
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6954483059056558669}
+  - component: {fileID: 7174066701707717853}
+  - component: {fileID: 4327191635033289659}
+  m_Layer: 11
+  m_Name: HoleCollider
+  m_TagString: HoleCollider
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6954483059056558669
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5943448232947849817}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.7071068, y: 0, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: -0.00007754914, y: 0.00000001833313, z: -0.093519315}
+  m_LocalScale: {x: 0.12499999, y: 0.12499999, z: 0.3120001}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8122171326760423307}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!64 &7174066701707717853
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5943448232947849817}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -22725266747507458, guid: 8c1cf58699f03f04f956b59e833806d6, type: 3}
+--- !u!114 &4327191635033289659
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5943448232947849817}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9292031b68cb53740b5f8a3cc6cbbfdc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  holeData:
+    shape: {fileID: -22725266747507458, guid: 8c1cf58699f03f04f956b59e833806d6, type: 3}
+    depth: 0.05
+    size: {x: 0.18, y: 0.18}
+    part: {fileID: 5168579248169057192, guid: 64ee3195f74df474c9cf21c91f168fd9, type: 3}
+    position: {x: -6, y: -0.25, z: 0.025}
+    rotation: {x: -0, y: -0, z: -0, w: 1}
+    forward: {x: 0, y: 0, z: 1}
+    outline: []
+  holeType: 2
+  detectors: []
+  twoSided: 0
+--- !u!1 &5991304738448577617
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4933857473341586178}
+  - component: {fileID: 5669033601789957278}
+  - component: {fileID: 7358886355118802315}
+  m_Layer: 11
+  m_Name: HoleCollider
+  m_TagString: HoleCollider
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4933857473341586178
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5991304738448577617}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0.5, y: 0.5, z: -0.5, w: 0.5}
+  m_LocalPosition: {x: -0.32992145, y: 0.029527573, z: 0.088582754}
+  m_LocalScale: {x: 0.14173235, y: 0.29921272, z: 0.06594493}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4583533667079428821}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!64 &5669033601789957278
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5991304738448577617}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -22725266747507458, guid: 8c1cf58699f03f04f956b59e833806d6, type: 3}
+--- !u!114 &7358886355118802315
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5991304738448577617}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9292031b68cb53740b5f8a3cc6cbbfdc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  holeData:
+    shape: {fileID: -22725266747507458, guid: 8c1cf58699f03f04f956b59e833806d6, type: 3}
+    depth: 0.05
+    size: {x: 0.18, y: 0.18}
+    part: {fileID: 5168579248169057192, guid: 64ee3195f74df474c9cf21c91f168fd9, type: 3}
+    position: {x: -6, y: -0.25, z: 0.025}
+    rotation: {x: -0, y: -0, z: -0, w: 1}
+    forward: {x: 0, y: 0, z: 1}
+    outline: []
   holeType: 0
   detectors: []
   twoSided: 0
@@ -2752,8 +3808,8 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 4115853212836245965}
-  - {fileID: 3992438003348740648}
+  - {fileID: 7873475065893113244}
+  - {fileID: 5598132119342854393}
   m_Father: {fileID: 3999360260535100182}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &8448892543313505505
@@ -2763,7 +3819,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6244193855215966416}
-  m_Mesh: {fileID: -6830822588687529954, guid: 21a56f56e5232c348a74c696937598b6, type: 2}
+  m_Mesh: {fileID: -7153388933354197156, guid: 21a56f56e5232c348a74c696937598b6, type: 2}
 --- !u!23 &5824457372585690665
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -2835,7 +3891,7 @@ MeshCollider:
   serializedVersion: 5
   m_Convex: 0
   m_CookingOptions: 30
-  m_Mesh: {fileID: -6830822588687529954, guid: 21a56f56e5232c348a74c696937598b6, type: 2}
+  m_Mesh: {fileID: -7153388933354197156, guid: 21a56f56e5232c348a74c696937598b6, type: 2}
 --- !u!114 &6336415709756685598
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2865,7 +3921,7 @@ MonoBehaviour:
   param1Value: Shaft Collar (hex screw)
   param2Value: 
   holeData: 
-  primaryHole: {fileID: 98675820060641181}
+  primaryHole: {fileID: 4201075969334020653}
   allowCenterInserts: 0
 --- !u!114 &7961517958629344826
 MonoBehaviour:
@@ -2916,7 +3972,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 8153444437065259825}
+  - {fileID: 4227676940595330718}
   m_Father: {fileID: 3999360260535100182}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &2502689150561015967
@@ -2926,7 +3982,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6491392586014349565}
-  m_Mesh: {fileID: -2513976361902071725, guid: 21a56f56e5232c348a74c696937598b6, type: 2}
+  m_Mesh: {fileID: 785859195385846848, guid: 21a56f56e5232c348a74c696937598b6, type: 2}
 --- !u!23 &188596994953220372
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -2998,7 +4054,7 @@ MeshCollider:
   serializedVersion: 5
   m_Convex: 0
   m_CookingOptions: 30
-  m_Mesh: {fileID: -2513976361902071725, guid: 21a56f56e5232c348a74c696937598b6, type: 2}
+  m_Mesh: {fileID: 785859195385846848, guid: 21a56f56e5232c348a74c696937598b6, type: 2}
 --- !u!114 &3992850782341312361
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3028,7 +4084,7 @@ MonoBehaviour:
   param1Value: Shaft Collar (set screw)
   param2Value: 
   holeData: 
-  primaryHole: {fileID: 5129417507225985164}
+  primaryHole: {fileID: 5196689665478324644}
   allowCenterInserts: 0
 --- !u!114 &2226432708013025042
 MonoBehaviour:
@@ -3044,7 +4100,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Parts_List.PartName
   name: Shaft Collar (set screw)
   weightInGrams: 3.99
---- !u!1 &6778451908464219691
+--- !u!1 &6673858344399378307
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -3052,9 +4108,9 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 5065058308038820958}
-  - component: {fileID: 5817387695976837691}
-  - component: {fileID: 3470466373092477416}
+  - component: {fileID: 1737597925186487123}
+  - component: {fileID: 8931912524372936812}
+  - component: {fileID: 7922111143611400234}
   m_Layer: 11
   m_Name: HoleCollider
   m_TagString: HoleCollider
@@ -3062,106 +4118,28 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &5065058308038820958
+--- !u!4 &1737597925186487123
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6778451908464219691}
+  m_GameObject: {fileID: 6673858344399378307}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 0.4968506, y: -0.00000001833313, z: 0.0019685382}
-  m_LocalScale: {x: 0.18208584, y: 0.18208584, z: 0.12500004}
+  m_LocalRotation: {x: -0, y: 0, z: -0.7071068, w: 0.7071068}
+  m_LocalPosition: {x: 0.47244117, y: 0.25196862, z: -0.023000007}
+  m_LocalScale: {x: 0.12598431, y: 0.12598431, z: 0.046000015}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 4583533667079428821}
+  m_Father: {fileID: 2963132228915756977}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!64 &5817387695976837691
+--- !u!64 &8931912524372936812
 MeshCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6778451908464219691}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: -8866702806410751908, guid: b3742fe5726aee84cb9d067be3423b22, type: 3}
---- !u!114 &3470466373092477416
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6778451908464219691}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9292031b68cb53740b5f8a3cc6cbbfdc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  holeData:
-    shape: {fileID: -8866702806410751908, guid: b3742fe5726aee84cb9d067be3423b22, type: 3}
-    depth: 0.25
-    size: {x: 0.164, y: 0.164}
-    part: {fileID: 4288159359939511421, guid: d66429db48fb0114d8d32f299a7317cc, type: 3}
-    position: {x: 0, y: 0, z: 0}
-    rotation: {x: -0, y: -0, z: -0, w: 1}
-    forward: {x: 0, y: 0, z: 1}
-  holeType: 0
-  detectors: []
-  twoSided: 0
---- !u!1 &6928104267248887358
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 5816520702626721940}
-  - component: {fileID: 5205228205556809046}
-  - component: {fileID: 7265162728367298268}
-  m_Layer: 11
-  m_Name: HoleCollider
-  m_TagString: HoleCollider
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &5816520702626721940
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6928104267248887358}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: -0.00007754914, y: 0.00000001833313, z: -0.093519315}
-  m_LocalScale: {x: 0.12499999, y: 0.12499999, z: 0.3120001}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 5876634089400434473}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!64 &5205228205556809046
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6928104267248887358}
+  m_GameObject: {fileID: 6673858344399378307}
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -3177,13 +4155,13 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: -22725266747507458, guid: 8c1cf58699f03f04f956b59e833806d6, type: 3}
---- !u!114 &7265162728367298268
+--- !u!114 &7922111143611400234
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6928104267248887358}
+  m_GameObject: {fileID: 6673858344399378307}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9292031b68cb53740b5f8a3cc6cbbfdc, type: 3}
@@ -3197,10 +4175,11 @@ MonoBehaviour:
     position: {x: -6, y: -0.25, z: 0.025}
     rotation: {x: -0, y: -0, z: -0, w: 1}
     forward: {x: 0, y: 0, z: 1}
-  holeType: 2
+    outline: []
+  holeType: 0
   detectors: []
   twoSided: 0
---- !u!1 &7018988710181693252
+--- !u!1 &6833008692525650051
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -3208,9 +4187,9 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 7140427081553203683}
-  - component: {fileID: 9145745777566846602}
-  - component: {fileID: 5262899834219807368}
+  - component: {fileID: 7873475065893113244}
+  - component: {fileID: 2426730741268940734}
+  - component: {fileID: 4201075969334020653}
   m_Layer: 11
   m_Name: HoleCollider
   m_TagString: HoleCollider
@@ -3218,28 +4197,28 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &7140427081553203683
+--- !u!4 &7873475065893113244
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7018988710181693252}
+  m_GameObject: {fileID: 6833008692525650051}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.49606326, y: 0.003937018, z: -0.099214114}
-  m_LocalScale: {x: 0.16189021, y: 0.16189021, z: 0.1992097}
+  m_LocalRotation: {x: -0.7071068, y: 0, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: 0.0039370055, y: 0.00061773486, z: -0.0019605695}
+  m_LocalScale: {x: 0.16478996, y: 0.16478996, z: 0.25000006}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 4499283777428268780}
+  m_Father: {fileID: 4534413589404346266}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!64 &9145745777566846602
+--- !u!64 &2426730741268940734
 MeshCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7018988710181693252}
+  m_GameObject: {fileID: 6833008692525650051}
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -3255,13 +4234,13 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: -8866702806410751908, guid: b3742fe5726aee84cb9d067be3423b22, type: 3}
---- !u!114 &5262899834219807368
+--- !u!114 &4201075969334020653
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7018988710181693252}
+  m_GameObject: {fileID: 6833008692525650051}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9292031b68cb53740b5f8a3cc6cbbfdc, type: 3}
@@ -3275,10 +4254,11 @@ MonoBehaviour:
     position: {x: 0, y: 0, z: 0}
     rotation: {x: -0, y: -0, z: -0, w: 1}
     forward: {x: 0, y: 0, z: 1}
+    outline: []
   holeType: 0
   detectors: []
   twoSided: 0
---- !u!1 &7039388767479968878
+--- !u!1 &6865289796043933552
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -3286,9 +4266,9 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 6145078349125662138}
-  - component: {fileID: 3653649957293894331}
-  - component: {fileID: 6201851854546903546}
+  - component: {fileID: 3438840868036290958}
+  - component: {fileID: 6199703551098696638}
+  - component: {fileID: 2671876044406197870}
   m_Layer: 11
   m_Name: HoleCollider
   m_TagString: HoleCollider
@@ -3296,184 +4276,28 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &6145078349125662138
+--- !u!4 &3438840868036290958
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7039388767479968878}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: -0.20019697, y: 0.7007877, z: -0.24803151}
-  m_LocalScale: {x: 0.1666951, y: 0.1666951, z: 0.25000015}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 414916597332447292}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!64 &3653649957293894331
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7039388767479968878}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: -8866702806410751908, guid: b3742fe5726aee84cb9d067be3423b22, type: 3}
---- !u!114 &6201851854546903546
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7039388767479968878}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9292031b68cb53740b5f8a3cc6cbbfdc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  holeData:
-    shape: {fileID: -8866702806410751908, guid: b3742fe5726aee84cb9d067be3423b22, type: 3}
-    depth: 0.25
-    size: {x: 0.164, y: 0.164}
-    part: {fileID: 4288159359939511421, guid: d66429db48fb0114d8d32f299a7317cc, type: 3}
-    position: {x: 0, y: 0, z: 0}
-    rotation: {x: -0, y: -0, z: -0, w: 1}
-    forward: {x: 0, y: 0, z: 1}
-  holeType: 0
-  detectors: []
-  twoSided: 0
---- !u!1 &7193179018720244236
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 773369233668052515}
-  - component: {fileID: 890398095574621004}
-  - component: {fileID: 7312790633334764500}
-  m_Layer: 11
-  m_Name: HoleCollider
-  m_TagString: HoleCollider
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &773369233668052515
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7193179018720244236}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.0031500175, y: -0.5031498, z: -0.00000005499939}
-  m_LocalScale: {x: 0.16951269, y: 0.16951269, z: 0.2500001}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 4453038912278214970}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!64 &890398095574621004
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7193179018720244236}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: -8866702806410751908, guid: b3742fe5726aee84cb9d067be3423b22, type: 3}
---- !u!114 &7312790633334764500
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7193179018720244236}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9292031b68cb53740b5f8a3cc6cbbfdc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  holeData:
-    shape: {fileID: -8866702806410751908, guid: b3742fe5726aee84cb9d067be3423b22, type: 3}
-    depth: 0.25
-    size: {x: 0.164, y: 0.164}
-    part: {fileID: 4288159359939511421, guid: d66429db48fb0114d8d32f299a7317cc, type: 3}
-    position: {x: 0, y: 0, z: 0}
-    rotation: {x: -0, y: -0, z: -0, w: 1}
-    forward: {x: 0, y: 0, z: 1}
-  holeType: 0
-  detectors: []
-  twoSided: 0
---- !u!1 &7374573702789286436
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1785332743252129817}
-  - component: {fileID: 7249408188076098699}
-  - component: {fileID: 2650642143240533516}
-  m_Layer: 11
-  m_Name: HoleCollider
-  m_TagString: HoleCollider
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1785332743252129817
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7374573702789286436}
+  m_GameObject: {fileID: 6865289796043933552}
   serializedVersion: 2
   m_LocalRotation: {x: -0.7071068, y: 0, z: 0, w: 0.7071068}
   m_LocalPosition: {x: 0.0039370055, y: 0.0004960762, z: -0.0019605695}
   m_LocalScale: {x: 0.16478996, y: 0.16478996, z: 0.25000006}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 8122171326760423307}
+  m_Father: {fileID: 5876634089400434473}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!64 &7249408188076098699
+--- !u!64 &6199703551098696638
 MeshCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7374573702789286436}
+  m_GameObject: {fileID: 6865289796043933552}
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -3489,13 +4313,13 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: -8866702806410751908, guid: b3742fe5726aee84cb9d067be3423b22, type: 3}
---- !u!114 &2650642143240533516
+--- !u!114 &2671876044406197870
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7374573702789286436}
+  m_GameObject: {fileID: 6865289796043933552}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9292031b68cb53740b5f8a3cc6cbbfdc, type: 3}
@@ -3509,6 +4333,165 @@ MonoBehaviour:
     position: {x: 0, y: 0, z: 0}
     rotation: {x: -0, y: -0, z: -0, w: 1}
     forward: {x: 0, y: 0, z: 1}
+    outline: []
+  holeType: 0
+  detectors: []
+  twoSided: 0
+--- !u!1 &6955213961498643338
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8379826204936607555}
+  - component: {fileID: 5735925104884396444}
+  - component: {fileID: 3637451226142810141}
+  m_Layer: 11
+  m_Name: HoleCollider
+  m_TagString: HoleCollider
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8379826204936607555
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6955213961498643338}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0.7071068, z: 0.7071068, w: 0}
+  m_LocalPosition: {x: -0.0070866486, y: -0.00000001833313, z: 0.0019685382}
+  m_LocalScale: {x: 0.12598431, y: 0.12598431, z: 0.12500004}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4583533667079428821}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!64 &5735925104884396444
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6955213961498643338}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -22725266747507458, guid: 8c1cf58699f03f04f956b59e833806d6, type: 3}
+--- !u!114 &3637451226142810141
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6955213961498643338}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9292031b68cb53740b5f8a3cc6cbbfdc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  holeData:
+    shape: {fileID: -22725266747507458, guid: 8c1cf58699f03f04f956b59e833806d6, type: 3}
+    depth: 0.05
+    size: {x: 0.18, y: 0.18}
+    part: {fileID: 5168579248169057192, guid: 64ee3195f74df474c9cf21c91f168fd9, type: 3}
+    position: {x: -6, y: -0.25, z: 0.025}
+    rotation: {x: -0, y: -0, z: -0, w: 1}
+    forward: {x: 0, y: 0, z: 1}
+    outline: []
+  holeType: 0
+  detectors: []
+  twoSided: 0
+--- !u!1 &7049467603695925366
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1993714814160109656}
+  - component: {fileID: 3821714251268985539}
+  - component: {fileID: 4057619916522174657}
+  m_Layer: 11
+  m_Name: HoleCollider
+  m_TagString: HoleCollider
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1993714814160109656
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7049467603695925366}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0.7071068, y: 0.7071068, z: 0, w: 0}
+  m_LocalPosition: {x: 0.004724002, y: 0.27637812, z: 0.08472053}
+  m_LocalScale: {x: 0.26771665, y: 0.26771665, z: 0.07944098}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4453038912278214970}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!64 &3821714251268985539
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7049467603695925366}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -22725266747507458, guid: 8c1cf58699f03f04f956b59e833806d6, type: 3}
+--- !u!114 &4057619916522174657
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7049467603695925366}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9292031b68cb53740b5f8a3cc6cbbfdc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  holeData:
+    shape: {fileID: -22725266747507458, guid: 8c1cf58699f03f04f956b59e833806d6, type: 3}
+    depth: 0.05
+    size: {x: 0.18, y: 0.18}
+    part: {fileID: 5168579248169057192, guid: 64ee3195f74df474c9cf21c91f168fd9, type: 3}
+    position: {x: -6, y: -0.25, z: 0.025}
+    rotation: {x: -0, y: -0, z: -0, w: 1}
+    forward: {x: 0, y: 0, z: 1}
+    outline: []
   holeType: 0
   detectors: []
   twoSided: 0
@@ -3547,7 +4530,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 3208229999241207745}
+  - {fileID: 7533002518010692065}
   m_Father: {fileID: 3999360260535100182}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &4136537027433722993
@@ -3557,7 +4540,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7476415185931660395}
-  m_Mesh: {fileID: 1068449428027960042, guid: 21a56f56e5232c348a74c696937598b6, type: 2}
+  m_Mesh: {fileID: -147243409027196550, guid: 21a56f56e5232c348a74c696937598b6, type: 2}
 --- !u!23 &8499913042609199695
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -3628,7 +4611,7 @@ MeshCollider:
   serializedVersion: 5
   m_Convex: 0
   m_CookingOptions: 30
-  m_Mesh: {fileID: 1068449428027960042, guid: 21a56f56e5232c348a74c696937598b6, type: 2}
+  m_Mesh: {fileID: -147243409027196550, guid: 21a56f56e5232c348a74c696937598b6, type: 2}
 --- !u!114 &932586211057969604
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3658,7 +4641,7 @@ MonoBehaviour:
   param1Value: Rubber Shaft Collar
   param2Value: 
   holeData: 
-  primaryHole: {fileID: 1594061875797119937}
+  primaryHole: {fileID: 6763169674750079279}
   allowCenterInserts: 0
 --- !u!114 &8641784465618606495
 MonoBehaviour:
@@ -3674,84 +4657,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Parts_List.PartName
   name: Rubber Shaft Collar
   weightInGrams: 0.44
---- !u!1 &7510926390348141279
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 9190972812242531444}
-  - component: {fileID: 2600371567097419358}
-  - component: {fileID: 3234386812629161687}
-  m_Layer: 11
-  m_Name: HoleCollider
-  m_TagString: HoleCollider
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &9190972812242531444
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7510926390348141279}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.6929137, y: 0.25196862, z: -0.023000007}
-  m_LocalScale: {x: 0.12598431, y: 0.12598431, z: 0.046000015}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 2963132228915756977}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!64 &2600371567097419358
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7510926390348141279}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: -22725266747507458, guid: 8c1cf58699f03f04f956b59e833806d6, type: 3}
---- !u!114 &3234386812629161687
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7510926390348141279}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9292031b68cb53740b5f8a3cc6cbbfdc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  holeData:
-    shape: {fileID: -22725266747507458, guid: 8c1cf58699f03f04f956b59e833806d6, type: 3}
-    depth: 0.05
-    size: {x: 0.18, y: 0.18}
-    part: {fileID: 5168579248169057192, guid: 64ee3195f74df474c9cf21c91f168fd9, type: 3}
-    position: {x: -6, y: -0.25, z: 0.025}
-    rotation: {x: -0, y: -0, z: -0, w: 1}
-    forward: {x: 0, y: 0, z: 1}
-  holeType: 0
-  detectors: []
-  twoSided: 0
 --- !u!1 &7549527364970079956
 GameObject:
   m_ObjectHideFlags: 0
@@ -3787,11 +4692,11 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 4786591156199799184}
-  - {fileID: 9082627577579175274}
-  - {fileID: 4293579848647882435}
-  - {fileID: 9190972812242531444}
-  - {fileID: 91489117705336975}
+  - {fileID: 5748138617914477116}
+  - {fileID: 3343388898421258972}
+  - {fileID: 1737597925186487123}
+  - {fileID: 7440255075627129344}
+  - {fileID: 6249824351164826353}
   m_Father: {fileID: 3999360260535100182}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &6194162685417180424
@@ -3801,7 +4706,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7549527364970079956}
-  m_Mesh: {fileID: -3562132673610104550, guid: 21a56f56e5232c348a74c696937598b6, type: 2}
+  m_Mesh: {fileID: -3836105300191230613, guid: 21a56f56e5232c348a74c696937598b6, type: 2}
 --- !u!23 &2432697623277677415
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -3872,7 +4777,7 @@ MeshCollider:
   serializedVersion: 5
   m_Convex: 0
   m_CookingOptions: 30
-  m_Mesh: {fileID: -3562132673610104550, guid: 21a56f56e5232c348a74c696937598b6, type: 2}
+  m_Mesh: {fileID: -3836105300191230613, guid: 21a56f56e5232c348a74c696937598b6, type: 2}
 --- !u!114 &8910834611989087455
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3918,7 +4823,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Parts_List.PartName
   name: Metal Lock Bar
   weightInGrams: 0.53
---- !u!1 &7699789236719062906
+--- !u!1 &7585527704615334897
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -3926,9 +4831,9 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 5932081964151632371}
-  - component: {fileID: 6342939871839329680}
-  - component: {fileID: 4709272128098082365}
+  - component: {fileID: 6770701949983396957}
+  - component: {fileID: 4639207036913422718}
+  - component: {fileID: 2108441712066966425}
   m_Layer: 11
   m_Name: HoleCollider
   m_TagString: HoleCollider
@@ -3936,28 +4841,28 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &5932081964151632371
+--- !u!4 &6770701949983396957
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7699789236719062906}
+  m_GameObject: {fileID: 7585527704615334897}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.49606326, y: 0.003937018, z: -0.1250014}
-  m_LocalScale: {x: 0.18897647, y: 0.18897647, z: 0.2499974}
+  m_LocalRotation: {x: 0.5, y: 0.5, z: -0.5, w: 0.5}
+  m_LocalPosition: {x: 0.33149618, y: 0.029527573, z: 0.088582754}
+  m_LocalScale: {x: 0.14173235, y: 0.29921272, z: 0.06594493}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 4499283777428268780}
+  m_Father: {fileID: 4583533667079428821}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!64 &6342939871839329680
+--- !u!64 &4639207036913422718
 MeshCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7699789236719062906}
+  m_GameObject: {fileID: 7585527704615334897}
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -3973,13 +4878,13 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: -22725266747507458, guid: 8c1cf58699f03f04f956b59e833806d6, type: 3}
---- !u!114 &4709272128098082365
+--- !u!114 &2108441712066966425
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7699789236719062906}
+  m_GameObject: {fileID: 7585527704615334897}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9292031b68cb53740b5f8a3cc6cbbfdc, type: 3}
@@ -3993,6 +4898,86 @@ MonoBehaviour:
     position: {x: -6, y: -0.25, z: 0.025}
     rotation: {x: -0, y: -0, z: -0, w: 1}
     forward: {x: 0, y: 0, z: 1}
+    outline: []
+  holeType: 0
+  detectors: []
+  twoSided: 0
+--- !u!1 &7635536389348013580
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6249824351164826353}
+  - component: {fileID: 4076593370358067546}
+  - component: {fileID: 6765944866111301061}
+  m_Layer: 11
+  m_Name: HoleCollider
+  m_TagString: HoleCollider
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6249824351164826353
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7635536389348013580}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: 0, z: -0.7071068, w: 0.7071068}
+  m_LocalPosition: {x: 0.92913425, y: 0.25196862, z: -0.023000007}
+  m_LocalScale: {x: 0.12598431, y: 0.12598431, z: 0.046000015}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2963132228915756977}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!64 &4076593370358067546
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7635536389348013580}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -22725266747507458, guid: 8c1cf58699f03f04f956b59e833806d6, type: 3}
+--- !u!114 &6765944866111301061
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7635536389348013580}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9292031b68cb53740b5f8a3cc6cbbfdc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  holeData:
+    shape: {fileID: -22725266747507458, guid: 8c1cf58699f03f04f956b59e833806d6, type: 3}
+    depth: 0.05
+    size: {x: 0.18, y: 0.18}
+    part: {fileID: 5168579248169057192, guid: 64ee3195f74df474c9cf21c91f168fd9, type: 3}
+    position: {x: -6, y: -0.25, z: 0.025}
+    rotation: {x: -0, y: -0, z: -0, w: 1}
+    forward: {x: 0, y: 0, z: 1}
+    outline: []
   holeType: 0
   detectors: []
   twoSided: 0
@@ -4031,8 +5016,8 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 6416074242213626452}
-  - {fileID: 8224955774247834194}
+  - {fileID: 1374555980279744645}
+  - {fileID: 5701532714424275179}
   m_Father: {fileID: 3999360260535100182}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &591368884294776038
@@ -4042,7 +5027,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8066970971577983854}
-  m_Mesh: {fileID: 13437350963794874, guid: 21a56f56e5232c348a74c696937598b6, type: 2}
+  m_Mesh: {fileID: 6413339875267288794, guid: 21a56f56e5232c348a74c696937598b6, type: 2}
 --- !u!23 &5256137143633468543
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -4113,7 +5098,7 @@ MeshCollider:
   serializedVersion: 5
   m_Convex: 0
   m_CookingOptions: 30
-  m_Mesh: {fileID: 13437350963794874, guid: 21a56f56e5232c348a74c696937598b6, type: 2}
+  m_Mesh: {fileID: 6413339875267288794, guid: 21a56f56e5232c348a74c696937598b6, type: 2}
 --- !u!114 &750199817251289684
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4143,7 +5128,7 @@ MonoBehaviour:
   param1Value: Shaft Collar (no screw)
   param2Value: 
   holeData: 
-  primaryHole: {fileID: 775535370201533857}
+  primaryHole: {fileID: 3840873248454279506}
   allowCenterInserts: 0
 --- !u!114 &2140102975802631273
 MonoBehaviour:
@@ -4194,8 +5179,8 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 575687199831925548}
-  - {fileID: 5530217269004221327}
+  - {fileID: 8821335343024043515}
+  - {fileID: 2758212237896116645}
   m_Father: {fileID: 3999360260535100182}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &6211582363313669887
@@ -4205,7 +5190,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8194792723924002336}
-  m_Mesh: {fileID: 6944441829838539775, guid: 21a56f56e5232c348a74c696937598b6, type: 2}
+  m_Mesh: {fileID: 9176360743943063309, guid: 21a56f56e5232c348a74c696937598b6, type: 2}
 --- !u!23 &914844346017911051
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -4277,7 +5262,7 @@ MeshCollider:
   serializedVersion: 5
   m_Convex: 0
   m_CookingOptions: 30
-  m_Mesh: {fileID: 6944441829838539775, guid: 21a56f56e5232c348a74c696937598b6, type: 2}
+  m_Mesh: {fileID: 9176360743943063309, guid: 21a56f56e5232c348a74c696937598b6, type: 2}
 --- !u!114 &6878547304548955384
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4307,7 +5292,7 @@ MonoBehaviour:
   param1Value: Shaft Collar (hex screw, threads shown)
   param2Value: 
   holeData: 
-  primaryHole: {fileID: 7804195914317135283}
+  primaryHole: {fileID: 8063901581103247336}
   allowCenterInserts: 0
 --- !u!114 &7960936940187987828
 MonoBehaviour:
@@ -4358,8 +5343,8 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1785332743252129817}
-  - {fileID: 3982987849739866858}
+  - {fileID: 219400744137630897}
+  - {fileID: 6954483059056558669}
   m_Father: {fileID: 3999360260535100182}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &2534154494234181482
@@ -4369,7 +5354,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8252336833292484817}
-  m_Mesh: {fileID: -1896579092100508418, guid: 21a56f56e5232c348a74c696937598b6, type: 2}
+  m_Mesh: {fileID: -4255970937243670604, guid: 21a56f56e5232c348a74c696937598b6, type: 2}
 --- !u!23 &5714224659560552504
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -4441,7 +5426,7 @@ MeshCollider:
   serializedVersion: 5
   m_Convex: 0
   m_CookingOptions: 30
-  m_Mesh: {fileID: -1896579092100508418, guid: 21a56f56e5232c348a74c696937598b6, type: 2}
+  m_Mesh: {fileID: -4255970937243670604, guid: 21a56f56e5232c348a74c696937598b6, type: 2}
 --- !u!114 &7326254110002029145
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4471,7 +5456,7 @@ MonoBehaviour:
   param1Value: Shaft Collar (star screw, threads shown)
   param2Value: 
   holeData: 
-  primaryHole: {fileID: 2650642143240533516}
+  primaryHole: {fileID: 7949677850048872117}
   allowCenterInserts: 0
 --- !u!114 &2617734828115200333
 MonoBehaviour:
@@ -4487,7 +5472,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Parts_List.PartName
   name: Shaft Collar (star screw, threads shown)
   weightInGrams: 4.76
---- !u!1 &8258186893741103218
+--- !u!1 &8301605737256253842
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -4495,9 +5480,9 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 6416074242213626452}
-  - component: {fileID: 3340317600798197400}
-  - component: {fileID: 775535370201533857}
+  - component: {fileID: 1846486378747421128}
+  - component: {fileID: 6190976279367121753}
+  - component: {fileID: 7061258793364640931}
   m_Layer: 11
   m_Name: HoleCollider
   m_TagString: HoleCollider
@@ -4505,28 +5490,28 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &6416074242213626452
+--- !u!4 &1846486378747421128
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8258186893741103218}
+  m_GameObject: {fileID: 8301605737256253842}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 0.0039370055, y: -0.00000001833313, z: 0.003932697}
-  m_LocalScale: {x: 0.16189021, y: 0.16189021, z: 0.2500001}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.2031497, y: 1.2047249, z: -0.063484184}
+  m_LocalScale: {x: 0.17410737, y: 0.17410737, z: 0.12500004}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 4850257246026689448}
+  m_Father: {fileID: 414916597332447292}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!64 &3340317600798197400
+--- !u!64 &6190976279367121753
 MeshCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8258186893741103218}
+  m_GameObject: {fileID: 8301605737256253842}
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -4542,13 +5527,13 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: -8866702806410751908, guid: b3742fe5726aee84cb9d067be3423b22, type: 3}
---- !u!114 &775535370201533857
+--- !u!114 &7061258793364640931
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8258186893741103218}
+  m_GameObject: {fileID: 8301605737256253842}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9292031b68cb53740b5f8a3cc6cbbfdc, type: 3}
@@ -4562,166 +5547,11 @@ MonoBehaviour:
     position: {x: 0, y: 0, z: 0}
     rotation: {x: -0, y: -0, z: -0, w: 1}
     forward: {x: 0, y: 0, z: 1}
-  holeType: 2
-  detectors: []
-  twoSided: 0
---- !u!1 &8267927396157126441
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 3982987849739866858}
-  - component: {fileID: 2806803670155914713}
-  - component: {fileID: 2699722260438181649}
-  m_Layer: 11
-  m_Name: HoleCollider
-  m_TagString: HoleCollider
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &3982987849739866858
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8267927396157126441}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: -0.00007754914, y: 0.00000001833313, z: -0.093519315}
-  m_LocalScale: {x: 0.12499999, y: 0.12499999, z: 0.3120001}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 8122171326760423307}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!64 &2806803670155914713
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8267927396157126441}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: -22725266747507458, guid: 8c1cf58699f03f04f956b59e833806d6, type: 3}
---- !u!114 &2699722260438181649
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8267927396157126441}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9292031b68cb53740b5f8a3cc6cbbfdc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  holeData:
-    shape: {fileID: -22725266747507458, guid: 8c1cf58699f03f04f956b59e833806d6, type: 3}
-    depth: 0.05
-    size: {x: 0.18, y: 0.18}
-    part: {fileID: 5168579248169057192, guid: 64ee3195f74df474c9cf21c91f168fd9, type: 3}
-    position: {x: -6, y: -0.25, z: 0.025}
-    rotation: {x: -0, y: -0, z: -0, w: 1}
-    forward: {x: 0, y: 0, z: 1}
-  holeType: 2
-  detectors: []
-  twoSided: 0
---- !u!1 &8270379159974618548
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 4115853212836245965}
-  - component: {fileID: 8833743464846848259}
-  - component: {fileID: 98675820060641181}
-  m_Layer: 11
-  m_Name: HoleCollider
-  m_TagString: HoleCollider
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &4115853212836245965
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8270379159974618548}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 0.0039370055, y: 0.00061773486, z: -0.0019605695}
-  m_LocalScale: {x: 0.16478996, y: 0.16478996, z: 0.25000006}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 4534413589404346266}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!64 &8833743464846848259
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8270379159974618548}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: -8866702806410751908, guid: b3742fe5726aee84cb9d067be3423b22, type: 3}
---- !u!114 &98675820060641181
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8270379159974618548}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9292031b68cb53740b5f8a3cc6cbbfdc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  holeData:
-    shape: {fileID: -8866702806410751908, guid: b3742fe5726aee84cb9d067be3423b22, type: 3}
-    depth: 0.25
-    size: {x: 0.164, y: 0.164}
-    part: {fileID: 4288159359939511421, guid: d66429db48fb0114d8d32f299a7317cc, type: 3}
-    position: {x: 0, y: 0, z: 0}
-    rotation: {x: -0, y: -0, z: -0, w: 1}
-    forward: {x: 0, y: 0, z: 1}
+    outline: []
   holeType: 0
   detectors: []
   twoSided: 0
---- !u!1 &8567768348501582813
+--- !u!1 &8434307519558129445
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -4729,9 +5559,9 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 3992438003348740648}
-  - component: {fileID: 5865633276664934617}
-  - component: {fileID: 3914811598970287824}
+  - component: {fileID: 7440255075627129344}
+  - component: {fileID: 2693590251257374649}
+  - component: {fileID: 2255376214712524804}
   m_Layer: 11
   m_Name: HoleCollider
   m_TagString: HoleCollider
@@ -4739,28 +5569,28 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &3992438003348740648
+--- !u!4 &7440255075627129344
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8567768348501582813}
+  m_GameObject: {fileID: 8434307519558129445}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: -0.00007754914, y: 0.00000001833313, z: -0.093519315}
-  m_LocalScale: {x: 0.12499999, y: 0.12499999, z: 0.3117568}
+  m_LocalRotation: {x: -0, y: 0, z: -0.7071068, w: 0.7071068}
+  m_LocalPosition: {x: 0.6929137, y: 0.25196862, z: -0.023000007}
+  m_LocalScale: {x: 0.12598431, y: 0.12598431, z: 0.046000015}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 4534413589404346266}
+  m_Father: {fileID: 2963132228915756977}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!64 &5865633276664934617
+--- !u!64 &2693590251257374649
 MeshCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8567768348501582813}
+  m_GameObject: {fileID: 8434307519558129445}
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -4776,13 +5606,13 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: -22725266747507458, guid: 8c1cf58699f03f04f956b59e833806d6, type: 3}
---- !u!114 &3914811598970287824
+--- !u!114 &2255376214712524804
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8567768348501582813}
+  m_GameObject: {fileID: 8434307519558129445}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9292031b68cb53740b5f8a3cc6cbbfdc, type: 3}
@@ -4796,10 +5626,11 @@ MonoBehaviour:
     position: {x: -6, y: -0.25, z: 0.025}
     rotation: {x: -0, y: -0, z: -0, w: 1}
     forward: {x: 0, y: 0, z: 1}
-  holeType: 2
+    outline: []
+  holeType: 0
   detectors: []
   twoSided: 0
---- !u!1 &9001463306008452326
+--- !u!1 &8651174451190626899
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -4807,9 +5638,9 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 6361555772548048582}
-  - component: {fileID: 701741579237934082}
-  - component: {fileID: 866298568735644517}
+  - component: {fileID: 4337290736586541798}
+  - component: {fileID: 7562053063170016285}
+  - component: {fileID: 4563533039775580776}
   m_Layer: 11
   m_Name: HoleCollider
   m_TagString: HoleCollider
@@ -4817,28 +5648,28 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &6361555772548048582
+--- !u!4 &4337290736586541798
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9001463306008452326}
+  m_GameObject: {fileID: 8651174451190626899}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.49606317, y: 0.003937018, z: -0.09921414}
-  m_LocalScale: {x: 0.16189021, y: 0.16189021, z: 0.19920966}
+  m_LocalRotation: {x: -0, y: 0, z: -0.7071068, w: 0.7071068}
+  m_LocalPosition: {x: -0.00000005328066, y: 0.003937018, z: -0.12553523}
+  m_LocalScale: {x: 0.18110244, y: 0.18110244, z: 0.24892972}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4499283777428268780}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!64 &701741579237934082
+--- !u!64 &7562053063170016285
 MeshCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9001463306008452326}
+  m_GameObject: {fileID: 8651174451190626899}
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -4853,27 +5684,28 @@ MeshCollider:
   serializedVersion: 5
   m_Convex: 0
   m_CookingOptions: 30
-  m_Mesh: {fileID: -8866702806410751908, guid: b3742fe5726aee84cb9d067be3423b22, type: 3}
---- !u!114 &866298568735644517
+  m_Mesh: {fileID: -22725266747507458, guid: 8c1cf58699f03f04f956b59e833806d6, type: 3}
+--- !u!114 &4563533039775580776
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9001463306008452326}
+  m_GameObject: {fileID: 8651174451190626899}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9292031b68cb53740b5f8a3cc6cbbfdc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   holeData:
-    shape: {fileID: -8866702806410751908, guid: b3742fe5726aee84cb9d067be3423b22, type: 3}
-    depth: 0.25
-    size: {x: 0.164, y: 0.164}
-    part: {fileID: 4288159359939511421, guid: d66429db48fb0114d8d32f299a7317cc, type: 3}
-    position: {x: 0, y: 0, z: 0}
+    shape: {fileID: -22725266747507458, guid: 8c1cf58699f03f04f956b59e833806d6, type: 3}
+    depth: 0.05
+    size: {x: 0.18, y: 0.18}
+    part: {fileID: 5168579248169057192, guid: 64ee3195f74df474c9cf21c91f168fd9, type: 3}
+    position: {x: -6, y: -0.25, z: 0.025}
     rotation: {x: -0, y: -0, z: -0, w: 1}
     forward: {x: 0, y: 0, z: 1}
+    outline: []
   holeType: 0
   detectors: []
   twoSided: 0
@@ -4903,12 +5735,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 9185131888871780766}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.92913425, y: 0.25196862, z: -0.023000007}
-  m_LocalScale: {x: 0.12598431, y: 0.12598431, z: 0.046000015}
+  m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: -0.15459481, y: -0.24330716, z: -0.05413392}
+  m_LocalScale: {x: 0.11023627, y: 0.2834647, z: 0.08293739}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 2963132228915756977}
+  m_Father: {fileID: 4453038912278214970}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!64 &1712440011776938041
 MeshCollider:
@@ -4952,6 +5784,7 @@ MonoBehaviour:
     position: {x: -6, y: -0.25, z: 0.025}
     rotation: {x: -0, y: -0, z: -0, w: 1}
     forward: {x: 0, y: 0, z: 1}
+    outline: []
   holeType: 0
   detectors: []
   twoSided: 0

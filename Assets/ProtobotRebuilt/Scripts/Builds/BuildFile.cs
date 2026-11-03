@@ -23,45 +23,55 @@ namespace Protobot.Builds {
             public string[] customParts = Array.Empty<string>();
         }
 
-        // Files in the original's format whose owner chose to keep them that way (so older versions still open
-        // them): they're saved in the old format until they're upgraded.
-        private static readonly HashSet<string> keepOld = new(StringComparer.OrdinalIgnoreCase);
-
+        // V2: the old format is only read now (every part is cut from full-length stock, which old versions
+        // don't have); an old file is saved in the new format, with a copy of the old file kept next to it.
         public static bool IsOld(string path) => File.Exists(path) && !IsZip(path);
-        public static void KeepOldFormat(string path) => keepOld.Add(Path.GetFullPath(path));
 
         /// <summary>Saves an old file in the new format now, keeping a copy of the old one next to it.</summary>
         public static string Upgrade(string path, BuildData build) {
             var backup = Path.Combine(Path.GetDirectoryName(path) ?? "", Path.GetFileNameWithoutExtension(path) + " (old format).pbb");
             File.Copy(path, backup, true);
-            keepOld.Remove(Path.GetFullPath(path));
-            Write(path, build);
+            WriteNew(path, build);
             return backup;
         }
-
-        public static bool KeepsOldFormat(string path) => !string.IsNullOrEmpty(path) && keepOld.Contains(Path.GetFullPath(path));
-        public static void UseNewFormat(string path) => keepOld.Remove(Path.GetFullPath(path));
 
         /// <summary>How many parts in the build are custom (imported or polycarbonate): old files can't hold them.</summary>
         public static int CustomPartCount(BuildData build) => build.parts.Count(p => CustomParts.Find(p.partId) != null || IsCustomId(p.partId));
 
         private static bool IsCustomId(string id) => id != null && (id.StartsWith(CustomParts.Imported + "-") || id.StartsWith(CustomParts.Polycarbonate + "-"));
 
-        /// <summary>The original's format (older versions open it), without the custom parts it can't hold.</summary>
-        public static void WriteOld(string path, BuildData build) {
-            var old = new BuildData {
-                name = build.name, fileName = build.fileName, camera = build.camera, lastWriteTime = build.lastWriteTime,
-                version = build.version, parts = build.parts.Where(p => !IsCustomId(p.partId)).ToArray(),
-            };
-            using var file = File.Create(path);
-            new BinaryFormatter().Serialize(file, old);
-        }
-
         public static void Write(string path, BuildData build) {
-            if (KeepsOldFormat(path)) {
-                WriteOld(path, build);
+            if (IsOld(path)) {
+                Upgrade(path, build);
                 return;
             }
+            WriteNew(path, build);
+        }
+
+        public static string BackupFolder => Path.Combine(Application.persistentDataPath, "Backups");
+        private const int BackupsKept = 10;
+        private static readonly TimeSpan BackupEvery = TimeSpan.FromMinutes(10);
+
+        /// <summary>
+        /// V2 (the original's issue #82, broken files losing parts): before a build file is replaced, the old one is
+        /// copied to Backups/&lt;build name&gt;/&lt;time&gt;.pbb, at most every 10 minutes (autosave saves every minute),
+        /// keeping the newest 10.
+        /// </summary>
+        private static void Backup(string path) {
+            try {
+                var folder = Path.Combine(BackupFolder, Path.GetFileNameWithoutExtension(path));
+                Directory.CreateDirectory(folder);
+                var existing = new DirectoryInfo(folder).GetFiles("*.pbb").OrderByDescending(f => f.CreationTimeUtc).ToList();
+                if (existing.Count > 0 && DateTime.UtcNow - existing[0].CreationTimeUtc < BackupEvery) return;
+                File.Copy(path, Path.Combine(folder, DateTime.Now.ToString("yyyy-MM-dd HH-mm-ss") + ".pbb"), true);
+                foreach (var old in existing.Skip(BackupsKept - 1)) old.Delete();
+            }
+            catch (Exception e) {
+                Debug.LogWarning("[Builds] Couldn't back up " + path + ": " + e.Message);
+            }
+        }
+
+        private static void WriteNew(string path, BuildData build) {
             var used = new HashSet<string>(build.parts.Select(p => p.partId).Where(id => CustomParts.Find(id) != null));
             var temp = path + ".saving";
             using (var stream = File.Create(temp))
@@ -76,7 +86,10 @@ namespace Protobot.Builds {
                 AddText(zip, "manifest.json", JsonUtility.ToJson(new Manifest { customParts = keys.ToArray() }, true));
             }
             // Replace the old file only once the new one is complete.
-            if (File.Exists(path)) File.Delete(path);
+            if (File.Exists(path)) {
+                Backup(path);
+                File.Delete(path);
+            }
             File.Move(temp, path);
         }
 

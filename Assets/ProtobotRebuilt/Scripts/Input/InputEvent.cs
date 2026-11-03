@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -45,7 +45,8 @@ namespace Protobot.InputEvents {
             if (RebindAction.Rebinding) return;
 
             // V2: keyboard shortcuts (1-5 for the tools, Delete, R...) do nothing while a text box is being typed in.
-            if ((TextInput.IsTyping || TextInput.ShortcutsPaused) && IsKeyboardShortcut) {
+            // V2: and in the simulation sandbox (the keys drive the robot there).
+            if ((TextInput.IsTyping || TextInput.ShortcutsPaused || Motion.Sandbox.Running) && IsKeyboardShortcut) {
                 prevPressStatus = IsPressed = false;
                 return;
             }

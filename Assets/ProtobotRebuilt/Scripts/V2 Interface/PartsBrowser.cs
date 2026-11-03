@@ -26,6 +26,8 @@ namespace Protobot.Interface {
         private TMP_InputField search;
         private TextMeshProUGUI countLabel;
         private ScrollRect scroll;
+        private RectTransform scrollArea;
+        private System.Action<int> stepHoles;  // V2: Ctrl+wheel while placing: one hole more or less
         private readonly List<(Button button, TextMeshProUGUI label)> categoryButtons = new();
         private readonly List<(CatalogNode node, Image tile)> tiles = new();
         private int category, sort;
@@ -101,7 +103,7 @@ namespace Protobot.Interface {
             }
 
             // The sections and their tiles.
-            var scrollArea = Ui.Rect("Scroll", panel);
+            scrollArea = Ui.Rect("Scroll", panel);
             scrollArea.anchorMin = new Vector2(0f, 0f);
             scrollArea.anchorMax = new Vector2(1f, 1f);
             scrollArea.offsetMin = new Vector2(10f, 10f);
@@ -326,6 +328,13 @@ namespace Protobot.Interface {
                 if (part != null) image.texture = Thumbnails.Get(part);
                 tile.gameObject.AddComponent<RightClick>().onRightClick = () => CustomMenu(node, rect);
             }
+            else if (PartsCatalog.ModelIcon(node) is Texture2D model) {
+                // V2: VEX-CAD parts and families show a picture of the part.
+                var image = Ui.Rect("Thumbnail", tile.transform).Place(new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -6f), new Vector2(52f, 52f))
+                    .gameObject.AddComponent<RawImage>();
+                image.raycastTarget = false;
+                image.texture = model;
+            }
             else {
                 var icon = Ui.Image(tile.transform, "Icon", Theme.Text);
                 icon.rectTransform.Place(new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -12f), new Vector2(40f, 40f));
@@ -431,6 +440,10 @@ namespace Protobot.Interface {
                 Polycarb.SheetEditor.Open();
                 return;
             }
+            if (node.action == "chain") {  // V2: the chain generator
+                Motion.ChainTool.Begin();
+                return;
+            }
             var type = PartsCatalog.Type(node.typeId);
             var generator = type != null ? type.GetComponent<PartGenerator>() : null;
             if (generator == null) return;
@@ -441,6 +454,13 @@ namespace Protobot.Interface {
                     var options = generator.GetParam2Options();
                     if (options != null && options.Count > 0 && !options.Contains(generator.param2.value)) generator.param2.value = options[0];
                 }
+            }
+            // V2: metal starts as full-length stock (the saw cuts it to length); Ctrl+wheel or the field change it.
+            if (generator is AluminumPartGenerator) {
+                if (generator.UsesParams && generator.param1.custom && generator.param1.customUnit == "Holes")
+                    generator.param1.value = ((int)generator.param1.customLimits.y).ToString();
+                if (generator.UsesTwoParams && generator.param2.custom && generator.param2.customUnit == "Holes")
+                    generator.param2.value = ((int)generator.param2.customLimits.y).ToString();
             }
             selected = node;
             Highlight();
@@ -466,7 +486,13 @@ namespace Protobot.Interface {
             PartsRecent.Use(generator.GetId());
         }
 
+        private static bool CtrlHeld() {
+            var keyboard = UnityEngine.InputSystem.Keyboard.current;
+            return keyboard != null && (keyboard.leftCtrlKey.isPressed || keyboard.rightCtrlKey.isPressed);
+        }
+
         private void BuildSizes() {
+            stepHoles = null;
             foreach (Transform child in footer)
                 if (child.GetSiblingIndex() > 0) Destroy(child.gameObject);
             var generator = Generator;
@@ -497,6 +523,10 @@ namespace Protobot.Interface {
                 });
             var hint = Ui.Hint(footer, "Click", "place", "R", "turn", "Esc", "stop");
             hint.Size(-1, 20f);
+            if (stepHoles != null)
+                Ui.Hint(footer, "Ctrl+Wheel", "more or fewer holes", "T", "reset turn").Size(-1, 20f);
+            else
+                Ui.Hint(footer, "T", "reset turn").Size(-1, 20f);
         }
 
         private void ParamRow(Parameter parameter, List<string> options, System.Action<string> set) {
@@ -532,7 +562,15 @@ namespace Protobot.Interface {
                 var step = integer ? 1f : 0.5f;
                 minus.onClick.AddListener(() => Apply(Current() - step));
                 plus.onClick.AddListener(() => Apply(Current() + step));
-                Ui.Tip(field, parameter.name, null, "From " + parameter.customLimits.x + " to " + parameter.customLimits.y + " " + parameter.customUnit.ToLowerInvariant());
+                var wheel = "From " + parameter.customLimits.x + " to " + parameter.customLimits.y + " " + parameter.customUnit.ToLowerInvariant()
+                            + ". Ctrl + mouse wheel changes it while you place the part.";
+                Ui.Tip(field, parameter.name, "Ctrl+Wheel", wheel);
+                Ui.Tip(minus, "Fewer " + parameter.customUnit.ToLowerInvariant(), "Ctrl+Wheel", wheel);
+                Ui.Tip(plus, "More " + parameter.customUnit.ToLowerInvariant(), "Ctrl+Wheel", wheel);
+                stepHoles = direction => {
+                    Apply(Current() + direction * step);
+                    Interface.Say(parameter.name + ": " + field.text + " " + parameter.customUnit.ToLowerInvariant());
+                };
             }
             else {
                 var labels = options.ToArray();
@@ -546,6 +584,19 @@ namespace Protobot.Interface {
 
         private void Update() {
             if (waitingForParts || dirty) Refresh();
+            // V2: Ctrl+wheel while placing a part with a hole count changes it (the camera doesn't zoom then).
+            if (MousePivotCameraInput.ScrollClaimed == null)
+                MousePivotCameraInput.ScrollClaimed = () => stepHoles != null && placement != null && placement.placing && CtrlHeld();
+            if (stepHoles != null && placement != null && placement.placing && CtrlHeld() && !MouseInput.overUI) {
+                var wheel = MouseInput.scrollAxis;
+                if (wheel != 0f) stepHoles(wheel > 0f ? 1 : -1);
+            }
+            // The size panel sits under the list, not over its last rows.
+            if (scrollArea != null) {
+                var bottom = footer.gameObject.activeSelf ? footer.rect.height + 18f : 10f;
+                if (!Mathf.Approximately(scrollArea.offsetMin.y, bottom))
+                    scrollArea.offsetMin = new Vector2(10f, bottom);
+            }
             var top = Layout.TopBarBottom + 14f;
             if (!collapsed) {
                 panel.offsetMax = new Vector2(-14f, -top);

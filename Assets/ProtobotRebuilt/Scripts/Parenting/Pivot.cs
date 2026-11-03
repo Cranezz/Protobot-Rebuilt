@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
@@ -54,7 +54,15 @@ namespace Protobot {
 
         /// <summary> Add a given list of objects to the object list and parent them </summary>
         public void AddObjects(List<GameObject> objs, bool checkGroups = true) {
+            // V2: an object whose parent is also carried (a cylinder's rod thread) stays on its parent; parented to the
+            // pivot it was left loose in the scene afterwards.
+            var all = new HashSet<GameObject>(objs.Where(o => o != null));
             for (int i = 0; i < objs.Count; i++) {
+                if (objs[i] == null) continue;
+                var nested = false;
+                for (var t = objs[i].transform.parent; t != null && !nested; t = t.parent)
+                    nested = all.Contains(t.gameObject);
+                if (nested) continue;
                 AddObject(objs[i], checkGroups);
             }
         }

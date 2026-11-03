@@ -18,7 +18,7 @@ namespace Protobot.SelectionSystem {
             if (!MouseInput.overUI) {
                 if (mouseCast.overObj) {
                     var selection = new ObjectSelection {
-                        gameObject = mouseCast.gameObject,
+                        gameObject = SelectAs.Resolve(mouseCast.gameObject),  // V2
                         selector = this
                     };
 

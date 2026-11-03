@@ -9,6 +9,9 @@ namespace Protobot.Interface {
     // V2: the paint color picker (as in the earlier V2): a saturation/brightness square with a hue bar beside it,
     // hex and R G B boxes, team colors and the recently used colors. Opens under the tool options bar; every
     // change applies straight away. Escape or a click outside closes it.
+    // V2: the Paint tool's picker floats instead (OpenFloating): it opens with the tool, its title bar drags it
+    // anywhere on the screen (the place is remembered), and "-" folds it into a small bar showing the current
+    // color; clicking the bar opens it again.
     public class ColorPickerPanel : MonoBehaviour {
         private static ColorPickerPanel open;
 
@@ -31,6 +34,114 @@ namespace Protobot.Interface {
         private bool syncing;
 
         public static bool IsOpen => open != null;
+
+        private bool floating, minimized;
+        private RectTransform window, header;
+        private Image headerSwatch;
+        private TextMeshProUGUI headerTitle;
+        private Button minimizeButton;
+        private const string PositionKey = "V2.PaintPanelPosition", MinimizedKey = "V2.PaintPanelMinimized";
+
+        /// <summary>The floating picker (the Paint tool's): draggable, folds into a bar; stays until closed.</summary>
+        public static void OpenFloating(string title, Color start, Action<Color> onChange) {
+            if (open != null && open.floating) {
+                open.changed = onChange;
+                open.SetColor(start, true, false);
+                return;
+            }
+            Close();
+            var go = Ui.Rect("Color Picker", Interface.Root).Fill().gameObject;
+            open = go.AddComponent<ColorPickerPanel>();
+            open.floating = true;
+            open.changed = onChange;
+            open.BuildFloating(title);
+            open.SetColor(start, true, false);
+        }
+
+        /// <summary>Sets the picker's color from outside (another part's color was picked up).</summary>
+        public static void Show(Color color) {
+            if (open != null) open.SetColor(color, true, false);
+        }
+
+        public static bool IsFloating => open != null && open.floating;
+
+        private void BuildFloating(string title) {
+            // The fullscreen holder mustn't take clicks meant for the scene.
+            window = Ui.Rect("Window", transform);
+            window.anchorMin = window.anchorMax = new Vector2(0f, 1f);
+            window.pivot = new Vector2(0f, 1f);
+            window.sizeDelta = new Vector2(330f, 404f + 36f);
+            var saved = PlayerPrefs.GetString(PositionKey, "");
+            var parts = saved.Split(',');
+            window.anchoredPosition = parts.Length == 2 && float.TryParse(parts[0], System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var x)
+                                      && float.TryParse(parts[1], System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var y)
+                ? new Vector2(x, y) : new Vector2(82f, -(Layout.TopBarBottom + 70f));
+
+            header = Ui.Panel(window, "Header", Theme.PanelRaised, 10f).rectTransform;
+            header.Place(new Vector2(0f, 1f), new Vector2(0f, 1f), Vector2.zero, new Vector2(330f, 34f));
+            header.GetChild(0).GetComponent<Image>().raycastTarget = true;
+            header.gameObject.AddComponent<Mover>().owner = this;
+            headerSwatch = Ui.Image(header, "Swatch", Color.white, 4f);
+            headerSwatch.rectTransform.Place(new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(10f, 0f), new Vector2(22f, 18f));
+            headerTitle = Ui.Text(header, "Title", title, Theme.FontBody, Theme.Text, Theme.Medium);
+            headerTitle.rectTransform.Place(new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(40f, 0f), new Vector2(220f, 30f));
+            headerTitle.raycastTarget = false;
+            minimizeButton = Ui.Button(header, "Minimize", "-", () => SetMinimized(!minimized), false, 5f, Theme.FontTitle);
+            ((RectTransform)minimizeButton.transform).Place(new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(-6f, 0f), new Vector2(28f, 26f));
+            Ui.Tip(minimizeButton, "Minimize", null, "Folds the picker into this bar; click the bar to open it again.");
+
+            var anchor = Ui.Rect("Anchor", window);
+            anchor.anchorMin = anchor.anchorMax = new Vector2(0f, 1f);
+            anchor.pivot = new Vector2(0f, 1f);
+            anchor.sizeDelta = Vector2.zero;
+            Build(anchor);
+            panel.SetParent(window, false);
+            panel.anchorMin = panel.anchorMax = new Vector2(0f, 1f);
+            panel.pivot = new Vector2(0f, 1f);
+            panel.anchoredPosition = new Vector2(0f, -38f);
+            SetMinimized(PlayerPrefs.GetInt(MinimizedKey, 0) == 1);
+            KeepOnScreen();
+        }
+
+        private void SetMinimized(bool value) {
+            minimized = value;
+            PlayerPrefs.SetInt(MinimizedKey, value ? 1 : 0);
+            panel.gameObject.SetActive(!value);
+            header.sizeDelta = new Vector2(value ? 200f : 330f, 34f);
+            minimizeButton.GetComponentInChildren<TextMeshProUGUI>().text = value ? "+" : "-";
+            var tip = minimizeButton.GetComponent<TipSource>();
+            if (tip != null) tip.title = value ? "Open the color picker" : "Minimize";
+        }
+
+        private void KeepOnScreen() {
+            if (window == null || Interface.Root == null) return;
+            var root = Interface.Root.rect;
+            var p = window.anchoredPosition;
+            p.x = Mathf.Clamp(p.x, 0f, root.width - 120f);
+            p.y = Mathf.Clamp(p.y, -root.height + 34f, 0f);
+            window.anchoredPosition = p;
+        }
+
+        // Dragging the title bar moves the picker; a click (no drag) on the folded bar opens it.
+        private class Mover : MonoBehaviour, IPointerDownHandler, IDragHandler, IPointerUpHandler {
+            public ColorPickerPanel owner;
+            private bool moved;
+
+            public void OnPointerDown(PointerEventData e) => moved = false;
+
+            public void OnDrag(PointerEventData e) {
+                moved = true;
+                var scale = Interface.Root.lossyScale.x;
+                owner.window.anchoredPosition += e.delta / Mathf.Max(scale, 0.0001f);
+                owner.KeepOnScreen();
+            }
+
+            public void OnPointerUp(PointerEventData e) {
+                var p = owner.window.anchoredPosition;
+                PlayerPrefs.SetString(PositionKey, p.x.ToString(System.Globalization.CultureInfo.InvariantCulture) + "," + p.y.ToString(System.Globalization.CultureInfo.InvariantCulture));
+                if (!moved && owner.minimized) owner.SetMinimized(false);
+            }
+        }
 
         public static void Toggle(RectTransform anchor, Color start, Action<Color> onChange) {
             if (open != null) {
@@ -163,6 +274,7 @@ namespace Protobot.Interface {
             squareHandle.anchorMin = squareHandle.anchorMax = new Vector2(saturation, value);
             hueHandle.anchorMin = hueHandle.anchorMax = new Vector2(0.5f, hue);
             preview.color = current;
+            if (headerSwatch != null) headerSwatch.color = current;
             hex.SetTextWithoutNotify("#" + ColorUtility.ToHtmlStringRGB(current));
             for (var i = 0; i < 3; i++)
                 rgb[i].SetTextWithoutNotify(Mathf.RoundToInt(current[i] * 255f).ToString());
@@ -171,6 +283,7 @@ namespace Protobot.Interface {
         }
 
         private void Update() {
+            if (floating) return;  // the Paint tool's picker stays until the tool closes it
             var mouse = Mouse.current;
             var outside = mouse != null && mouse.leftButton.wasPressedThisFrame
                           && !RectTransformUtility.RectangleContainsScreenPoint(panel, mouse.position.ReadValue())

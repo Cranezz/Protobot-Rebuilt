@@ -44,6 +44,17 @@ namespace Protobot {
             };
         }
 
+        /// <summary>V2: takes the collider's size and shape again after it was changed (custom parts set the size
+        /// after copying a template, which had already read the template's: the hole showed the wrong size, off
+        /// the surface).</summary>
+        public void Refresh(Vector2[] outline = null) {
+            holeData.shape = GetComponent<MeshCollider>().sharedMesh;
+            holeData.depth = transform.localScale.z;
+            holeData.size = new Vector2(transform.localScale.x, transform.localScale.y);
+            holeData.outline = outline;
+            holeData.part = transform.parent.gameObject;
+        }
+
         private void Update() {
             holeData.position = transform.position;
             holeData.rotation = transform.rotation;
@@ -95,6 +106,10 @@ namespace Protobot {
         public Vector3 position;
         public Quaternion rotation;
         public Vector3 forward;
+
+        // V2: the exact shape of a custom hole (a filleted slot, any outline), in inches in the hole's own x/y around
+        // its middle; null for plain round/square/rectangular holes.
+        public Vector2[] outline;
 
         public bool IsHighStrength() => size == new Vector2(0.25f, 0.25f) && shape == HoleShapes.instance.GetShapeMesh("square");
     }

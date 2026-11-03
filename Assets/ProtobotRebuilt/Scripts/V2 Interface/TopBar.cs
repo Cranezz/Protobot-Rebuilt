@@ -23,6 +23,7 @@ namespace Protobot.Interface {
         private string openName;
         private readonly Dictionary<string, RectTransform> menuButtons = new();
         private TextMeshProUGUI title, weight, plastic;
+        private Button simulate;  // V2
         private TMP_Text oldTitle, oldWeight;
         private Image plasticChip;
         private readonly List<(Toggle source, Image background, Image icon)> toggles = new();
@@ -114,7 +115,11 @@ namespace Protobot.Interface {
             var undo = OldButton("Functions Bar/Undo");
             var redo = OldButton("Functions Bar/Redo");
             QuickButton(left, "Undo", undo != null ? undo.GetComponent<Image>().sprite : null, () => Press(undo), "Undo", Key("Undo"));
-            QuickButton(left, "Redo", redo != null ? redo.GetComponent<Image>().sprite : null, () => Press(redo), "Redo", Key("Redo"));
+            var redoButton = QuickButton(left, "Redo", redo != null ? redo.GetComponent<Image>().sprite : null, () => Press(redo), "Redo", Key("Redo"));
+            // The original draws redo with the undo arrow mirrored.
+            var redoIcon = redoButton.transform.Find("Icon");
+            if (redoIcon != null && undo != null && redo != null && undo.GetComponent<Image>().sprite == redo.GetComponent<Image>().sprite)
+                redoIcon.localScale = new Vector3(-1f, 1f, 1f);
             Ui.Divider(left, true).Size(1f, 22f);
             ToggleButton(left, OldToggle("Functions Bar/Grid Toggle"), "Grid", Key("Toggle Grid"), "Show the grid under the build");
             ToggleButton(left, OldToggle("Functions Bar/Select Hole Mode"), "Holes only", Key("Toggle Holes Only"), "Clicks pick holes, not parts");
@@ -146,6 +151,11 @@ namespace Protobot.Interface {
             chip.Size(-1, 30f);
             Ui.Tip(chip, "Plastic", null, "The polycarbonate in this build, against the rules: click to see it laid out on sheets.");
 
+            // V2: the simulation sandbox.
+            simulate = Ui.Button(right, "Simulate", "Simulate", Motion.Sandbox.Toggle, true, 6f, Theme.FontSmall);
+            simulate.Size(-1, 30f);
+            Ui.Tip(simulate, "Simulate", null, "Gravity and physics: the robot drives (W/A/S/D, arrows or a gamepad), motors turn, cylinders push; parts not fastened fall off. Stop puts the build back.");
+
             weight = Ui.Text(right, "Weight", "", Theme.FontSmall, Theme.TextDim, null, TextAlignmentOptions.MidlineRight);
             weight.Size(-1, Height);
             var fullscreen = OldToggle("Fullscreen Toggle");
@@ -165,7 +175,7 @@ namespace Protobot.Interface {
             new Item { divider = true },
             new Item { label = "Save", shortcut = Key("Save"), action = () => Press(OldButton("File Menu/Save Button")) },
             new Item { label = "Save as…", action = () => Press(OldButton("File Menu/Save As Button")) },
-            new Item { label = "Save for older versions…", action = () => builds?.SaveForOlderVersions() },
+            new Item { label = Builds.AutoSave.Enabled ? "Autosave every minute: on" : "Autosave every minute: off", action = Builds.AutoSave.Toggle },
             new Item { divider = true },
             new Item { label = "Import part…", action = Custom.ImportDialog.Choose },
             new Item { label = "Export parts list", action = () => Press(OldButton("Export Parts List")) },
@@ -176,6 +186,18 @@ namespace Protobot.Interface {
         private List<Item> EditMenu() => new() {
             new Item { label = "Undo", shortcut = Key("Undo"), action = () => Press(OldButton("Functions Bar/Undo")) },
             new Item { label = "Redo", shortcut = Key("Redo"), action = () => Press(OldButton("Functions Bar/Redo")) },
+            new Item { label = "Look at the origin", action = () => {
+                // V2 (the original's issue #93): back to the build's middle.
+                if (PivotCamera.Main != null) PivotCamera.Main.MoveFocusPosition(Vector3.zero);
+                Interface.Say("Looking at the origin");
+            } },
+            new Item { label = "Open backups folder", action = () => {
+                System.IO.Directory.CreateDirectory(Builds.BuildFile.BackupFolder);
+                Application.OpenURL("file:///" + Builds.BuildFile.BackupFolder.Replace('\\', '/'));
+                Interface.Say("Backups are kept for every build you save (the last 10, one every 10 minutes)");
+            } },
+            new Item { label = "Controls (motors, cylinders, drive)…", action = () => Motion.ControlsPanel.Open() },
+            new Item { label = "Make a chain…", action = () => Motion.ChainTool.Begin() },
             new Item { divider = true },
             new Item { label = "Preferences…", action = () => Press(OldButton("Edit Menu/Preferences Button")) },
         };
@@ -263,10 +285,11 @@ namespace Protobot.Interface {
 
         // ------------------------------------------------------------------ buttons
 
-        private static void QuickButton(RectTransform parent, string name, Sprite icon, Action action, string tip, string key) {
+        private static Button QuickButton(RectTransform parent, string name, Sprite icon, Action action, string tip, string key) {
             var button = Ui.IconButton(parent, name, icon, action, 32f, 16f);
             button.Size(32f, 32f);
             Ui.Tip(button, tip, key);
+            return button;
         }
 
         private void ToggleButton(RectTransform parent, Toggle source, string tip, string key, string description) {
@@ -296,6 +319,11 @@ namespace Protobot.Interface {
                 icon.color = source.isOn ? Theme.Text : Theme.TextFaint;
             }
             if (++plasticFrame % 30 == 0) UpdatePlastic();
+            if (simulate != null) {
+                var label = simulate.GetComponentInChildren<TextMeshProUGUI>();
+                var text = Motion.Sandbox.Running ? "Stop simulating" : "Simulate";
+                if (label.text != text) label.text = text;
+            }
 
             // Clicking anywhere else closes the menu.
             var mouse = Mouse.current;

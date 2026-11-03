@@ -5,45 +5,8 @@ using UnityEngine;
 namespace Protobot.Builds {
     // V2: opening a build saved by an older Protobot asks whether to upgrade the file to the new format (which
     // can hold custom parts and polycarbonate pieces). Upgrading saves it now and keeps a copy of the old file;
-    // "Keep old format" saves it the old way, so older versions can still open it.
+    // "Later" leaves it until the next save, which upgrades it the same way (the old format isn't written any more).
     public static class UpgradePrompt {
-        /// <summary>
-        /// Before saving in the old format: custom parts (imported, polycarbonate) can't go in it. "Save without
-        /// them" goes on; <paramref name="useNew"/> (when given) offers the new format instead.
-        /// </summary>
-        public static void WarnCustomParts(int count, bool sameFile, System.Action saveWithout, System.Action useNew) {
-            var dialog = Dialog.Open("Custom parts won't be saved", new Vector2(560f, 270f));
-            Ui.Column(dialog.Body, 10f);
-            var text = Ui.Text(dialog.Body, "Message",
-                "This build has " + count + (count == 1 ? " custom part" : " custom parts") + " (imported models or polycarbonate). " +
-                "Files for older versions of Protobot can't hold them, so " + (count == 1 ? "it" : "they") + " won't be saved" +
-                (sameFile ? " in this file." : " in the copy."), Theme.FontBody, Theme.Text);
-            text.textWrappingMode = TextWrappingModes.Normal;
-            text.Size(-1, 76f);
-            var hint = Ui.Text(dialog.Body, "Hint",
-                useNew != null ? "Use the new format to keep them (older versions won't open it)." : "Your build here keeps them.",
-                Theme.FontBody, Theme.Warning);
-            hint.textWrappingMode = TextWrappingModes.Normal;
-            hint.Size(-1, 44f);
-            var cancel = Ui.Button(dialog.Footer, "Cancel", "Cancel", () => {
-                dialog.Close();
-                Interface.Interface.Say("Not saved", false);
-            }, false, 6f);
-            cancel.Size(-1f, 36f);
-            var without = Ui.Button(dialog.Footer, "Without", "Save without them", () => {
-                dialog.Close();
-                saveWithout();
-            }, useNew == null, 6f);
-            without.Size(-1f, 36f);
-            if (useNew != null) {
-                var upgrade = Ui.Button(dialog.Footer, "New format", "Use new format", () => {
-                    dialog.Close();
-                    useNew();
-                }, true, 6f);
-                upgrade.Size(-1f, 36f);
-            }
-        }
-
         public static void Ask(string path, BuildsManager builds) {
             var dialog = Dialog.Open("Upgrade this build file?", new Vector2(560f, 300f));
             dialog.closeOnEscape = false;
@@ -60,10 +23,9 @@ namespace Protobot.Builds {
             warning.textWrappingMode = TextWrappingModes.Normal;
             warning.Size(-1, 70f);
 
-            var keep = Ui.Button(dialog.Footer, "Keep", "Keep old format", () => {
-                BuildFile.KeepOldFormat(path);
+            var keep = Ui.Button(dialog.Footer, "Later", "Later", () => {
                 dialog.Close();
-                Interface.Interface.Say("Kept " + name + " in the old format", false);
+                Interface.Interface.Say(name + " will be upgraded when you save it", false);
             }, false, 6f);
             keep.Size(-1f, 36f);
             var upgrade = Ui.Button(dialog.Footer, "Upgrade", "Upgrade file", () => {

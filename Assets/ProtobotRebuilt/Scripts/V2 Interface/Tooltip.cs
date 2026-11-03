@@ -56,6 +56,10 @@ namespace Protobot.Interface {
         }
 
         private void LateUpdate() {
+            // A click (opening a menu, choosing) puts the tip away until the mouse goes over something again.
+            var mouse = UnityEngine.InputSystem.Mouse.current;
+            if (mouse != null && (mouse.leftButton.wasPressedThisFrame || mouse.rightButton.wasPressedThisFrame))
+                source = null;
             if (source == null || !source.isActiveAndEnabled) {
                 if (panel.gameObject.activeSelf)
                     panel.gameObject.SetActive(false);
@@ -73,20 +77,37 @@ namespace Protobot.Interface {
             description.text = source.description ?? "";
             description.gameObject.SetActive(!string.IsNullOrEmpty(source.description));
             panel.gameObject.SetActive(true);
+            transform.SetAsLastSibling();  // over panels built after it
 
-            // Beside the element: to its right, or to its left when there's no room.
+            // Below the element when it's in the top bar, else beside it (to its right, or its left when there's
+            // no room); kept on the screen.
+            LayoutRebuilder.ForceRebuildLayoutImmediate(panel);
             var target = (RectTransform)source.transform;
             var corners = new Vector3[4];
             target.GetWorldCorners(corners);
             var canvas = (RectTransform)transform.parent;
-            RectTransformUtility.ScreenPointToLocalPointInRectangle(canvas, (corners[2] + corners[3]) / 2f, null, out var right);
-            RectTransformUtility.ScreenPointToLocalPointInRectangle(canvas, (corners[0] + corners[1]) / 2f, null, out var left);
-            var width = panel.sizeDelta.x;
+            var camera = GetComponentInParent<Canvas>().renderMode == RenderMode.ScreenSpaceOverlay ? null : GetComponentInParent<Canvas>().worldCamera;
+            Vector2 Local(Vector3 world) {
+                RectTransformUtility.ScreenPointToLocalPointInRectangle(canvas, RectTransformUtility.WorldToScreenPoint(camera, world), camera, out var p);
+                return p;
+            }
+            var right = Local((corners[2] + corners[3]) / 2f);
+            var left = Local((corners[0] + corners[1]) / 2f);
+            var bottom = Local((corners[0] + corners[3]) / 2f);
+            var size = panel.rect.size;
             var canvasRect = canvas.rect;
-            var useLeft = right.x + 12f + width > canvasRect.xMax;
-            panel.pivot = new Vector2(useLeft ? 1f : 0f, 0.5f);
             panel.anchorMin = panel.anchorMax = new Vector2(0.5f, 0.5f);
-            panel.anchoredPosition = useLeft ? left + new Vector2(-12f, 0f) : right + new Vector2(12f, 0f);
+            panel.pivot = new Vector2(0.5f, 0.5f);
+            Vector2 center;
+            if (bottom.y > canvasRect.yMax - 80f)
+                center = bottom + new Vector2(0f, -10f - size.y / 2f);
+            else if (right.x + 12f + size.x > canvasRect.xMax)
+                center = left + new Vector2(-12f - size.x / 2f, 0f);
+            else
+                center = right + new Vector2(12f + size.x / 2f, 0f);
+            center.x = Mathf.Clamp(center.x, canvasRect.xMin + size.x / 2f + 4f, canvasRect.xMax - size.x / 2f - 4f);
+            center.y = Mathf.Clamp(center.y, canvasRect.yMin + size.y / 2f + 4f, canvasRect.yMax - size.y / 2f - 4f);
+            panel.anchoredPosition = center;
         }
     }
 }

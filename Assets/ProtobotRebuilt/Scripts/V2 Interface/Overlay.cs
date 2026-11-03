@@ -59,6 +59,7 @@ namespace Protobot.Interface {
         }
 
         private void LateUpdate() {
+            Dimension.Tidy();
             if (begunFrame != Time.frameCount) {
                 quads.Clear();
                 hitSegments.Clear();

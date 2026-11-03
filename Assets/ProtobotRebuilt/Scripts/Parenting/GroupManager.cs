@@ -69,6 +69,10 @@ namespace Protobot {
             }
         }
 
+        /// <summary>V2: what one object is fastened to directly (moving parts follow these links).</summary>
+        public static IEnumerable<GameObject> Neighbours(GameObject obj) =>
+            obj != null && Graph.TryGetValue(obj, out var set) ? set.ToList() : new List<GameObject>();
+
         public static bool TryGetGroup(this GameObject obj, out List<GameObject> objs) {
             if (Graph.ContainsKey(obj) && Graph[obj].Count > 0) {
                 visited.Clear();

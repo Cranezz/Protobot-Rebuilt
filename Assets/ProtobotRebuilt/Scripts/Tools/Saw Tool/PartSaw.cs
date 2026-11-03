@@ -16,10 +16,11 @@ namespace Protobot.Tools {
     // V2: the saw. Click a part: a cut plane appears through its middle, across its longest side, with a
     // dimension from a reference point (the part's end at first) to the plane.
     // - Drag the arrow to slide the plane (1/16" steps with snapping, Shift for free). R: rotation rings to tilt
-    //   it (5° steps); Esc goes back to the arrow, Esc again cancels and switches to the Transform tool.
-    // - The dimension goes from its reference point to the centre of the plane (so tilting keeps it). Click its
-    //   value to type a distance; drag its reference dot onto a hole, corner, edge or face (or click the dot,
-    //   then the point) to measure from there instead, like dimensioning in a CAD program.
+    //   it (5° steps); Esc goes back to the arrow, Esc again cancels and switches to the Select tool.
+    // - The dimension runs from its reference point square to the plane (V2), with legs along the part's axes
+    //   (each typeable) to the plane's centre. Click its value to type a distance; drag its reference dot onto a
+    //   hole, corner, edge or face (or click the dot, then the point) to measure from there instead, and drag the
+    //   plane's centre dot onto a point to put the cut there, like dimensioning in a CAD program.
     // - Enter or Cut makes the cut. Channels, angles and plates cut squarely between two holes become two parts
     //   their generator makes (names, weights and saving as any part); shafts cut squarely become two exact
     //   shafts; anything else is cut through its mesh (PartCutting) and keeps both pieces. Undo puts it back.
@@ -32,13 +33,19 @@ namespace Protobot.Tools {
         private const float Step = 1f / 16f;
         private const float AngleStep = 5f;
 
-        private enum Mode { Pick, Move, Rotate, Reference }
+        private enum Mode { Pick, Move, Rotate, Reference, Target }
 
         private Mode mode = Mode.Pick;
         private GameObject part;
         private Vector3 center, normal, u, v;  // the plane, world space (u, v span it)
         private FeaturePicker.Feature reference;
         private bool referenceIsEnd;
+        // V2: the direction the cut is measured along (square to the plane when the reference was set: the part's
+        // length for its end). Tilting the plane keeps it, so the dimension still runs along the part to the
+        // plane's centre, and the angle shows how far the cut is from square.
+        private Vector3 measureAxis;
+        /// <summary>V2 (for fun): cut every part the plane goes through, not only the one picked.</summary>
+        private static bool cutAll;
         private float planeHalfU = 1f, planeHalfV = 1f;
         private GameObject planeObject;
         private Material planeInstance;
@@ -58,12 +65,15 @@ namespace Protobot.Tools {
         private static PartSaw active;
 
         [RuntimeInitializeOnLoadMethod]
-        private static void RegisterOptions() => ToolRail.RegisterOptions("Saw", BuildOptions);
+        private static void RegisterOptions() {
+            ToolRail.RegisterOptions("Saw", BuildOptions);
+            ToolRail.RegisterBusy("Saw", () => true);  // V2: the saw handles Esc itself (steps back, then Select)
+        }
 
         private static void BuildOptions(RectTransform bar) {
             if (active == null || active.part == null) {
                 ToolOptions.Note(bar, "Click a part to place a cut");
-                Ui.Hint(bar, "Esc", "Transform tool");
+                Ui.Hint(bar, "Esc", "Select tool");
                 return;
             }
             active.BuildEditOptions(bar);
@@ -92,21 +102,21 @@ namespace Protobot.Tools {
                 if (part != null) EndCut();
                 UpdatePick();
                 if (!typing && keyboard != null && keyboard.escapeKey.wasPressedThisFrame)
-                    ToolRail.Select("Transform");
+                    ToolRail.Select("Select");
                 return;
             }
 
             if (!typing && keyboard != null) {
                 if (keyboard.escapeKey.wasPressedThisFrame) {
-                    if (mode == Mode.Reference || mode == Mode.Rotate) SetMode(Mode.Move);
+                    if (mode == Mode.Reference || mode == Mode.Target || mode == Mode.Rotate) SetMode(Mode.Move);
                     else {
                         EndCut();
                         feedback.Show("Cut cancelled", FeedbackDisplay.DisplayType.alert);
-                        ToolRail.Select("Transform");
+                        ToolRail.Select("Select");
                         return;
                     }
                 }
-                else if (keyboard.rKey.wasPressedThisFrame && mode != Mode.Reference)
+                else if (keyboard.rKey.wasPressedThisFrame && mode != Mode.Reference && mode != Mode.Target)
                     SetMode(mode == Mode.Rotate ? Mode.Move : Mode.Rotate);
                 else if (keyboard.enterKey.wasPressedThisFrame || keyboard.numpadEnterKey.wasPressedThisFrame) {
                     ApplyCut();
@@ -115,6 +125,7 @@ namespace Protobot.Tools {
             }
 
             if (mode == Mode.Reference) UpdateReferencePick();
+            else if (mode == Mode.Target) UpdateTargetPick();
             else UpdateHandles();
 
             KeepOutline();
@@ -210,6 +221,7 @@ namespace Protobot.Tools {
             mode = Mode.Pick;
             dragging = Handle.None;
             CloseEditField();
+            Dimension.Close();
             if (planeObject != null) planeObject.SetActive(false);
             ToolOptions.Rebuild();
         }
@@ -235,6 +247,7 @@ namespace Protobot.Tools {
                 kind = FeaturePicker.Kind.Face, point = center + normal * min, normal = -normal, part = part
             };
             referenceIsEnd = true;
+            measureAxis = normal;
         }
 
         // How big to draw the plane: the part's extent across it. Recentring (only when the cut starts) puts the
@@ -263,30 +276,56 @@ namespace Protobot.Tools {
 
         // ------------------------------------------------------------------ the dimension
 
-        /// <summary>Distance from the reference point to the centre of the cut plane (inches): a point-to-point
-        /// dimension, so tilting the plane about its centre keeps it.</summary>
-        private float Distance => Vector3.Distance(center, reference.point);
+        /// <summary>V2: distance from the reference point to the cut plane, square to the plane (what you'd
+        /// measure with a ruler from the end of the part), in inches.</summary>
+        private float Distance => Mathf.Abs(Vector3.Dot(center - reference.point, measureAxis));
 
-        /// <summary>Slides the plane along its normal until its centre is <paramref name="value"/> from the
-        /// reference (the nearer of the two places that are); false if it can't get that close.</summary>
-        private bool SetDistance(float value) {
-            var w = center - reference.point;
-            var along = Vector3.Dot(w, normal);
-            var discriminant = along * along - w.sqrMagnitude + value * value;
-            if (discriminant < 0f) {
-                center -= normal * along;  // as close as it gets
-                return false;
+        /// <summary>V2: how far the cut is from square, in degrees (0 to 90).</summary>
+        private float Tilt {
+            get {
+                var angle = Vector3.Angle(measureAxis, normal);
+                return angle > 90f ? 180f - angle : angle;
             }
-            var root = Mathf.Sqrt(discriminant);
-            var s1 = -along + root;
-            var s2 = -along - root;
-            center += normal * (Mathf.Abs(s1) <= Mathf.Abs(s2) ? s1 : s2);
-            return true;
+        }
+
+        /// <summary>V2: tilts the plane to this angle from square, about the line it's tilted on now.</summary>
+        private void SetTilt(float degrees) {
+            degrees = Mathf.Clamp(degrees, 0f, 89f);
+            var baseAxis = Vector3.Dot(normal, measureAxis) < 0f ? -measureAxis : measureAxis;
+            var hinge = Vector3.Cross(baseAxis, normal);
+            if (hinge.sqrMagnitude < 1e-8f) hinge = u;
+            var target = (Quaternion.AngleAxis(degrees, hinge.normalized) * baseAxis).normalized;
+            var turn = Quaternion.FromToRotation(normal, target);
+            normal = target;
+            u = (turn * u).normalized;
+            v = (turn * v).normalized;
+            MeasurePlane(false);
+            feedback.Show("Cut " + degrees.ToString("0.#", CultureInfo.InvariantCulture) + "° from square", FeedbackDisplay.DisplayType.success);
+            ToolOptions.Rebuild();
+        }
+
+        /// <summary>Slides the plane along its normal until it's <paramref name="value"/> from the reference, on
+        /// the side it's on now.</summary>
+        private void SetDistance(float value) {
+            var along = Vector3.Dot(center - reference.point, measureAxis);
+            var side = along < 0f ? -1f : 1f;
+            center += measureAxis * (side * value - along);
+        }
+
+        /// <summary>V2: a leg of the dimension was typed: move the plane's centre along that axis of the part.</summary>
+        private void SetLeg(int axis, float value) {
+            var frame = part.transform.rotation;
+            var c = Dimension.Components(reference.point, center, frame);
+            var side = c[axis] < 0f ? -1f : 1f;
+            var direction = frame * (axis == 0 ? Vector3.right : axis == 1 ? Vector3.up : Vector3.forward);
+            center += direction * (side * value - c[axis]);
+            feedback.Show(Dimension.AxisName(axis) + " set to " + Inch.Format(value), FeedbackDisplay.DisplayType.success);
+            ToolOptions.Rebuild();
         }
 
         private void TypeDistance(float inches) {
-            if (!SetDistance(Mathf.Abs(inches)))
-                feedback.Show("The plane can't get that close to the point it's measured from: it went as close as it can", FeedbackDisplay.DisplayType.alert);
+            SetDistance(Mathf.Abs(inches));
+            feedback.Show("Cut " + Inch.Format(Mathf.Abs(inches)) + " from " + ReferenceName, FeedbackDisplay.DisplayType.success);
             ToolOptions.Rebuild();
         }
 
@@ -310,24 +349,51 @@ namespace Protobot.Tools {
         private bool dotPressed, dotDragging;
         private Vector2 dotPressMouse;
 
+        // Dragging the plane's centre dot onto a point: the plane moves there.
+        private bool targetPressed, targetDragging;
+        private Vector2 targetPressMouse;
+
+        // V2: like a CAD dimension. The main one runs square to the plane, from the reference point (the part's
+        // end at first) to the plane; the legs show how far apart the reference and the plane's centre are along
+        // the part's own axes, each typeable. Two dots: the reference (drag it onto a hole, corner, edge or face to
+        // measure from there) and the plane's centre (drag it onto a point and the plane moves there).
         private void DrawDimension() {
             var d = Distance;
             var color = Theme.Dimension;
-            // A point-to-point dimension: from the reference to the centre of the plane.
-            if (!Overlay.ToScreen(reference.point, out var a) || !Overlay.ToScreen(center, out var b))
+            var along = Vector3.Dot(center - reference.point, measureAxis);
+            // The dimension runs along the part to the plane's centre (tilted or not); it starts level with the
+            // reference, joined to it by a faint extension line.
+            var start = center - measureAxis * along;
+            if (!Overlay.ToScreen(reference.point, out var a) || !Overlay.ToScreen(start, out var f) || !Overlay.ToScreen(center, out var b))
                 return;
-            Overlay.Line(a, b, color, 1.5f);
-            if (Vector2.Distance(a, b) > 30f) {
-                Overlay.Arrowhead(a, b, color);
-                Overlay.Arrowhead(b, a, color);
+            if (Vector2.Distance(a, f) > 3f) Overlay.Line(a, f, new Color(color.r, color.g, color.b, 0.45f), 1f);
+            Overlay.Line(f, b, color, 1.8f);
+            if (Vector2.Distance(f, b) > 30f) {
+                Overlay.Arrowhead(f, b, color);
+                Overlay.Arrowhead(b, f, color);
             }
+            // The angle from square, beside the plane's centre (click to type one).
+            var tilt = Tilt;
+            if (tilt > 0.05f && angleField == null) {
+                var angleLabel = Overlay.Text(b + new Vector2(0f, -34f), tilt.ToString("0.#", CultureInfo.InvariantCulture) + "°", color, OpenAngleField, false);
+                Ui.Tip(angleLabel, "Cut angle", null, "How far the cut is from square. Click to type an angle.");
+            }
+            else if (angleField != null)
+                ((RectTransform)angleField.transform).anchoredPosition = b + new Vector2(0f, -34f);
+            Dimension.Legs("saw", reference.point, center, part.transform.rotation, SetLeg, 0.75f);
 
             // The reference end: drag the dot onto another point, or click it, then click a point.
             var overDot = Vector2.Distance(Overlay.Mouse, a) < 10f;
+            var overTarget = !overDot && Vector2.Distance(Overlay.Mouse, b) < 10f;
             if (overDot && MouseInput.LeftButton.wasPressedThisFrame && dragging == Handle.None) {
                 dotPressed = true;
                 dotDragging = false;
                 dotPressMouse = Overlay.Mouse;
+            }
+            if (overTarget && MouseInput.LeftButton.wasPressedThisFrame && dragging == Handle.None) {
+                targetPressed = true;
+                targetDragging = false;
+                targetPressMouse = Overlay.Mouse;
             }
             if (dotPressed) {
                 if (MouseInput.LeftButton.isPressed) {
@@ -350,25 +416,72 @@ namespace Protobot.Tools {
                     dotDragging = false;
                 }
             }
+            if (targetPressed) {
+                if (MouseInput.LeftButton.isPressed) {
+                    if (Vector2.Distance(Overlay.Mouse, targetPressMouse) > 5f) targetDragging = true;
+                    if (targetDragging) {
+                        var target = FeaturePicker.Pick();
+                        FeaturePicker.DrawHover(target, Theme.Accent);
+                        if (!target.Valid) Overlay.Disc(Overlay.Mouse, 5f, Theme.Accent);
+                    }
+                }
+                else {
+                    targetPressed = false;
+                    if (!targetDragging)
+                        SetMode(Mode.Target);
+                    else {
+                        var target = FeaturePicker.Pick();
+                        if (target.Valid) MovePlaneTo(target);
+                        else feedback.Show("Drop the dot on a hole, corner, edge or face to put the cut there", FeedbackDisplay.DisplayType.alert);
+                    }
+                    targetDragging = false;
+                }
+            }
             if (!dotDragging) {
                 Overlay.Disc(a, 6f, Color.black, true);
                 Overlay.Disc(a, 5f, mode == Mode.Reference ? Theme.Accent : color, true);
                 if (overDot) Overlay.Ring(a, 9f, Color.white, 1.5f);
             }
             FeaturePicker.Draw(reference.kind == FeaturePicker.Kind.Face ? default : reference, color);
-            Overlay.Disc(b, 4f, color);
+            if (!targetDragging) {
+                Overlay.Disc(b, 5.5f, Color.black, true);
+                Overlay.Disc(b, 4.5f, mode == Mode.Target ? Theme.Accent : Color.white, true);
+                if (overTarget) Overlay.Ring(b, 9f, Color.white, 1.5f);
+            }
 
             if (editField == null) {
-                var label = Overlay.Text((a + b) / 2f, Inch.Format(d), color, OpenEditField, true);
-                Ui.Tip(label, "Cut distance", null, "From " + ReferenceName + " to the middle of the cut. Click to type a distance; drag the dot to measure from another point.");
+                var label = Overlay.Text((f + b) / 2f, Inch.Format(d), color, OpenEditField, true);
+                Ui.Tip(label, "Cut distance", null, "From " + ReferenceName + " to the cut, square to it. Click to type a distance. Drag the colored dot to measure from another point; drag the white dot to put the cut on a point.");
             }
             else
-                ((RectTransform)editField.transform).anchoredPosition = (a + b) / 2f;
+                ((RectTransform)editField.transform).anchoredPosition = (f + b) / 2f;
+        }
+
+        // V2: the plane's centre goes to a point (the second end of the measurement); the plane keeps its angle.
+        private void MovePlaneTo(FeaturePicker.Feature target) {
+            center = target.point;
+            MeasurePlane(false);
+            SetMode(Mode.Move);
+            feedback.Show("Cut through the " + target.Describe().ToLowerInvariant() + ": " + Inch.Format(Distance) + " from " + ReferenceName, FeedbackDisplay.DisplayType.success);
+            ToolOptions.Rebuild();
+        }
+
+        private void UpdateTargetPick() {
+            var feature = MouseInput.withinScreen && !MouseInput.overUI ? FeaturePicker.Pick() : default;
+            FeaturePicker.DrawHover(feature, Theme.Accent);
+            if (!MouseInput.LeftButton.wasPressedThisFrame || MouseInput.overUI)
+                return;
+            if (!feature.Valid) {
+                feedback.Show("Click a hole, corner, edge or face to put the cut there", FeedbackDisplay.DisplayType.alert);
+                return;
+            }
+            MovePlaneTo(feature);
         }
 
         private void SetReference(FeaturePicker.Feature feature) {
             reference = feature;
             referenceIsEnd = false;
+            measureAxis = normal;
             SetMode(Mode.Move);
             feedback.Show("Measuring from the " + feature.Describe().ToLowerInvariant(), FeedbackDisplay.DisplayType.success);
         }
@@ -399,6 +512,27 @@ namespace Protobot.Tools {
         private void CloseEditField() {
             if (editField != null) Destroy(editField.gameObject);
             editField = null;
+            if (angleField != null) Destroy(angleField.gameObject);
+            angleField = null;
+        }
+
+        private TMP_InputField angleField;
+
+        private void OpenAngleField() {
+            if (angleField != null) return;
+            angleField = Ui.Field(Overlay.Instance.transform, "Angle", Tilt.ToString("0.#", CultureInfo.InvariantCulture), text => {
+                if (float.TryParse(text.Replace("°", "").Trim(), NumberStyles.Float, CultureInfo.InvariantCulture, out var degrees)) SetTilt(degrees);
+                else if (!string.IsNullOrWhiteSpace(text)) feedback.Show("Type an angle in degrees, like 45", FeedbackDisplay.DisplayType.alert);
+                if (angleField != null) Destroy(angleField.gameObject);
+                angleField = null;
+            }, Theme.FontBody, TextAlignmentOptions.Center);
+            var rect = (RectTransform)angleField.transform;
+            rect.anchorMin = rect.anchorMax = Vector2.zero;
+            rect.pivot = new Vector2(0.5f, 0.5f);
+            rect.sizeDelta = new Vector2(72f, 28f);
+            angleField.onFocusSelectAll = true;
+            angleField.Select();
+            angleField.ActivateInputField();
         }
 
         private void UpdateReferencePick() {
@@ -522,8 +656,7 @@ namespace Protobot.Tools {
                 ringU = Overlay.WorldCircle(center, u, length, hu ? Theme.Warning : Theme.AxisX, 2.5f, true);
                 ringV = Overlay.WorldCircle(center, v, length, hv ? Theme.Warning : Theme.AxisY, 2.5f, true);
                 if (dragging != Handle.None && Overlay.ToScreen(center, out var c)) {
-                    var tilt = Vector3.Angle(dragStartNormal, normal);
-                    Overlay.Text(c + new Vector2(0f, 40f), tilt.ToString("0.#", CultureInfo.InvariantCulture) + " deg", Theme.Text);
+                    Overlay.Text(c + new Vector2(0f, 40f), Tilt.ToString("0.#", CultureInfo.InvariantCulture) + "° from square", Theme.Text);
                 }
             }
         }
@@ -587,14 +720,28 @@ namespace Protobot.Tools {
                 if (Inch.TryParse(text, out var inches)) TypeDistance(inches);
             }, Theme.FontBody, TextAlignmentOptions.Center);
             field.Size(80f, 30f);
+            ToolOptions.Note(bar, "Angle");
+            var angle = Ui.Field(bar, "Angle", Tilt.ToString("0.#", CultureInfo.InvariantCulture) + "°", text => {
+                if (float.TryParse(text.Replace("°", "").Trim(), NumberStyles.Float, CultureInfo.InvariantCulture, out var degrees)) SetTilt(degrees);
+                else feedback.Show("Type an angle in degrees, like 45", FeedbackDisplay.DisplayType.alert);
+            }, Theme.FontBody, TextAlignmentOptions.Center);
+            angle.Size(60f, 30f);
+            Ui.Tip(angle, "Cut angle", null, "Degrees from square (0 = straight across). R shows rings to tilt it by dragging.");
             var from = Ui.Button(bar, "From", "From: " + (referenceIsEnd ? "part end" : reference.Describe().ToLowerInvariant()), () => SetMode(Mode.Reference), mode == Mode.Reference, 5f, Theme.FontSmall);
             from.Size(-1f, 30f);
             Ui.Tip(from, "Measure from", null, "Click, then click a hole, corner or face on any part to measure the cut from it.");
+            var to = Ui.Button(bar, "To", "Cut at a point", () => SetMode(Mode.Target), mode == Mode.Target, 5f, Theme.FontSmall);
+            to.Size(-1f, 30f);
+            Ui.Tip(to, "Cut at a point", null, "Click, then click a hole, corner, edge or face: the cut moves there (keeping its angle).");
             ToolOptions.Note(bar, "Pieces " + Inch.Format(behind) + " + " + Inch.Format(ahead));
             Ui.Divider(bar, true).Size(1f, 22f);
             if (mode == Mode.Rotate) Ui.Hint(bar, "R", "slide", "Esc", "back");
-            else if (mode == Mode.Reference) Ui.Hint(bar, "Esc", "back");
+            else if (mode == Mode.Reference || mode == Mode.Target) Ui.Hint(bar, "Esc", "back");
             else Ui.Hint(bar, "R", "tilt", "Shift", "free", "Esc", "cancel");
+            ToolOptions.Switch(bar, "All parts", cutAll, on => {
+                cutAll = on;
+                feedback.Show(on ? "The cut goes through every part the plane crosses" : "Only the picked part is cut", FeedbackDisplay.DisplayType.success);
+            });
             var cut = Ui.Button(bar, "Cut", "Cut", ApplyCut, true, 5f);
             cut.Size(64f, 30f);
             Ui.Tip(cut, "Cut", "Enter", "Cut the part in two along the plane.");
@@ -625,15 +772,66 @@ namespace Protobot.Tools {
         private void ApplyCut() {
             if (part == null) return;
             CloseEditField();
-            var cut = Plan();
-            var target = part;
-            if (cut.kind == Kind.Holes && cut.count < 2) {
-                feedback.Show("A single-hole piece can't be cut any shorter", FeedbackDisplay.DisplayType.alert);
+            var main = part;
+            var targets = new List<GameObject> { main };
+            if (cutAll) targets.AddRange(Crossed().Where(p => p != main));
+            var before = new List<IElement>();
+            var after = new List<IElement>();
+            string mainResult = null;
+            var done = 0;
+            foreach (var target in targets) {
+                part = target;
+                if (CutOne(out var result, before, after, targets.Count == 1)) {
+                    done++;
+                    mainResult ??= NameOf(target) + " " + result;
+                }
+            }
+            part = main;
+            if (done == 0) {
+                if (targets.Count > 1) feedback.Show("The plane doesn't go through any part", FeedbackDisplay.DisplayType.alert);
                 return;
             }
 
+            EndCut();
+            // Nothing stays selected on a part that's gone (a selected hole's marker would float there).
+            foreach (var manager in FindObjectsByType<SelectionSystem.SelectionManager>(FindObjectsSortMode.None))
+                manager.ClearCurrent();
+            // Undo: the current state learns the pieces didn't exist yet; the new state swaps the parts for them.
+            StateSystem.AddElements(before);
+            StateSystem.AddState(new State(after));
+
+            FindObjectOfType<PartListOutput>()?.CalculatePartsList();
+            feedback.Show(done == 1 ? "Cut " + mainResult : "Cut " + done + " parts along the plane", FeedbackDisplay.DisplayType.success);
+        }
+
+        // V2: every cuttable part the (endless) plane goes through.
+        private List<GameObject> Crossed() {
+            var list = new List<GameObject>();
+            foreach (var obj in PartsManager.FindLoadedObjects()) {
+                if (obj == null || obj.IsDeleted() || !PartCutting.IsCuttable(obj)) continue;
+                float min = float.MaxValue, max = float.MinValue;
+                foreach (var c in FeaturePicker.Corners(obj)) {
+                    var d = Vector3.Dot(c - center, normal);
+                    min = Mathf.Min(min, d);
+                    max = Mathf.Max(max, d);
+                }
+                if (min < -0.01f && max > 0.01f) list.Add(obj);
+            }
+            return list;
+        }
+
+        // Cuts the part in two; the undo elements go into before/after. False (with a message when it's the only
+        // part being cut) if it can't be cut here.
+        private bool CutOne(out string result, List<IElement> before, List<IElement> after, bool alone) {
+            result = null;
+            var cut = Plan();
+            var target = part;
+            if (cut.kind == Kind.Holes && cut.count < 2) {
+                if (alone) feedback.Show("A single-hole piece can't be cut any shorter", FeedbackDisplay.DisplayType.alert);
+                return false;
+            }
+
             GameObject first, second;
-            string result;
             switch (cut.kind) {
                 case Kind.Holes: {
                     var firstCount = cut.first;
@@ -659,8 +857,8 @@ namespace Protobot.Tools {
             if (first == null || second == null) {
                 if (first != null) Destroy(first);
                 if (second != null) Destroy(second);
-                feedback.Show("The plane doesn't go through the part", FeedbackDisplay.DisplayType.alert);
-                return;
+                if (alone) feedback.Show("The plane doesn't go through the part", FeedbackDisplay.DisplayType.alert);
+                return false;
             }
 
             if (cut.kind != Kind.Mesh) {
@@ -675,21 +873,14 @@ namespace Protobot.Tools {
             foreach (var piece in new[] { first, second })
                 SetOutline(piece, false);
 
-            EndCut();
-            // Nothing stays selected on the part that's gone (a selected hole's marker would float there).
-            foreach (var manager in FindObjectsByType<SelectionSystem.SelectionManager>(FindObjectsSortMode.None))
-                manager.ClearCurrent();
-            // Undo: the current state learns the pieces didn't exist yet; the new state swaps the part for them.
-            StateSystem.AddElement(Element(target, true));
-            StateSystem.AddElement(Element(first, false));
-            StateSystem.AddElement(Element(second, false));
+            before.Add(Element(target, true));
+            before.Add(Element(first, false));
+            before.Add(Element(second, false));
             new ObjectElement(target).ApplyExistence(false);
-            StateSystem.AddState(new State(new List<IElement> {
-                Element(target, false), Element(first, true), Element(second, true)
-            }));
-
-            FindObjectOfType<PartListOutput>()?.CalculatePartsList();
-            feedback.Show("Cut " + NameOf(target) + " " + result, FeedbackDisplay.DisplayType.success);
+            after.Add(Element(target, false));
+            after.Add(Element(first, true));
+            after.Add(Element(second, true));
+            return true;
         }
 
         // Which kind of cut: generated parts cut squarely where their generator can make the pieces.

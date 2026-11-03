@@ -21,6 +21,14 @@ namespace Protobot {
         bool disableOrbitInput = false;
         bool disablePanInput = false;
 
+        // V2: the same buttons turn and pan the previews in dialogs (the import window), and the scene behind a
+        // dialog stays still.
+        private static MousePivotCameraInput instance;
+        public static bool OrbitPressed => instance != null && instance.orbitInput != null && instance.orbitInput.IsPressed;
+        public static bool PanPressed => instance != null && instance.panInput != null && instance.panInput.IsPressed;
+
+        private void Awake() => instance = this;
+
         private void Start() {
             orbitInput.performed += () => {
                 if (panInput.IsPressed) {
@@ -46,6 +54,8 @@ namespace Protobot {
         }
 
         private void Update() {
+            if (TextInput.ShortcutsPaused)
+                return;  // V2: a dialog or the sheet editor is open
             if (orbitInput.IsPressed && !disableOrbitInput) {
                 Orbit();
             }
@@ -79,7 +89,12 @@ namespace Protobot {
             updateZoom?.Invoke(mouseYInput);
         }
 
+        // V2: something else uses the wheel this frame (Ctrl+wheel changes a part's hole count while placing).
+        public static System.Func<bool> ScrollClaimed;
+
         public void ZoomScroll() {
+            if (ScrollClaimed != null && ScrollClaimed())
+                return;
             if (!MouseInput.overUI && MouseInput.withinScreen) {
                 float scrollInput = MouseInput.scrollAxis;
                 if (scrollInput != 0)

@@ -79,7 +79,9 @@ namespace Protobot.Interface {
                 var index = i;
                 var button = Ui.Button(holder.transform, labels[i], labels[i], () => onSelect(index), i == selected, 4f, Theme.FontSmall);
                 var label = button.GetComponentInChildren<TextMeshProUGUI>();
-                button.Size(width > 0f ? width : -1f, 26f);
+                // Equal shares when the holder is stretched (a side panel), so the selected one doesn't spill over.
+                button.Size(width > 0f ? width : -1f, 26f, 1f);
+                button.GetComponent<LayoutElement>().minWidth = 40f;
                 if (i != selected)
                     button.targetGraphic.color = new Color(1f, 1f, 1f, 0f);
                 if (i != selected)

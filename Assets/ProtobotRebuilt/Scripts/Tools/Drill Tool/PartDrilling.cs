@@ -35,21 +35,25 @@ namespace Protobot.Tools {
             var normal = (hole.localRotation * Vector3.forward).normalized;
             var depth = Mathf.Abs(hole.localScale.z);
             var filter = part.GetComponent<MeshFilter>();
-            // V2: the wall can be thicker than its hole collider (then the back face kept its square hole);
-            // cut through the metal the mesh actually has around the hole.
-            var (front, back) = WallExtent(filter.sharedMesh, hole.localPosition, normal, depth,
-                Mathf.Max(diameter, Mathf.Max(hole.localScale.x, hole.localScale.y)) * 0.75f + 0.02f);
+            var radius = diameter / 2f;
+            // V2: only the wall the hole is in, as far as the mesh goes (to the next face: one flange of a
+            // channel, the whole case of a brain), and the new round wall only where there's material around it
+            // (where the circle runs into an earlier cut or hole there's nothing to line).
+            var near = new Wall(filter.sharedMesh, hole.localPosition, Mathf.Max(radius, Mathf.Max(hole.localScale.x, hole.localScale.y) * 0.75f) + depth * 4f + 0.25f);
+            var (front, back) = near.Extent(hole.localPosition, normal, Mathf.Max(radius, Mathf.Max(hole.localScale.x, hole.localScale.y) * 0.5f) + 0.015f, depth);
             const float margin = 0.002f;
             var info = new HoleInfo {
                 found = true,
                 center = hole.localPosition + normal * (front + margin),
                 normal = normal,
                 thickness = front - back + 2f * margin,
-                holeRadius = diameter / 2f,
+                holeRadius = radius,
                 round = true,
             };
+            // Each side of the new hole is lined only as far as the material right there goes along it.
+            var spans = near.Spans(hole.localPosition, normal, radius + 0.004f, HoleDrilling.DrillSegments, front, back, front + margin, depth);
 
-            var drilled = HoleDrilling.Drill(filter.sharedMesh, info, diameter / 2f);
+            var drilled = HoleDrilling.Drill(filter.sharedMesh, info, radius, null, HoleDrilling.DrillSegments, spans);
             if (drilled == null)
                 return false;
 
@@ -68,20 +72,118 @@ namespace Protobot.Tools {
             return true;
         }
 
-        // How far the wall goes in front of and behind the hole's centre (along its axis), from the mesh's
-        // vertices around the hole; at least the hole collider's own depth, at most a little more than it.
-        private static (float front, float back) WallExtent(Mesh mesh, Vector3 center, Vector3 axis, float depth, float radius) {
-            float front = depth / 2f, back = -depth / 2f;
-            var reach = Mathf.Max(depth * 1.5f, 0.1f);
-            foreach (var vertex in mesh.vertices) {
-                var offset = vertex - center;
-                var along = Vector3.Dot(offset, axis);
-                if (Mathf.Abs(along) > reach || (offset - axis * along).sqrMagnitude > radius * radius)
-                    continue;
-                front = Mathf.Max(front, along);
-                back = Mathf.Min(back, along);
+        // V2: the mesh's triangles around a hole, for finding the wall it's in.
+        private class Wall {
+            private readonly List<(Vector3 a, Vector3 b, Vector3 c)> triangles = new();
+
+            public Wall(Mesh mesh, Vector3 center, float reach) {
+                var v = mesh.vertices;
+                var t = mesh.triangles;
+                var r2 = reach * reach;
+                for (var i = 0; i + 2 < t.Length; i += 3) {
+                    Vector3 a = v[t[i]], b = v[t[i + 1]], c = v[t[i + 2]];
+                    var box = new Bounds(a, Vector3.zero);
+                    box.Encapsulate(b);
+                    box.Encapsulate(c);
+                    if (box.SqrDistance(center) <= r2) triangles.Add((a, b, c));
+                }
             }
-            return (front, back);
+
+            // Where a line along the axis through a point crosses the mesh (distances along the axis, sorted).
+            private List<float> Crossings(Vector3 point, Vector3 axis) {
+                var result = new List<float>();
+                foreach (var (a, b, c) in triangles)
+                    if (Line(point, axis, a, b, c, out var d)) result.Add(d);
+                result.Sort();
+                // Shared edges give the same crossing twice.
+                for (var i = result.Count - 1; i > 0; i--)
+                    if (result[i] - result[i - 1] < 1e-5f) result.RemoveAt(i);
+                return result;
+            }
+
+            /// <summary>How far the wall the hole is in goes in front of and behind its centre: the stretch of
+            /// material around the hole (just outside it, all the way round) that the hole's middle is in or
+            /// nearest.</summary>
+            public (float front, float back) Extent(Vector3 center, Vector3 axis, float ringRadius, float depth) {
+                Basis(axis, out var u, out var w);
+                float front = float.MinValue, back = float.MaxValue;
+                for (var k = 0; k < 16; k++) {
+                    var angle = k * Mathf.PI * 2f / 16f;
+                    var crossings = Crossings(center + (u * Mathf.Cos(angle) + w * Mathf.Sin(angle)) * ringRadius, axis);
+                    // Material between each pair of crossings; the pair around the middle (or nearest to it).
+                    float bestGap = float.MaxValue, bestA = 0f, bestB = 0f;
+                    for (var i = 0; i + 1 < crossings.Count; i += 2) {
+                        float a = crossings[i], b = crossings[i + 1];
+                        var gap = a > 0f ? a : b < 0f ? -b : 0f;
+                        if (gap < bestGap) {
+                            bestGap = gap;
+                            bestA = a;
+                            bestB = b;
+                        }
+                    }
+                    if (bestGap > depth) continue;  // nothing here near the hole (an edge, a cut)
+                    front = Mathf.Max(front, bestB);
+                    back = Mathf.Min(back, bestA);
+                }
+                if (front < back) return (depth / 2f, -depth / 2f);
+                return (Mathf.Max(front, depth / 2f), Mathf.Min(back, -depth / 2f));
+            }
+
+            /// <summary>
+            /// For each side of the new hole, the stretch of material just outside it along the hole (the one the
+            /// hole's own wall is in, or nearest), kept within front..back, as (top, bottom) from the drill's top
+            /// face at <paramref name="topAt"/>; (0, 0) where there's none. Null when the mesh can't tell (not
+            /// closed): then the whole hole is lined.
+            /// </summary>
+            public Vector2[] Spans(Vector3 center, Vector3 axis, float radius, int segments, float front, float back, float topAt, float depth) {
+                Basis(axis, out var u, out var w);
+                var result = new Vector2[segments];
+                var any = false;
+                for (var k = 0; k < segments; k++) {
+                    var angle = (k + 0.5f) * Mathf.PI * 2f / segments;
+                    var crossings = Crossings(center + (u * Mathf.Cos(angle) + w * Mathf.Sin(angle)) * radius, axis);
+                    float bestGap = float.MaxValue, bestA = 0f, bestB = 0f;
+                    for (var i = 0; i + 1 < crossings.Count; i += 2) {
+                        float a = crossings[i], b = crossings[i + 1];
+                        var gap = a > 0f ? a : b < 0f ? -b : 0f;
+                        if (gap < bestGap) {
+                            bestGap = gap;
+                            bestA = a;
+                            bestB = b;
+                        }
+                    }
+                    if (bestGap > depth) continue;  // open air on this side (an edge, a cut, another hole)
+                    var top = Mathf.Min(bestB, front) - topAt;
+                    var bottom = Mathf.Max(bestA, back) - topAt;
+                    if (top - bottom < 0.0005f) continue;
+                    result[k] = new Vector2(top, bottom);
+                    any = true;
+                }
+                return any ? result : null;
+            }
+
+            private static void Basis(Vector3 n, out Vector3 u, out Vector3 w) {
+                u = Vector3.Cross(n, Mathf.Abs(n.y) < 0.9f ? Vector3.up : Vector3.right).normalized;
+                w = Vector3.Cross(n, u);
+            }
+
+            private static bool Line(Vector3 origin, Vector3 direction, Vector3 a, Vector3 b, Vector3 c, out float distance) {
+                distance = 0f;
+                var e1 = b - a;
+                var e2 = c - a;
+                var p = Vector3.Cross(direction, e2);
+                var det = Vector3.Dot(e1, p);
+                if (Mathf.Abs(det) < 1e-12f) return false;
+                var inv = 1f / det;
+                var s = origin - a;
+                var u = Vector3.Dot(s, p) * inv;
+                if (u < 0f || u > 1f) return false;
+                var q = Vector3.Cross(s, e1);
+                var v = Vector3.Dot(direction, q) * inv;
+                if (v < 0f || u + v > 1f) return false;
+                distance = Vector3.Dot(e2, q) * inv;
+                return true;
+            }
         }
 
         public static void Record(SavedObject saved, int index, float diameter) {

@@ -10,6 +10,8 @@ namespace Protobot.Builds {
         public double xRot, yRot, zRot;
         public double rColor, gColor, bColor;
         public string states;
+        // V2: every color of a part made of several (motors, wheels...), "RRGGBB,RRGGBB,..." (empty: one color).
+        [System.Runtime.Serialization.OptionalField] public string colors;
         [FormerlySerializedAs("meshId")] public string partId;
         public Vector3 GetPos() => new Vector3((float)xPos, (float)yPos, (float)zPos);
         public Quaternion GetRot() => Quaternion.Euler((float)xRot, (float)yRot, (float)zRot);

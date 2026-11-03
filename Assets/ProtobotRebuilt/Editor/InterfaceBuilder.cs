@@ -38,7 +38,7 @@ public static class InterfaceBuilder {
         serialized.FindProperty("searchIcon").objectReferenceValue = Sprite(Icons + "Menu UI/zoom-in.png");
         serialized.FindProperty("closeIcon").objectReferenceValue = Sprite(Icons + "Tools Icons/minimize.png");
         serialized.FindProperty("sawIcon").objectReferenceValue = Sprite(Icons + "V2 Icons/ScissorsIcon.png");
-        serialized.FindProperty("joinIcon").objectReferenceValue = Sprite(Icons + "V2 Icons/JoinIcon.png");
+        serialized.FindProperty("selectIcon").objectReferenceValue = Sprite(Icons + "V2 Icons/SelectIcon.png");
         serialized.FindProperty("polycarbIcon").objectReferenceValue = Sprite(Icons + "V2 Icons/PolycarbIcon.png");
         serialized.FindProperty("importIcon").objectReferenceValue = Sprite(Icons + "V2 Icons/ImportIcon.png");
         serialized.FindProperty("sheetsIcon").objectReferenceValue = Sprite(Icons + "V2 Icons/SheetsIcon.png");

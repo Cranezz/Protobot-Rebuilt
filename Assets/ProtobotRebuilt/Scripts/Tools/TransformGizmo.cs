@@ -3,9 +3,9 @@ using Protobot.StateSystems;
 using UnityEngine;
 
 namespace Protobot.Tools {
-    // V2: where the Transform tool's gizmo sits and which way its axes point. A part screwed to others (a group)
-    // gets the gizmo at the middle of the whole group instead of at the clicked part's middle hole; the arrows
-    // and rings move and turn the group about that point. Kept in the part's own space, so it doesn't drift
+    // V2: where the Transform tool's gizmo sits and which way its axes point: at the middle of the part (a long
+    // channel's middle, not its first hole), or of the whole group when it's screwed to others; a selected hole
+    // keeps it on the hole. The arrows and rings move and turn the group about that point. Kept in the part's own space, so it doesn't drift
     // as the group turns.
     public static class TransformGizmo {
         private static GameObject measured;
@@ -40,8 +40,8 @@ namespace Protobot.Tools {
             if (!obj.TryGetComponent(out SavedObject _))
                 return Vector3.zero;  // a pivot of several selected parts already sits at their middle
             List<GameObject> group = obj.GetConnectedObjects(true);
-            if (group == null || group.Count <= 1)
-                return Vector3.zero;  // one part: its middle hole, as the original
+            if (group == null || group.Count == 0)
+                group = new List<GameObject> { obj };
 
             var root = obj.transform;
             var bounds = new Bounds();
@@ -66,9 +66,23 @@ namespace Protobot.Tools {
             return any ? Vector3.Scale(bounds.center, root.lossyScale) : Vector3.zero;
         }
 
-        /// <summary>Rounds a move to 1/8" steps along the gizmo's own axes (local) or the world's (global).</summary>
+        private const string MoveStepKey = "TransformMoveStep", TurnStepKey = "TransformTurnStep";
+
+        /// <summary>Snap step for moves, in inches (1/8" unless changed in the tool options).</summary>
+        public static float MoveStep {
+            get => Mathf.Max(1f / 64f, PlayerPrefs.GetFloat(MoveStepKey, 0.125f));
+            set => PlayerPrefs.SetFloat(MoveStepKey, Mathf.Clamp(value, 1f / 64f, 48f));
+        }
+
+        /// <summary>Snap step for turns, in degrees (5° unless changed).</summary>
+        public static float TurnStep {
+            get => Mathf.Clamp(PlayerPrefs.GetFloat(TurnStepKey, 5f), 0.5f, 180f);
+            set => PlayerPrefs.SetFloat(TurnStepKey, Mathf.Clamp(value, 0.5f, 180f));
+        }
+
+        /// <summary>Rounds a move to <see cref="MoveStep"/> along the gizmo's own axes (local) or the world's (global).</summary>
         public static Vector3 SnapDelta(Vector3 delta, Vector3? alongAxis = null) {
-            const float step = 0.125f;
+            var step = MoveStep;
             if (alongAxis.HasValue) {
                 var axis = alongAxis.Value.normalized;
                 return axis * Mathf.Round(Vector3.Dot(delta, axis) / step) * step;

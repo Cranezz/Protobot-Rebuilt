@@ -43,8 +43,8 @@ namespace Protobot.Custom {
 
         public static Result Read(string path) {
             var result = new Result();
+            var extension = Path.GetExtension(path).TrimStart('.').ToLowerInvariant();
             try {
-                var extension = Path.GetExtension(path).TrimStart('.').ToLowerInvariant();
                 switch (extension) {
                     case "stl": ReadStl(File.ReadAllBytes(path), result); result.zUp = true; break;
                     case "obj": ReadObj(File.ReadAllLines(path), result); break;
@@ -78,21 +78,35 @@ namespace Protobot.Custom {
                 return result;
             }
             if (!result.unitKnown)
-                result.unit = GuessUnit(result.vertices);
+                result.unit = GuessUnit(result.vertices, extension);
             return result;
         }
 
-        // Unitless files: the first unit that makes it a robot part's size (about 1/4" to 40"), trying what CAD
-        // programs export most: millimetres (STL), centimetres (Fusion's OBJ), inches, metres (Blender).
-        private static Unit GuessUnit(List<Vector3> vertices) {
+        // Unitless files: the unit that makes it the most robot-part-like size (about 1/4" to 40", a few inches
+        // most likely), leaning on what each format usually holds: STL, PLY and OFF millimetres, OBJ centimetres
+        // (Fusion's) and glTF metres (its spec's).
+        private static Unit GuessUnit(List<Vector3> vertices, string extension) {
             var bounds = new Bounds(vertices[0], Vector3.zero);
             foreach (var v in vertices) bounds.Encapsulate(v);
             var size = Mathf.Max(bounds.size.x, bounds.size.y, bounds.size.z);
+            var usual = extension switch {
+                "obj" => Unit.Centimeters,
+                "gltf" or "glb" => Unit.Meters,
+                _ => Unit.Millimeters,
+            };
+            var best = usual;
+            var bestScore = float.MaxValue;
             foreach (var unit in new[] { Unit.Millimeters, Unit.Centimeters, Unit.Inches, Unit.Meters }) {
                 var inches = size * InchesPer(unit);
-                if (inches >= 0.3f && inches <= 40f) return unit;
+                if (inches < 0.3f || inches > 40f) continue;
+                var score = Mathf.Abs(Mathf.Log(inches / 4f));
+                if (unit == usual) score -= extension == "obj" ? 1f : 2f;
+                if (score < bestScore) {
+                    bestScore = score;
+                    best = unit;
+                }
             }
-            return Unit.Millimeters;
+            return best;
         }
 
         private static float F(string s) => float.Parse(s, NumberStyles.Float, CultureInfo.InvariantCulture);

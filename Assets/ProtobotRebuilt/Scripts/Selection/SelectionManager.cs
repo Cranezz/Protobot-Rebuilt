@@ -85,7 +85,12 @@ namespace Protobot.SelectionSystem {
             return null;
         }
 
+        // V2: no selecting or hover highlights at all while this says so (the Paint tool: a click paints).
+        public static Func<bool> Blocked;
+
         public void SetCurrent(ISelection newSelection) {
+            if (Blocked != null && Blocked())
+                return;
             if (!PassedAllConditions(newSelection)) {
                 if (clearOnFailConditions)
                     ClearCurrent();

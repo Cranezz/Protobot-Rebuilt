@@ -16,7 +16,10 @@ namespace Protobot.Tools {
         private static MeasureTool active;
 
         [RuntimeInitializeOnLoadMethod]
-        private static void RegisterOptions() => ToolRail.RegisterOptions("Measure", BuildOptions);
+        private static void RegisterOptions() {
+            ToolRail.RegisterOptions("Measure", BuildOptions);
+            ToolRail.RegisterBusy("Measure", () => active != null && active.first.Valid);
+        }
 
         private static void BuildOptions(RectTransform bar) {
             if (active == null || !active.first.Valid) {
@@ -31,10 +34,14 @@ namespace Protobot.Tools {
             var d = active.second.point - active.first.point;
             var total = ToolOptions.Note(bar, "Distance  " + Inch.Format(d.magnitude));
             total.color = Theme.Text;
+            // V2: apart along the part's own axes when both ends are on one part, else the world's.
+            var frame = Dimension.FrameFor(active.first.part, active.second.part);
+            var c = Dimension.Components(active.first.point, active.second.point, frame);
             for (var i = 0; i < 3; i++) {
-                var axis = ToolOptions.Note(bar, (i == 0 ? "X " : i == 1 ? "Y " : "Z ") + Inch.Format(Mathf.Abs(d[i])));
+                var axis = ToolOptions.Note(bar, Dimension.AxisName(i) + " " + Inch.Format(Mathf.Abs(c[i])));
                 axis.color = Theme.Axis(i);
             }
+            ToolOptions.Note(bar, frame == Quaternion.identity ? "(world axes)" : "(the part's axes)");
             Ui.Hint(bar, "Drag", "an end to move it", "Esc", "clear");
         }
 
@@ -127,13 +134,9 @@ namespace Protobot.Tools {
 
             var a = first.point;
             var b = end.point;
-            // The X, Y and Z legs, faint, then the straight line with its length.
-            var x = new Vector3(b.x, a.y, a.z);
-            var y = new Vector3(b.x, b.y, a.z);
-            var faint = 0.55f;
-            Overlay.Line(a, x, WithAlpha(Theme.AxisX, faint), 1.2f);
-            Overlay.Line(x, y, WithAlpha(Theme.AxisY, faint), 1.2f);
-            Overlay.Line(y, b, WithAlpha(Theme.AxisZ, faint), 1.2f);
+            // The X, Y and Z legs with their lengths (the part's axes when both ends are on one part, so a turned
+            // part measured straight along itself shows no legs), then the straight line with its length.
+            Dimension.Legs("measure", a, b, Dimension.FrameFor(first.part, end.part));
             if (Overlay.ToScreen(a, out var sa) && Overlay.ToScreen(b, out var sb)) {
                 Overlay.Line(sa, sb, Theme.Dimension, 2f);
                 if (Vector2.Distance(sa, sb) > 30f) {
