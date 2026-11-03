@@ -42,6 +42,11 @@ public static class ClassicToolsBuilder {
         var serializedMeasure = new SerializedObject(measure);
         serializedMeasure.FindProperty("feedback").objectReferenceValue = feedback;
         serializedMeasure.ApplyModifiedPropertiesWithoutUndo();
+        // V2: the join tool (key 7): face, edge, corner or hole to another part's.
+        var join = AddTool<JoinTool>("Join", "Join (face, edge, corner, hole)", "Assets/ProtobotRebuilt/Sprites/V2 Icons/JoinIcon.png", "7", -269.5f, sidebar, toggles, keybindings);
+        var serializedJoin = new SerializedObject(join);
+        serializedJoin.FindProperty("feedback").objectReferenceValue = feedback;
+        serializedJoin.ApplyModifiedPropertiesWithoutUndo();
         BuildPreferences(roots.First(r => r.name == "Preferences Canvas").transform, keybindings);
 
         EditorSceneManager.MarkSceneDirty(scene);
@@ -83,7 +88,7 @@ public static class ClassicToolsBuilder {
         ((RectTransform)button.transform).anchoredPosition = new Vector2(((RectTransform)moveButton).anchoredPosition.x, y);
         var iconImage = button.transform.Find("Move Icon").GetComponent<Image>();
         iconImage.name = name + " Icon";
-        iconImage.sprite = LoadSprite(IconFolder + icon);
+        iconImage.sprite = LoadSprite(icon.Contains("/") ? icon : IconFolder + icon);
         button.GetComponent<Tooltip>().text = tooltip;
         var buttonToggle = button.GetComponent<Toggle>();
         buttonToggle.SetIsOnWithoutNotify(false);
@@ -130,7 +135,7 @@ public static class ClassicToolsBuilder {
                 Object.DestroyImmediate(child.gameObject);
         var template = page.transform.Find("Shortcut Container (7)").gameObject;
         var y = -40f;
-        foreach (var tool in new[] { "Saw", "Drill", "Measure" }) {
+        foreach (var tool in new[] { "Saw", "Drill", "Measure", "Join" }) {
             var row = Object.Instantiate(template, page.transform);
             row.name = tool + " Shortcut";
             ((RectTransform)row.transform).anchoredPosition = new Vector2(((RectTransform)template.transform).anchoredPosition.x, y);
@@ -153,9 +158,10 @@ public static class ClassicToolsBuilder {
         helpRect.sizeDelta = new Vector2(helpRect.sizeDelta.x, 190f);
         help.GetComponent<Text>().text =
             "Saw: click a part to place a cut plane. Drag the arrow (1/16\" steps, Shift: free) or click the dimension to type " +
-            "a distance; click its dot to measure from a hole, corner or face. R: tilt the plane. Enter cuts, Esc goes back.\n\n" +
+            "a distance; drag its dot to measure from a hole, corner, edge or face. R: tilt the plane. Enter cuts, Esc goes back.\n\n" +
             "Drill: pick a bit (1/16\" to 1\") in the tool options, then click a hole.\n\n" +
-            "Measure: click two holes, corners or faces to see the distance between them.";
+            "Measure: click two holes, corners, edges or faces to see the distance between them; drag an end to move it.\n\n" +
+            "Join: click a face, edge, corner or hole on one part, then on another part: the first moves to meet it.";
         page.SetActive(false);
 
         var graphicsTab = tabs.Find("Graphics Toggle") ?? tabs.Find("Game Elements Toggle");

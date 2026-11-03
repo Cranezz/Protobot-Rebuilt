@@ -37,11 +37,38 @@ public static class InterfaceBuilder {
         serialized.FindProperty("chevronIcon").objectReferenceValue = Sprite(Icons + "Tools Icons/chevron-arrow-up.png");
         serialized.FindProperty("searchIcon").objectReferenceValue = Sprite(Icons + "Menu UI/zoom-in.png");
         serialized.FindProperty("closeIcon").objectReferenceValue = Sprite(Icons + "Tools Icons/minimize.png");
+        serialized.FindProperty("sawIcon").objectReferenceValue = Sprite(Icons + "V2 Icons/ScissorsIcon.png");
+        serialized.FindProperty("joinIcon").objectReferenceValue = Sprite(Icons + "V2 Icons/JoinIcon.png");
+        serialized.FindProperty("polycarbIcon").objectReferenceValue = Sprite(Icons + "V2 Icons/PolycarbIcon.png");
+        serialized.FindProperty("importIcon").objectReferenceValue = Sprite(Icons + "V2 Icons/ImportIcon.png");
+        serialized.FindProperty("sheetsIcon").objectReferenceValue = Sprite(Icons + "V2 Icons/SheetsIcon.png");
+        // Custom parts: imported metal (paintable, the original's "Metal Color"), plastic, and polycarbonate.
+        serialized.FindProperty("metalMaterial").objectReferenceValue = AssetDatabase.LoadAssetAtPath<Material>(Materials + "Metal Color.mat");
+        serialized.FindProperty("plasticMaterial").objectReferenceValue = AssetDatabase.LoadAssetAtPath<Material>(Materials + "Dark Gray Plastic.mat");
+        serialized.FindProperty("polycarbMaterial").objectReferenceValue = PolycarbonateMaterial();
         serialized.ApplyModifiedPropertiesWithoutUndo();
 
         EditorSceneManager.MarkSceneDirty(scene);
         EditorSceneManager.SaveScene(scene);
         Debug.Log("[V2] Built the new interface.");
+    }
+
+    private const string Materials = "Assets/ProtobotRebuilt/Materials/";
+
+    // Clear, slightly blue-grey and glossy, like a polycarbonate sheet (a copy of the original's "Clear").
+    private static Material PolycarbonateMaterial() {
+        const string path = Materials + "V2 Polycarbonate.mat";
+        var material = AssetDatabase.LoadAssetAtPath<Material>(path);
+        if (material != null)
+            return material;
+        material = new Material(AssetDatabase.LoadAssetAtPath<Material>(Materials + "Clear.mat")) { name = "V2 Polycarbonate" };
+        var color = new Color(0.62f, 0.72f, 0.82f, 0.28f);
+        material.SetColor("_BaseColor", color);
+        material.color = color;
+        material.SetFloat("_Smoothness", 0.55f);
+        material.SetFloat("_Metallic", 0f);
+        AssetDatabase.CreateAsset(material, path);
+        return material;
     }
 
     private static Sprite Sprite(string path) {

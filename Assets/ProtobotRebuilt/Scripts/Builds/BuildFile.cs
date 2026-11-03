@@ -1,0 +1,122 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.IO.Compression;
+using System.Linq;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.Text;
+using Protobot.Custom;
+using UnityEngine;
+
+namespace Protobot.Builds {
+    // V2: the .pbb file. It's now a zip: "build.json" (the BuildData, readable) and "parts/<key>.json" for every
+    // custom part the build uses (imported models, polycarbonate pieces), so a build sent to someone else opens
+    // with its parts, which also go into their parts library. Files from the original (a BinaryFormatter
+    // stream) still open; they're written in the new form the next time they're saved.
+    public static class BuildFile {
+        public const int FormatVersion = 2;
+
+        [Serializable]
+        private class Manifest {
+            public int format = FormatVersion;
+            public string app = AppData.Version;
+            public string[] customParts = Array.Empty<string>();
+        }
+
+        // Files in the original's format whose owner chose to keep them that way (so older versions still open
+        // them): they're saved in the old format until they're upgraded.
+        private static readonly HashSet<string> keepOld = new(StringComparer.OrdinalIgnoreCase);
+
+        public static bool IsOld(string path) => File.Exists(path) && !IsZip(path);
+        public static void KeepOldFormat(string path) => keepOld.Add(Path.GetFullPath(path));
+
+        /// <summary>Saves an old file in the new format now, keeping a copy of the old one next to it.</summary>
+        public static string Upgrade(string path, BuildData build) {
+            var backup = Path.Combine(Path.GetDirectoryName(path) ?? "", Path.GetFileNameWithoutExtension(path) + " (old format).pbb");
+            File.Copy(path, backup, true);
+            keepOld.Remove(Path.GetFullPath(path));
+            Write(path, build);
+            return backup;
+        }
+
+        public static bool KeepsOldFormat(string path) => !string.IsNullOrEmpty(path) && keepOld.Contains(Path.GetFullPath(path));
+        public static void UseNewFormat(string path) => keepOld.Remove(Path.GetFullPath(path));
+
+        /// <summary>How many parts in the build are custom (imported or polycarbonate): old files can't hold them.</summary>
+        public static int CustomPartCount(BuildData build) => build.parts.Count(p => CustomParts.Find(p.partId) != null || IsCustomId(p.partId));
+
+        private static bool IsCustomId(string id) => id != null && (id.StartsWith(CustomParts.Imported + "-") || id.StartsWith(CustomParts.Polycarbonate + "-"));
+
+        /// <summary>The original's format (older versions open it), without the custom parts it can't hold.</summary>
+        public static void WriteOld(string path, BuildData build) {
+            var old = new BuildData {
+                name = build.name, fileName = build.fileName, camera = build.camera, lastWriteTime = build.lastWriteTime,
+                version = build.version, parts = build.parts.Where(p => !IsCustomId(p.partId)).ToArray(),
+            };
+            using var file = File.Create(path);
+            new BinaryFormatter().Serialize(file, old);
+        }
+
+        public static void Write(string path, BuildData build) {
+            if (KeepsOldFormat(path)) {
+                WriteOld(path, build);
+                return;
+            }
+            var used = new HashSet<string>(build.parts.Select(p => p.partId).Where(id => CustomParts.Find(id) != null));
+            var temp = path + ".saving";
+            using (var stream = File.Create(temp))
+            using (var zip = new ZipArchive(stream, ZipArchiveMode.Create)) {
+                AddText(zip, "build.json", JsonUtility.ToJson(build, true));
+                var keys = new List<string>();
+                foreach (var id in used) {
+                    var part = CustomParts.Find(id);
+                    AddText(zip, "parts/" + part.key + ".json", JsonUtility.ToJson(part));
+                    keys.Add(part.key);
+                }
+                AddText(zip, "manifest.json", JsonUtility.ToJson(new Manifest { customParts = keys.ToArray() }, true));
+            }
+            // Replace the old file only once the new one is complete.
+            if (File.Exists(path)) File.Delete(path);
+            File.Move(temp, path);
+        }
+
+        public static BuildData Read(string path) {
+            if (!File.Exists(path)) return null;
+            if (IsZip(path)) {
+                using var stream = File.OpenRead(path);
+                using var zip = new ZipArchive(stream, ZipArchiveMode.Read);
+                foreach (var entry in zip.Entries.Where(e => e.FullName.StartsWith("parts/") && e.FullName.EndsWith(".json"))) {
+                    try {
+                        var part = JsonUtility.FromJson<CustomPartData>(ReadText(entry));
+                        if (part != null && !string.IsNullOrEmpty(part.key))
+                            CustomParts.Add(part);
+                    }
+                    catch (Exception e) {
+                        Debug.LogWarning("[Build file] Couldn't read " + entry.FullName + ": " + e.Message);
+                    }
+                }
+                var buildEntry = zip.GetEntry("build.json");
+                return buildEntry != null ? JsonUtility.FromJson<BuildData>(ReadText(buildEntry)) : null;
+            }
+            // The original's format.
+            using var file = File.Open(path, FileMode.Open);
+            return (BuildData)new BinaryFormatter().Deserialize(file);
+        }
+
+        private static bool IsZip(string path) {
+            using var file = File.OpenRead(path);
+            return file.Length > 4 && file.ReadByte() == 'P' && file.ReadByte() == 'K';
+        }
+
+        private static void AddText(ZipArchive zip, string name, string text) {
+            var entry = zip.CreateEntry(name, System.IO.Compression.CompressionLevel.Optimal);
+            using var writer = new StreamWriter(entry.Open(), new UTF8Encoding(false));
+            writer.Write(text);
+        }
+
+        private static string ReadText(ZipArchiveEntry entry) {
+            using var reader = new StreamReader(entry.Open(), Encoding.UTF8);
+            return reader.ReadToEnd();
+        }
+    }
+}

@@ -16,6 +16,8 @@ namespace Protobot {
                 .OrderBy(p => !p.id.StartsWith("VX")).ToArray();
             foreach (var p in partTypes)
                 p.GetComponent<PartGenerator>().InitParamValues();
+            // V2: imported models and polycarbonate pieces (Custom Parts), with ids like the others.
+            partTypes = partTypes.Concat(Custom.CustomPartGenerator.CreateTypes()).ToArray();
         }
 
         public static PartType GetPartType(string id) {

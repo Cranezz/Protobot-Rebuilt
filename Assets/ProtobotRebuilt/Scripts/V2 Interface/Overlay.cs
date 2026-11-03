@@ -111,6 +111,32 @@ namespace Protobot.Interface {
             if (handle) Instance.hitDiscs.Add((center, radius + 4f));
         }
 
+        /// <summary>A filled square (corner markers).</summary>
+        public static void Square(Vector2 center, float half, Color color) {
+            if (Instance == null) return;
+            Instance.quads.Add(new Quad {
+                a = center + new Vector2(-half, -half), b = center + new Vector2(-half, half),
+                c = center + new Vector2(half, half), d = center + new Vector2(half, -half), color = color
+            });
+        }
+
+        /// <summary>A filled triangle pointing up (midpoint markers).</summary>
+        public static void Triangle(Vector2 center, float size, Color color) {
+            if (Instance == null) return;
+            var top = center + new Vector2(0f, size);
+            Instance.quads.Add(new Quad {
+                a = center + new Vector2(-size * 0.9f, -size * 0.6f), b = top, c = top,
+                d = center + new Vector2(size * 0.9f, -size * 0.6f), color = color
+            });
+        }
+
+        /// <summary>A filled polygon (convex, or a fan from its first point), e.g. sketch regions.</summary>
+        public static void Fan(IList<Vector2> points, Color color) {
+            if (Instance == null || points.Count < 3) return;
+            for (var i = 1; i + 1 < points.Count; i++)
+                Instance.quads.Add(new Quad { a = points[0], b = points[i], c = points[i + 1], d = points[i + 1], color = color });
+        }
+
         public static void Ring(Vector2 center, float radius, Color color, float width = 1.5f, int segments = 24) {
             for (var i = 0; i < segments; i++) {
                 var a0 = i * Mathf.PI * 2f / segments;

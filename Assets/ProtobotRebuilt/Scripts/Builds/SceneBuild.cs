@@ -89,7 +89,11 @@ namespace Protobot.Builds {
             //Debug.Log(buildData.version);    
             if(!versionsNoColor.Contains(buildData.version) && buildData.version != null)
             { 
-                generatedObject.GetComponent<Renderer>().material.color = objectData.GetColor();
+                // V2: saved colors have no alpha: see-through parts (polycarbonate) keep theirs.
+                var renderer = generatedObject.GetComponent<Renderer>();
+                var color = objectData.GetColor();
+                color.a = renderer.material.color.a;
+                renderer.material.color = color;
             }
             // V2: edits kept in the part's state (drilled holes) are made again.
             if (!string.IsNullOrEmpty(objectData.states) && generatedObject.TryGetComponent(out SavedObject savedObject)) {

@@ -8,6 +8,9 @@ namespace Protobot.InputEvents {
         /// <summary>Set when a text box finishes editing: the Enter that ended it isn't a shortcut too.</summary>
         public static int EditEndedFrame = -10;
 
+        /// <summary>A window or full-screen editor of the new interface is open: the 3D view's shortcuts wait.</summary>
+        public static bool ShortcutsPaused => Interface.Dialog.OpenCount > 0 || Polycarb.SheetEditor.IsOpen;
+
         public static bool IsTyping {
             get {
                 if (UnityEngine.Time.frameCount - EditEndedFrame <= 1)

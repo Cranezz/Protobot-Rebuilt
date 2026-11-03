@@ -100,7 +100,8 @@ namespace Protobot.Interface {
                 fit.padding = new RectOffset(10, 10, 0, 0);
                 fit.childAlignment = TextAnchor.MiddleCenter;
                 fit.childControlWidth = fit.childControlHeight = true;
-                fit.childForceExpandWidth = fit.childForceExpandHeight = true;
+                // Not "expand": that would make the button itself stretch in rows and columns.
+                fit.childForceExpandWidth = fit.childForceExpandHeight = false;
             }
             if (onClick != null)
                 button.onClick.AddListener(() => {

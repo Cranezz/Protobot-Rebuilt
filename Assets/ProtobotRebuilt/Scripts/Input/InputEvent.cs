@@ -45,7 +45,7 @@ namespace Protobot.InputEvents {
             if (RebindAction.Rebinding) return;
 
             // V2: keyboard shortcuts (1-5 for the tools, Delete, R...) do nothing while a text box is being typed in.
-            if (TextInput.IsTyping && IsKeyboardShortcut) {
+            if ((TextInput.IsTyping || TextInput.ShortcutsPaused) && IsKeyboardShortcut) {
                 prevPressStatus = IsPressed = false;
                 return;
             }

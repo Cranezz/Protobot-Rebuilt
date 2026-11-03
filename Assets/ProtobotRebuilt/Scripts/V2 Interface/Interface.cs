@@ -13,6 +13,8 @@ namespace Protobot.Interface {
 
         [SerializeField] private TMP_FontAsset regular, medium, bold;
         public Sprite measureIcon, chevronIcon, closeIcon, searchIcon;
+        public Sprite sawIcon, joinIcon, polycarbIcon, importIcon, sheetsIcon;
+        public Material metalMaterial, plasticMaterial, polycarbMaterial;
 
         private FeedbackDisplay feedback;
 
@@ -51,6 +53,7 @@ namespace Protobot.Interface {
             }
 
             Overlay.Create(Root);
+            TopBar.Create(Root);
             ToolRail.Create(Root);
             ToolOptions.Create(Root);
             PartsBrowser.Create(Root);

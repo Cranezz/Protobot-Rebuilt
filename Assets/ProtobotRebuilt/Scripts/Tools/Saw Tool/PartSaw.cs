@@ -17,8 +17,9 @@ namespace Protobot.Tools {
     // dimension from a reference point (the part's end at first) to the plane.
     // - Drag the arrow to slide the plane (1/16" steps with snapping, Shift for free). R: rotation rings to tilt
     //   it (5° steps); Esc goes back to the arrow, Esc again cancels and switches to the Transform tool.
-    // - Click the dimension's value to type a distance; click its reference dot (or "Measure from") and then a
-    //   hole, corner or face to measure from there instead, like dimensioning in a CAD program.
+    // - The dimension goes from its reference point to the centre of the plane (so tilting keeps it). Click its
+    //   value to type a distance; drag its reference dot onto a hole, corner, edge or face (or click the dot,
+    //   then the point) to measure from there instead, like dimensioning in a CAD program.
     // - Enter or Cut makes the cut. Channels, angles and plates cut squarely between two holes become two parts
     //   their generator makes (names, weights and saving as any part); shafts cut squarely become two exact
     //   shafts; anything else is cut through its mesh (PartCutting) and keeps both pieces. Undo puts it back.
@@ -84,7 +85,7 @@ namespace Protobot.Tools {
 
         private void Update() {
             Overlay.Begin();
-            var typing = TextInput.IsTyping;
+            var typing = TextInput.IsTyping || TextInput.ShortcutsPaused;
             var keyboard = Keyboard.current;
 
             if (part == null || !part.activeInHierarchy) {
@@ -196,8 +197,8 @@ namespace Protobot.Tools {
             var snapped = PartCutting.Snap(part, localNormal, localCenter[axis], false);
             center += normal * (snapped - localCenter[axis]) * t.lossyScale[axis];
 
+            MeasurePlane(true);
             SetEndReference();
-            MeasurePlane();
             mode = Mode.Move;
             ToolOptions.Rebuild();
             feedback.Show("Drag the arrow or click the dimension to set the cut", FeedbackDisplay.DisplayType.success);
@@ -236,8 +237,10 @@ namespace Protobot.Tools {
             referenceIsEnd = true;
         }
 
-        // How big to draw the plane: the part's extent across it.
-        private void MeasurePlane() {
+        // How big to draw the plane: the part's extent across it. Recentring (only when the cut starts) puts the
+        // plane's centre in the middle of the part's cross-section; later the centre stays where it is, so the
+        // dimension (measured to it) doesn't change when the plane is tilted.
+        private void MeasurePlane(bool recenter) {
             float minU = float.MaxValue, maxU = float.MinValue, minV = float.MaxValue, maxV = float.MinValue;
             foreach (var c in FeaturePicker.Corners(part)) {
                 var d = c - center;
@@ -247,19 +250,44 @@ namespace Protobot.Tools {
                 minV = Mathf.Min(minV, dv); maxV = Mathf.Max(maxV, dv);
             }
             if (minU > maxU) { minU = minV = -1f; maxU = maxV = 1f; }
-            // Keep the plane centred on the part's cross-section.
-            center += u * (minU + maxU) / 2f + v * (minV + maxV) / 2f;
-            planeHalfU = (maxU - minU) / 2f + 0.25f;
-            planeHalfV = (maxV - minV) / 2f + 0.25f;
+            if (recenter) {
+                center += u * (minU + maxU) / 2f + v * (minV + maxV) / 2f;
+                planeHalfU = (maxU - minU) / 2f + 0.25f;
+                planeHalfV = (maxV - minV) / 2f + 0.25f;
+            }
+            else {
+                planeHalfU = Mathf.Max(-minU, maxU) + 0.25f;
+                planeHalfV = Mathf.Max(-minV, maxV) + 0.25f;
+            }
         }
 
         // ------------------------------------------------------------------ the dimension
 
-        /// <summary>Signed distance from the reference to the plane, along the plane's normal (inches).</summary>
-        private float Distance => Vector3.Dot(center - reference.point, normal);
+        /// <summary>Distance from the reference point to the centre of the cut plane (inches): a point-to-point
+        /// dimension, so tilting the plane about its centre keeps it.</summary>
+        private float Distance => Vector3.Distance(center, reference.point);
 
-        private void SetDistance(float value) {
-            center += normal * (value - Distance);
+        /// <summary>Slides the plane along its normal until its centre is <paramref name="value"/> from the
+        /// reference (the nearer of the two places that are); false if it can't get that close.</summary>
+        private bool SetDistance(float value) {
+            var w = center - reference.point;
+            var along = Vector3.Dot(w, normal);
+            var discriminant = along * along - w.sqrMagnitude + value * value;
+            if (discriminant < 0f) {
+                center -= normal * along;  // as close as it gets
+                return false;
+            }
+            var root = Mathf.Sqrt(discriminant);
+            var s1 = -along + root;
+            var s2 = -along - root;
+            center += normal * (Mathf.Abs(s1) <= Mathf.Abs(s2) ? s1 : s2);
+            return true;
+        }
+
+        private void TypeDistance(float inches) {
+            if (!SetDistance(Mathf.Abs(inches)))
+                feedback.Show("The plane can't get that close to the point it's measured from: it went as close as it can", FeedbackDisplay.DisplayType.alert);
+            ToolOptions.Rebuild();
         }
 
         private float Snap(float value) {
@@ -278,46 +306,78 @@ namespace Protobot.Tools {
             return (-min, max);
         }
 
-        private Vector3 DimensionOffset => -v * (planeHalfV + 0.35f);
+        // Dragging the reference dot onto another point.
+        private bool dotPressed, dotDragging;
+        private Vector2 dotPressMouse;
 
         private void DrawDimension() {
             var d = Distance;
-            var r = reference.point;
-            var q = r + normal * d;               // the reference projected onto the plane
-            var offset = DimensionOffset;
             var color = Theme.Dimension;
-            // Extension lines from the reference and from the plane, then the dimension line between them.
-            Overlay.Line(r, r + offset * 1.1f, new Color(color.r, color.g, color.b, 0.55f), 1f);
-            Overlay.Line(q, q + offset * 1.1f, new Color(color.r, color.g, color.b, 0.55f), 1f);
-            if (!Overlay.ToScreen(r + offset, out var a) || !Overlay.ToScreen(q + offset, out var b))
+            // A point-to-point dimension: from the reference to the centre of the plane.
+            if (!Overlay.ToScreen(reference.point, out var a) || !Overlay.ToScreen(center, out var b))
                 return;
             Overlay.Line(a, b, color, 1.5f);
             if (Vector2.Distance(a, b) > 30f) {
                 Overlay.Arrowhead(a, b, color);
                 Overlay.Arrowhead(b, a, color);
             }
-            // The reference end: a dot to click to measure from somewhere else.
-            Overlay.Disc(a, 6f, Color.black, true);
-            Overlay.Disc(a, 5f, mode == Mode.Reference ? Theme.Accent : color, true);
+
+            // The reference end: drag the dot onto another point, or click it, then click a point.
             var overDot = Vector2.Distance(Overlay.Mouse, a) < 10f;
-            if (overDot) Overlay.Ring(a, 9f, Color.white, 1.5f);
-            if (overDot && MouseInput.LeftButton.wasPressedThisFrame)
-                SetMode(Mode.Reference);
+            if (overDot && MouseInput.LeftButton.wasPressedThisFrame && dragging == Handle.None) {
+                dotPressed = true;
+                dotDragging = false;
+                dotPressMouse = Overlay.Mouse;
+            }
+            if (dotPressed) {
+                if (MouseInput.LeftButton.isPressed) {
+                    if (Vector2.Distance(Overlay.Mouse, dotPressMouse) > 5f) dotDragging = true;
+                    if (dotDragging) {
+                        var target = FeaturePicker.Pick();
+                        FeaturePicker.DrawHover(target, Theme.Accent);
+                        if (!target.Valid) Overlay.Disc(Overlay.Mouse, 5f, Theme.Accent);
+                    }
+                }
+                else {
+                    dotPressed = false;
+                    if (!dotDragging)
+                        SetMode(Mode.Reference);
+                    else {
+                        var target = FeaturePicker.Pick();
+                        if (target.Valid) SetReference(target);
+                        else feedback.Show("Drop the dot on a hole, corner, edge or face to measure from it", FeedbackDisplay.DisplayType.alert);
+                    }
+                    dotDragging = false;
+                }
+            }
+            if (!dotDragging) {
+                Overlay.Disc(a, 6f, Color.black, true);
+                Overlay.Disc(a, 5f, mode == Mode.Reference ? Theme.Accent : color, true);
+                if (overDot) Overlay.Ring(a, 9f, Color.white, 1.5f);
+            }
             FeaturePicker.Draw(reference.kind == FeaturePicker.Kind.Face ? default : reference, color);
+            Overlay.Disc(b, 4f, color);
 
             if (editField == null) {
-                var label = Overlay.Text((a + b) / 2f, Inch.Format(Mathf.Abs(d)), color, OpenEditField, true);
-                Ui.Tip(label, "Cut distance", null, "Click to type a distance. Measured from " + ReferenceName + ".");
+                var label = Overlay.Text((a + b) / 2f, Inch.Format(d), color, OpenEditField, true);
+                Ui.Tip(label, "Cut distance", null, "From " + ReferenceName + " to the middle of the cut. Click to type a distance; drag the dot to measure from another point.");
             }
             else
                 ((RectTransform)editField.transform).anchoredPosition = (a + b) / 2f;
+        }
+
+        private void SetReference(FeaturePicker.Feature feature) {
+            reference = feature;
+            referenceIsEnd = false;
+            SetMode(Mode.Move);
+            feedback.Show("Measuring from the " + feature.Describe().ToLowerInvariant(), FeedbackDisplay.DisplayType.success);
         }
 
         private string ReferenceName => referenceIsEnd ? "the end of the part" : reference.Describe().ToLowerInvariant();
 
         private void OpenEditField() {
             if (editField != null) return;
-            editField = Ui.Field(Overlay.Instance.transform, "Distance", Inch.Format(Mathf.Abs(Distance), false), CommitEditField,
+            editField = Ui.Field(Overlay.Instance.transform, "Distance", Inch.Format(Distance, false), CommitEditField,
                 Theme.FontBody, TextAlignmentOptions.Center);
             var rect = (RectTransform)editField.transform;
             rect.anchorMin = rect.anchorMax = Vector2.zero;
@@ -329,11 +389,8 @@ namespace Protobot.Tools {
         }
 
         private void CommitEditField(string text) {
-            if (Inch.TryParse(text, out var inches)) {
-                var sign = Distance < 0f ? -1f : 1f;
-                SetDistance(sign * inches);
-                ToolOptions.Rebuild();
-            }
+            if (Inch.TryParse(text, out var inches))
+                TypeDistance(inches);
             else if (!string.IsNullOrWhiteSpace(text))
                 feedback.Show("Type a distance like 3 1/2 or 3.5", FeedbackDisplay.DisplayType.alert);
             CloseEditField();
@@ -346,19 +403,14 @@ namespace Protobot.Tools {
 
         private void UpdateReferencePick() {
             var feature = MouseInput.withinScreen && !MouseInput.overUI ? FeaturePicker.Pick() : default;
-            FeaturePicker.Draw(feature, Theme.Accent);
-            if (feature.Valid && Overlay.ToScreen(feature.point, out var p))
-                Overlay.Text(p + new Vector2(0f, 22f), feature.Describe(), Theme.Text);
+            FeaturePicker.DrawHover(feature, Theme.Accent);
             if (!MouseInput.LeftButton.wasPressedThisFrame || MouseInput.overUI)
                 return;
             if (!feature.Valid) {
-                feedback.Show("Click a hole, corner or face to measure from", FeedbackDisplay.DisplayType.alert);
+                feedback.Show("Click a hole, corner, edge or face to measure from", FeedbackDisplay.DisplayType.alert);
                 return;
             }
-            reference = feature;
-            referenceIsEnd = false;
-            SetMode(Mode.Move);
-            feedback.Show("Measuring from the " + feature.Describe().ToLowerInvariant(), FeedbackDisplay.DisplayType.success);
+            SetReference(feature);
         }
 
         // ------------------------------------------------------------------ handles
@@ -387,6 +439,7 @@ namespace Protobot.Tools {
                     var dv = ringV.Count > 1 ? Overlay.DistanceTo(ringV, mouse) : float.MaxValue;
                     if (Mathf.Min(du, dv) < 8f) hover = du <= dv ? Handle.RingU : Handle.RingV;
                 }
+                if (dotPressed) return;
                 if (hover != Handle.None && MouseInput.LeftButton.wasPressedThisFrame)
                     StartDrag(hover);
                 else if (hover == Handle.None && MouseInput.LeftButton.wasPressedThisFrame && !MouseInput.overUI) {
@@ -399,7 +452,7 @@ namespace Protobot.Tools {
             }
             if (!MouseInput.LeftButton.isPressed) {
                 if (dragging != Handle.Arrow)
-                    MeasurePlane();  // tilted: fit the plane to the part again
+                    MeasurePlane(false);  // tilted: fit the plane to the part again
                 dragging = Handle.None;
                 ToolOptions.Rebuild();
                 return;
@@ -530,11 +583,8 @@ namespace Protobot.Tools {
             ToolOptions.Note(bar, name.Length > 34 ? name.Substring(0, 33) + "…" : name);
             Ui.Divider(bar, true).Size(1f, 22f);
             ToolOptions.Note(bar, "Distance");
-            var field = Ui.Field(bar, "Distance", Inch.Format(Mathf.Abs(Distance), false), text => {
-                if (Inch.TryParse(text, out var inches)) {
-                    SetDistance((Distance < 0f ? -1f : 1f) * inches);
-                    ToolOptions.Rebuild();
-                }
+            var field = Ui.Field(bar, "Distance", Inch.Format(Distance, false), text => {
+                if (Inch.TryParse(text, out var inches)) TypeDistance(inches);
             }, Theme.FontBody, TextAlignmentOptions.Center);
             field.Size(80f, 30f);
             var from = Ui.Button(bar, "From", "From: " + (referenceIsEnd ? "part end" : reference.Describe().ToLowerInvariant()), () => SetMode(Mode.Reference), mode == Mode.Reference, 5f, Theme.FontSmall);
@@ -750,8 +800,7 @@ namespace Protobot.Tools {
             return element;
         }
 
-        private static string NameOf(GameObject part) =>
-            part.TryGetComponent(out PartName named) && !string.IsNullOrEmpty(named.name) ? named.name : part.name;
+        private static string NameOf(GameObject part) => PartLabels.Short(part);
 
         private static GameObject Make(Cut cut, int count, float center) {
             string id;

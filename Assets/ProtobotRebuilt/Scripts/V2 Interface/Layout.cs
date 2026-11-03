@@ -10,6 +10,9 @@ namespace Protobot.Interface {
         /// <summary>Distance from the top of the screen to the bottom of the original top bar.</summary>
         public static float TopBarBottom {
             get {
+                // The new top bar (the original's is hidden behind it).
+                if (TopBar.Instance != null)
+                    return TopBar.Height;
                 if (measuredFrame == Time.frameCount)
                     return topBarBottom;
                 measuredFrame = Time.frameCount;

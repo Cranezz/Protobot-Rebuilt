@@ -23,6 +23,7 @@ namespace Protobot.Interface {
         private static readonly (string name, string sidebar, string keyEvent, int group, string description)[] Tools = {
             ("Transform", "Transform Tool", "Enable Transform Tool", 0, "Move and turn parts with the arrows and rings. Snapping and local/global are in the options above."),
             ("Move", "Move Tool", "Enable Move Tool", 0, "Click a hole on a part, then a hole on another part to put them together."),
+            ("Join", "Join Tool", "Enable Join Tool", 0, "Click a face, edge, corner or hole on one part, then on another: the first part moves to meet it."),
             ("Paint", "Color Tool", "Enable Color Tool", 0, "Click parts to paint them. Pick the color in the options above."),
             ("Saw", "Saw Tool", "Enable Saw Tool", 1, "Click a part to place a cut. Drag the plane or type its distance, then press Enter to cut."),
             ("Drill", "Drill Tool", "Enable Drill Tool", 1, "Click a hole to drill it out round. Choose the bit size above."),
@@ -103,6 +104,10 @@ namespace Protobot.Interface {
         private static Sprite IconOf(Transform sidebarButton, string name) {
             if (name == "Measure" && Interface.Instance.measureIcon != null)
                 return Interface.Instance.measureIcon;
+            if (name == "Saw" && Interface.Instance.sawIcon != null)
+                return Interface.Instance.sawIcon;
+            if (name == "Join" && Interface.Instance.joinIcon != null)
+                return Interface.Instance.joinIcon;
             var icon = sidebarButton.GetComponentsInChildren<Image>(true).FirstOrDefault(i => i.name.EndsWith("Icon"));
             return icon != null ? icon.sprite : null;
         }
