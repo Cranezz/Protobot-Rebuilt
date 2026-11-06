@@ -152,6 +152,13 @@ namespace Protobot.Interface {
             Ui.Tip(chip, "Plastic", null, "The polycarbonate in this build, against the rules: click to see it laid out on sheets.");
 
             // V2: the simulation sandbox.
+            // V2: games on a competition field (Robot Skills for now).
+            var play = Ui.Button(right, "Play", "Play game", () => {
+                if (Game.SkillsGame.Active) Game.SkillsGame.Current.Exit();
+                else Game.GameUi.OpenPlay();
+            }, false, 6f, Theme.FontSmall);
+            play.Size(-1, 30f);
+            Ui.Tip(play, "Play game", null, "Put your robot on this season's field and run Robot Skills: a timed minute, scored as you go.");
             simulate = Ui.Button(right, "Simulate", "Simulate", Motion.Sandbox.Toggle, true, 6f, Theme.FontSmall);
             simulate.Size(-1, 30f);
             Ui.Tip(simulate, "Simulate", null, "Gravity and physics: the robot drives (W/A/S/D, arrows or a gamepad), motors turn, cylinders push; parts not fastened fall off. Stop puts the build back.");
@@ -177,6 +184,8 @@ namespace Protobot.Interface {
             new Item { label = "Save as…", action = () => Press(OldButton("File Menu/Save As Button")) },
             new Item { label = Builds.AutoSave.Enabled ? "Autosave every minute: on" : "Autosave every minute: off", action = Builds.AutoSave.Toggle },
             new Item { divider = true },
+            new Item { label = "Play game…", action = Game.GameUi.OpenPlay },
+            new Item { divider = true },
             new Item { label = "Import part…", action = Custom.ImportDialog.Choose },
             new Item { label = "Custom parts library…", action = Custom.LibraryDialog.Open },
             new Item { label = "Export parts list", action = () => Press(OldButton("Export Parts List")) },
@@ -200,6 +209,7 @@ namespace Protobot.Interface {
             new Item { label = "Controls (motors, cylinders, drive)…", action = () => Motion.ControlsPanel.Open() },
             new Item { label = "Make a chain…", action = () => Motion.ChainTool.Begin() },
             new Item { divider = true },
+            new Item { label = "Graphics…", action = GraphicsWindow.Open },
             new Item { label = "Preferences…", action = () => Press(OldButton("Edit Menu/Preferences Button")) },
         };
 

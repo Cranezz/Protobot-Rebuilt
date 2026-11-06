@@ -3,7 +3,87 @@ guid: c419c5a4a47c17a44bf87b015b42dd0a
 ModelImporter:
   serializedVersion: 24300
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Field AprilTag
+    second: {fileID: 2100000, guid: b14692866f7322b45a031d3af304a6eb, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Field Blue
+    second: {fileID: 2100000, guid: 20c493112a1131e40a2f7b1f78cbfe20, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Field Clear
+    second: {fileID: 2100000, guid: 510de11455cce884d9b31a601bb635f3, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Field Dark Gray
+    second: {fileID: 2100000, guid: 1a5394a3f26952f41b32c69f17430bf9, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Field Fitting
+    second: {fileID: 2100000, guid: 3329a1870b11b5240ba7e68260ce8d63, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Field Goal Black
+    second: {fileID: 2100000, guid: 95a495d3e3ca6d2459bbc7f65601c606, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Field Gray
+    second: {fileID: 2100000, guid: 06a4b995c5036a64a8068611dcc70867, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Field Hardware
+    second: {fileID: 2100000, guid: ac1f74aef52a62b40ae44540654ebb8d, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Field Panel
+    second: {fileID: 2100000, guid: 5abd00adcb0169a4f8a056864a1f6fec, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Field Rail
+    second: {fileID: 2100000, guid: 59a07f2a4025b5d4d98b6745e55cb749, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Field Red
+    second: {fileID: 2100000, guid: 1e08fafa66413864b993a0ca08b99083, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Field Rubber
+    second: {fileID: 2100000, guid: a733211cb0f1f0f4e89d42a7ea966076, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Field Tape
+    second: {fileID: 2100000, guid: 8d5e774d677e23047ab6463b09414f65, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Field Tile
+    second: {fileID: 2100000, guid: 5a8b82d75c6ce9943beda6f9a2cca648, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Field Tile Dark
+    second: {fileID: 2100000, guid: 98c3df4a6cf92054484450d4d361ec74, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Field Yellow
+    second: {fileID: 2100000, guid: 2bbca2986a5227f4b81d4ac44dd25b0a, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
@@ -31,7 +111,7 @@ ModelImporter:
     extraExposedTransformPaths: []
     extraUserProperties: []
     clipAnimations: []
-    isReadable: 0
+    isReadable: 1
   meshes:
     lODScreenPercentages: []
     globalScale: 39.37008

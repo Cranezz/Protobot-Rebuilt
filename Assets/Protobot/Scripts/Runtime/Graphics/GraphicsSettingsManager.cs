@@ -37,6 +37,8 @@ namespace Protobot.GraphicsQuality
         {
             Current = null;
             Changed = null;
+            renderScaleMultiplier = 1f;
+            idleLimit = 0;
             originalQualityPipeline = null;
             runtimePipeline = null;
             SceneManager.sceneLoaded -= OnSceneLoaded;
@@ -109,9 +111,22 @@ namespace Protobot.GraphicsQuality
             if (cameraData.renderType != CameraRenderType.Base)
                 return;
 
+            // Small cameras drawing into a texture (the view cube's) don't need shadows, AO or post-processing:
+            // they drew all of them every frame.
+            if (camera.targetTexture != null)
+            {
+                cameraData.SetRenderer((int)AmbientOcclusion.Off);
+                cameraData.renderPostProcessing = false;
+                cameraData.renderShadows = false;
+                cameraData.antialiasing = AntialiasingMode.None;
+                return;
+            }
+
             // The renderer list in the URP asset is ordered to match the AmbientOcclusion enum.
             cameraData.SetRenderer((int)Current.ambientOcclusion);
-            cameraData.renderPostProcessing = Current.postProcessing;
+            // FXAA and SMAA run in the post-processing pass.
+            cameraData.renderPostProcessing = Current.postProcessing
+                || Current.antiAliasing == AntiAliasing.FXAA || Current.antiAliasing == AntiAliasing.SMAA;
             cameraData.renderShadows = Current.shadows != ShadowQuality.Off;
             cameraData.antialiasing = ToCameraAntiAliasing(Current.antiAliasing);
             cameraData.antialiasingQuality = AntialiasingQuality.High;
@@ -146,12 +161,34 @@ namespace Protobot.GraphicsQuality
             runtimePipeline = null;
         }
 
+        /// <summary>
+        /// Multiplies the render scale without changing the saved settings: the benchmark uses it to draw the 3D view
+        /// at another resolution (720p, 1080p...) inside the same window. 1 = off.
+        /// </summary>
+        public static float RenderScaleMultiplier
+        {
+            get => renderScaleMultiplier;
+            set
+            {
+                renderScaleMultiplier = Mathf.Max(0.05f, value);
+                if (Current != null && runtimePipeline != null)
+                    ApplyPipeline(Current);
+            }
+        }
+
+        static float renderScaleMultiplier = 1f;
+
         static void ApplyPipeline(GraphicsSettingsData s)
         {
             var pipeline = runtimePipeline;
 
-            pipeline.renderScale = s.renderScale;
-            pipeline.upscalingFilter = s.renderScale < 1f ? UpscalingFilterSelection.FSR : UpscalingFilterSelection.Auto;
+            var scale = Mathf.Clamp(s.renderScale * renderScaleMultiplier, 0.1f, 2f);
+            pipeline.renderScale = scale;
+            pipeline.upscalingFilter = scale < 0.99f ? UpscalingFilterSelection.FSR : UpscalingFilterSelection.Auto;
+            // Nothing in the app reads the camera's opaque or depth copies (SSAO makes its own depth): copying them
+            // every frame only cost bandwidth, which old and integrated GPUs have least of.
+            pipeline.supportsCameraOpaqueTexture = false;
+            pipeline.supportsCameraDepthTexture = false;
             pipeline.supportsHDR = s.hdr;
 
             // MSAA and TAA can't be combined, so MSAA is only on when it's the chosen mode.
@@ -183,10 +220,32 @@ namespace Protobot.GraphicsQuality
             QualitySettings.anisotropicFiltering = s.anisotropicFiltering ? AnisotropicFiltering.ForceEnable : AnisotropicFiltering.Disable;
         }
 
-        static void ApplyDisplay(GraphicsSettingsData s)
+        /// <summary>The idle/background frame rate in force (0 = none): set by <see cref="IdleFrameRate"/>.</summary>
+        internal static int idleLimit;
+
+        /// <summary>The frame rate the idle limit holds the app to now, 0 when it's not idle.</summary>
+        public static int IdleLimit => idleLimit;
+
+        /// <summary>Sets the frame rate from the settings, or the idle limit while one is in force.</summary>
+        internal static void ApplyFrameRate()
         {
+            var s = Current;
+            if (s == null)
+                return;
+            if (idleLimit > 0)
+            {
+                QualitySettings.vSyncCount = 0;
+                Application.targetFrameRate = s.vSync || s.frameRateLimit <= 0 ? idleLimit : Mathf.Min(idleLimit, s.frameRateLimit);
+                return;
+            }
             QualitySettings.vSyncCount = s.vSync ? 1 : 0;
             Application.targetFrameRate = s.vSync || s.frameRateLimit <= 0 ? -1 : s.frameRateLimit;
+        }
+
+        static void ApplyDisplay(GraphicsSettingsData s)
+        {
+            ApplyFrameRate();
+            IdleFrameRate.Ensure();
 
 #if !UNITY_EDITOR
             // The editor's Game view controls its own size, so window/resolution only apply in builds.
@@ -232,9 +291,11 @@ namespace Protobot.GraphicsQuality
                 if (settings == null || settings.version > GraphicsSettingsData.CurrentVersion)
                     return null;
 
-                // Version 1 files predate Model Detail: fill it in from the saved preset.
-                if (settings.version < 2 && settings.preset != GraphicsPreset.Custom)
+                // Version 1 files predate Model Detail, version 2 the retuned presets: take the saved preset's new values.
+                if (settings.version < 3 && settings.preset != GraphicsPreset.Custom)
                     settings.SetQualityFromPreset(settings.preset);
+                if (settings.version < 3)
+                    settings.idleFrameRate = true;
 
                 settings.version = GraphicsSettingsData.CurrentVersion;
                 return settings;
@@ -278,12 +339,14 @@ namespace Protobot.GraphicsQuality
                 this.softQuality = softQuality;
             }
 
+            // Every cascade draws the shadow casters in it again: in a build of millions of triangles (and the field)
+            // cascades cost more than resolution, so there are at most three.
             public static ShadowSettings For(ShadowQuality quality) => quality switch
             {
                 ShadowQuality.Low => new ShadowSettings(40f, 1, 1024, SoftShadowQuality.Low),
-                ShadowQuality.Medium => new ShadowSettings(75f, 2, 2048, SoftShadowQuality.Medium),
-                ShadowQuality.High => new ShadowSettings(110f, 3, 2048, SoftShadowQuality.High),
-                ShadowQuality.Ultra => new ShadowSettings(150f, 4, 4096, SoftShadowQuality.High),
+                ShadowQuality.Medium => new ShadowSettings(60f, 2, 2048, SoftShadowQuality.Medium),
+                ShadowQuality.High => new ShadowSettings(100f, 2, 2048, SoftShadowQuality.High),
+                ShadowQuality.Ultra => new ShadowSettings(150f, 3, 4096, SoftShadowQuality.High),
                 // Off: shadows are turned off on the camera; these values just keep the asset valid.
                 _ => new ShadowSettings(40f, 1, 256, SoftShadowQuality.Low),
             };

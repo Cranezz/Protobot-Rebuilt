@@ -33,9 +33,7 @@ namespace Protobot {
             MeshCollider meshCollider = GetComponent<MeshCollider>();
 
             holeData = new HoleData {
-                position = transform.position,
-                rotation = transform.rotation,
-                forward = transform.forward,
+                source = transform,  // V2: position, rotation and forward are read from it when asked
 
                 shape = meshCollider.sharedMesh,
                 depth = transform.localScale.z,
@@ -55,21 +53,45 @@ namespace Protobot {
             holeData.part = transform.parent.gameObject;
         }
 
-        private void Update() {
-            holeData.position = transform.position;
-            holeData.rotation = transform.rotation;
-            holeData.forward = transform.forward;
+        // V2: there was an Update on every hole copying its transform into holeData and looking for deleted
+        // screws: with a few thousand holes in a robot that was 8 ms of every frame, most of the app's CPU time.
+        // holeData now reads the transform when asked, and only holes holding a screw/shaft are checked, by one
+        // ticker (Occupied).
+        private static readonly HashSet<HoleCollider> Occupied = new();
+        private static readonly List<HoleCollider> Checking = new();
+        private static HoleTicker ticker;
 
-            RemoveDeletedDetectors();
+        private void Track() {
+            if (detectors != null && detectors.Count > 0) {
+                Occupied.Add(this);
+                if (ticker == null) {
+                    // Not DontSave: that would outlive Play mode in the editor.
+                    ticker = new GameObject("Hole Ticker") { hideFlags = HideFlags.HideInHierarchy }.AddComponent<HoleTicker>();
+                    DontDestroyOnLoad(ticker.gameObject);
+                }
+            }
+            else Occupied.Remove(this);
         }
+
+        private class HoleTicker : MonoBehaviour {
+            private void Update() {
+                Checking.Clear();
+                Checking.AddRange(Occupied);
+                foreach (var hole in Checking) {
+                    if (hole == null) { Occupied.Remove(hole); continue; }
+                    hole.RemoveDeletedDetectors();
+                }
+            }
+        }
+
+        private void OnDestroy() => Occupied.Remove(this);
 
         public void RemoveDeletedDetectors() {
             detectors.RemoveAll(detector => detector == null); // V2: destroyed ones (not only deleted) free the hole
-            var deleteList = detectors.Where(detector => detector.gameObject.IsDeleted()).ToList();
-
-            foreach (var detector in deleteList) {
-                detector.RemoveHole(this);
-            }
+            for (var i = detectors.Count - 1; i >= 0; i--)
+                if (i < detectors.Count && detectors[i].gameObject.IsDeleted())
+                    detectors[i].RemoveHole(this);
+            Track();
         }
 
         public bool IsOccupiedBy(HoleDetector otherDetector) {
@@ -80,11 +102,13 @@ namespace Protobot {
             if (IsOccupiedBy(newDetector) || IsOccupied) return;
             
             detectors.Add(newDetector);
+            Track();  // V2
             OnSetDetector?.Invoke(newDetector);
         }
 
         public void RemoveDetector(HoleDetector detector) {
             detectors.Remove(detector);
+            Track();  // V2
         }
 
         private void OnDisable() {
@@ -103,9 +127,26 @@ namespace Protobot {
         public Vector2 size;
         public GameObject part;
 
-        public Vector3 position;
-        public Quaternion rotation;
-        public Vector3 forward;
+        // V2: read from the hole collider's transform when asked (they were copied into fields every frame).
+        [NonSerialized] public Transform source;
+        private Vector3 storedPosition;
+        private Quaternion storedRotation = Quaternion.identity;
+        private Vector3 storedForward = Vector3.forward;
+
+        public Vector3 position {
+            get => source != null ? source.position : storedPosition;
+            set { source = null; storedPosition = value; }
+        }
+
+        public Quaternion rotation {
+            get => source != null ? source.rotation : storedRotation;
+            set { source = null; storedRotation = value; }
+        }
+
+        public Vector3 forward {
+            get => source != null ? source.forward : storedForward;
+            set { source = null; storedForward = value; }
+        }
 
         // V2: the exact shape of a custom hole (a filleted slot, any outline), in inches in the hole's own x/y around
         // its middle; null for plain round/square/rectangular holes.

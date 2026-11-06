@@ -68,6 +68,9 @@ namespace Protobot.Motion {
             host = new GameObject("Motor Runner").AddComponent<MotorRunner>();
         }
 
+        /// <summary>Whether any motor is running (the idle frame rate waits for it).</summary>
+        public static bool Active => host != null && host.runs.Count > 0;
+
         /// <summary>Whether a motor is turning (its own run or driven by another).</summary>
         public static bool Turning(MotorDrive motor) => motor != null && Mathf.Abs(motor.Level) > 0.001f;
 

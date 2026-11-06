@@ -51,6 +51,9 @@ namespace Protobot.Interface {
                 movement.activePos = new Vector2(0f, 24f);
                 movement.inactivePos = new Vector2(0f, -40f);
                 rect.anchoredPosition = movement.inactivePos;
+                // Where it rests when nothing is shown: UIMovement.Awake may have run first and kept the old top
+                // position (30 px up), which left the empty toast ("Feedback text goes here!") on screen.
+                movement.SetInitPos(movement.inactivePos);
             }
 
             // The original's pop-ups in the new colors.

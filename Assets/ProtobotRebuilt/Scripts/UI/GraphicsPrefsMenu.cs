@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using Protobot.GraphicsQuality;
@@ -37,6 +38,21 @@ namespace Protobot.UI {
         void OnEnable() {
             GraphicsSettingsManager.Changed += OnSettingsChanged;
             Refresh();
+            // V2: the graphics settings have their own window now (Edit > Graphics…): this tab opens it, closes
+            // Preferences and goes back to the General tab for next time.
+            if (Application.isPlaying)
+                StartCoroutine(OpenWindow());
+        }
+
+        private System.Collections.IEnumerator OpenWindow() {
+            yield return null;  // after the tab toggle has finished switching pages
+            var root = transform.root;
+            Protobot.Interface.GraphicsWindow.Open();
+            var close = root.GetComponentsInChildren<Button>(true).FirstOrDefault(b => b.name == "Close Button");
+            if (close != null) close.onClick.Invoke();
+            // Last: it hides this page (and stops this coroutine).
+            var general = root.GetComponentsInChildren<Toggle>(true).FirstOrDefault(t => t.name == "General Toggle");
+            if (general != null) general.isOn = true;
         }
 
         void OnDisable() {

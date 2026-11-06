@@ -56,6 +56,8 @@ namespace Protobot.Builds {
 
         private void Update() {
             if (builds == null) return;
+            // A game on the field: no saving and no notices over it (the build doesn't change while it's on).
+            if (Game.SkillsGame.Active) return;
             var now = Time.unscaledTime;
             var hasFile = builds.buildPath != "";
 

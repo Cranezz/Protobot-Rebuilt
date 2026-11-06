@@ -25,6 +25,28 @@ namespace Protobot.Motion {
 
         private static Sandbox instance;
         public static bool Running => instance != null;
+
+        // V2 game mode (Scripts/Game): a game puts the robot on a field. It sets these before Begin.
+        public const int ElementLayer = 18, FieldLayer = 19;
+        private static readonly int[] SimLayers = { Layer, GroundLayer, ElementLayer, FieldLayer };
+        /// <summary>The floor's height (the field's tiles) instead of the build's lowest point.</summary>
+        public static float? FloorHeight;
+        /// <summary>Adds the field's colliders and game elements to the simulation (under its root, so they go with it).</summary>
+        public static System.Action<Transform> BuildEnvironment;
+        /// <summary>A game runs the simulation: it handles Esc and the messages, and has its own window.</summary>
+        public static bool Hosted;
+        /// <summary>Off before a match starts and after it ends: motors and cylinders take no commands.</summary>
+        public static bool DriveEnabled = true;
+
+        // Which simulation layers touch: the robot everything, the ground the robot and game elements, game elements
+        // everything, the field's fixed parts the robot and game elements.
+        private static bool Touches(int a, int b) {
+            if (a > b) (a, b) = (b, a);
+            if (a == Layer) return b == Layer || b == GroundLayer || b == ElementLayer || b == FieldLayer;
+            if (a == GroundLayer) return b == ElementLayer;
+            if (a == ElementLayer) return b == ElementLayer || b == FieldLayer;
+            return false;
+        }
         public static Sandbox Instance => instance;
 
         public bool Paused { get; private set; }
@@ -83,7 +105,8 @@ namespace Protobot.Motion {
         private Vector3 savedGravity;
         private float savedStep;
         private int savedIterations, savedVelocityIterations;
-        private float savedMaxAngular, savedBounce;
+        private float savedMaxAngular, savedBounce, savedMaxDelta;
+        private readonly List<Collider> pausedTriggers = new();
         private bool[] savedLayers;
         private System.Func<bool> savedBlocked;
 
@@ -120,6 +143,7 @@ namespace Protobot.Motion {
                 return;
             }
             SetBuildInterface(false);
+            if (Hosted) return;
             ControlsPanel.Open();
             Audio.Sounds.Play(Audio.Sounds.Tick);
             var motors = instance.trains.Sum(t => t.motors.Count);
@@ -138,7 +162,9 @@ namespace Protobot.Motion {
             SetBuildInterface(true);
             ControlsPanel.CloseSimulation();
             foreach (var motor in MotorDrive.Live()) motor.Sound(0f);
-            Interface.Interface.Say("Back to building: the build is as it was", true);
+            FlexGrip.Clear();
+            DriveEnabled = true;
+            if (!Hosted) Interface.Interface.Say("Back to building: the build is as it was", true);
         }
 
         public static void Reset() {
@@ -153,7 +179,7 @@ namespace Protobot.Motion {
             Interface.Interface.Say(value ? "Paused" : "Running", true);
         }
 
-        private static void SetBuildInterface(bool on) {
+        public static void SetBuildInterface(bool on) {
             if (Interface.Interface.Root == null) return;
             foreach (var name in new[] { "Tool Rail", "Tool Options", "Parts Browser" }) {
                 var t = Interface.Interface.Root.Find(name);
@@ -167,10 +193,9 @@ namespace Protobot.Motion {
 
         private void Restore() {
             if (savedLayers != null) {
-                for (var other = 0; other < 32; other++) {
-                    Physics.IgnoreLayerCollision(Layer, other, savedLayers[other]);
-                    Physics.IgnoreLayerCollision(GroundLayer, other, savedLayers[32 + other]);
-                }
+                for (var i = SimLayers.Length - 1; i >= 0; i--)
+                    for (var other = 0; other < 32; other++)
+                        Physics.IgnoreLayerCollision(SimLayers[i], other, savedLayers[i * 32 + other]);
                 Physics.gravity = savedGravity;
                 Time.fixedDeltaTime = savedStep;
                 Physics.defaultSolverIterations = savedIterations;
@@ -179,6 +204,10 @@ namespace Protobot.Motion {
                 Physics.bounceThreshold = savedBounce;
                 Physics.simulationMode = SimulationMode.FixedUpdate;
                 SelectionSystem.SelectionManager.Blocked = savedBlocked;
+                Time.maximumDeltaTime = savedMaxDelta;
+                foreach (var trigger in pausedTriggers)
+                    if (trigger != null) trigger.enabled = true;
+                pausedTriggers.Clear();
             }
             foreach (var renderer in hidden)
                 if (renderer != null) renderer.enabled = true;
@@ -209,11 +238,11 @@ namespace Protobot.Motion {
             savedVelocityIterations = Physics.defaultSolverVelocityIterations;
             savedMaxAngular = Physics.defaultMaxAngularSpeed;
             savedBounce = Physics.bounceThreshold;
-            savedLayers = new bool[64];
-            for (var other = 0; other < 32; other++) {
-                savedLayers[other] = Physics.GetIgnoreLayerCollision(Layer, other);
-                savedLayers[32 + other] = Physics.GetIgnoreLayerCollision(GroundLayer, other);
-            }
+            savedMaxDelta = Time.maximumDeltaTime;
+            savedLayers = new bool[SimLayers.Length * 32];
+            for (var i = 0; i < SimLayers.Length; i++)
+                for (var other = 0; other < 32; other++)
+                    savedLayers[i * 32 + other] = Physics.GetIgnoreLayerCollision(SimLayers[i], other);
             savedBlocked = SelectionSystem.SelectionManager.Blocked;
             SelectionSystem.SelectionManager.Blocked = () => true;
 
@@ -223,11 +252,20 @@ namespace Protobot.Motion {
             Physics.defaultSolverVelocityIterations = 6;
             Physics.defaultMaxAngularSpeed = 400f;
             Physics.bounceThreshold = 4f;
-            for (var other = 0; other < 32; other++) {
-                var sim = other == Layer || other == GroundLayer;
-                Physics.IgnoreLayerCollision(Layer, other, !sim);
-                Physics.IgnoreLayerCollision(GroundLayer, other, other != Layer);
-            }
+            // V2: a slow frame runs at most 12 steps (the simulation slows down instead of freezing on a weak PC),
+            // and the screws' hole-finding triggers rest: nothing in the build changes while it runs, and their
+            // OnTriggerStay ran for every screw and hole on every step (half the simulation's time on a big robot).
+            // Switching a collider off sends no exit, so every screw keeps its holes.
+            Time.maximumDeltaTime = 0.05f;
+            foreach (var detector in FindObjectsByType<HoleDetector>(FindObjectsSortMode.None))
+                foreach (var trigger in detector.GetComponents<Collider>())
+                    if (trigger.enabled && trigger.isTrigger) {
+                        trigger.enabled = false;
+                        pausedTriggers.Add(trigger);
+                    }
+            foreach (var layer in SimLayers)
+                for (var other = 0; other < 32; other++)
+                    Physics.IgnoreLayerCollision(layer, other, !Touches(layer, other));
 
             root = new GameObject("Simulation").transform;
             var parts = FindObjectsByType<SavedObject>(FindObjectsSortMode.None)
@@ -287,8 +325,9 @@ namespace Protobot.Motion {
             ground.transform.SetParent(root, false);
             var box = ground.AddComponent<BoxCollider>();
             box.size = new Vector3(4000f, 2f, 4000f);
-            box.center = new Vector3(0f, floor - 1f, 0f);
+            box.center = new Vector3(0f, (FloorHeight ?? floor) - 1f, 0f);
             box.sharedMaterial = Material(1f);
+            BuildEnvironment?.Invoke(root);   // V2: a game's field and game elements
 
             // Collisions within the robot only where parts don't start out touching (gears in mesh, a wheel on its
             // channel would fight).
@@ -330,7 +369,7 @@ namespace Protobot.Motion {
             return material;
         }
 
-        private enum WheelKind { None, Traction, Omni }
+        private enum WheelKind { None, Traction, Omni, Flex }
 
         private static readonly Dictionary<(Mesh, Vector3), Mesh> Hulls = new();
         private static Vector3[] directions;
@@ -411,6 +450,7 @@ namespace Protobot.Motion {
             if (!part.TryGetComponent(out SavedObject saved) || string.IsNullOrEmpty(saved.id)) return WheelKind.None;
             var id = saved.id.ToUpperInvariant();
             if (id.StartsWith("OMNI-") || (id.Contains("OMNI") && !id.Contains("LOCKED"))) return WheelKind.Omni;
+            if (id.StartsWith("FWHL-") || id.Contains("FLEX")) return WheelKind.Flex;   // V2: soft grip (FlexGrip)
             if (id.StartsWith("TWHL-") || id.StartsWith("FWHL-") || id.StartsWith("MECN") || id.Contains("WHEEL") || id.Contains("TIRE")) return WheelKind.Traction;
             return WheelKind.None;
         }
@@ -491,7 +531,9 @@ namespace Protobot.Motion {
                 collider.sharedMesh = Hull(filter.sharedMesh, kind != WheelKind.None ? WheelAxis(node) : (Vector3?)null);
                 collider.convex = true;
                 collider.contactOffset = 0.02f;
-                collider.sharedMaterial = kind == WheelKind.Omni ? Material(0f) : kind == WheelKind.Traction ? Material(1f) : Material(0.35f);
+                collider.sharedMaterial = kind == WheelKind.Omni ? Material(0f) : kind == WheelKind.Traction ? Material(1f)
+                    : kind == WheelKind.Flex ? Material(1.2f) : Material(0.35f);
+                if (kind == WheelKind.Flex) FlexGrip.Register(collider);
                 body.colliders++;
                 if (kind == WheelKind.Omni) omnis.Add(new Wheel { rb = rb, collider = collider, radius = Mathf.Max(size.x, size.y, size.z) / 2f });
             }
@@ -709,12 +751,12 @@ namespace Protobot.Motion {
         }
 
         private void Update() {
-            if (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame && !InputEvents.TextInput.IsTyping && !MotionUi.Capturing && !Popup.IsOpen) {
+            if (!Hosted && Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame && !InputEvents.TextInput.IsTyping && !MotionUi.Capturing && !Popup.IsOpen) {
                 Stop();
                 return;
             }
-            var typing = InputEvents.TextInput.IsTyping || InputEvents.TextInput.ShortcutsPaused;
-            var (left, right) = DrivePower();
+            var typing = InputEvents.TextInput.IsTyping || InputEvents.TextInput.ShortcutsPaused || !DriveEnabled;
+            var (left, right) = DriveEnabled ? DrivePower() : (0f, 0f);
             foreach (var train in trains)
                 foreach (var (motor, _) in train.motors) {
                     var side = Controls.Side(motor.gameObject);
@@ -868,6 +910,8 @@ namespace Protobot.Motion {
         // ------------------------------------------------------------------ for the controls panel
 
         public int BodyCount => bodies.Count;
+        /// <summary>What the simulation made (removed when it stops): a game adds its pieces here.</summary>
+        public Transform Root => root;
         public bool Drives(MotorDrive motor) => trains.Any(t => t.motors.Any(m => m.motor == motor));
         public bool Slides(PneumaticCylinder cylinder) => slides.Any(s => s.cylinder == cylinder);
         public bool Extended(PneumaticCylinder cylinder) => slides.FirstOrDefault(s => s.cylinder == cylinder)?.extended ?? cylinder.Extended;

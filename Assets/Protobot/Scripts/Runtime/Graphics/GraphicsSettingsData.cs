@@ -10,7 +10,7 @@ namespace Protobot.GraphicsQuality
     [Serializable]
     public class GraphicsSettingsData
     {
-        public const int CurrentVersion = 2;
+        public const int CurrentVersion = 3;
 
         /// <summary>Bumped when the saved format changes, so old files can be upgraded.</summary>
         public int version = CurrentVersion;
@@ -27,7 +27,14 @@ namespace Protobot.GraphicsQuality
         public TextureQuality textures = TextureQuality.Full;
         public ModelDetail modelDetail = ModelDetail.High;
         public bool anisotropicFiltering = true;
-        public bool hdr = true;
+        public bool hdr;
+
+        /// <summary>
+        /// Skips drawing parts that are only a few pixels tall on screen (far-away screws, nuts, the field's hardware):
+        /// 0 off, 1 under 2 px, 2 under 5 px, 3 under 10 px. Models are never simplified; a part is drawn again, in full detail, as
+        /// soon as it's bigger. Opt-in (no preset turns it on): it's for integrated graphics and old cards.
+        /// </summary>
+        public int smallPartCulling;
 
         [Header("Display (never changed by presets)")]
         public FullScreenMode windowMode = FullScreenMode.FullScreenWindow;
@@ -40,6 +47,13 @@ namespace Protobot.GraphicsQuality
         /// <summary>0 means unlimited. Ignored while vSync is on.</summary>
         public int frameRateLimit;
 
+        /// <summary>Drops to 30 FPS after a few seconds without input (nothing moves in a CAD view then), and to
+        /// 10 FPS while the window is in the background: saves battery and keeps laptops from heating up and slowing down.</summary>
+        public bool idleFrameRate = true;
+
+        /// <summary>A small frame rate counter in the corner of the 3D view.</summary>
+        public bool showFrameRate;
+
         public GraphicsSettingsData Clone() => (GraphicsSettingsData)MemberwiseClone();
 
         /// <summary>Overwrites the quality options with the values of a preset. Display options are left alone.</summary>
@@ -50,11 +64,12 @@ namespace Protobot.GraphicsQuality
             switch (newPreset)
             {
                 case GraphicsPreset.VeryLow:
-                    renderScale = 0.7f;
-                    antiAliasing = AntiAliasing.Off;
+                    // For integrated graphics and old workstation cards: no shadows, a lower resolution scaled up with FSR.
+                    renderScale = 0.75f;
+                    antiAliasing = AntiAliasing.FXAA;
                     shadows = ShadowQuality.Off;
                     ambientOcclusion = AmbientOcclusion.Off;
-                    postProcessing = false;
+                    postProcessing = true;
                     textures = TextureQuality.Half;
                     modelDetail = ModelDetail.Low;
                     anisotropicFiltering = false;
@@ -62,7 +77,8 @@ namespace Protobot.GraphicsQuality
                     break;
 
                 case GraphicsPreset.Low:
-                    renderScale = 0.85f;
+                    // Full resolution (thin edges stay sharp: what a robot is drawn with), one shadow cascade.
+                    renderScale = 1f;
                     antiAliasing = AntiAliasing.FXAA;
                     shadows = ShadowQuality.Low;
                     ambientOcclusion = AmbientOcclusion.Off;
@@ -82,7 +98,7 @@ namespace Protobot.GraphicsQuality
                     textures = TextureQuality.Full;
                     modelDetail = ModelDetail.Medium;
                     anisotropicFiltering = true;
-                    hdr = true;
+                    hdr = false;
                     break;
 
                 case GraphicsPreset.High:
@@ -94,7 +110,7 @@ namespace Protobot.GraphicsQuality
                     textures = TextureQuality.Full;
                     modelDetail = ModelDetail.High;
                     anisotropicFiltering = true;
-                    hdr = true;
+                    hdr = false;
                     break;
 
                 case GraphicsPreset.Ultra:
@@ -106,7 +122,7 @@ namespace Protobot.GraphicsQuality
                     textures = TextureQuality.Full;
                     modelDetail = ModelDetail.Ultra;
                     anisotropicFiltering = true;
-                    hdr = true;
+                    hdr = false;
                     break;
 
                 case GraphicsPreset.Extreme:
@@ -119,7 +135,7 @@ namespace Protobot.GraphicsQuality
                     textures = TextureQuality.Full;
                     modelDetail = ModelDetail.Ultra;
                     anisotropicFiltering = true;
-                    hdr = true;
+                    hdr = false;
                     break;
             }
         }

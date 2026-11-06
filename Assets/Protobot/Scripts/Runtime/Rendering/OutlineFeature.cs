@@ -27,11 +27,25 @@ namespace Protobot.Rendering
             if (!on && (renderer.renderingLayerMask & Layer) == 0)
                 return;  // not outlined: leave it without a property block (keeps it SRP-batched)
             renderer.renderingLayerMask = on ? renderer.renderingLayerMask | Layer : renderer.renderingLayerMask & ~Layer;
+            if (on) Outlined.Add(renderer);
+            else Outlined.Remove(renderer);
             var block = new MaterialPropertyBlock();
             renderer.GetPropertyBlock(block);
             color.a = 1f;  // the mask leaves out alpha 0 (no colour given)
             block.SetColor(ObjectColorId, on ? color : Color.clear);
             renderer.SetPropertyBlock(block);
+        }
+
+        // What is outlined now: with nothing, the mask and the full-screen composite are skipped (two full-screen
+        // passes saved on every frame, which counts on old and integrated GPUs).
+        static readonly HashSet<Renderer> Outlined = new();
+
+        static bool AnyOutlined()
+        {
+            if (Outlined.Count == 0)
+                return false;
+            Outlined.RemoveWhere(r => r == null || (r.renderingLayerMask & Layer) == 0);
+            return Outlined.Count > 0;
         }
 
         [SerializeField] Shader maskShader;
@@ -62,6 +76,8 @@ namespace Protobot.Rendering
                 return;
             if (renderingData.cameraData.renderType == CameraRenderType.Overlay)
                 return;  // the hand-held tool camera
+            if (!AnyOutlined())
+                return;
             if (maskMaterial == null)
                 maskMaterial = CoreUtils.CreateEngineMaterial(maskShader);
             if (compositeMaterial == null)
