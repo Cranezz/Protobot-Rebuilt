@@ -101,6 +101,90 @@ namespace Protobot.Polycarb {
             return false;
         }
 
+        /// <summary>
+        /// V2: how defined the sketch is, as SolidWorks colours it: the points and circles that can still move or grow
+        /// without breaking a relation or dimension (under-defined, blue) and whether it's fully defined. Worked out
+        /// from the equations' Jacobian: what isn't fixed by them is in its null space.
+        /// </summary>
+        public static (HashSet<int> freePoints, HashSet<int> freeRadii) Analyze(SketchData sketch) {
+            var freePoints = new HashSet<int>();
+            var freeRadii = new HashSet<int>();
+            var hold = new HashSet<int>();
+            foreach (var r in sketch.relations)
+                if (r.kind == RelationKind.Fix) {
+                    if (r.p1 != 0) hold.Add(r.p1);
+                    var e = sketch.Entity(r.e1);
+                    if (e != null) foreach (var id in sketch.PointsOf(e)) hold.Add(id);
+                }
+            var vars = new Variables();
+            var used = new HashSet<int>();
+            foreach (var e in sketch.entities) foreach (var id in sketch.PointsOf(e)) used.Add(id);
+            foreach (var p in sketch.points)
+                if (used.Contains(p.id) && !hold.Contains(p.id)) {
+                    vars.coords.Add((p, 0));
+                    vars.coords.Add((p, 1));
+                }
+            foreach (var e in sketch.entities)
+                if ((e.kind == EntityKind.Circle || e.kind == EntityKind.Arc) && !sketch.relations.Any(r => r.kind == RelationKind.Fix && r.e1 == e.id))
+                    vars.radii.Add(e);
+            var n = vars.Count;
+            if (n == 0) return (freePoints, freeRadii);
+            var equations = Equations(sketch);
+            var m = equations.Count;
+            var free = new bool[n];
+            if (m == 0) {
+                for (var j = 0; j < n; j++) free[j] = true;
+            }
+            else {
+                // Numeric Jacobian, then row-reduced: columns without a pivot are free; a pivot column is free when its
+                // row still depends on a free column.
+                var J = new double[m, n];
+                var r0 = new float[m];
+                for (var k = 0; k < m; k++) r0[k] = equations[k]();
+                const float h = 1e-4f;
+                for (var j = 0; j < n; j++) {
+                    var keep = vars.Get(j);
+                    vars.Set(j, keep + h);
+                    for (var k = 0; k < m; k++) J[k, j] = (equations[k]() - r0[k]) / h;
+                    vars.Set(j, keep);
+                }
+                var pivotOfRow = new List<int>();
+                var row = 0;
+                for (var col = 0; col < n && row < m; col++) {
+                    var best = row;
+                    for (var k = row + 1; k < m; k++)
+                        if (Math.Abs(J[k, col]) > Math.Abs(J[best, col])) best = k;
+                    if (Math.Abs(J[best, col]) < 1e-6) continue;
+                    if (best != row)
+                        for (var c = 0; c < n; c++) (J[row, c], J[best, c]) = (J[best, c], J[row, c]);
+                    var pivot = J[row, col];
+                    for (var c = 0; c < n; c++) J[row, c] /= pivot;
+                    for (var k = 0; k < m; k++) {
+                        if (k == row || Math.Abs(J[k, col]) < 1e-12) continue;
+                        var f = J[k, col];
+                        for (var c = 0; c < n; c++) J[k, c] -= f * J[row, c];
+                    }
+                    pivotOfRow.Add(col);
+                    row++;
+                }
+                var isPivot = new bool[n];
+                foreach (var c in pivotOfRow) isPivot[c] = true;
+                for (var j = 0; j < n; j++) free[j] = !isPivot[j];
+                for (var r = 0; r < pivotOfRow.Count; r++)
+                    for (var c = 0; c < n; c++)
+                        if (!isPivot[c] && Math.Abs(J[r, c]) > 1e-5) {
+                            free[pivotOfRow[r]] = true;
+                            break;
+                        }
+            }
+            for (var j = 0; j < n; j++) {
+                if (!free[j]) continue;
+                if (j < vars.coords.Count) freePoints.Add(vars.coords[j].point.id);
+                else freeRadii.Add(vars.radii[j - vars.coords.Count].id);
+            }
+            return (freePoints, freeRadii);
+        }
+
         private static float Residual(List<Func<float>> equations) => equations.Count == 0 ? 0f : equations.Max(e => Mathf.Abs(e()));
 
         private static double[] SolveLinear(double[,] a, double[] b) {
@@ -208,6 +292,27 @@ namespace Protobot.Polycarb {
                             list.Add(() => o2.p.y - o1.p.y);
                         }
                         break;
+                    case RelationKind.Collinear:
+                        if (Ends(s, e1, out var ka, out var kb) && Ends(s, e2, out var kc, out var kd)) {
+                            list.Add(() => Cross((kb.p - ka.p).normalized, kc.p - ka.p));
+                            list.Add(() => Cross((kb.p - ka.p).normalized, kd.p - ka.p));
+                        }
+                        break;
+                    case RelationKind.Symmetric:
+                        // Two points mirror each other across a line: their middle is on it, and they're square to it.
+                        if (p1 != null && p2 != null && Ends(s, e1, out var sa, out var sb)) {
+                            list.Add(() => Cross((sb.p - sa.p).normalized, (p1.p + p2.p) / 2f - sa.p));
+                            list.Add(() => Vector2.Dot((sb.p - sa.p).normalized, p2.p - p1.p));
+                        }
+                        break;
+                    case RelationKind.Coradial:
+                        if (IsRound(e1) && IsRound(e2) && P(e1.a) != null && P(e2.a) != null) {
+                            var (cc1, cc2, kk1, kk2) = (P(e1.a), P(e2.a), e1, e2);
+                            list.Add(() => cc2.p.x - cc1.p.x);
+                            list.Add(() => cc2.p.y - cc1.p.y);
+                            list.Add(() => kk1.radius - kk2.radius);
+                        }
+                        break;
                     case RelationKind.Tangent: {
                         if (IsRound(e1) && IsRound(e2) && P(e1.a) != null && P(e2.a) != null) {
                             // Two circles or arcs: touching outside or inside, whichever they're nearer now.
@@ -258,6 +363,38 @@ namespace Protobot.Polycarb {
                     case DimensionKind.Distance when P(d.from) != null && P(d.to) != null: {
                         var (a, b) = (P(d.from), P(d.to));
                         list.Add(() => Vector2.Distance(a.p, b.p) - value);
+                        break;
+                    }
+                    case DimensionKind.Horizontal when P(d.from) != null && P(d.to) != null: {
+                        var (a, b) = (P(d.from), P(d.to));
+                        list.Add(() => Mathf.Abs(b.p.x - a.p.x) - value);
+                        break;
+                    }
+                    case DimensionKind.Vertical when P(d.from) != null && P(d.to) != null: {
+                        var (a, b) = (P(d.from), P(d.to));
+                        list.Add(() => Mathf.Abs(b.p.y - a.p.y) - value);
+                        break;
+                    }
+                    case DimensionKind.Radius when e != null: {
+                        var round = e;
+                        list.Add(() => round.radius - value);
+                        break;
+                    }
+                    case DimensionKind.PointLine when P(d.from) != null && Ends(s, e, out var la, out var lb): {
+                        var q = P(d.from);
+                        list.Add(() => Mathf.Abs(Cross((lb.p - la.p).normalized, q.p - la.p)) - value);
+                        break;
+                    }
+                    case DimensionKind.LineLine when Ends(s, e, out var la, out var lb) && Ends(s, s.Entity(d.entity2), out var lc, out _): {
+                        list.Add(() => Mathf.Abs(Cross((lb.p - la.p).normalized, lc.p - la.p)) - value);
+                        break;
+                    }
+                    case DimensionKind.Angle when e != null && s.Entity(d.entity2) is SketchEntity other && Ends(s, e, out _, out _) && Ends(s, other, out _, out _): {
+                        var (l1, l2) = (e, other);
+                        list.Add(() => {
+                            var (d1, d2) = SketchData.AngleDirections(s, l1, l2, s.Point);
+                            return (Vector2.Angle(d1, d2) - value) * Mathf.Deg2Rad;
+                        });
                         break;
                     }
                 }

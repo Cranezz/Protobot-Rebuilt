@@ -178,6 +178,7 @@ namespace Protobot.Interface {
             new Item { label = Builds.AutoSave.Enabled ? "Autosave every minute: on" : "Autosave every minute: off", action = Builds.AutoSave.Toggle },
             new Item { divider = true },
             new Item { label = "Import part…", action = Custom.ImportDialog.Choose },
+            new Item { label = "Custom parts library…", action = Custom.LibraryDialog.Open },
             new Item { label = "Export parts list", action = () => Press(OldButton("Export Parts List")) },
             new Item { divider = true },
             new Item { label = "Exit", action = () => Press(OldButton("File Menu/Exit Button")) },

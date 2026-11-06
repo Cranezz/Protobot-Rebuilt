@@ -339,7 +339,15 @@ namespace Protobot.Interface {
                 var icon = Ui.Image(tile.transform, "Icon", Theme.Text);
                 icon.rectTransform.Place(new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -12f), new Vector2(40f, 40f));
                 var sprite = node.action == "polycarb" ? Interface.Instance.polycarbIcon : PartsCatalog.Type(node.IconType)?.icon;
-                if (sprite != null) {
+                if (node.action == "library") {
+                    // V2: three stacked cards (the library of your own parts).
+                    icon.color = new Color(1f, 1f, 1f, 0f);
+                    for (var i = 2; i >= 0; i--) {
+                        var card = Ui.Image(icon.transform, "Card", i == 0 ? Theme.Accent : Color.Lerp(Theme.TextDim, Theme.Field, i * 0.3f), 4f);
+                        card.rectTransform.Place(new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(i * 4f - 4f, 4f - i * 4f), new Vector2(26f, 30f));
+                    }
+                }
+                else if (sprite != null) {
                     icon.sprite = sprite;
                     icon.preserveAspect = true;
                     if (node.action == "polycarb") icon.color = new Color(0.7f, 0.85f, 1f, 1f);
@@ -396,16 +404,24 @@ namespace Protobot.Interface {
             if (part == null) return;
             var options = new List<string> { "Place" };
             if (part.kind == CustomParts.Polycarbonate) options.Add("Edit sketch");
-            options.Add("Remove from library");
+            else options.Add("Edit holes");
+            options.Add("Delete from library");
+            options.Add("Manage library…");
             Popup.Open(anchor, options.ToArray(), -1, i => {
                 switch (options[i]) {
                     case "Place": Choose(node); break;
                     case "Edit sketch": Polycarb.SheetEditor.Edit(part); break;
+                    case "Edit holes": ImportDialog.Edit(part); break;
+                    case "Manage library…": LibraryDialog.Open(); break;
                     default:
+                        // V2: the file moves to the library's Deleted folder (File > Custom parts library restores it).
                         var used = PartsManager.FindLoadedObjects().Any(o => o.GetComponent<SavedObject>().id == part.Id && !o.IsDeleted());
-                        CustomParts.Remove(part.key);
+                        if (!CustomParts.Remove(part.key)) {
+                            Interface.Say("Couldn't delete " + part.name + " (its file may be open somewhere else)", false);
+                            break;
+                        }
                         Thumbnails.Forget(part.key);
-                        Interface.Say(used ? "Removed " + part.name + " from your library (the copies in this build stay)" : "Removed " + part.name + " from your library", false);
+                        Interface.Say("Deleted " + part.name + " from your library" + (used ? " (the copies in this build stay)" : "") + ": File > Custom parts library can restore it");
                         break;
                 }
             });
@@ -438,6 +454,10 @@ namespace Protobot.Interface {
             }
             if (node.action == "polycarb") {
                 Polycarb.SheetEditor.Open();
+                return;
+            }
+            if (node.action == "library") {  // V2: see, edit and delete custom parts
+                LibraryDialog.Open();
                 return;
             }
             if (node.action == "chain") {  // V2: the chain generator

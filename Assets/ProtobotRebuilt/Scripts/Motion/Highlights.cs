@@ -38,13 +38,20 @@ namespace Protobot.Motion {
 
         private static bool Same(Color a, Color b) => Mathf.Abs(a.r - b.r) + Mathf.Abs(a.g - b.g) + Mathf.Abs(a.b - b.b) < 0.01f;
 
+        // Reused every frame (no garbage while outlines are on).
+        private readonly Dictionary<Renderer, (Color color, bool strong)> wanted = new();
+        private readonly List<Renderer> found = new();
+        private readonly List<Renderer> gone = new();
+
         private void LateUpdate() {
+            if (requests.Count == 0 && shown.Count == 0) return;
             // What each renderer should show from here (the strongest request wins).
-            var wanted = new Dictionary<Renderer, (Color color, bool strong)>();
+            wanted.Clear();
             foreach (var request in requests.Values)
                 foreach (var obj in request.objects) {
                     if (obj == null || obj.IsDeleted()) continue;
-                    foreach (var renderer in obj.GetComponentsInChildren<Renderer>()) {
+                    obj.GetComponentsInChildren(found);
+                    foreach (var renderer in found) {
                         if (renderer is not MeshRenderer || !renderer.enabled) continue;
                         if (wanted.TryGetValue(renderer, out var have) && (have.strong || !request.strong)) continue;
                         wanted[renderer] = (request.color, request.strong);
@@ -52,7 +59,7 @@ namespace Protobot.Motion {
                 }
 
             // Let go of what isn't wanted any more.
-            var gone = new List<Renderer>();
+            gone.Clear();
             foreach (var pair in shown)
                 if (pair.Key == null) gone.Add(pair.Key);
                 else if (!wanted.ContainsKey(pair.Key)) {

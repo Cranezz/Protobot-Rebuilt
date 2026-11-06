@@ -13,7 +13,8 @@ namespace Protobot.Polycarb {
         public Vector2 p;
     }
 
-    public enum EntityKind { Line, Rectangle, Circle, Arc }
+    // V2: Point is a sketch point on its own (a hole's place, a reference), as SolidWorks' Point tool makes.
+    public enum EntityKind { Line, Rectangle, Circle, Arc, Point }
 
     [Serializable]
     public class SketchEntity {
@@ -22,12 +23,15 @@ namespace Protobot.Polycarb {
         public int a, b, c, d;     // points: line a-b; rectangle corners a,b,c,d (a-b along x); circle centre a; arc centre a, start b, end c
         public float radius;       // circle and arc
         public bool construction;  // drawn dashed, not part of any region
+        public bool projected;     // V2: brought in from a part's edges (Convert Entities): fixed where it is
     }
 
-    public enum DimensionKind { Length, Width, Height, Diameter, Distance }
+    // V2: as SolidWorks' Smart Dimension: also horizontal and vertical distances between points, a point to a line,
+    // between parallel lines, the angle between lines, and an arc's radius.
+    public enum DimensionKind { Length, Width, Height, Diameter, Distance, Horizontal, Vertical, PointLine, Angle, Radius, LineLine }
 
     // V2: sketch relations, as in a CAD sketch (SketchSolver keeps them true).
-    public enum RelationKind { Horizontal, Vertical, Parallel, Perpendicular, Equal, Coincident, Tangent, Concentric, Midpoint, Fix }
+    public enum RelationKind { Horizontal, Vertical, Parallel, Perpendicular, Equal, Coincident, Tangent, Concentric, Midpoint, Fix, Collinear, Symmetric, Coradial }
 
     [Serializable]
     public class SketchRelation {
@@ -48,14 +52,15 @@ namespace Protobot.Polycarb {
     public class SketchDimension {
         public int id;
         public DimensionKind kind;
-        public int entity;          // Length (line), Width/Height (rectangle), Diameter (circle/arc)
-        public int from, to;        // Distance: two points
+        public int entity;          // Length (line), Width/Height (rectangle), Diameter/Radius (circle/arc), the line of PointLine/LineLine/Angle
+        public int entity2;         // V2: the second line (LineLine, Angle)
+        public int from, to;        // Distance/Horizontal/Vertical: two points; PointLine: the point (from)
         public float offset = 0.35f;
         public float value;         // V2: the size it holds (0 in older sketches: what it measures)
     }
 
     [Serializable]
-    public class SketchData {
+    public partial class SketchData {
         public List<SketchPoint> points = new();
         public List<SketchEntity> entities = new();
         public List<SketchDimension> dimensions = new();
@@ -65,6 +70,7 @@ namespace Protobot.Polycarb {
         public List<ManualHole> manualHoles = new();
         public List<Vector2> notHoles = new();  // holes found in the piece that you said aren't screw holes
         public int nextId = 1;
+        public int origin;   // V2: the sketch's origin point (fixed at 0, 0), as every SolidWorks sketch has
 
         public SketchPoint Point(int id) => points.FirstOrDefault(p => p.id == id);
         public Vector2 P(int id) => Point(id)?.p ?? Vector2.zero;
@@ -95,13 +101,14 @@ namespace Protobot.Polycarb {
             EntityKind.Line => new[] { e.a, e.b },
             EntityKind.Rectangle => new[] { e.a, e.b, e.c, e.d },
             EntityKind.Circle => new[] { e.a },
+            EntityKind.Point => new[] { e.a },
             _ => new[] { e.a, e.b, e.c },
         };
 
         /// <summary>Removes an entity, its dimensions and relations, and points nothing else uses.</summary>
         public void Remove(SketchEntity entity) {
             entities.Remove(entity);
-            dimensions.RemoveAll(d => d.entity == entity.id);
+            dimensions.RemoveAll(d => d.entity == entity.id || d.entity2 == entity.id);
             relations ??= new List<SketchRelation>();
             relations.RemoveAll(r => r.e1 == entity.id || r.e2 == entity.id);
             Tidy();
@@ -110,9 +117,13 @@ namespace Protobot.Polycarb {
         /// <summary>Drops points nothing uses, and dimensions and relations on them.</summary>
         public void Tidy() {
             var used = new HashSet<int>(entities.SelectMany(PointsOf));
+            if (origin != 0) used.Add(origin);
             var gone = points.Where(p => !used.Contains(p.id)).Select(p => p.id).ToList();
             points.RemoveAll(p => gone.Contains(p.id));
-            dimensions.RemoveAll(d => d.kind == DimensionKind.Distance && (gone.Contains(d.from) || gone.Contains(d.to)));
+            dimensions.RemoveAll(d => (d.kind == DimensionKind.Distance || d.kind == DimensionKind.Horizontal || d.kind == DimensionKind.Vertical || d.kind == DimensionKind.PointLine)
+                                      && (gone.Contains(d.from) || gone.Contains(d.to)));
+            var ids = new HashSet<int>(entities.Select(e => e.id));
+            dimensions.RemoveAll(d => (d.kind == DimensionKind.PointLine || d.kind == DimensionKind.LineLine || d.kind == DimensionKind.Angle) && (!ids.Contains(d.entity) || d.entity2 != 0 && !ids.Contains(d.entity2)));
             relations ??= new List<SketchRelation>();
             relations.RemoveAll(r => gone.Contains(r.p1) || gone.Contains(r.p2));
         }
@@ -135,6 +146,11 @@ namespace Protobot.Polycarb {
             // side can be related, dimensioned and trimmed on its own.
             foreach (var rect in entities.Where(e => e.kind == EntityKind.Rectangle).ToList())
                 Explode(rect);
+            // V2: the origin, fixed (dimensions and relations to it fully define a sketch, as in SolidWorks).
+            if (origin == 0 || Point(origin) == null) {
+                origin = AddPoint(Vector2.zero).id;
+                Relate(RelationKind.Fix, p1: origin);
+            }
         }
 
         // ------------------------------------------------------------------ trimming (V2)
@@ -168,6 +184,10 @@ namespace Protobot.Polycarb {
         /// short or split in two. False when nothing crosses it (then the whole curve goes).
         /// </summary>
         public bool Trim(SketchEntity e, Vector2 at) {
+            if (e.kind == EntityKind.Point) {
+                Remove(e);
+                return false;
+            }
             if (e.kind == EntityKind.Rectangle) {
                 var lines = Explode(e);
                 var nearest = lines.OrderBy(l => DistanceToSegment(at, P(l.a), P(l.b))).First();
@@ -276,6 +296,44 @@ namespace Protobot.Polycarb {
             return true;
         }
 
+        /// <summary>Distance from a point to the endless line through a and b.</summary>
+        public static float DistanceToLine(Vector2 p, Vector2 a, Vector2 b) {
+            var d = b - a;
+            if (d.sqrMagnitude < 1e-12f) return Vector2.Distance(p, a);
+            d.Normalize();
+            return Mathf.Abs(d.x * (p.y - a.y) - d.y * (p.x - a.x));
+        }
+
+        /// <summary>V2: the angle (degrees) between two lines at the corner they make: each measured from where they
+        /// meet (their shared end, or where they'd cross) towards its far end.</summary>
+        public float AngleBetween(SketchEntity l1, SketchEntity l2) {
+            var (d1, d2) = AngleDirections(this, l1, l2, Point);
+            return Vector2.Angle(d1, d2);
+        }
+
+        public static (Vector2, Vector2) AngleDirections(SketchData s, SketchEntity l1, SketchEntity l2, Func<int, SketchPoint> point) {
+            var vertex = AngleCorner(l1, l2, point);
+            Vector2 a1 = point(l1.a).p, b1 = point(l1.b).p, a2 = point(l2.a).p, b2 = point(l2.b).p;
+            var d1 = (Vector2.Distance(a1, vertex) > Vector2.Distance(b1, vertex) ? a1 : b1) - vertex;
+            var d2 = (Vector2.Distance(a2, vertex) > Vector2.Distance(b2, vertex) ? a2 : b2) - vertex;
+            return (d1, d2);
+        }
+
+        /// <summary>Where two lines make their corner: their shared end, or where they'd cross.</summary>
+        public static Vector2 AngleCorner(SketchEntity l1, SketchEntity l2, Func<int, SketchPoint> point) {
+            Vector2 a1 = point(l1.a).p, b1 = point(l1.b).p, a2 = point(l2.a).p, b2 = point(l2.b).p;
+            Vector2 vertex;
+            if (l1.a == l2.a || l1.a == l2.b) vertex = a1;
+            else if (l1.b == l2.a || l1.b == l2.b) vertex = b1;
+            else {
+                var r = b1 - a1;
+                var q = b2 - a2;
+                var den = r.x * q.y - r.y * q.x;
+                vertex = Mathf.Abs(den) < 1e-9f ? a1 : a1 + r * (((a2.x - a1.x) * q.y - (a2.y - a1.y) * q.x) / den);
+            }
+            return vertex;
+        }
+
         private static float DistanceToSegment(Vector2 p, Vector2 a, Vector2 b) {
             var ab = b - a;
             var t = ab.sqrMagnitude > 1e-10f ? Mathf.Clamp01(Vector2.Dot(p - a, ab) / ab.sqrMagnitude) : 0f;
@@ -312,6 +370,7 @@ namespace Protobot.Polycarb {
         /// <summary>Merges point <paramref name="from"/> into <paramref name="into"/> (snapping an end onto another).</summary>
         public void Merge(int from, int into) {
             if (from == into) return;
+            if (from == origin) (from, into) = (into, from);  // V2: the origin stays
             foreach (var e in entities) {
                 if (e.a == from) e.a = into;
                 if (e.b == from) e.b = into;
@@ -338,6 +397,12 @@ namespace Protobot.Polycarb {
                 DimensionKind.Width => e != null ? Vector2.Distance(P(e.a), P(e.b)) : 0f,
                 DimensionKind.Height => e != null ? Vector2.Distance(P(e.b), P(e.c)) : 0f,
                 DimensionKind.Diameter => e != null ? e.radius * 2f : 0f,
+                DimensionKind.Radius => e != null ? e.radius : 0f,
+                DimensionKind.Horizontal => Mathf.Abs(P(dimension.to).x - P(dimension.from).x),
+                DimensionKind.Vertical => Mathf.Abs(P(dimension.to).y - P(dimension.from).y),
+                DimensionKind.PointLine => e != null ? DistanceToLine(P(dimension.from), P(e.a), P(e.b)) : 0f,
+                DimensionKind.LineLine => e != null && Entity(dimension.entity2) is SketchEntity l2 ? DistanceToLine(P(l2.a), P(e.a), P(e.b)) : 0f,
+                DimensionKind.Angle => e != null && Entity(dimension.entity2) is SketchEntity m2 ? AngleBetween(e, m2) : 0f,
                 _ => Vector2.Distance(P(dimension.from), P(dimension.to)),
             };
         }
@@ -415,6 +480,9 @@ namespace Protobot.Polycarb {
                     list.Add(P(e.c));
                     list.Add(P(e.d));
                     closed = true;
+                    break;
+                case EntityKind.Point:
+                    list.Add(P(e.a));
                     break;
                 case EntityKind.Circle: {
                     var c = P(e.a);

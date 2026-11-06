@@ -97,7 +97,6 @@ namespace Protobot.Motion {
         /// <summary>Runs forward (1) or in reverse (-1) until stopped (0); the same direction again stops it.</summary>
         public void Run(int direction) {
             if (direction == Toggled) direction = 0;
-            if (direction == 0 && Toggled != 0) Interface.Interface.Say(Label + " stopped", true);
             Toggled = direction;
         }
 

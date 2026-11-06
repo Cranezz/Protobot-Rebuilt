@@ -57,10 +57,39 @@ namespace Protobot.Motion {
 
         // ------------------------------------------------------------------ rotors
 
-        /// <summary>Every shaft in the build as a rotor.</summary>
+        // A hole as Fill needs it, read once per look at the build (transform reads are the slow part).
+        private struct HoleInfo {
+            public HoleCollider hole;
+            public GameObject part;
+            public Vector3 position, forward;
+        }
+
+        private static List<Rotor> cached;
+        private static long cachedVersion = -1;
+
+        /// <summary>Every shaft in the build as a rotor, kept until the build changes (an undo step, a part made or
+        /// removed): use this unless parts were moved without an undo step.</summary>
+        public static List<Rotor> Current() {
+            if (cached == null || cachedVersion != Dynamics.Version) {
+                cached = Rotors();
+                cachedVersion = Dynamics.Version;
+            }
+            return cached;
+        }
+
+        /// <summary>Every shaft in the build as a rotor (looked at now).</summary>
         public static List<Rotor> Rotors() {
-            var holes = Object.FindObjectsByType<HoleCollider>(FindObjectsSortMode.None)
-                              .Where(h => h.transform.parent != null && !h.transform.parent.gameObject.IsDeleted()).ToList();
+            var holes = new List<HoleInfo>();
+            var gone = new Dictionary<GameObject, bool>();
+            foreach (var h in Object.FindObjectsByType<HoleCollider>(FindObjectsSortMode.None)) {
+                var parent = h.transform.parent;
+                if (parent == null) continue;
+                var part = parent.gameObject;
+                if (!gone.TryGetValue(part, out var deleted)) gone[part] = deleted = part.IsDeleted();
+                if (deleted) continue;
+                var t = h.transform;
+                holes.Add(new HoleInfo { hole = h, part = part, position = t.position, forward = t.forward });
+            }
             var motors = MotorDrive.Live();
             var rotors = new List<Rotor>();
             foreach (var shaft in Object.FindObjectsByType<Shaft>(FindObjectsSortMode.None))
@@ -96,7 +125,7 @@ namespace Protobot.Motion {
             return along >= rotor.low - slack && along <= rotor.high + slack;
         }
 
-        private static void Fill(Rotor rotor, List<HoleCollider> holes, List<MotorDrive> motors) {
+        private static void Fill(Rotor rotor, List<HoleInfo> holes, List<MotorDrive> motors) {
             var square = HoleShapes.instance != null ? HoleShapes.instance.GetShapeMesh("square") : null;
             var locked = new List<GameObject>();
             var turnsIn = new HashSet<GameObject>();
@@ -104,11 +133,13 @@ namespace Protobot.Motion {
                 if (motor.ShaftHole != null && OnShaft(rotor, motor.ShaftHole.transform.position)
                     && Mathf.Abs(Vector3.Dot(motor.ShaftHole.transform.forward, rotor.axis)) > 0.98f)
                     rotor.motors.Add(motor);
-            foreach (var hole in holes) {
-                var part = hole.transform.parent.gameObject;
-                if (part == rotor.shaft || locked.Contains(part)) continue;
-                if (Mathf.Abs(Vector3.Dot(hole.transform.forward, rotor.axis)) < 0.98f) continue;
-                if (!OnShaft(rotor, hole.transform.position)) continue;
+            foreach (var info in holes) {
+                var part = info.part;
+                if (part == rotor.shaft) continue;
+                if (Mathf.Abs(Vector3.Dot(info.forward, rotor.axis)) < 0.98f) continue;
+                if (!OnShaft(rotor, info.position)) continue;
+                if (locked.Contains(part)) continue;
+                var hole = info.hole;
                 if (rotor.motors.Any(m => m.gameObject == part)) continue;   // driven, not locked
                 var size = Mathf.Max(hole.transform.lossyScale.x, hole.transform.lossyScale.y);
                 var isSquare = hole.TryGetComponent(out MeshCollider mesh) && square != null && mesh.sharedMesh == square;
@@ -119,7 +150,7 @@ namespace Protobot.Motion {
                     rotor.bearings.RemoveAll(b => b.part == part);
                 }
                 else if (turnsIn.Add(part))
-                    rotor.bearings.Add((part, hole.transform.position));
+                    rotor.bearings.Add((part, info.position));
             }
             var stop = new HashSet<GameObject>(turnsIn);
             foreach (var motor in rotor.motors) stop.Add(motor.gameObject);
@@ -182,17 +213,22 @@ namespace Protobot.Motion {
 
         // ------------------------------------------------------------------ chains
 
-        // Which chain each sprocket is on (and its wrap), found when the rotors are.
+        // Which chain each sprocket is on (and its wrap), and each chain's sprockets, found when the rotors are.
         private static readonly Dictionary<GameObject, List<(ChainLoop chain, int wrap)>> chainOf = new();
+        private static readonly Dictionary<ChainLoop, List<(GameObject part, int wrap)>> sprocketsOf = new();
 
         private static void FindChains() {
             chainOf.Clear();
+            sprocketsOf.Clear();
             foreach (var chain in ChainLoop.All)
-                if (chain != null && !chain.gameObject.IsDeleted() && chain.Path != null && chain.Path.Valid)
-                    foreach (var (part, wrap) in chain.Sprockets()) {
+                if (chain != null && !chain.gameObject.IsDeleted() && chain.Path != null && chain.Path.Valid) {
+                    var found = chain.Sprockets();
+                    sprocketsOf[chain] = found;
+                    foreach (var (part, wrap) in found) {
                         if (!chainOf.TryGetValue(part, out var list)) chainOf[part] = list = new List<(ChainLoop, int)>();
                         list.Add((chain, wrap));
                     }
+                }
         }
 
         // ------------------------------------------------------------------ systems
@@ -203,6 +239,10 @@ namespace Protobot.Motion {
             if (first == null) return system;
             system.rotors.Add(first);
             system.ratio[first] = 1f;
+            // Which rotor each gear or sprocket turns with.
+            var rotorOf = new Dictionary<GameObject, Rotor>();
+            foreach (var r in all)
+                foreach (var g in r.gears) rotorOf[g.part] = r;
             var queue = new Queue<Rotor>();
             queue.Enqueue(first);
             while (queue.Count > 0) {
@@ -217,10 +257,10 @@ namespace Protobot.Motion {
                         var sa = Mathf.Sign(Vector3.Dot(rotor.axis, n));
                         if (!system.chains.Any(c => c.chain == chain))
                             system.chains.Add((chain, rotor, sa * chain.Rolling(wrap) / mine.way));
-                        foreach (var (part, otherWrap) in chain.Sprockets()) {
+                        if (!sprocketsOf.TryGetValue(chain, out var onChain)) continue;
+                        foreach (var (part, otherWrap) in onChain) {
                             if (otherWrap == wrap) continue;
-                            var other = all.FirstOrDefault(r => r != rotor && r.gears.Any(g => g.part == part));
-                            if (other == null) continue;
+                            if (!rotorOf.TryGetValue(part, out var other) || other == rotor) continue;
                             var theirs = chain.wraps[otherWrap];
                             var sb = Mathf.Sign(Vector3.Dot(other.axis, n));
                             // A chain moves one link per tooth: the ratio is the teeth's.
@@ -280,7 +320,7 @@ namespace Protobot.Motion {
 
         /// <summary>The system a motor drives (null when no shaft is in it).</summary>
         public static DriveSystem SystemOf(MotorDrive motor, List<Rotor> all = null) {
-            all ??= Rotors();
+            all ??= Current();
             var rotor = all.FirstOrDefault(r => r.motors.Contains(motor));
             return rotor == null ? null : SystemOf(rotor, all);
         }

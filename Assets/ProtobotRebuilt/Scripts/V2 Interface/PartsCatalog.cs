@@ -236,7 +236,9 @@ namespace Protobot.Interface {
             Add(Group(s, "Sprockets & chain", "SPKT",
                 Group(s, "Normal sprockets", "SPKT", Sizes(s, "SPKT", "Normal", o => o + " sprocket")),
                 Group(s, "High strength sprockets", "SPKT", Sizes(s, "SPKT", "High Strength", o => o + " HS sprocket")),
-                Group(s, "6P sprockets", "VXSPROCKETS", Vex(s, "VXSPROCKETS", o => Contains(o, "6P"))),
+                // V2: the 6P (low strength) sprockets, smallest first.
+                Group(s, "6P (low strength) sprockets", "VXSPROCKETS", Vex(s, "VXSPROCKETS", o => Contains(o, "6P"))
+                    .Where(n => n != null).OrderBy(n => int.TryParse(Regex.Match(n.name, @"(\d+)T").Groups[1].Value, out var t) ? t : 0)),
                 Group(s, "Tank tread drive", "VXSPROCKETS", Vex(s, "VXSPROCKETS", o => Contains(o, "9P"))),
                 new CatalogNode { section = s, name = "Chain (round sprockets)", action = "chain", iconType = "VXCHAIN9P",
                                   tip = "Make a chain: click the sprockets it goes round, in order; click one again to wrap it from the other side." },
@@ -336,6 +338,7 @@ namespace Protobot.Interface {
             const string s = "Custom";
             nodes.Add(new CatalogNode { section = s, name = "Import part", action = "import", tip = "Add your own part from a 3D model file (STL, OBJ, 3MF, GLB, glTF, PLY, OFF)." });
             nodes.Add(new CatalogNode { section = s, name = "Polycarbonate", action = "polycarb", tip = "Sketch a polycarbonate piece on the sheet and cut it out." });
+            nodes.Add(new CatalogNode { section = s, name = "Library", action = "library", tip = "Your imported parts and plastic pieces: edit them, or delete ones you don't need." });
             foreach (var part in Protobot.Custom.CustomParts.All.OrderByDescending(p => p.created))
                 nodes.Add(new CatalogNode { section = s, name = part.name, customId = part.Id, typeId = part.kind, p1 = part.key,
                     tip = part.kind == Protobot.Custom.CustomParts.Polycarbonate ? "Polycarbonate piece" : "Imported from " + part.source });

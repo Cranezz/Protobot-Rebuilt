@@ -156,7 +156,7 @@ namespace Protobot.Motion {
 
         // Not the speed: the slider being dragged would be made again.
         private string Signature() => string.Join("|", controlled.Select(m => m.GetInstanceID() + ":" + m.Rpm + ":" + Controls.ForwardKey(m.gameObject) + ":"
-                                                                         + Controls.ReverseKey(m.gameObject) + ":" + Controls.Reversed(m.gameObject)))
+                                                                         + Controls.ReverseKey(m.gameObject) + ":" + Controls.Reversed(m.gameObject) + ":" + m.Label))
                                       + "#" + string.Join(",", MotorDrive.Live().Select(m => m.Label)) + "#" + stateVersion;
 
         private void Rebuild() {
@@ -201,31 +201,24 @@ namespace Protobot.Motion {
                 v => Interface.Interface.Say(Names(motors) + ": " + Mathf.RoundToInt(v * 100f) + "% speed", true));
             slider.Size(-1, 26f, 1f);
 
-            // Direction, name.
-            var reversed = motors.All(m => Controls.Reversed(m.gameObject));
-            ToolOptions.Switch(body, "Reversed (forward turns the other way)", reversed, on => {
-                foreach (var m in motors) Controls.SetReversed(m.gameObject, on);
-                Interface.Interface.Say(Names(motors) + (on ? " reversed" : " not reversed"), true);
-            });
-            if (motors.Count == 1) {
-                var nameRow = Row("Name");
-                Label(nameRow, "Name", 58f);
-                var motor = motors[0];
-                var field = Ui.Field(nameRow, "Name", Controls.GivenName(motor.gameObject) ?? "", value => {
-                    var before = motor.Label;
-                    Controls.SetName(motor.gameObject, value);
-                    Interface.Interface.Say(before == motor.Label ? motor.Label : before + " is now " + motor.Label, true);
-                });
-                field.Size(-1, 28f, 1f);
-                Ui.Tip(field, "Name", null, "A name for this motor (\"Left drive\", \"Arm\"); empty: Motor " + motor.Number + ".");
-            }
+            // Each controlled motor: its name and which way is forward for it (paired motors are listed here).
+            var listHeading = Ui.Text(body, "Controlled", motors.Count == 1 ? "This motor" : "Controlled together", Theme.FontSmall, Theme.Text, Theme.Medium);
+            listHeading.Size(-1, 22f);
+            foreach (var motor in motors) MotorRow(motor, motors.Count > 1);
 
             status = Ui.Text(body, "Status", "", Theme.FontSmall, Theme.TextDim);
             status.Size(-1, 22f);
 
             // The systems these motors drive, and the motors in them not controlled.
-            var rotors = GearTrain.Rotors();
-            systems = motors.Select(m => GearTrain.SystemOf(m, rotors)).Where(s => s != null).ToArray();
+            var rotors = GearTrain.Current();
+            // V2: one entry per system (two motors on one system each find it; list it once).
+            var found = new List<DriveSystem>();
+            foreach (var m in motors) {
+                if (found.Any(s => s.Motors.Contains(m))) continue;
+                var system = GearTrain.SystemOf(m, rotors);
+                if (system != null) found.Add(system);
+            }
+            systems = found.ToArray();
             geared = systems.SelectMany(s => s.Motors).Distinct().Where(m => !controlled.Contains(m)).ToList();
             Ui.Divider(body);
             var shafts = systems.SelectMany(s => s.rotors).Distinct().Count();
@@ -270,6 +263,45 @@ namespace Protobot.Motion {
                     pair.Size(-1, 26f);
                     Ui.Tip(pair, "Pair", null, "Controls " + other.Label + " with these (it gets their keys, speed and gearbox; set them to match).");
                 }
+            }
+        }
+
+        private void MotorRow(MotorDrive motor, bool canUnpair) {
+            var row = Row(motor.Label);
+            var dot = Ui.Image(row, "Cartridge", motor.Color, 5f);
+            dot.Size(10f, 10f);
+            var field = Ui.Field(row, "Name", Controls.GivenName(motor.gameObject) ?? "", value => {
+                var before = motor.Label;
+                Controls.SetName(motor.gameObject, value);
+                if (before != motor.Label) Interface.Interface.Say(before + " is now " + motor.Label, true);
+            });
+            field.Size(-1, 28f, 1f);
+            if (string.IsNullOrEmpty(field.text) && field.placeholder == null) {
+                var hint = Ui.Text(field.transform.Find("Text Area"), "Placeholder", "Motor " + motor.Number, Theme.FontBody, Theme.TextFaint);
+                hint.rectTransform.Fill();
+                field.placeholder = hint;
+            }
+            Ui.Tip(field, "Name", null, "A name for this motor (\"Left drive\", \"Arm\"); empty: Motor " + motor.Number + ".");
+            var kind = Ui.Text(row, "Kind", motor.Kind, Theme.FontSmall, Theme.TextDim);
+            kind.Size(34f, 26f);
+            var reversed = Controls.Reversed(motor.gameObject);
+            var rev = Ui.Button(row, "Reversed", "Rev", () => {
+                Controls.SetReversed(motor.gameObject, !Controls.Reversed(motor.gameObject));
+                Interface.Interface.Say(motor.Label + (Controls.Reversed(motor.gameObject) ? " reversed: forward turns the other way" : " not reversed"), true);
+                Audio.Sounds.Play(Audio.Sounds.Tick);
+                shown = null;
+            }, reversed, 5f, Theme.FontSmall);
+            rev.Size(-1, 26f);
+            if (!reversed) rev.targetGraphic.color = Theme.Field;
+            Ui.Tip(rev, "Reversed", null, "Forward turns this motor the other way (two motors facing each other on one system).");
+            if (canUnpair) {
+                var off = Ui.Button(row, "Unpair", "×", () => {
+                    controlled.Remove(motor);
+                    motor.StopToggle();
+                    Interface.Interface.Say(motor.Label + " isn't controlled with the others now", true);
+                }, false, 5f, Theme.FontBody);
+                off.Size(26f, 26f);
+                Ui.Tip(off, "Unpair", null, "Stops controlling " + motor.Label + " with these.");
             }
         }
 

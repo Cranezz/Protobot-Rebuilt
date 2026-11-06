@@ -10,45 +10,41 @@ using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 namespace Protobot.Polycarb {
-    // V2: the polycarbonate editor, a full screen of its own over the build, laid out like a CAD sketch:
-    // - A toolbar of icons along the top (hover one for its name and key): sketch tools (select, line, rectangle,
-    //   circle, arc, slot), trim, construction, dimension, and the relations (horizontal, vertical, parallel,
-    //   perpendicular, equal, coincident, tangent, concentric, midpoint, fix) for what's selected. Shift- or
-    //   Ctrl-click selects more than one thing. SketchSolver keeps every relation and dimension true while you
-    //   drag and type; a relation that can't hold is refused.
-    // - Snapping to the 1/16" grid and to points; dimensions hold the size you type. Undo and redo.
-    // - "Make piece": the view tilts into 3D, you click the closed areas that make the piece (several join into
-    //   one) and see it extruded as you go, with its screw holes found as you pick (every cut-out up to 1 1/4"
-    //   across, its exact shape; click one to leave it out) and "Hole on a curve" to put a hole on any circle or
-    //   arc (half a circle at the edge too). Open outlines are marked and explained. Then name it, pick the
-    //   thickness and the plastic, and Create: it goes in the parts browser and you place it on the robot.
+    // V2: the polycarbonate editor, laid out like a SolidWorks sketch (the tools are in SheetEditor.Tools, the
+    // PropertyManager panel in SheetEditor.Side, drawing in SheetEditor.Draw, Smart Dimension in
+    // SheetEditor.Dimension, sketching on a part in the build in SheetEditor.Place):
+    // - A toolbar of icons: sketch tools (line, centerline, midpoint line, corner / centre / 3-point rectangle, slot,
+    //   circle, perimeter circle, centrepoint / tangent / 3-point arc, polygon, point; the variants under ▾), modify
+    //   tools (trim, extend, fillet, chamfer, offset, mirror, linear and circular patterns, move / copy / rotate /
+    //   scale), construction, smart dimension, relations, Convert Entities, view.
+    // - Snaps and automatic relations as you draw; SketchSolver keeps every relation and dimension true; blue is
+    //   under defined, white fully defined. Box selection, dragging, copy and paste, undo and redo.
+    // - Make piece: the view tilts into 3D (or, on a part, stays in the build), you click the closed areas that make
+    //   the piece and see it extruded with its screw holes found; then name it, pick the thickness and the plastic,
+    //   and Create (on a part, it's made right there on the face).
     // The wheel zooms anywhere on the screen; right or middle drag pans.
-    public class SheetEditor : MonoBehaviour {
-        private enum Tool { Select, Line, Rectangle, Circle, Arc, Slot, Trim, Dimension }
+    public partial class SheetEditor : MonoBehaviour {
+        private enum Tool {
+            Select, Line, Centerline, MidpointLine, Rectangle, CenterRectangle, ThreePointRectangle, Circle, PerimeterCircle,
+            Arc, TangentArc, ThreePointArc, Slot, Polygon, Point, Trim, Extend, Fillet, Chamfer, Offset, Mirror,
+            LinearPattern, CircularPattern, Move, Copy, Rotate, Scale, Dimension, Project,
+        }
         private enum Stage { Sketch, Piece }
 
-        private static readonly (Tool tool, string name, string key, string help)[] Tools = {
-            (Tool.Select, "Select", "V", "Click a line, shape or point to select it; Shift or Ctrl adds more. Drag a point to move it. Delete removes what's selected."),
-            (Tool.Line, "Line", "L", "Click to start, click for each corner. Click the first point to close it; Esc or right-click to stop."),
-            (Tool.Rectangle, "Rectangle", "R", "Click one corner, then the opposite one."),
-            (Tool.Circle, "Circle", "C", "Click the centre, then a point on the circle."),
-            (Tool.Arc, "Arc", "A", "Click the centre, the start, then the end (it goes counter-clockwise)."),
-            (Tool.Slot, "Slot", "S", "Click one end's centre, the other end's centre, then how wide it is."),
-            (Tool.Trim, "Trim", "T", "Click the part of a curve to cut away: it's trimmed back to where other curves cross it."),
-            (Tool.Dimension, "Dimension", "D", "Click a line, a rectangle's side or a circle; or two points for the distance between them. Type the size: it holds."),
-        };
-
         private static readonly (RelationKind kind, string name, string help)[] RelationButtons = {
-            (RelationKind.Horizontal, "Horizontal", "Select lines (or two points) to make them horizontal."),
-            (RelationKind.Vertical, "Vertical", "Select lines (or two points) to make them vertical."),
-            (RelationKind.Parallel, "Parallel", "Select two lines."),
-            (RelationKind.Perpendicular, "Perpendicular", "Select two lines."),
-            (RelationKind.Equal, "Equal", "Select lines (same length) or circles and arcs (same size)."),
-            (RelationKind.Coincident, "Coincident", "Select a point and another point, a line, a circle or an arc."),
-            (RelationKind.Tangent, "Tangent", "Select a line and a circle or arc."),
-            (RelationKind.Concentric, "Concentric", "Select two circles or arcs."),
-            (RelationKind.Midpoint, "Midpoint", "Select a point and a line: the point goes to the line's middle."),
-            (RelationKind.Fix, "Fix", "Select points or curves: they stay where they are."),
+            (RelationKind.Horizontal, "Horizontal", "Lines (or two points) level."),
+            (RelationKind.Vertical, "Vertical", "Lines (or two points) upright."),
+            (RelationKind.Collinear, "Collinear", "Two lines on one straight line."),
+            (RelationKind.Parallel, "Parallel", "Two lines parallel."),
+            (RelationKind.Perpendicular, "Perpendicular", "Two lines square to each other."),
+            (RelationKind.Equal, "Equal", "Lines the same length, or circles and arcs the same size."),
+            (RelationKind.Coincident, "Coincident", "A point on another point, a line, a circle or an arc."),
+            (RelationKind.Midpoint, "Midpoint", "A point at the middle of a line."),
+            (RelationKind.Tangent, "Tangent", "A line and a circle or arc (or two circles) touching smoothly."),
+            (RelationKind.Concentric, "Concentric", "Two circles or arcs on one centre."),
+            (RelationKind.Coradial, "Coradial", "Two circles or arcs on one centre and the same size."),
+            (RelationKind.Symmetric, "Symmetric", "Two points mirror each other across a line (select the points and the line)."),
+            (RelationKind.Fix, "Fix", "Points or curves stay where they are."),
         };
 
         public static SheetEditor Instance { get; private set; }
@@ -75,8 +71,6 @@ namespace Protobot.Polycarb {
         private TextMeshProUGUI status;
         private readonly List<TextMeshProUGUI> labels = new();
         private int labelsUsed;
-        private readonly List<(Tool tool, Image background, ShapeGraphic icon)> toolButtons = new();
-        private readonly List<(RelationKind kind, Button button, ShapeGraphic icon)> relationButtons = new();
         private Button makeButton, backButton, redoButton, undoButton;
 
         // Drawing in progress
@@ -115,15 +109,28 @@ namespace Protobot.Polycarb {
                 Instance.pieceName = "Plastic piece " + (CustomParts.OfKind(CustomParts.Polycarbonate).Count() + 1);
             Instance.sketch.Upgrade();
             Instance.Build();
+            Instance.AnalyzeDefinition();
+            Instance.BuildSide();
         }
 
         public void Close() {
             CloseEditField();
+            RestoreScene();
             Destroy(gameObject);
         }
 
         private void OnDestroy() {
+            // Leaving Play mode tears everything down: nothing to put back then.
+            if (!quitting) RestoreScene();
             if (Instance == this) Instance = null;
+        }
+
+        private static bool quitting;
+
+        [RuntimeInitializeOnLoadMethod]
+        private static void WatchQuitting() {
+            quitting = false;
+            Application.quitting += () => quitting = true;
         }
 
         // ------------------------------------------------------------------ building the screen
@@ -152,6 +159,7 @@ namespace Protobot.Polycarb {
             redoButton = Ui.Button(top, "Redo", "Redo", Redo, false, 6f, Theme.FontSmall);
             redoButton.Size(-1, 32f);
             Ui.Tip(redoButton, "Redo", "Ctrl+Y");
+            BuildPlaceButton(top);
             var cancel = Ui.Button(top, "Cancel", "Cancel", () => {
                 Close();
                 Interface.Interface.Say("Closed the polycarbonate editor", false);
@@ -171,32 +179,8 @@ namespace Protobot.Polycarb {
             toolbar.offsetMin = new Vector2(14f, -126f);
             toolbar.offsetMax = new Vector2(-14f, -60f);
             toolbar.GetChild(0).gameObject.AddComponent<LayoutElement>().ignoreLayout = true;
-            Ui.Row(toolbar, 2f, new RectOffset(8, 8, 4, 4));
-            Group("Sketch");
-            foreach (var def in Tools) {
-                if (def.tool == Tool.Trim) {
-                    Separator();
-                    Group("Modify");
-                }
-                if (def.tool == Tool.Dimension) {
-                    ToolbarButton("Construction", "Construction", "Q", "Turns what's selected into construction lines (dashed): they help you draw but aren't cut.", ToggleConstruction);
-                    ToolbarButton("Delete", "Delete", "Del", "Deletes what's selected.", DeleteSelected);
-                    Separator();
-                    Group("Dimension");
-                }
-                var tool2 = def.tool;
-                var (bg, icon) = ToolbarButton(def.name, def.name, def.key, def.help, () => SetTool(tool2));
-                toolButtons.Add((def.tool, bg, icon));
-            }
-            Separator();
-            Group("Relations");
-            foreach (var def in RelationButtons) {
-                var kind = def.kind;
-                var (bg, icon) = ToolbarButton(def.name, def.name, null, def.help, () => AddRelation(kind));
-                relationButtons.Add((def.kind, bg.GetComponent<Button>(), icon));
-            }
-            Separator();
-            ToolbarButton("Fit", "Fit", "F", "Fits the sheet and the sketch in the view.", Fit);
+            Ui.Row(toolbar, 1f, new RectOffset(8, 8, 4, 4));
+            BuildToolbar();
 
             // The drawing area.
             canvasRect = Ui.Rect("Canvas", transform);
@@ -210,14 +194,7 @@ namespace Protobot.Polycarb {
             shapes = ShapeGraphic.Create(canvasRect);
 
             // Settings on the right.
-            side = Ui.Panel(transform, "Side", Theme.Panel, 10f).rectTransform;
-            side.anchorMin = new Vector2(1f, 0f);
-            side.anchorMax = new Vector2(1f, 1f);
-            side.pivot = new Vector2(1f, 1f);
-            side.offsetMin = new Vector2(-330f, 40f);
-            side.offsetMax = new Vector2(-14f, -136f);
-            side.GetChild(0).gameObject.AddComponent<LayoutElement>().ignoreLayout = true;
-            Ui.Column(side, 6f, new RectOffset(14, 14, 12, 12));
+            BuildSidePanel();
 
             // Status line.
             statusBar = Ui.Rect("Status", transform);
@@ -234,7 +211,7 @@ namespace Protobot.Polycarb {
             sketchChanged = false;
             SetStage(Stage.Sketch);
             SetTool(sketch.entities.Count > 0 ? Tool.Select : Tool.Rectangle);
-            Interface.Interface.Say("Draw the piece, then Make piece");
+            Interface.Interface.Say("Draw the piece, then Make piece (or Sketch on a part to draw it on the robot)");
         }
 
         private void Group(string title) {
@@ -250,7 +227,6 @@ namespace Protobot.Polycarb {
         // An icon over a small name; the tooltip says what it does.
         private (Image background, ShapeGraphic icon) ToolbarButton(string icon, string name, string key, string help, System.Action onClick) {
             var background = Ui.Image(toolbar, name, new Color(1f, 1f, 1f, 0f), 7f, true);
-            background.Size(name.Length > 10 ? 74f : 58f, 58f);
             var button = background.gameObject.AddComponent<Button>();
             button.transition = Selectable.Transition.None;
             button.onClick.AddListener(() => onClick());
@@ -260,8 +236,12 @@ namespace Protobot.Polycarb {
             var graphic = ShapeGraphic.Create(holder);
             SketchIcons.Draw(graphic, icon, Theme.Text);
             var text = Ui.Text(background.transform, "Name", name, 10.5f, Theme.TextDim, Theme.Regular, TextAlignmentOptions.Center);
-            text.rectTransform.Place(new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 3f), new Vector2(76f, 16f));
+            text.rectTransform.Place(new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 3f), new Vector2(72f, 16f));
             text.enableWordWrapping = false;
+            // Each button as wide as its label (labels never run into each other).
+            var width = Mathf.Max(52f, Mathf.Ceil(text.GetPreferredValues(name).x) + 10f);
+            background.Size(width, 58f);
+            text.rectTransform.sizeDelta = new Vector2(width, 16f);
             Ui.Tip(background, name, key, help);
             return (background, graphic);
         }
@@ -274,6 +254,10 @@ namespace Protobot.Polycarb {
         // The sheet (and what's drawn) fills the view.
         private void Fit() {
             if (canvasRect == null) return;
+            if (inPlace) {
+                NormalTo();
+                return;
+            }
             var rect = canvasRect.rect;
             var min = Vector2.zero;
             var max = SheetSize;
@@ -286,25 +270,11 @@ namespace Protobot.Polycarb {
             pan = new Vector2(rect.width, rect.height) / 2f - (min + max) / 2f * zoom;
         }
 
-        private void SetTool(Tool newTool) {
-            if (stage != Stage.Sketch) return;
-            tool = newTool;
-            clicks.Clear();
-            chainStart = chainLast = -1;
-            dimensionFirstPoint = -1;
-            if (tool != Tool.Select) ClearSelection();
-            foreach (var (t, bg, icon) in toolButtons) {
-                var on = t == tool;
-                bg.color = on ? Theme.Accent : new Color(1f, 1f, 1f, 0f);
-                bg.GetComponent<HoverTint>().enabled = !on;
-            }
-            BuildSide();
-        }
-
         private void SetStage(Stage newStage) {
             stage = newStage;
             placingHole = false;
-            tiltTarget = stage == Stage.Piece ? 1f : 0f;
+            tiltTarget = stage == Stage.Piece && !inPlace ? 1f : 0f;
+            ResetToolState();
             clicks.Clear();
             chainStart = chainLast = -1;
             ClearSelection();
@@ -313,7 +283,7 @@ namespace Protobot.Polycarb {
             // The 3D view takes the toolbar's room.
             var topEdge = stage == Stage.Sketch ? -136f : -66f;
             canvasRect.offsetMax = new Vector2(-344f, topEdge);
-            side.offsetMax = new Vector2(-14f, topEdge);
+            sidePanel.offsetMax = new Vector2(-14f, topEdge);
             backButton.gameObject.SetActive(stage == Stage.Piece);
             makeButton.GetComponentInChildren<TextMeshProUGUI>().text = stage == Stage.Sketch ? "Make piece" : editing != null ? "Save piece" : "Create";
             if (stage == Stage.Piece) {
@@ -332,72 +302,7 @@ namespace Protobot.Polycarb {
             else CreatePiece();
         }
 
-        // ------------------------------------------------------------------ the side panel
-
-        private void BuildSide() {
-            foreach (Transform child in side)
-                if (child.GetSiblingIndex() > 0) Destroy(child.gameObject);
-            UpdateRelationButtons();
-            if (stage == Stage.Piece) {
-                BuildPieceSide();
-                return;
-            }
-            var def = Tools.First(t => t.tool == tool);
-            Dialog.Heading(side, def.name);
-            Wrapped(def.help, Theme.TextDim, 58f);
-
-            var count = selectedEntities.Count + selectedPoints.Count;
-            if (count > 0) {
-                Dialog.Heading(side, count == 1 && selectedEntities.Count == 1 ? "Selected " + selectedEntities[0].kind.ToString().ToLowerInvariant()
-                    : "Selected: " + count + (count == 1 ? " item" : " items"));
-                if (selectedEntities.Count == 1 && selectedPoints.Count == 0) {
-                    var selected = selectedEntities[0];
-                    foreach (var (label, kind) in SizesOf(selected)) {
-                        var row = Dialog.Row(side, label, 32f, 90f);
-                        var dimension = new SketchDimension { kind = kind, entity = selected.id };
-                        var field = Ui.Field(row, label, Inch.Format(sketch.Measure(dimension), false), text => {
-                            if (Inch.TryParse(text, out var value)) {
-                                Remember();
-                                Resize(dimension, value);
-                            }
-                            else Interface.Interface.Say("Type a size like 1 1/2 or 1.5", false);
-                        }, Theme.FontBody, TextAlignmentOptions.Center);
-                        field.Size(110f, 30f);
-                        Ui.Text(row, "Unit", "in", Theme.FontSmall, Theme.TextFaint).Size(-1, 30f);
-                    }
-                }
-                // Its relations, each removable.
-                var related = sketch.relations.Where(r => selectedEntities.Any(e => r.e1 == e.id || r.e2 == e.id)
-                                                          || selectedPoints.Any(p => r.p1 == p || r.p2 == p)).ToList();
-                if (related.Count > 0) {
-                    Ui.Text(side, "Relations", "Relations", Theme.FontSmall, Theme.TextDim, Theme.Medium).Size(-1, 20f);
-                    foreach (var relation in related) {
-                        var row = Dialog.Row(side, "", 28f, 0f);
-                        Ui.Text(row, "Kind", relation.kind.ToString(), Theme.FontSmall, Theme.Text).Size(-1, 28f, 1f);
-                        var keep = relation;
-                        var remove = Ui.Button(row, "Remove", "Remove", () => {
-                            Remember();
-                            sketch.relations.Remove(keep);
-                            Changed();
-                            Interface.Interface.Say("Removed the " + keep.kind.ToString().ToLowerInvariant() + " relation", false);
-                        }, false, 5f, Theme.FontSmall);
-                        remove.Size(80f, 26f);
-                    }
-                }
-                Wrapped("Pick a relation in the toolbar to add it to what's selected.", Theme.TextFaint, 36f);
-            }
-
-            Dialog.Heading(side, "Sketch");
-            ToolOptions.Switch(side, "Snap to 1/16\" grid (or hold Ctrl)", gridSnap, on => gridSnap = on);
-            var open = sketch.OpenEnds();
-            if (open.Count > 0)
-                Wrapped(open.Count + (open.Count == 1 ? " open end" : " open ends") + " (red): the outline isn't closed there, so it doesn't make an area yet. Draw to it or drag the end onto the point it should meet.", Theme.Warning, 58f);
-            else if (regions != null && regions.Areas.Any())
-                Wrapped(regions.Areas.Count() + (regions.Areas.Count() == 1 ? " closed area" : " closed areas") + ": Make piece when you're ready.", Theme.Success, 36f);
-
-            Dialog.Heading(side, "Plastic in this build");
-            RulesBlock();
-        }
+        // ------------------------------------------------------------------ the side panel (piece stage)
 
         private void BuildPieceSide() {
             Dialog.Heading(side, "Make piece");
@@ -471,19 +376,15 @@ namespace Protobot.Polycarb {
             sheets.Size(-1, 30f);
         }
 
-        private void Wrapped(string text, Color color, float height) {
-            var label = Ui.Text(side, "Text", text, Theme.FontSmall, color);
-            label.textWrappingMode = TextWrappingModes.Normal;
-            label.Size(-1, height);
-        }
-
         private static string Describe(CustomHole h) =>
             h.outline != null && h.outline.Length >= 3 ? Inch.Format(Mathf.Min(h.size, h.size2 > 0f ? h.size2 : h.size)) + " × " + Inch.Format(Mathf.Max(h.size, h.size2)) + " (its shape)"
             : h.square ? Inch.Format(h.size) + " square" : Inch.Format(h.size) + " round";
 
-        private static IEnumerable<(string, DimensionKind)> SizesOf(SketchEntity e) => e.kind switch {
+        private static IEnumerable<(string, DimensionKind)> SizesOf(SketchEntity e) => e.projected ? new (string, DimensionKind)[0] : e.kind switch {
             EntityKind.Line => new[] { ("Length", DimensionKind.Length) },
             EntityKind.Rectangle => new[] { ("Width", DimensionKind.Width), ("Height", DimensionKind.Height) },
+            EntityKind.Arc => new[] { ("Radius", DimensionKind.Radius) },
+            EntityKind.Point => new (string, DimensionKind)[0],
             _ => new[] { ("Diameter", DimensionKind.Diameter) },
         };
 
@@ -494,16 +395,6 @@ namespace Protobot.Polycarb {
             selectedPoints.Clear();
         }
 
-        private void UpdateRelationButtons() {
-            foreach (var (kind, button, icon) in relationButtons) {
-                var ok = RelationFits(kind, out _);
-                button.interactable = ok;
-                SketchIcons.Draw(icon, kind.ToString(), ok ? Theme.Text : new Color(1f, 1f, 1f, 0.22f));
-                var name = button.transform.Find("Name")?.GetComponent<TextMeshProUGUI>();
-                if (name != null) name.color = ok ? Theme.TextDim : Theme.TextFaint;
-            }
-        }
-
         private static bool IsRound(SketchEntity e) => e.kind == EntityKind.Circle || e.kind == EntityKind.Arc;
 
         // Whether the selection suits a relation; the relations it makes.
@@ -511,7 +402,12 @@ namespace Protobot.Polycarb {
             made = new List<SketchRelation>();
             var lines = selectedEntities.Where(e => e.kind == EntityKind.Line).ToList();
             var rounds = selectedEntities.Where(IsRound).ToList();
-            var points = selectedPoints;
+            // Point entities count as their points.
+            var points = selectedPoints.Concat(selectedEntities.Where(e => e.kind == EntityKind.Point).Select(e => e.a)).Distinct().ToList();
+            if (selectedEntities.Any(e => e.kind == EntityKind.Point)) {
+                var keep = selectedEntities.Where(e => e.kind != EntityKind.Point).ToList();
+                return RelationFitsWith(kind, lines, rounds, points, keep, out made);
+            }
             var others = selectedEntities.Count - lines.Count - rounds.Count;
             switch (kind) {
                 case RelationKind.Horizontal:
@@ -523,8 +419,17 @@ namespace Protobot.Polycarb {
                     break;
                 case RelationKind.Parallel:
                 case RelationKind.Perpendicular:
+                case RelationKind.Collinear:
                     if (lines.Count == 2 && selectedEntities.Count == 2 && points.Count == 0)
                         made.Add(new SketchRelation { kind = kind, e1 = lines[0].id, e2 = lines[1].id });
+                    break;
+                case RelationKind.Coradial:
+                    if (rounds.Count == 2 && selectedEntities.Count == 2 && points.Count == 0)
+                        made.Add(new SketchRelation { kind = kind, e1 = rounds[0].id, e2 = rounds[1].id });
+                    break;
+                case RelationKind.Symmetric:
+                    if (points.Count == 2 && lines.Count == 1 && selectedEntities.Count == 1)
+                        made.Add(new SketchRelation { kind = kind, e1 = lines[0].id, p1 = points[0], p2 = points[1] });
                     break;
                 case RelationKind.Equal:
                     if (points.Count == 0 && others == 0 && (lines.Count >= 2 && rounds.Count == 0 || rounds.Count >= 2 && lines.Count == 0)) {
@@ -558,6 +463,21 @@ namespace Protobot.Polycarb {
                     break;
             }
             return made.Count > 0;
+        }
+
+        private bool RelationFitsWith(RelationKind kind, List<SketchEntity> lines, List<SketchEntity> rounds, List<int> points, List<SketchEntity> entities, out List<SketchRelation> made) {
+            var keepEntities = selectedEntities.ToList();
+            var keepPoints = selectedPoints.ToList();
+            selectedEntities.Clear();
+            selectedEntities.AddRange(entities);
+            selectedPoints.Clear();
+            selectedPoints.AddRange(points);
+            var ok = RelationFits(kind, out made);
+            selectedEntities.Clear();
+            selectedEntities.AddRange(keepEntities);
+            selectedPoints.Clear();
+            selectedPoints.AddRange(keepPoints);
+            return ok;
         }
 
         private void AddRelation(RelationKind kind) {
@@ -612,19 +532,6 @@ namespace Protobot.Polycarb {
             Changed();
         }
 
-        // What stays put when a dimension changes.
-        private IEnumerable<int> Anchor(SketchDimension d) {
-            var e = sketch.Entity(d.entity);
-            return d.kind switch {
-                DimensionKind.Length when e != null => new[] { e.a },
-                DimensionKind.Width when e != null => new[] { e.a, e.d },
-                DimensionKind.Height when e != null => new[] { e.a, e.b },
-                DimensionKind.Diameter when e != null => new[] { e.a },
-                DimensionKind.Distance => new[] { d.from },
-                _ => new int[0],
-            };
-        }
-
         // ------------------------------------------------------------------ view
 
         private const float TiltAngle = 38f;  // degrees the piece stage leans the sheet back
@@ -636,6 +543,7 @@ namespace Protobot.Polycarb {
         /// <summary>A sketch point at a height (inches above the sheet) on the canvas: from straight above, or
         /// leaning back in perspective while the piece stage is shown.</summary>
         private Vector2 ToCanvas(Vector2 inches, float height = 0f) {
+            if (inPlace) return PlaneToCanvas(inches, height);
             if (tilt <= 0.0001f) return inches * zoom + pan + canvasRect.rect.min;
             var theta = tilt * TiltAngle * Mathf.Deg2Rad;
             var c = ViewCenter;
@@ -649,6 +557,7 @@ namespace Protobot.Polycarb {
 
         /// <summary>The sketch point (on the sheet) under a canvas point.</summary>
         private Vector2 ToSketch(Vector2 canvas) {
+            if (inPlace) return CanvasToPlane(canvas);
             var flat = (canvas - canvasRect.rect.min - pan) / zoom;
             if (tilt <= 0.0001f) return flat;
             var theta = tilt * TiltAngle * Mathf.Deg2Rad;
@@ -669,8 +578,9 @@ namespace Protobot.Polycarb {
         }
 
         private bool OverPanel(Vector2 mouse) =>
-            RectTransformUtility.RectangleContainsScreenPoint(side, mouse) || (toolbar.gameObject.activeSelf && RectTransformUtility.RectangleContainsScreenPoint(toolbar, mouse))
-            || Popup.IsOpen || (editField != null && RectTransformUtility.RectangleContainsScreenPoint((RectTransform)editField.transform, mouse));
+            RectTransformUtility.RectangleContainsScreenPoint(sidePanel, mouse) || (toolbar.gameObject.activeSelf && RectTransformUtility.RectangleContainsScreenPoint(toolbar, mouse))
+            || Popup.IsOpen || (editField != null && RectTransformUtility.RectangleContainsScreenPoint((RectTransform)editField.transform, mouse))
+            || RectTransformUtility.RectangleContainsScreenPoint((RectTransform)transform.Find("Top"), mouse);
 
         // ------------------------------------------------------------------ input
 
@@ -680,6 +590,10 @@ namespace Protobot.Polycarb {
             var mouse = Mouse.current;
             var keyboard = Keyboard.current;
             if (mouse == null || canvasRect == null) return;
+            if (pickingFace) {
+                UpdateFacePick();
+                return;
+            }
             if (sketchChanged) {
                 regions = Regions.Of(sketch);
                 sketchChanged = false;
@@ -689,41 +603,53 @@ namespace Protobot.Polycarb {
             redoButton.interactable = redo.Count > 0;
 
             if (!Typing && keyboard != null && !Popup.IsOpen && Dialog.OpenCount == 0) Keys(keyboard);
-            if (this == null || canvasRect == null) return;
+            if (this == null || canvasRect == null || pickingFace) return;
 
             var inside = MouseInCanvas(out var canvasMouse);
-            // Pan: right or middle drag; zoom: the wheel anywhere on the editor (about the mouse over the drawing).
-            if (inside && (mouse.middleButton.wasPressedThisFrame || (mouse.rightButton.wasPressedThisFrame && clicks.Count == 0 && chainLast < 0))) {
-                panning = true;
-                panMouse = canvasMouse;
+            if (inPlace) {
+                // In the build: the scene's camera buttons turn and pan, the wheel zooms.
+                SceneCamera();
+                UpdatePlaneZoom();
             }
-            if (panning) {
-                if (mouse.middleButton.isPressed || mouse.rightButton.isPressed) {
-                    pan += canvasMouse - panMouse;
+            else {
+                // Pan: right or middle drag; zoom: the wheel anywhere on the editor (about the mouse over the drawing).
+                if (inside && (mouse.middleButton.wasPressedThisFrame || (mouse.rightButton.wasPressedThisFrame && !Drawing))) {
+                    panning = true;
                     panMouse = canvasMouse;
                 }
-                else panning = false;
-            }
-            var wheel = mouse.scroll.ReadValue().y;
-            if (Mathf.Abs(wheel) > 0.01f && !Popup.IsOpen && Dialog.OpenCount == 0) {
-                var about = inside ? canvasMouse : canvasRect.rect.center;
-                var before = ToSketch(about);
-                zoom = Mathf.Clamp(zoom * (wheel > 0f ? 1.15f : 1f / 1.15f), 4f, 4000f);
-                pan += about - ToCanvas(before);
+                if (panning) {
+                    if (mouse.middleButton.isPressed || mouse.rightButton.isPressed) {
+                        pan += canvasMouse - panMouse;
+                        panMouse = canvasMouse;
+                    }
+                    else panning = false;
+                }
+                var wheel = mouse.scroll.ReadValue().y;
+                if (Mathf.Abs(wheel) > 0.01f && !Popup.IsOpen && Dialog.OpenCount == 0 && !OverSideScroll(mouse.position.ReadValue())) {
+                    var about = inside ? canvasMouse : canvasRect.rect.center;
+                    var before = ToSketch(about);
+                    zoom = Mathf.Clamp(zoom * (wheel > 0f ? 1.15f : 1f / 1.15f), 4f, 4000f);
+                    pan += about - ToCanvas(before);
+                }
             }
 
             // V2: the grid snaps only when switched on or while Ctrl is held (points always catch).
             var ctrlHeld = keyboard != null && (keyboard.ctrlKey.isPressed || keyboard.leftCommandKey.isPressed);
-            var free = !(gridSnap || ctrlHeld) || keyboard != null && keyboard.shiftKey.isPressed && tool != Tool.Select;
-            var snapped = Snap(ToSketch(canvasMouse), free, out var snapPoint);
+            var snap = SnapAt(ToSketch(canvasMouse), (gridSnap || ctrlHeld) && !inPlace || ctrlHeld);
             if (inside && !panning) {
-                if (stage == Stage.Sketch) HandleMouse(mouse, snapped, snapPoint, canvasMouse);
+                if (stage == Stage.Sketch) HandleMouse(mouse, snap, canvasMouse);
                 else HandlePieceMouse(mouse, canvasMouse);
             }
-            Draw(inside ? snapped : (Vector2?)null, snapPoint, canvasMouse);
-            status.text = (inside && stage == Stage.Sketch ? "X " + Inch.Format(snapped.x) + "   Y " + Inch.Format(snapped.y) + "      " : "") +
-                          "Wheel: zoom · Right-drag: pan · F: fit · Ctrl: snap to the grid · Ctrl+Z / Ctrl+Y: undo / redo";
+            if (this == null || canvasRect == null) return;
+            Draw(snap, canvasMouse, inside && !panning);
+            var where = inside && stage == Stage.Sketch ? "X " + Inch.Format(snap.p.x) + "   Y " + Inch.Format(snap.p.y) + "      " : "";
+            status.text = where + (inPlace
+                ? "Scene buttons: turn and pan · Wheel: zoom · Normal to: face the sketch · Ctrl: grid · Ctrl+Z / Ctrl+Y: undo / redo"
+                : "Wheel: zoom · Right-drag: pan · F: fit · Ctrl: snap to the grid · Ctrl+Z / Ctrl+Y: undo / redo · Ctrl+C / Ctrl+V: copy / paste");
         }
+
+        // The wheel over the side panel scrolls it.
+        private bool OverSideScroll(Vector2 mouse) => sidePanel != null && RectTransformUtility.RectangleContainsScreenPoint(sidePanel, mouse);
 
         private void Keys(Keyboard keyboard) {
             var ctrl = keyboard.ctrlKey.isPressed || keyboard.leftCommandKey.isPressed;
@@ -734,13 +660,13 @@ namespace Protobot.Polycarb {
                     BuildSide();
                 }
                 else if (stage == Stage.Piece) SetStage(Stage.Sketch);
-                else if (clicks.Count > 0 || chainLast >= 0 || dimensionFirstPoint >= 0) {
-                    clicks.Clear();
-                    chainStart = chainLast = -1;
-                    dimensionFirstPoint = -1;
+                else if (Drawing || placingDimension || opStep != OpStep.Entities) {
+                    CancelDrawing();
+                    pendingDimension = null;
                 }
-                else if (selectedEntities.Count + selectedPoints.Count > 0) {
+                else if (selectedEntities.Count + selectedPoints.Count > 0 || selectedDimension != null) {
                     ClearSelection();
+                    selectedDimension = null;
                     BuildSide();
                 }
                 else if (tool != Tool.Select) SetTool(Tool.Select);
@@ -754,249 +680,25 @@ namespace Protobot.Polycarb {
                 Undo();
                 return;
             }
-            if (keyboard.enterKey.wasPressedThisFrame || keyboard.numpadEnterKey.wasPressedThisFrame) MakeOrCreate();
+            if (stage == Stage.Sketch && ctrl) {
+                if (keyboard.aKey.wasPressedThisFrame) SelectAll();
+                else if (keyboard.cKey.wasPressedThisFrame) CopySelection();
+                else if (keyboard.vKey.wasPressedThisFrame) Paste();
+                return;
+            }
+            if (keyboard.enterKey.wasPressedThisFrame || keyboard.numpadEnterKey.wasPressedThisFrame) {
+                // The tool's Apply, else Make piece.
+                if (stage == Stage.Sketch && tool is Tool.LinearPattern or Tool.CircularPattern or Tool.Rotate or Tool.Scale or Tool.Move or Tool.Copy or Tool.Mirror && OperationSource().Count > 0)
+                    ApplyOperation();
+                else MakeOrCreate();
+                return;
+            }
             if (keyboard.fKey.wasPressedThisFrame) Fit();
             if (stage != Stage.Sketch || ctrl) return;
             if (keyboard.deleteKey.wasPressedThisFrame || keyboard.backspaceKey.wasPressedThisFrame) DeleteSelected();
             if (keyboard.qKey.wasPressedThisFrame) ToggleConstruction();
             foreach (var def in Tools)
-                if (keyboard[(Key)System.Enum.Parse(typeof(Key), def.key)].wasPressedThisFrame) SetTool(def.tool);
-        }
-
-        // Grid and existing points; returns the point id snapped to (or -1).
-        private Vector2 Snap(Vector2 p, bool free, out int point) {
-            point = -1;
-            var best = 10f / zoom;
-            foreach (var sp in sketch.points) {
-                if (sp.id == draggingPoint) continue;
-                var d = Vector2.Distance(sp.p, p);
-                if (d < best) {
-                    best = d;
-                    point = sp.id;
-                }
-            }
-            if (point >= 0) return sketch.P(point);
-            if (free) return p;
-            const float step = 1f / 16f;
-            return new Vector2(Mathf.Round(p.x / step) * step, Mathf.Round(p.y / step) * step);
-        }
-
-        // Horizontal and vertical lines snap straight when they're nearly.
-        private Vector2 Straighten(Vector2 start, Vector2 p, int snapPoint) {
-            if (snapPoint >= 0) return p;
-            var d = p - start;
-            if (Mathf.Abs(d.y) * zoom < 7f) p.y = start.y;
-            if (Mathf.Abs(d.x) * zoom < 7f) p.x = start.x;
-            return p;
-        }
-
-        private int PointAt(Vector2 p, int snapPoint) => snapPoint >= 0 ? snapPoint : sketch.AddPoint(p).id;
-
-        private void HandleMouse(UnityEngine.InputSystem.Mouse mouse, Vector2 p, int snapPoint, Vector2 canvasMouse) {
-            var pressed = mouse.leftButton.wasPressedThisFrame;
-            if (mouse.rightButton.wasPressedThisFrame && (clicks.Count > 0 || chainLast >= 0)) {
-                clicks.Clear();
-                chainStart = chainLast = -1;
-                return;
-            }
-            switch (tool) {
-                case Tool.Select: {
-                    var keyboard = Keyboard.current;
-                    var add = keyboard != null && (keyboard.shiftKey.isPressed || keyboard.ctrlKey.isPressed);
-                    if (pressed) {
-                        var point = HoverPoint(canvasMouse);
-                        if (point >= 0) {
-                            // A point: select it (adding with Shift/Ctrl), and dragging moves it.
-                            if (!add && !selectedPoints.Contains(point)) ClearSelection();
-                            if (add && selectedPoints.Contains(point)) selectedPoints.Remove(point);
-                            else if (!selectedPoints.Contains(point)) selectedPoints.Add(point);
-                            draggingPoint = point;
-                            dragStart = sketch.Copy();
-                            BuildSide();
-                        }
-                        else {
-                            var entity = HoverEntity(canvasMouse);
-                            if (!add) ClearSelection();
-                            if (entity != null) {
-                                if (selectedEntities.Contains(entity)) selectedEntities.Remove(entity);
-                                else selectedEntities.Add(entity);
-                            }
-                            BuildSide();
-                        }
-                    }
-                    if (draggingPoint >= 0) {
-                        if (mouse.leftButton.isPressed) {
-                            var held = keyboard != null && (keyboard.ctrlKey.isPressed || keyboard.leftCommandKey.isPressed);
-                            var target = Snap(ToSketch(canvasMouse), !(gridSnap || held) || keyboard != null && keyboard.shiftKey.isPressed, out _);
-                            MovePoint(draggingPoint, target);
-                            Changed(false);
-                        }
-                        else {
-                            // Dropped on another point: they become one.
-                            var dropped = sketch.Point(draggingPoint);
-                            var other = sketch.points.FirstOrDefault(sp => sp.id != draggingPoint && dropped != null && Vector2.Distance(sp.p, dropped.p) < 1e-4f);
-                            var moved = dragStart != null && dropped != null && Vector2.Distance(dragStart.P(draggingPoint), dropped.p) > 1e-5f;
-                            if (moved) {
-                                undo.Add(dragStart);
-                                redo.Clear();
-                            }
-                            if (other != null && !IsCircleCenterOnly(draggingPoint)) {
-                                sketch.Merge(draggingPoint, other.id);
-                                selectedPoints.Remove(draggingPoint);
-                            }
-                            draggingPoint = -1;
-                            dragStart = null;
-                            Changed();
-                        }
-                    }
-                    break;
-                }
-                case Tool.Line:
-                    if (!pressed) break;
-                    if (chainLast < 0) {
-                        Remember();
-                        chainStart = chainLast = PointAt(p, snapPoint);
-                        break;
-                    }
-                    var end = Straighten(sketch.P(chainLast), p, snapPoint);
-                    if (Vector2.Distance(end, sketch.P(chainLast)) < 1e-4f) break;
-                    var endPoint = snapPoint >= 0 ? snapPoint : sketch.AddPoint(end).id;
-                    sketch.Add(EntityKind.Line, chainLast, endPoint);
-                    Changed();
-                    if (endPoint == chainStart || snapPoint >= 0 && endPoint != chainLast) {
-                        // Closed, or joined onto something drawn: done.
-                        if (endPoint == chainStart) Interface.Interface.Say("Closed the shape");
-                        chainStart = chainLast = -1;
-                    }
-                    else chainLast = endPoint;
-                    break;
-                case Tool.Rectangle:
-                    if (!pressed) break;
-                    if (clicks.Count == 0) {
-                        clicks.Add(p);
-                        break;
-                    }
-                    if (Mathf.Abs(p.x - clicks[0].x) < 1e-3f || Mathf.Abs(p.y - clicks[0].y) < 1e-3f) {
-                        Interface.Interface.Say("A rectangle needs a width and a height", false);
-                        break;
-                    }
-                    Remember();
-                    AddRectangle(clicks[0], p);
-                    clicks.Clear();
-                    Changed();
-                    break;
-                case Tool.Circle:
-                    if (!pressed) break;
-                    if (clicks.Count == 0) {
-                        clicks.Add(p);
-                        break;
-                    }
-                    var radius = Vector2.Distance(p, clicks[0]);
-                    if (radius < 0.01f) break;
-                    Remember();
-                    sketch.Add(EntityKind.Circle, sketch.AddPoint(clicks[0]).id, radius: radius);
-                    clicks.Clear();
-                    Changed();
-                    break;
-                case Tool.Arc:
-                    if (!pressed) break;
-                    clicks.Add(p);
-                    if (clicks.Count < 3) break;
-                    var arcRadius = Vector2.Distance(clicks[1], clicks[0]);
-                    if (arcRadius < 0.01f) {
-                        clicks.Clear();
-                        break;
-                    }
-                    Remember();
-                    var endOnCircle = clicks[0] + (clicks[2] - clicks[0]).normalized * arcRadius;
-                    sketch.Add(EntityKind.Arc, sketch.AddPoint(clicks[0]).id, sketch.AddPoint(clicks[1]).id, sketch.AddPoint(endOnCircle).id, radius: arcRadius);
-                    clicks.Clear();
-                    Changed();
-                    break;
-                case Tool.Slot:
-                    if (!pressed) break;
-                    clicks.Add(p);
-                    if (clicks.Count < 3) break;
-                    var half = DistanceToLine(clicks[2], clicks[0], clicks[1]);
-                    if (half < 0.01f || Vector2.Distance(clicks[0], clicks[1]) < 0.01f) {
-                        clicks.Clear();
-                        Interface.Interface.Say("A slot needs a length and a width", false);
-                        break;
-                    }
-                    Remember();
-                    AddSlot(clicks[0], clicks[1], half);
-                    clicks.Clear();
-                    Changed();
-                    break;
-                case Tool.Trim: {
-                    // V2: like SolidWorks' power trim: click a curve, or hold the button and drag across the
-                    // pieces to cut away.
-                    var at = ToSketch(canvasMouse);
-                    if (pressed) {
-                        Remember();
-                        trimming = true;
-                        trimmedCount = 0;
-                        trimLast = at;
-                        var entity = HoverEntity(canvasMouse);
-                        if (entity != null) {
-                            sketch.Trim(entity, at);
-                            trimmedCount++;
-                            Changed();
-                        }
-                        break;
-                    }
-                    if (!trimming) break;
-                    if (mouse.leftButton.isPressed) {
-                        if (Vector2.Distance(at, trimLast) * zoom < 2f) break;
-                        foreach (var (entity, cross) in CrossedBy(trimLast, at)) {
-                            if (!sketch.entities.Contains(entity)) continue;
-                            sketch.Trim(entity, cross);
-                            trimmedCount++;
-                        }
-                        trimLast = at;
-                        Changed();
-                        break;
-                    }
-                    trimming = false;
-                    if (trimmedCount == 0) {
-                        undo.RemoveAt(undo.Count - 1);
-                        Interface.Interface.Say("Click a curve, or drag across the pieces to cut away", false);
-                    }
-                    else Interface.Interface.Say("Trimmed " + trimmedCount + (trimmedCount == 1 ? " piece" : " pieces"));
-                    break;
-                }
-                case Tool.Dimension:
-                    if (!pressed) break;
-                    var hoverPoint = HoverPoint(canvasMouse);
-                    if (dimensionFirstPoint >= 0) {
-                        if (hoverPoint >= 0 && hoverPoint != dimensionFirstPoint) {
-                            Remember();
-                            AddDimension(new SketchDimension { kind = DimensionKind.Distance, from = dimensionFirstPoint, to = hoverPoint });
-                        }
-                        dimensionFirstPoint = -1;
-                        break;
-                    }
-                    var hovered = HoverEntity(canvasMouse);
-                    if (hoverPoint >= 0 && (hovered == null || DistanceToPointPixels(hoverPoint, canvasMouse) < 6f)) {
-                        dimensionFirstPoint = hoverPoint;
-                        Interface.Interface.Say("Now click the second point");
-                        break;
-                    }
-                    if (hovered == null) {
-                        Interface.Interface.Say("Click a line, a rectangle's side, a circle, or a point", false);
-                        break;
-                    }
-                    Remember();
-                    var kind = hovered.kind switch {
-                        EntityKind.Line => DimensionKind.Length,
-                        EntityKind.Rectangle => NearestRectangleSide(hovered, ToSketch(canvasMouse), out _),
-                        _ => DimensionKind.Diameter,
-                    };
-                    var sideIndex = 0;
-                    if (hovered.kind == EntityKind.Rectangle) NearestRectangleSide(hovered, ToSketch(canvasMouse), out sideIndex);
-                    AddDimension(new SketchDimension { kind = kind, entity = hovered.id, from = sideIndex });
-                    break;
-            }
+                if (def.key != null && keyboard[(Key)System.Enum.Parse(typeof(Key), def.key)].wasPressedThisFrame) SetTool(def.tool);
         }
 
         private bool trimming;
@@ -1055,7 +757,7 @@ namespace Protobot.Polycarb {
 
         // The piece stage: click areas to pick them, a blue hole to leave it out, or (placing a hole) a curve.
         private void HandlePieceMouse(UnityEngine.InputSystem.Mouse mouse, Vector2 canvasMouse) {
-            if (!mouse.leftButton.wasPressedThisFrame || regions == null || tilt < 0.5f) return;
+            if (!mouse.leftButton.wasPressedThisFrame || regions == null || tilt < 0.5f && !inPlace) return;
             var at = ToSketch(canvasMouse);
             if (placingHole) {
                 var curve = HoverEntity(canvasMouse);
@@ -1127,20 +829,14 @@ namespace Protobot.Polycarb {
 
         private bool IsCircleCenterOnly(int point) => sketch.entities.Any(e => (e.kind == EntityKind.Circle || e.kind == EntityKind.Arc) && e.a == point);
 
-        private void AddRectangle(Vector2 corner, Vector2 opposite) {
+        // Its first and opposite corners' points.
+        private (int, int) AddRectangle(Vector2 corner, Vector2 opposite) {
             var a = sketch.AddPoint(corner);
             var b = sketch.AddPoint(new Vector2(opposite.x, corner.y));
             var c = sketch.AddPoint(opposite);
             var d = sketch.AddPoint(new Vector2(corner.x, opposite.y));
             sketch.Explode(sketch.Add(EntityKind.Rectangle, a.id, b.id, c.id, d.id));
-        }
-
-        private void AddDimension(SketchDimension dimension) {
-            dimension.id = sketch.nextId++;
-            dimension.value = sketch.Measure(dimension);
-            sketch.dimensions.Add(dimension);
-            Changed();
-            OpenEditField(dimension);
+            return (a.id, c.id);
         }
 
         // Which side of a rectangle is nearest: its width (a-b or c-d) or height (b-c or d-a), and which of the
@@ -1172,8 +868,13 @@ namespace Protobot.Polycarb {
 
         private void DeleteSelected() {
             var entities = selectedEntities.Where(e => sketch.entities.Contains(e)).ToList();
+            selectedPoints.Remove(sketch.origin);
             var dimensionsOnPoints = selectedPoints.Count;
             if (entities.Count == 0 && dimensionsOnPoints == 0) {
+                if (selectedDimension != null && sketch.dimensions.Contains(selectedDimension)) {
+                    DeleteDimension(selectedDimension);
+                    return;
+                }
                 Interface.Interface.Say("Select something first", false);
                 return;
             }
@@ -1227,13 +928,29 @@ namespace Protobot.Polycarb {
 
         private void Changed(bool rebuildSide = true) {
             sketchChanged = true;
+            version++;
             selectedEntities.RemoveAll(e => !sketch.entities.Contains(e));
             selectedPoints.RemoveAll(p => sketch.Point(p) == null);
+            if (selectedDimension != null && !sketch.dimensions.Contains(selectedDimension)) selectedDimension = null;
+            if (mirrorAxis != null && !sketch.entities.Contains(mirrorAxis)) mirrorAxis = null;
             if (rebuildSide) {
                 regions = Regions.Of(sketch);
                 sketchChanged = false;
+                AnalyzeDefinition();
                 BuildSide();
             }
+        }
+
+        // What can still move (blue) and whether the sketch is fully defined, as SolidWorks shows it.
+        private void AnalyzeDefinition() {
+            if (sketch.points.Count > 600) {
+                freePoints = new HashSet<int>(sketch.points.Select(p => p.id));
+                freeRadii = new HashSet<int>();
+                fullyDefined = false;
+                return;
+            }
+            (freePoints, freeRadii) = SketchSolver.Analyze(sketch);
+            fullyDefined = freePoints.Count == 0 && freeRadii.Count == 0 && sketch.entities.Any(e => !e.projected);
         }
 
         // ------------------------------------------------------------------ hit testing (canvas units)
@@ -1291,139 +1008,13 @@ namespace Protobot.Polycarb {
         private static readonly Color HoleBlue = new(0.3f, 0.66f, 1f, 1f);
         private static readonly Color RelationGreen = new(0.45f, 0.85f, 0.55f, 1f);
 
-        private void Draw(Vector2? cursor, int snapPoint, Vector2 canvasMouse) {
-            shapes.Clear();
-            labelsUsed = 0;
-            var rect = canvasRect.rect;
-            var sheet = SheetSize;
-
-            // The sheet, its grid, and its size.
-            var corners = new[] { ToCanvas(Vector2.zero), ToCanvas(new Vector2(sheet.x, 0f)), ToCanvas(sheet), ToCanvas(new Vector2(0f, sheet.y)) };
-            shapes.Quad(corners[0], corners[1], corners[2], corners[3], Paper);
-            var min = Vector2.Min(ToSketch(rect.min), ToSketch(new Vector2(rect.xMin, rect.yMax)));
-            var max = Vector2.Max(ToSketch(rect.max), ToSketch(new Vector2(rect.xMax, rect.yMin)));
-            min = Vector2.Max(min, new Vector2(-200f, -200f));
-            max = Vector2.Min(max, new Vector2(200f, 200f));
-            var fine = zoom > 40f ? 0.25f : zoom > 12f ? 1f : 4f;
-            for (var x = Mathf.Floor(min.x / fine) * fine; x <= max.x; x += fine) {
-                var major = Mathf.Abs(x - Mathf.Round(x)) < 1e-3f;
-                shapes.Line(ToCanvas(new Vector2(x, min.y)), ToCanvas(new Vector2(x, max.y)), major ? GridInch : GridFine, 1f);
-            }
-            for (var y = Mathf.Floor(min.y / fine) * fine; y <= max.y; y += fine) {
-                var major = Mathf.Abs(y - Mathf.Round(y)) < 1e-3f;
-                shapes.Line(ToCanvas(new Vector2(min.x, y)), ToCanvas(new Vector2(max.x, y)), major ? GridInch : GridFine, 1f);
-            }
-            var edge = new Color(Theme.Accent.r, Theme.Accent.g, Theme.Accent.b, 0.7f);
-            shapes.Polyline(corners, edge, 1.5f, true);
-            Label(ToCanvas(new Vector2(sheet.x / 2f, sheet.y)) + new Vector2(0f, 14f),
-                SheetUsage.CurrentRules == SheetUsage.Rules.Current ? "Largest piece allowed: 4\" × 8\"" : "Sheet: 12\" × 24\"", Theme.TextDim, false);
-
-            if (stage == Stage.Piece) {
-                DrawPiece(canvasMouse, cursor.HasValue);
-                DrawOpenEnds();
-                for (var i = 0; i < labels.Count; i++) labels[i].transform.parent.gameObject.SetActive(i < labelsUsed);
-                return;
-            }
-
-            // The sketch.
-            var hoverEntity = tool == Tool.Select || tool == Tool.Dimension || tool == Tool.Trim ? HoverEntity(canvasMouse) : null;
-            foreach (var e in sketch.entities) {
-                var line = sketch.Polyline(e, out var closed).Select(p => ToCanvas(p)).ToList();
-                var selected = selectedEntities.Contains(e);
-                var color = selected ? Theme.Accent : e == hoverEntity ? (tool == Tool.Trim ? Theme.Danger : Theme.AccentHover) : e.construction ? Construction : Ink;
-                if (e.construction) {
-                    for (var i = 0; i < line.Count - (closed ? 0 : 1); i++) shapes.Dashed(line[i], line[(i + 1) % line.Count], color, 1.2f);
-                }
-                else shapes.Polyline(line, color, selected ? 2.5f : 1.8f, closed);
-                if (e.kind == EntityKind.Circle || e.kind == EntityKind.Arc) {
-                    var c = ToCanvas(sketch.P(e.a));
-                    shapes.Line(c - new Vector2(4f, 0f), c + new Vector2(4f, 0f), color, 1f);
-                    shapes.Line(c - new Vector2(0f, 4f), c + new Vector2(0f, 4f), color, 1f);
-                }
-            }
-            var hoverPoint = tool == Tool.Select ? HoverPoint(canvasMouse) : -1;
-            foreach (var p in sketch.points) {
-                if (IsCircleCenterOnly(p.id) && !selectedPoints.Contains(p.id) && p.id != hoverPoint) continue;
-                var c = ToCanvas(p.p);
-                var color = selectedPoints.Contains(p.id) ? Theme.Accent : p.id == hoverPoint ? Theme.AccentHover : p.id == dimensionFirstPoint ? Theme.Dimension : Ink;
-                var size = selectedPoints.Contains(p.id) || p.id == hoverPoint ? 4.5f : 3f;
-                shapes.Rect(c - Vector2.one * size, c + Vector2.one * size, color);
-            }
-            DrawRelations();
-            DrawOpenEnds();
-
-            // Dimensions.
-            foreach (var dimension in sketch.dimensions.ToList()) DrawDimension(dimension);
-
-            // What's being drawn.
-            if (cursor.HasValue) {
-                var p = cursor.Value;
-                var preview = new Color(Theme.Accent.r, Theme.Accent.g, Theme.Accent.b, 0.9f);
-                switch (tool) {
-                    case Tool.Line when chainLast >= 0: {
-                        var start = sketch.P(chainLast);
-                        var end = Straighten(start, p, snapPoint);
-                        shapes.Line(ToCanvas(start), ToCanvas(end), preview, 1.8f);
-                        Label((ToCanvas(start) + ToCanvas(end)) / 2f + new Vector2(0f, 14f), Inch.Format(Vector2.Distance(start, end)), Theme.Dimension, true);
-                        break;
-                    }
-                    case Tool.Rectangle when clicks.Count == 1: {
-                        var a = clicks[0];
-                        var box = new[] { a, new Vector2(p.x, a.y), p, new Vector2(a.x, p.y) }.Select(q => ToCanvas(q)).ToList();
-                        shapes.Polyline(box, preview, 1.8f, true);
-                        Label((box[0] + box[1]) / 2f - new Vector2(0f, 14f), Inch.Format(Mathf.Abs(p.x - a.x)), Theme.Dimension, true);
-                        Label((box[1] + box[2]) / 2f + new Vector2(30f, 0f), Inch.Format(Mathf.Abs(p.y - a.y)), Theme.Dimension, true);
-                        break;
-                    }
-                    case Tool.Circle when clicks.Count == 1: {
-                        var r = Vector2.Distance(p, clicks[0]);
-                        shapes.Ring(ToCanvas(clicks[0]), r * zoom, preview, 1.8f, 72);
-                        Label(ToCanvas(clicks[0]) + new Vector2(0f, r * zoom + 14f), "Ø " + Inch.Format(r * 2f), Theme.Dimension, true);
-                        break;
-                    }
-                    case Tool.Arc when clicks.Count >= 1: {
-                        var r = Vector2.Distance(clicks.Count > 1 ? clicks[1] : p, clicks[0]);
-                        if (clicks.Count == 1) shapes.Dashed(ToCanvas(clicks[0]), ToCanvas(p), preview, 1f);
-                        else {
-                            var temp = new SketchData();
-                            var c = temp.AddPoint(clicks[0]);
-                            var s = temp.AddPoint(clicks[1]);
-                            var e = temp.AddPoint(clicks[0] + (p - clicks[0]).normalized * r);
-                            shapes.Polyline(temp.Polyline(temp.Add(EntityKind.Arc, c.id, s.id, e.id, radius: r), out _).Select(q => ToCanvas(q)).ToList(), preview, 1.8f);
-                        }
-                        break;
-                    }
-                    case Tool.Slot when clicks.Count >= 1: {
-                        if (clicks.Count == 1) {
-                            shapes.Dashed(ToCanvas(clicks[0]), ToCanvas(p), preview, 1f);
-                            break;
-                        }
-                        var half = Mathf.Max(DistanceToLine(p, clicks[0], clicks[1]), 0.01f);
-                        shapes.Polyline(SketchIcons.Slot(clicks[0], clicks[1], half, 16).Select(q => ToCanvas(q)).ToList(), preview, 1.8f, true);
-                        Label(ToCanvas(clicks[1]) + new Vector2(0f, 18f), Inch.Format(half * 2f) + " wide", Theme.Dimension, true);
-                        break;
-                    }
-                    case Tool.Dimension when dimensionFirstPoint >= 0:
-                        shapes.Dashed(ToCanvas(sketch.P(dimensionFirstPoint)), ToCanvas(p), Theme.Dimension, 1f);
-                        break;
-                }
-                // The snap marker.
-                if (snapPoint >= 0) shapes.Ring(ToCanvas(sketch.P(snapPoint)), 7f, Theme.Warning, 1.5f, 20);
-                else if (tool != Tool.Select && tool != Tool.Trim) {
-                    var c = ToCanvas(p);
-                    shapes.Line(c - new Vector2(6f, 0f), c + new Vector2(6f, 0f), Theme.TextDim, 1f);
-                    shapes.Line(c - new Vector2(0f, 6f), c + new Vector2(0f, 6f), Theme.TextDim, 1f);
-                }
-            }
-            for (var i = 0; i < labels.Count; i++) labels[i].transform.parent.gameObject.SetActive(i < labelsUsed);
-        }
-
         // Small green relation marks beside what they hold (like a CAD sketch's).
         private void DrawRelations() {
             var stack = new Dictionary<int, int>();
             foreach (var r in sketch.relations) {
                 Vector2 at;
                 var e = sketch.Entity(r.e1);
+                if (e != null && e.projected || r.p1 == sketch.origin && r.kind == RelationKind.Fix) continue;
                 if (e != null) {
                     var line = sketch.Polyline(e, out _);
                     at = ToCanvas(line[line.Count / 2]);
@@ -1515,7 +1106,7 @@ namespace Protobot.Polycarb {
                 if (curve != null)
                     shapes.Polyline(sketch.Polyline(curve, out var closedCurve).Select(p => ToCanvas(p, h)).ToList(), HoleBlue, 2.6f, closedCurve);
                 else
-                    shapes.Ring(ToCanvas(manual.center, h), manual.radius * zoom * 0.95f, HoleBlue, 2.2f, 40);
+                    shapes.Polyline(CircleOnCanvas(manual.center, manual.radius * 0.95f), HoleBlue, 2.2f, true);
                 shapes.Disc(ToCanvas(manual.center, h), 3f, HoleBlue, 12);
             }
             if (placingHole && inside) {
@@ -1536,54 +1127,6 @@ namespace Protobot.Polycarb {
                 foreach (var p in hole.polygon) { xy.Add(p.x); xy.Add(p.y); points.Add(ToCanvas(p)); }
             }
             shapes.Triangles(points, Geometry.Earcut.Triangulate(xy, starts), color);
-        }
-
-        private void DrawDimension(SketchDimension dimension) {
-            var e = sketch.Entity(dimension.entity);
-            Vector2 a, b;
-            switch (dimension.kind) {
-                case DimensionKind.Length when e != null: a = sketch.P(e.a); b = sketch.P(e.b); break;
-                case DimensionKind.Width when e != null:
-                    if (dimension.from == 1) { a = sketch.P(e.d); b = sketch.P(e.c); }
-                    else { a = sketch.P(e.a); b = sketch.P(e.b); }
-                    break;
-                case DimensionKind.Height when e != null:
-                    if (dimension.from == 1) { a = sketch.P(e.a); b = sketch.P(e.d); }
-                    else { a = sketch.P(e.b); b = sketch.P(e.c); }
-                    break;
-                case DimensionKind.Diameter when e != null: {
-                    var c = sketch.P(e.a);
-                    a = c - Vector2.right * e.radius;
-                    b = c + Vector2.right * e.radius;
-                    break;
-                }
-                case DimensionKind.Distance: a = sketch.P(dimension.from); b = sketch.P(dimension.to); break;
-                default: return;
-            }
-            var color = Theme.Dimension;
-            var ca = ToCanvas(a);
-            var cb = ToCanvas(b);
-            var dir = (cb - ca).normalized;
-            var normal = new Vector2(-dir.y, dir.x);
-            var offset = dimension.kind == DimensionKind.Diameter ? Vector2.zero : normal * 22f;
-            // Outside the rectangle, not across it.
-            if (e != null && e.kind == EntityKind.Rectangle) {
-                var middle = ToCanvas((sketch.P(e.a) + sketch.P(e.c)) / 2f);
-                if (Vector2.Dot(offset, (ca + cb) / 2f - middle) < 0f) offset = -offset;
-            }
-            if (offset != Vector2.zero) {
-                shapes.Line(ca, ca + offset * 1.2f, new Color(color.r, color.g, color.b, 0.5f), 1f);
-                shapes.Line(cb, cb + offset * 1.2f, new Color(color.r, color.g, color.b, 0.5f), 1f);
-            }
-            var p = ca + offset;
-            var q = cb + offset;
-            shapes.Line(p, q, color, 1.2f);
-            Arrow(p, dir, color);
-            Arrow(q, -dir, color);
-            var value = sketch.Measure(dimension);
-            var text = (dimension.kind == DimensionKind.Diameter ? "Ø " : "") + Inch.Format(value);
-            var label = Label((p + q) / 2f, text, color, true);
-            label.transform.parent.GetComponent<Button>().onClick.AddListener(() => OpenEditField(dimension));
         }
 
         private void Arrow(Vector2 tip, Vector2 inward, Color color) {
@@ -1615,45 +1158,6 @@ namespace Protobot.Polycarb {
             return label;
         }
 
-        // ------------------------------------------------------------------ typing a dimension
-
-        private void OpenEditField(SketchDimension dimension) {
-            CloseEditField();
-            editingDimension = dimension;
-            editField = Ui.Field(transform, "Dimension", Inch.Format(sketch.Measure(dimension), false), text => {
-                if (editingDimension == null) return;
-                if (Inch.TryParse(text, out var value)) {
-                    Remember();
-                    var keep = editingDimension;
-                    var before = keep.value;
-                    keep.value = Mathf.Max(0.01f, value);
-                    if (SketchSolver.Solve(sketch, Anchor(keep))) Changed();
-                    else {
-                        keep.value = before;
-                        undo.RemoveAt(undo.Count - 1);
-                        Interface.Interface.Say("That size doesn't work with the sketch's relations and other dimensions", false);
-                    }
-                }
-                else if (!string.IsNullOrWhiteSpace(text)) Interface.Interface.Say("Type a size like 1 1/2 or 1.5", false);
-                CloseEditField();
-            }, Theme.FontBody, TextAlignmentOptions.Center);
-            var rect = (RectTransform)editField.transform;
-            rect.anchorMin = rect.anchorMax = new Vector2(0.5f, 0.5f);
-            var mouse = Mouse.current.position.ReadValue();
-            RectTransformUtility.ScreenPointToLocalPointInRectangle((RectTransform)transform, mouse, null, out var local);
-            rect.anchoredPosition = local + new Vector2(0f, 30f);
-            rect.sizeDelta = new Vector2(110f, 30f);
-            editField.onFocusSelectAll = true;
-            editField.Select();
-            editField.ActivateInputField();
-        }
-
-        private void CloseEditField() {
-            if (editField != null) Destroy(editField.gameObject);
-            editField = null;
-            editingDimension = null;
-        }
-
         // ------------------------------------------------------------------ making the piece
 
         private void CreatePiece() {
@@ -1673,7 +1177,14 @@ namespace Protobot.Polycarb {
             CustomParts.Add(part);
             Thumbnails.Forget(part.key);
             var updated = editing != null ? CustomParts.UpdateInScene(part) : 0;
+            var onPart = inPlace;
+            if (onPart) PlaceOnFace(part, loops);
             Close();
+            if (onPart) {
+                Interface.Interface.Say((editing != null ? "Saved " : "Made ") + part.name + " on the part, with " + part.holes.Length + (part.holes.Length == 1 ? " hole" : " holes")
+                                        + (updated > 1 ? " (" + updated + " copies updated)" : ""));
+                return;
+            }
             var shape = SheetUsage.Shape(part);
             var tooBig = SheetUsage.CurrentRules == SheetUsage.Rules.Current && shape.tooBig;
             if (editing != null) {

@@ -76,6 +76,7 @@ namespace Protobot {
                 // (a plate's and then a nut's) counted as overlapping and a copied screw never connected.
                 // Holes overlap when one's centre is inside the other.
                 foreach (HoleCollider hole in holes) {
+                    if (hole == null) continue;  // V2: destroyed with its part (a build opened over this one)
                     if (Contains(hole.transform, otherHole.transform.position) || Contains(otherHole.transform, hole.transform.position))
                         return true;
                 }

@@ -101,8 +101,9 @@ namespace Protobot.Builds {
                 foreach (var entry in zip.Entries.Where(e => e.FullName.StartsWith("parts/") && e.FullName.EndsWith(".json"))) {
                     try {
                         var part = JsonUtility.FromJson<CustomPartData>(ReadText(entry));
+                        // A part deleted from the library only serves this build (it isn't put back).
                         if (part != null && !string.IsNullOrEmpty(part.key))
-                            CustomParts.Add(part);
+                            CustomParts.AddFromBuild(part);
                     }
                     catch (Exception e) {
                         Debug.LogWarning("[Build file] Couldn't read " + entry.FullName + ": " + e.Message);

@@ -30,7 +30,6 @@ namespace Protobot.Motion {
         private string style = "chain";
         private ChainLoop editing;
         private RectTransform window, body;
-        private TextMeshProUGUI status;
         private System.Func<bool> savedBlocked;
         private int shown = -1;
         private ChainPath preview;
@@ -82,6 +81,9 @@ namespace Protobot.Motion {
 
         // ------------------------------------------------------------------ window
 
+        private const float Width = 460f;
+        private Button make;
+
         private void Build() {
             savedBlocked = SelectionSystem.SelectionManager.Blocked;
             SelectionSystem.SelectionManager.Blocked = () => true;
@@ -89,37 +91,76 @@ namespace Protobot.Motion {
             window.anchorMin = window.anchorMax = new Vector2(0f, 1f);
             window.pivot = new Vector2(0f, 1f);
             window.anchoredPosition = new Vector2(76f, -(Layout.TopBarBottom + 60f));
-            window.sizeDelta = new Vector2(400f, 0f);
-            Ui.Column(window, 6f, new RectOffset(14, 14, 10, 14));
+            window.sizeDelta = new Vector2(Width, 0f);
+            Ui.Column(window, 10f, new RectOffset(14, 14, 12, 14));
             window.gameObject.AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
             window.GetChild(0).gameObject.AddComponent<LayoutElement>().ignoreLayout = true;
-            var title = Ui.Text(window, "Title", editing != null ? "Edit chain" : "Chain", Theme.FontTitle, Theme.Text, Theme.Medium);
-            title.Size(-1, 30f);
             body = Ui.Rect("Body", window);
-            Ui.Column(body, 5f);
+            Ui.Column(body, 8f);
             body.gameObject.AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
-            status = Ui.Text(window, "Status", "", Theme.FontSmall, Theme.TextDim);
-            status.textWrappingMode = TextWrappingModes.Normal;
-            status.Size(-1, 52f);
             var buttons = Ui.Rect("Buttons", window);
             Ui.Row(buttons, 8f, null, TextAnchor.MiddleRight);
             buttons.Size(-1, 32f);
             var cancel = Ui.Button(buttons, "Cancel", "Cancel", () => Stop(), false, 6f);
             cancel.Size(-1, 30f);
-            var make = Ui.Button(buttons, "Make", editing != null ? "Keep changes" : "Make chain", Make, true, 6f);
+            make = Ui.Button(buttons, "Make", editing != null ? "Keep changes" : "Make chain", Make, true, 6f);
             make.Size(-1, 30f);
-            Ui.Tip(make, "Make chain", "Enter", "Makes the chain round the sprockets picked.");
+            Ui.Tip(make, editing != null ? "Keep changes" : "Make chain", "Enter", "Makes the chain round the sprockets picked.");
         }
 
+        private int edits;
+
         private void Refresh() {
+            edits++;
             for (var i = body.childCount - 1; i >= 0; i--) Destroy(body.GetChild(i).gameObject);
-            var hint = Ui.Text(body, "Hint", picks.Count == 0
-                ? "Click the sprockets in the order the chain goes round them. The chain goes round the outside; click a sprocket again to wrap it from the other side."
-                : (family != null ? family.name + ", " + Inch.Format(family.pitch) + " pitch. " : "") + "Click more sprockets, or one again to flip its side. Backspace takes the last off.",
-                Theme.FontSmall, Theme.TextDim);
+            var ways = Ways();
+            UpdatePreview(ways);
+            var ready = picks.Count >= 2 && preview != null && preview.Valid;
+            if (make != null) {
+                // Greyed out until the loop can be made (Enter still says why not).
+                make.interactable = ready;
+                make.gameObject.GetOrAdd<CanvasGroup>().alpha = ready ? 1f : 0.4f;
+            }
+
+            // Title, and the chain size once a sprocket is picked.
+            var head = Ui.Rect("Head", body);
+            Ui.Row(head, 8f);
+            head.Size(-1, 28f);
+            var title = Ui.Text(head, "Title", editing != null ? "Edit chain" : "Make a chain", Theme.FontTitle, Theme.Text, Theme.Medium);
+            title.Size(-1, 28f, 1f);
+            if (family != null) Chip(head, family.name + "  ·  " + Inch.Format(family.pitch) + " pitch");
+
+            // Where you are: pick the sprockets, choose their sides, make it.
+            var stage = picks.Count < 2 ? 0 : ready ? 2 : 1;
+            var steps = Ui.Rect("Steps", body);
+            Ui.Row(steps, 4f);
+            steps.Size(-1, 26f);
+            var names = new[] { "1  Pick sprockets", "2  Choose sides", "3  Make it" };
+            for (var i = 0; i < names.Length; i++) {
+                var on = i == stage;
+                var pill = Ui.Image(steps, names[i], on ? Theme.Accent : i < stage ? Theme.AccentSoft : Theme.Field, 6f);
+                pill.Size(-1, 24f, 1f);
+                var label = Ui.Text(pill.transform, "Label", names[i], Theme.FontSmall, on ? Color.white : i < stage ? Theme.Text : Theme.TextFaint, Theme.Medium, TextAlignmentOptions.Center);
+                label.rectTransform.Fill();
+            }
+
+            // What to do next.
+            string next;
+            if (picks.Count == 0)
+                next = "Click the first sprocket the chain goes round (its shaft or hub works too).";
+            else if (picks.Count == 1)
+                next = "Click the next sprocket round the loop. Hovering one shows the chain it would make.";
+            else if (!ready)
+                next = picks.Count >= 3
+                    ? "This loop doesn't work yet (below). Try Order round the loop, flip a sprocket's side, or take one off."
+                    : "This loop doesn't work yet (below): flip a sprocket's side or move one.";
+            else
+                next = "Add more sprockets, or set one to Inside for an idler. Press Enter or Make chain when it looks right.";
+            var hint = Ui.Text(body, "Hint", next, Theme.FontBody, Theme.Text);
             hint.textWrappingMode = TextWrappingModes.Normal;
             hint.overflowMode = TextOverflowModes.Overflow;
-            hint.Size(-1, 66f);
+            hint.Size(-1, Mathf.Max(22f, hint.GetPreferredValues(next, Width - 30f, 0f).y + 2f));
+
             if (family != null && family.HasTreads) {
                 var styles = ChainFamily.Styles;
                 ToolOptions.Segmented(body, styles.Select(x => x.name).ToArray(), System.Array.FindIndex(styles, x => x.key == style), i => {
@@ -129,37 +170,187 @@ namespace Protobot.Motion {
                     Refresh();
                 });
             }
-            var ways = Ways();
-            for (var i = 0; i < picks.Count; i++) {
-                var pick = picks[i];
-                var index = i;
-                var row = Ui.Rect("Sprocket " + (i + 1), body);
-                Ui.Row(row, 6f);
-                row.Size(-1, 28f);
-                var label = Ui.Text(row, "Name", (i + 1) + ".  " + PartLabels.Short(pick.part) + " (" + pick.teeth + "T)", Theme.FontBody, Theme.Text);
-                label.Size(-1, 26f, 1f);
-                var side = Ui.Button(row, "Side", pick.flipped ? "inside" : "outside", () => {
-                    picks[index].flipped = !picks[index].flipped;
-                    Interface.Interface.Say("Sprocket " + (index + 1) + ": the chain wraps it from " + (picks[index].flipped ? "inside the loop" : "outside"), true);
-                    Audio.Sounds.Play(Audio.Sounds.Tick);
+
+            // The sprockets, in the chain's order.
+            if (picks.Count > 0) {
+                var list = Ui.Image(body, "Sprockets", Theme.Field, 8f);
+                Ui.Column(list.rectTransform, 0f, new RectOffset(8, 6, 4, 4));
+                for (var i = 0; i < picks.Count; i++) SprocketRow(list.rectTransform, i, ways);
+                var tools = Ui.Rect("Tools", body);
+                Ui.Row(tools, 6f);
+                tools.Size(-1, 28f);
+                if (picks.Count >= 3) {
+                    var order = Ui.Button(tools, "Order", "Order round the loop", AutoOrder, false, 6f, Theme.FontSmall);
+                    order.Size(-1, 26f);
+                    Ui.Tip(order, "Order round the loop", null, "Puts the sprockets in the order that makes the shortest chain that works (keeps their sides).");
+                }
+                var clear = Ui.Button(tools, "Clear", "Start over", () => {
+                    picks.Clear();
+                    family = null;
+                    Interface.Interface.Say("Chain: start again from the first sprocket", true);
                     Refresh();
-                }, pick.flipped, 5f, Theme.FontSmall);
-                side.Size(70f, 24f);
-                Ui.Tip(side, "Which side", null, "Outside: the chain goes round it with the loop. Inside: it presses into the loop (an idler) and turns the other way.");
-                var remove = Ui.Button(row, "Remove", "×", () => {
-                    picks.RemoveAt(index);
-                    if (picks.Count == 0) family = null;
-                    Refresh();
-                }, false, 5f, Theme.FontBody);
-                remove.Size(26f, 24f);
+                }, false, 6f, Theme.FontSmall);
+                clear.Size(-1, 26f);
             }
-            UpdatePreview(ways);
+
+            if (picks.Count >= 2) Summary();
+            Help();
+        }
+
+        private static void Chip(RectTransform parent, string text) {
+            var chip = Ui.Image(parent, "Chip", Theme.AccentSoft, 6f);
+            Ui.Row(chip.rectTransform, 0f, new RectOffset(8, 8, 0, 0));
+            chip.Size(-1, 22f);
+            var label = Ui.Text(chip.transform, "Label", text, Theme.FontSmall, Theme.Text, Theme.Medium, TextAlignmentOptions.Center);
+            label.Size(label.GetPreferredValues(text).x + 2f, 22f);
+        }
+
+        // One sprocket: its place in the chain, size, speed next to the first, teeth in the chain, side.
+        private void SprocketRow(RectTransform list, int index, List<int> ways) {
+            var pick = picks[index];
+            var row = Ui.Rect("Sprocket " + (index + 1), list);
+            Ui.Row(row, 8f);
+            row.Size(-1, 42f);
+            var badge = Ui.Image(row, "Number", pick.flipped ? Theme.Warning : Theme.Accent, 11f);
+            badge.Size(22f, 22f);
+            var number = Ui.Text(badge.transform, "N", (index + 1).ToString(), Theme.FontSmall, pick.flipped ? Theme.Field : Color.white, Theme.Medium, TextAlignmentOptions.Center);
+            number.rectTransform.Fill();
+            var words = Ui.Rect("Words", row);
+            Ui.Column(words, 0f);
+            words.Size(-1, 40f, 1f);
+            // Its text never pushes the side buttons: every row lines them up.
+            var wordsLayout = words.GetComponent<LayoutElement>();
+            wordsLayout.preferredWidth = 0f;
+            wordsLayout.minWidth = 0f;
+            var name = Ui.Text(words, "Name", pick.teeth + "T sprocket", Theme.FontBody, Theme.Text, Theme.Medium);
+            name.Size(-1, 21f);
+            var detail = Ui.Text(words, "Detail", Detail(index, ways), Theme.FontSmall, Theme.TextDim);
+            detail.Size(-1, 18f);
+            ToolOptions.Segmented(row, new[] { "Outside", "Inside" }, pick.flipped ? 1 : 0, side => {
+                if ((side == 1) == picks[index].flipped) return;
+                picks[index].flipped = side == 1;
+                Interface.Interface.Say("Sprocket " + (index + 1) + ": the chain wraps it from " + (picks[index].flipped ? "inside the loop" : "outside"), true);
+                Audio.Sounds.Play(Audio.Sounds.Tick);
+                Refresh();
+            }, 60f);
+            // Its own width only (its buttons would stretch and squeeze the name).
+            var sides = row.GetChild(row.childCount - 1).gameObject.GetOrAdd<LayoutElement>();
+            sides.flexibleWidth = 0f;
+            sides.preferredWidth = 132f;
+            var remove = Ui.Button(row, "Remove", "×", () => {
+                picks.RemoveAt(index);
+                if (picks.Count == 0) family = null;
+                Interface.Interface.Say("Took sprocket " + (index + 1) + " off the chain", true);
+                Refresh();
+            }, false, 5f, Theme.FontBody);
+            remove.Size(28f, 28f);
+            remove.targetGraphic.color = new Color(1f, 1f, 1f, 0f);
+            Ui.Tip(remove, "Take it off", null, "Takes this sprocket off the chain.");
+            var hit = row.gameObject.AddComponent<Image>();
+            hit.color = new Color(1f, 1f, 1f, 0f);
+            Ui.Tip(hit, pick.teeth + "T sprocket", null,
+                "Speed is next to sprocket 1 (" + picks[0].teeth + "T). Teeth in: how many of its teeth are in the chain at once; under 3 and a loaded chain can skip.");
+        }
+
+        // "×0.5 speed, backward · 9 teeth in" (speed next to the first sprocket; teeth in the chain at once).
+        private string Detail(int index, List<int> ways) {
+            var pick = picks[index];
+            var ratio = (float)picks[0].teeth / Mathf.Max(pick.teeth, 1) * (ways[index] == ways[0] ? 1f : -1f);
+            var text = "×" + Mathf.Abs(ratio).ToString("0.##", System.Globalization.CultureInfo.InvariantCulture) + " speed" + (ratio < 0f ? ", backward" : "");
+            if (preview == null || !preview.Valid) return text;
+            var teeth = preview.TeethIn(index, pick.teeth);
+            return teeth < 3 && !pick.flipped
+                ? text + "  ·  <color=#FABA3B>" + Teeth(teeth) + " in: may skip</color>"
+                : text + "  ·  " + Teeth(teeth) + " in";
+        }
+
+        private static string Teeth(int count) => count + (count == 1 ? " tooth" : " teeth");
+
+        // Links, length and weight, and whether it fits.
+        private void Summary() {
+            var card = Ui.Image(body, "Summary", Theme.Field, 8f);
+            Ui.Column(card.rectTransform, 6f, new RectOffset(12, 12, 10, 10));
+            if (preview == null || !preview.Valid) {
+                var problem = preview?.problem ?? "Pick at least two sprockets";
+                var words = Ui.Text(card.transform, "Problem", problem, Theme.FontSmall, Theme.Danger);
+                words.textWrappingMode = TextWrappingModes.Normal;
+                words.overflowMode = TextOverflowModes.Overflow;
+                words.Size(-1, Mathf.Max(20f, words.GetPreferredValues(problem, Width - 54f, 0f).y + 2f));
+                return;
+            }
+            var stats = Ui.Rect("Stats", card.transform);
+            Ui.Row(stats, 6f);
+            stats.Size(-1, 40f);
+            var pounds = preview.links * family.gramsPerLink / 453.592f;
+            Stat(stats, preview.links.ToString(), "links");
+            Stat(stats, Inch.Format(preview.length), "long");
+            Stat(stats, pounds < 0.01f ? "<0.01 lb" : pounds.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture) + " lb", "weight");
+            var off = preview.length - preview.tight;
+            var fits = Mathf.Abs(off) <= family.pitch * 0.3f;
+            var fit = fits
+                ? "Fits: the links come to the loop's own length, so it runs tight."
+                : "The links come to " + Inch.Format(Mathf.Abs(off)) + (off > 0f ? " more" : " less") + " than the loop: move a sprocket about " + Inch.Format(Mathf.Abs(off) / 2f) + (off > 0f ? " farther away" : " closer") + ", or add an idler (Inside), for it to run tight.";
+            var line = Ui.Text(card.transform, "Fit", fit, Theme.FontSmall, fits ? Theme.Success : Theme.Warning);
+            line.textWrappingMode = TextWrappingModes.Normal;
+            line.overflowMode = TextOverflowModes.Overflow;
+            line.Size(-1, Mathf.Max(18f, line.GetPreferredValues(fit, Width - 54f, 0f).y + 2f));
+        }
+
+        private static void Stat(RectTransform parent, string value, string label) {
+            var cell = Ui.Rect(label, parent);
+            Ui.Column(cell, 0f);
+            cell.Size(-1, 40f, 1f);
+            var big = Ui.Text(cell, "Value", value, Theme.FontTitle, Theme.Text, Theme.Medium);
+            big.overflowMode = TextOverflowModes.Overflow;
+            big.Size(-1, 22f);
+            var small = Ui.Text(cell, "Label", label, Theme.FontSmall, Theme.TextFaint);
+            small.overflowMode = TextOverflowModes.Overflow;
+            small.Size(-1, 18f);
+        }
+
+        private const string HelpKey = "V2.ChainHelpOpen";
+
+        // How chains work, folded away once read.
+        private void Help() {
+            var open = PlayerPrefs.GetInt(HelpKey, 1) == 1;
+            var toggle = Ui.Button(body, "Help", open ? "Hide how chains work" : "How chains work", () => {
+                PlayerPrefs.SetInt(HelpKey, PlayerPrefs.GetInt(HelpKey, 1) == 1 ? 0 : 1);
+                PlayerPrefs.SetInt(HelpKey + "Set", 1);
+                Refresh();
+            }, false, 5f, Theme.FontSmall);
+            toggle.Size(-1, 26f);
+            if (!open) return;
+            var lines = new[] {
+                ("Order", "The chain goes round the sprockets in the order you click them. Hover the next one to see the chain it would make; Order round the loop sorts them for you."),
+                ("Sides", "Outside (blue): the chain goes round it with the loop. Inside (yellow): it presses into the loop and turns the other way, for an idler or to turn a shaft backward. Click a sprocket again to switch."),
+                ("Sizes", "Normal chain: 10T to 48T sprockets. High strength chain or tank tread: HS sprockets and the tread drive wheel. 6P chain: 6P (low strength) sprockets. Axles parallel, sprockets lined up."),
+                ("Fit", "A chain is a whole number of links and runs tight; you're told how far to move a sprocket when it falls between. Keep 3 or more teeth in the chain on every sprocket that drives or is driven."),
+                ("Motors", "A motor turning any sprocket on the chain turns them all, at the teeth's ratio (12T to 24T: half speed)."),
+                ("Later", "Right-click the chain > Edit chain to change it; delete it like any part."),
+            };
+            foreach (var (title, text) in lines) {
+                var row = Ui.Rect(title, body);
+                Ui.Row(row, 8f, null, TextAnchor.UpperLeft);
+                var head = Ui.Text(row, "Title", title, Theme.FontSmall, Theme.Accent, Theme.Medium);
+                head.Size(54f, 18f);
+                var words = Ui.Text(row, "Text", text, Theme.FontSmall, Theme.TextDim);
+                words.textWrappingMode = TextWrappingModes.Normal;
+                words.overflowMode = TextOverflowModes.Overflow;
+                var height = Mathf.Max(18f, words.GetPreferredValues(text, Width - 92f, 0f).y + 2f);
+                words.Size(Width - 92f, height);
+                row.Size(-1, height);
+            }
+            var keys = Ui.Hint(body, "Enter", "make it", "Backspace", "take the last off", "Esc", "stop");
+            keys.Size(-1, 22f);
         }
 
         // Each pick's way round: the loop's own way (from the order the sprockets were picked in), flipped ones the other.
         private List<int> Ways() {
             Plane();
-            var flat = picks.Select(p => Flat(p.center)).ToList();
+            return WaysFor(picks.Select(p => Flat(p.center)).ToList(), picks.Select(p => p.flipped).ToList());
+        }
+
+        private static List<int> WaysFor(IList<Vector2> flat, IList<bool> flipped) {
             var area = 0f;
             for (var i = 0; i < flat.Count; i++) {
                 var a = flat[i];
@@ -167,7 +358,7 @@ namespace Protobot.Motion {
                 area += a.x * b.y - b.x * a.y;
             }
             var loop = area < 0f ? -1 : 1;
-            return picks.Select(p => p.flipped ? -loop : loop).ToList();
+            return flipped.Select(f => f ? -loop : loop).ToList();
         }
 
         private void Plane() {
@@ -184,23 +375,67 @@ namespace Protobot.Motion {
             return new Vector2(local.x, local.y);
         }
 
+        private ChainPath PathFor(IList<Vector2> flat, IList<int> teeth, IList<int> ways) {
+            var wraps = new List<ChainWrap>();
+            for (var i = 0; i < flat.Count; i++)
+                wraps.Add(new ChainWrap { center = flat[i], radius = family.PitchRadius(teeth[i]), way = ways[i], teeth = teeth[i] });
+            var down = Quaternion.Inverse(frame) * Vector3.down;
+            return ChainPath.Build(wraps, family.pitch, new Vector2(down.x, down.y));
+        }
+
         private void UpdatePreview(List<int> ways) {
             Plane();
-            preview = null;
-            if (family == null || picks.Count < 2) {
-                status.text = picks.Count == 1 ? "Now the next sprocket the chain goes to." : "";
-                return;
+            preview = family == null || picks.Count < 2 ? null : PathFor(picks.Select(p => Flat(p.center)).ToList(), picks.Select(p => p.teeth).ToList(), ways);
+        }
+
+        // Every order of the sprockets (the first stays first): the one making the shortest chain that works. Past
+        // eight sprockets, round their middle by angle.
+        private void AutoOrder() {
+            if (picks.Count < 3) return;
+            Plane();
+            List<Pick> best = null;
+            var bestLength = float.MaxValue;
+            if (picks.Count <= 8) {
+                var rest = Enumerable.Range(1, picks.Count - 1).ToList();
+                foreach (var order in Permutations(rest)) {
+                    if (order.Count > 1 && order[0] > order[^1]) continue;  // the same loop the other way round
+                    var tried = new List<Pick> { picks[0] };
+                    tried.AddRange(order.Select(i => picks[i]));
+                    var flat = tried.Select(p => Flat(p.center)).ToList();
+                    var path = PathFor(flat, tried.Select(p => p.teeth).ToList(), WaysFor(flat, tried.Select(p => p.flipped).ToList()));
+                    if (!path.Valid || path.tight >= bestLength) continue;
+                    bestLength = path.tight;
+                    best = tried;
+                }
             }
-            var wraps = picks.Select((p, i) => new ChainWrap { center = Flat(p.center), radius = family.PitchRadius(p.teeth), way = ways[i], teeth = p.teeth }).ToList();
-            var down = Quaternion.Inverse(frame) * Vector3.down;
-            preview = ChainPath.Build(wraps, family.pitch, new Vector2(down.x, down.y));
-            if (!preview.Valid) {
-                status.text = "<color=#EE5450>" + preview.problem + "</color>";
-                return;
+            if (best == null) {
+                var flat = picks.Select(p => Flat(p.center)).ToList();
+                var middle = flat.Aggregate(Vector2.zero, (a, b) => a + b) / flat.Count;
+                var start = Mathf.Atan2(flat[0].y - middle.y, flat[0].x - middle.x);
+                best = picks.Select((p, i) => (p, angle: Mathf.Repeat(Mathf.Atan2(flat[i].y - middle.y, flat[i].x - middle.x) - start, Mathf.PI * 2f)))
+                            .OrderBy(x => x.angle).Select(x => x.p).ToList();
             }
-            var slack = preview.length - preview.tight;
-            status.text = preview.links + " links, " + Inch.Format(preview.length) + " of chain. Slack " + Inch.Format(slack)
-                          + (slack > family.pitch * 0.6f ? ": a little loose (move a sprocket about " + Inch.Format(slack / 2f) + " apart, or add an idler)" : ": snug");
+            var changed = !best.SequenceEqual(picks);
+            picks.Clear();
+            picks.AddRange(best);
+            Interface.Interface.Say(changed ? "Sprockets put in order round the loop" : "They're already in the best order", true);
+            Audio.Sounds.Play(Audio.Sounds.Tick);
+            Refresh();
+        }
+
+        private static IEnumerable<List<int>> Permutations(List<int> items) {
+            if (items.Count <= 1) {
+                yield return new List<int>(items);
+                yield break;
+            }
+            for (var i = 0; i < items.Count; i++) {
+                var rest = new List<int>(items);
+                rest.RemoveAt(i);
+                foreach (var tail in Permutations(rest)) {
+                    tail.Insert(0, items[i]);
+                    yield return tail;
+                }
+            }
         }
 
         // ------------------------------------------------------------------ picking
@@ -214,17 +449,16 @@ namespace Protobot.Motion {
             // On its shaft or hub, or just off its teeth: the sprocket round that point.
             GameObject best = null;
             var nearest = float.MaxValue;
-            foreach (var other in FindObjectsByType<SavedObject>(FindObjectsSortMode.None)) {
-                var chain = ChainFamily.ForSprocket(other.gameObject);
-                if (chain == null || other.gameObject.IsDeleted()) continue;
-                var (center, axis) = ChainLoop.SprocketFrame(other.gameObject);
+            foreach (var (part, chain, teeth, center, axis) in ChainLoop.AllSprockets()) {
+                if (part == null) continue;
                 var offset = hit.point - center;
                 var along = Vector3.Dot(offset, axis);
+                if (Mathf.Abs(along) > 0.7f) continue;
                 var radial = Vector3.ProjectOnPlane(offset, axis).magnitude;
-                if (Mathf.Abs(along) > 0.7f || radial > chain.PitchRadius(GearTrain.Teeth(other.gameObject, out _)) + 0.2f) continue;
+                if (radial > chain.PitchRadius(teeth) + 0.2f) continue;
                 if (radial + Mathf.Abs(along) < nearest) {
                     nearest = radial + Mathf.Abs(along);
-                    best = other.gameObject;
+                    best = part;
                 }
             }
             return best ?? (saved != null ? saved.gameObject : null);
@@ -268,7 +502,7 @@ namespace Protobot.Motion {
             family = chainFamily;
             picks.Add(new Pick { part = part, center = center, axis = axis, teeth = GearTrain.Teeth(part, out _) });
             Audio.Sounds.Play(Audio.Sounds.Tick);
-            Interface.Interface.Say("Sprocket " + picks.Count + ": " + PartLabels.Short(part), true);
+            Interface.Interface.Say("Sprocket " + picks.Count + " added: " + picks[picks.Count - 1].teeth + "T", true);
             Refresh();
         }
 
@@ -299,6 +533,11 @@ namespace Protobot.Motion {
             StateSystem.AddElement(placed);
             StateSystem.AddState(new ObjectElement(chain));
             Audio.Sounds.Play(Audio.Sounds.Clack);
+            // The guide folds away once a chain is made (it opens again from its button).
+            if (!PlayerPrefs.HasKey(HelpKey + "Set")) {
+                PlayerPrefs.SetInt(HelpKey, 0);
+                PlayerPrefs.SetInt(HelpKey + "Set", 1);
+            }
             Stop("Made a " + (style == "chain" ? family.name.ToLower() : ChainFamily.Styles.First(x => x.key == style).name.ToLower()) + " of " + loop.Path.links + " links (" + Inch.Format(loop.Path.length) + ") round " + picks.Count + " sprockets");
         }
 
@@ -329,23 +568,54 @@ namespace Protobot.Motion {
             Draw(hover);
         }
 
+        // The chain the hovered sprocket would make if clicked next (drawn faint), worked out when either changes.
+        private GameObject ghostFor;
+        private int ghostEdits = -1;
+        private ChainPath ghost;
+
+        private void UpdateGhost(GameObject hover) {
+            if (hover == ghostFor && edits == ghostEdits) return;
+            ghostFor = hover;
+            ghostEdits = edits;
+            ghost = null;
+            if (hover == null || picks.Count == 0 || picks.Any(p => p.part == hover)) return;
+            var chainFamily = ChainFamily.ForSprocket(hover);
+            if (chainFamily == null || chainFamily != family) return;
+            var (center, axis) = ChainLoop.SprocketFrame(hover);
+            if (Mathf.Abs(Vector3.Dot(axis, picks[0].axis)) < 0.98f || Mathf.Abs(Vector3.Dot(center - picks[0].center, picks[0].axis.normalized)) > 0.3f) return;
+            Plane();
+            var flat = picks.Select(p => Flat(p.center)).Append(Flat(center)).ToList();
+            var teeth = picks.Select(p => p.teeth).Append(GearTrain.Teeth(hover, out _)).ToList();
+            ghost = PathFor(flat, teeth, WaysFor(flat, picks.Select(p => p.flipped).Append(false).ToList()));
+        }
+
         private void Draw(GameObject hover) {
             Overlay.Begin();
             var color = Theme.Accent;
+            Vector3 World(Vector2 flat) => origin + frame * new Vector3(flat.x, flat.y, 0f);
+            UpdateGhost(hover);
             if (hover != null && ChainFamily.ForSprocket(hover) is ChainFamily f) {
                 var (center, axis) = ChainLoop.SprocketFrame(hover);
-                Overlay.WorldCircle(center, axis, f.PitchRadius(GearTrain.Teeth(hover, out _)), picks.Any(p => p.part == hover) ? Theme.Warning : Color.white, 1.5f);
+                var picked = picks.Any(p => p.part == hover);
+                var fits = family == null || f == family;
+                Overlay.WorldCircle(center, axis, f.PitchRadius(GearTrain.Teeth(hover, out _)), picked ? Theme.Warning : fits ? Color.white : Theme.Danger, 1.5f);
+                if (!picked && Overlay.ToScreen(center, out var at))
+                    Overlay.Text(at + new Vector2(0f, -22f), fits ? "add as " + (picks.Count + 1) : "takes " + f.name.ToLower(), fits ? Color.white : Theme.Danger, null, true);
             }
-            var ways = Ways();
+            // The chain the hovered sprocket would make: faint, or red where it can't go.
+            if (ghost != null && ghost.points.Count > 1) {
+                var faint = ghost.Valid ? new Color(1f, 1f, 1f, 0.35f) : new Color(Theme.Danger.r, Theme.Danger.g, Theme.Danger.b, 0.4f);
+                for (var i = 0; i < ghost.points.Count; i++)
+                    Overlay.Line(World(ghost.points[i]), World(ghost.points[(i + 1) % ghost.points.Count]), faint, 1.5f);
+            }
             for (var i = 0; i < picks.Count; i++) {
                 var p = picks[i];
                 var radius = family != null ? family.PitchRadius(p.teeth) : 0.5f;
                 Overlay.WorldCircle(p.center, p.axis, radius, p.flipped ? Theme.Warning : color, 1.5f);
-                if (Overlay.ToScreen(p.center, out var at)) Overlay.Text(at, (i + 1).ToString(), p.flipped ? Theme.Warning : color, null, true);
+                if (Overlay.ToScreen(p.center, out var at)) Overlay.Text(at, (i + 1) + (p.flipped ? "  inside" : "  outside"), p.flipped ? Theme.Warning : color, null, true);
             }
             if (preview == null || !preview.Valid) return;
             // The chain's line, every link's pin a dot.
-            Vector3 World(Vector2 flat) => origin + frame * new Vector3(flat.x, flat.y, 0f);
             for (var i = 0; i < preview.points.Count; i++)
                 Overlay.Line(World(preview.points[i]), World(preview.points[(i + 1) % preview.points.Count]), color, 2.5f);
             var step = preview.length / preview.links;

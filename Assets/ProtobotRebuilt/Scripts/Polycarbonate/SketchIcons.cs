@@ -152,6 +152,166 @@ namespace Protobot.Polycarb {
                     g.Ring(Vector2.zero, 8f, Theme.Accent, 2f, 28);
                     g.Disc(Vector2.zero, 2.5f, Theme.Accent, 12);
                     break;
+                // V2: the SolidWorks tools added since.
+                case "Centerline":
+                    g.Dashed(new Vector2(-10, -10), new Vector2(10, 10), c, 2f, 6f, 2f);
+                    g.Disc(Vector2.zero, 1.5f, c, 8);
+                    break;
+                case "MidpointLine":
+                    g.Line(new Vector2(-10, -6), new Vector2(10, 6), c, 2f);
+                    g.Triangle(new Vector2(0, 4), new Vector2(-3, -2), new Vector2(3, -2), Theme.Warning);
+                    break;
+                case "CenterRectangle":
+                    g.Polyline(new[] { new Vector2(-9, -6), new Vector2(9, -6), new Vector2(9, 6), new Vector2(-9, 6) }, c, 2f, true);
+                    g.Dashed(new Vector2(-9, -6), new Vector2(9, 6), faint, 1f, 3f, 2f);
+                    g.Dashed(new Vector2(9, -6), new Vector2(-9, 6), faint, 1f, 3f, 2f);
+                    Dot(g, Vector2.zero, c);
+                    break;
+                case "ThreePointRectangle":
+                    g.Polyline(new[] { new Vector2(-10, -2), new Vector2(2, -10), new Vector2(10, 2), new Vector2(-2, 10) }, c, 2f, true);
+                    Dot(g, new Vector2(-10, -2), c);
+                    Dot(g, new Vector2(2, -10), c);
+                    Dot(g, new Vector2(10, 2), c);
+                    break;
+                case "PerimeterCircle":
+                    g.Ring(Vector2.zero, 9f, c, 2f, 32);
+                    Dot(g, new Vector2(0, 9), c);
+                    Dot(g, new Vector2(-7.8f, -4.5f), c);
+                    Dot(g, new Vector2(7.8f, -4.5f), c);
+                    break;
+                case "TangentArc": {
+                    g.Line(new Vector2(-11, -6), new Vector2(0, -6), c, 2f);
+                    var points = new List<Vector2>();
+                    for (var i = 0; i <= 12; i++) {
+                        var a = -Mathf.PI / 2f + Mathf.PI * i / 12f;
+                        points.Add(new Vector2(Mathf.Cos(a), Mathf.Sin(a)) * 6f + new Vector2(0, 0));
+                    }
+                    g.Polyline(points, c, 2f);
+                    break;
+                }
+                case "ThreePointArc": {
+                    var points = new List<Vector2>();
+                    for (var i = 0; i <= 16; i++) {
+                        var a = Mathf.PI * (0.15f + 0.7f * i / 16f);
+                        points.Add(new Vector2(Mathf.Cos(a), Mathf.Sin(a)) * 11f + new Vector2(0, -6));
+                    }
+                    g.Polyline(points, c, 2f);
+                    Dot(g, points[0], c);
+                    Dot(g, points[8], c);
+                    Dot(g, points[16], c);
+                    break;
+                }
+                case "Polygon": {
+                    var points = new List<Vector2>();
+                    for (var i = 0; i < 6; i++) points.Add(new Vector2(Mathf.Cos(i * Mathf.PI / 3f), Mathf.Sin(i * Mathf.PI / 3f)) * 10f);
+                    g.Polyline(points, c, 2f, true);
+                    g.Ring(Vector2.zero, 10f, faint, 1f, 24);
+                    break;
+                }
+                case "Point":
+                    g.Disc(Vector2.zero, 3.5f, c, 14);
+                    g.Ring(Vector2.zero, 7f, faint, 1f, 16);
+                    break;
+                case "Extend":
+                    g.Line(new Vector2(-10, 0), new Vector2(2, 0), c, 2f);
+                    g.Dashed(new Vector2(2, 0), new Vector2(8, 0), c, 2f, 2f, 2f);
+                    g.Line(new Vector2(9, -9), new Vector2(9, 9), faint, 1.5f);
+                    g.Triangle(new Vector2(8, 0), new Vector2(3, 3), new Vector2(3, -3), c);
+                    break;
+                case "Fillet": {
+                    var points = new List<Vector2> { new(-10, -9), new(-10, 0) };
+                    for (var i = 0; i <= 8; i++) {
+                        var a = Mathf.PI - Mathf.PI / 2f * i / 8f;
+                        points.Add(new Vector2(Mathf.Cos(a), Mathf.Sin(a)) * 9f + new Vector2(-1, 0));
+                    }
+                    points.Add(new Vector2(10, 9));
+                    g.Polyline(points, c, 2f);
+                    break;
+                }
+                case "Chamfer":
+                    g.Polyline(new[] { new Vector2(-10, -9), new Vector2(-10, 1), new Vector2(-2, 9), new Vector2(10, 9) }, c, 2f);
+                    break;
+                case "Offset":
+                    g.Polyline(new[] { new Vector2(-10, -10), new Vector2(-10, 6), new Vector2(6, 6) }, c, 2f);
+                    g.Polyline(new[] { new Vector2(-5, -10), new Vector2(-5, 1), new Vector2(6, 1) }, faint, 1.6f);
+                    break;
+                case "Mirror":
+                    g.Dashed(new Vector2(0, -11), new Vector2(0, 11), faint, 1.2f, 3f, 2f);
+                    g.Polyline(new[] { new Vector2(-3, -7), new Vector2(-10, 0), new Vector2(-3, 7) }, c, 2f, true);
+                    g.Polyline(new[] { new Vector2(3, -7), new Vector2(10, 0), new Vector2(3, 7) }, faint, 2f, true);
+                    break;
+                case "LinearPattern":
+                    for (var i = 0; i < 3; i++) g.Rect(new Vector2(-11 + i * 8, -3), new Vector2(-6 + i * 8, 2), i == 0 ? c : faint);
+                    g.Line(new Vector2(-9, -8), new Vector2(9, -8), faint, 1f);
+                    break;
+                case "CircularPattern":
+                    g.Ring(Vector2.zero, 8f, faint, 1f, 24);
+                    for (var i = 0; i < 6; i++) {
+                        var a = i * Mathf.PI / 3f;
+                        g.Disc(new Vector2(Mathf.Cos(a), Mathf.Sin(a)) * 8f, 2.5f, i == 0 ? c : faint, 10);
+                    }
+                    break;
+                case "Move":
+                    g.Line(new Vector2(-10, 0), new Vector2(10, 0), c, 1.8f);
+                    g.Line(new Vector2(0, -10), new Vector2(0, 10), c, 1.8f);
+                    g.Triangle(new Vector2(11, 0), new Vector2(6, 3), new Vector2(6, -3), c);
+                    g.Triangle(new Vector2(-11, 0), new Vector2(-6, 3), new Vector2(-6, -3), c);
+                    g.Triangle(new Vector2(0, 11), new Vector2(3, 6), new Vector2(-3, 6), c);
+                    g.Triangle(new Vector2(0, -11), new Vector2(3, -6), new Vector2(-3, -6), c);
+                    break;
+                case "Copy":
+                    g.Polyline(new[] { new Vector2(-10, -4), new Vector2(2, -4), new Vector2(2, 8), new Vector2(-10, 8) }, faint, 1.6f, true);
+                    g.Polyline(new[] { new Vector2(-4, -10), new Vector2(8, -10), new Vector2(8, 2), new Vector2(-4, 2) }, c, 2f, true);
+                    break;
+                case "Rotate": {
+                    var points = new List<Vector2>();
+                    for (var i = 0; i <= 16; i++) {
+                        var a = Mathf.PI * 0.2f + Mathf.PI * 1.5f * i / 16f;
+                        points.Add(new Vector2(Mathf.Cos(a), Mathf.Sin(a)) * 8f);
+                    }
+                    g.Polyline(points, c, 2f);
+                    g.Triangle(points[16] + new Vector2(4, 0), points[16] + new Vector2(-3, 3), points[16] + new Vector2(-3, -4), c);
+                    break;
+                }
+                case "Scale":
+                    g.Polyline(new[] { new Vector2(-10, -10), new Vector2(-2, -10), new Vector2(-2, -2), new Vector2(-10, -2) }, faint, 1.6f, true);
+                    g.Polyline(new[] { new Vector2(-10, -10), new Vector2(10, -10), new Vector2(10, 10), new Vector2(-10, 10) }, c, 2f, true);
+                    g.Line(new Vector2(-2, -2), new Vector2(7, 7), c, 1.5f);
+                    break;
+                case "Project":
+                    g.Polyline(new[] { new Vector2(-8, 2), new Vector2(4, 8), new Vector2(10, 4), new Vector2(-2, -2) }, faint, 1.4f, true);
+                    g.Polyline(new[] { new Vector2(-10, -10), new Vector2(2, -4), new Vector2(8, -8), new Vector2(-4, -14) }, new Color(0.78f, 0.52f, 1f, 1f), 2f, true);
+                    g.Line(new Vector2(-2, -2), new Vector2(-4, -8), faint, 1f);
+                    break;
+                case "Relations":
+                    g.Line(new Vector2(-10, -6), new Vector2(10, -6), c, 2f);
+                    g.Line(new Vector2(-10, 4), new Vector2(10, 4), c, 2f);
+                    g.Rect(new Vector2(-3, -12), new Vector2(7, -2), new Color(0.45f, 0.85f, 0.55f, 1f));
+                    break;
+                case "ShowRelations":
+                    g.Rect(new Vector2(-10, -5), new Vector2(0, 5), new Color(0.45f, 0.85f, 0.55f, 1f));
+                    g.Ring(new Vector2(6, 0), 5f, c, 1.5f, 16);
+                    g.Disc(new Vector2(6, 0), 2f, c, 8);
+                    break;
+                case "NormalTo":
+                    g.Polyline(new[] { new Vector2(-8, -8), new Vector2(8, -8), new Vector2(8, 8), new Vector2(-8, 8) }, c, 2f, true);
+                    g.Disc(Vector2.zero, 3f, Theme.Accent, 12);
+                    g.Ring(Vector2.zero, 6f, faint, 1f, 16);
+                    break;
+                case "Collinear":
+                    g.Line(new Vector2(-11, 0), new Vector2(-2, 0), c, 2.5f);
+                    g.Line(new Vector2(2, 0), new Vector2(11, 0), c, 2.5f);
+                    g.Dashed(new Vector2(-11, 0), new Vector2(11, 0), faint, 1f, 2f, 2f);
+                    break;
+                case "Symmetric":
+                    g.Dashed(new Vector2(0, -11), new Vector2(0, 11), faint, 1.2f, 3f, 2f);
+                    g.Disc(new Vector2(-6, 0), 3f, c, 12);
+                    g.Disc(new Vector2(6, 0), 3f, c, 12);
+                    break;
+                case "Coradial":
+                    g.Ring(Vector2.zero, 9f, c, 2f, 32);
+                    g.Ring(Vector2.zero, 7f, faint, 1.5f, 28);
+                    break;
             }
         }
 

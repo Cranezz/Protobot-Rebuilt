@@ -134,6 +134,60 @@ namespace Protobot.EditorTools {
             return (a, b, screw);
         }
 
+        /// <summary>A big plate (25 x 25 holes) with 14 shafts and 20 sprockets stacked at three heights (high strength
+        /// at the bottom, Normal in the middle, 6P on top), joined by six chains into one system a single motor turns,
+        /// and a small C-channel arm screwed to a shaft collar on one shaft (it turns with it). Returns the sprockets by
+        /// chain ("A".."H"), in the order the chains go round them, and the inside (idler) ones' indexes.</summary>
+        public static Dictionary<string, (List<GameObject> sprockets, int[] inside)> SprocketPlate(Vector3 origin) {
+            var up = Vector3.up;
+            Part("PLTE-25-25", origin, Quaternion.LookRotation(up, Vector3.forward));
+            const float half = 0.023f;
+            float[] level = { 0.6f, 1.25f, 1.9f };
+            var shafts = new Dictionary<string, Vector2> {
+                ["S0"] = new(-5f, -5f), ["S1"] = new(-1.5f, -5f), ["S2"] = new(-5f, -1.5f), ["S3"] = new(3f, -5f),
+                ["S4"] = new(1f, -1.5f), ["S5"] = new(5f, 1f), ["S6"] = new(1.5f, 3f), ["S7"] = new(-2f, 4.5f),
+                ["S8"] = new(-4.5f, 1f), ["S9"] = new(-5f, 5f), ["S10"] = new(-2.5f, 1.5f), ["S11"] = new(5f, 5.5f),
+                ["S12"] = new(3.5f, -1f), ["S13"] = new(-2.5f, -2.5f),
+            };
+            Vector3 Hole(string shaft) => origin + new Vector3(shafts[shaft].x, 0f, shafts[shaft].y);
+            foreach (var shaft in shafts.Keys) Shaft(Hole(shaft) + up * 1.2f, up, 4);
+            Motor(Hole("S0") - up * half, up, Vector3.forward);
+            foreach (var dz in new[] { 0.5f, 1.0f }) Screw(Hole("S0") + new Vector3(0f, half, dz), up);
+            GameObject Sprocket(string shaft, int height, string id) {
+                var at = Hole(shaft) + up * level[height];
+                var part = Part(id, at, Quaternion.LookRotation(up));
+                var (center, axis) = Motion.ChainLoop.SprocketFrame(part);
+                part.transform.rotation = Quaternion.FromToRotation(axis, up) * part.transform.rotation;
+                (center, _) = Motion.ChainLoop.SprocketFrame(part);
+                part.transform.position += at - center;
+                return part;
+            }
+            var chains = new Dictionary<string, (List<GameObject>, int[])> {
+                // High strength at the bottom: the motor's chain, and two more.
+                ["A"] = (new List<GameObject> { Sprocket("S0", 0, "SPKT-High Strength-12T"), Sprocket("S1", 0, "SPKT-High Strength-24T"), Sprocket("S2", 0, "SPKT-High Strength-18T") }, new int[0]),
+                ["D"] = (new List<GameObject> { Sprocket("S6", 0, "SPKT-High Strength-12T"), Sprocket("S7", 0, "SPKT-High Strength-30T"), Sprocket("S8", 0, "SPKT-High Strength-6T") }, new int[0]),
+                ["G"] = (new List<GameObject> { Sprocket("S5", 0, "SPKT-High Strength-18T"), Sprocket("S11", 0, "SPKT-High Strength-24T") }, new int[0]),
+                // Normal in the middle.
+                ["B"] = (new List<GameObject> { Sprocket("S1", 1, "SPKT-Normal-10T"), Sprocket("S3", 1, "SPKT-Normal-48T"), Sprocket("S4", 1, "SPKT-Normal-24T") }, new int[0]),
+                ["E"] = (new List<GameObject> { Sprocket("S7", 1, "SPKT-Normal-15T"), Sprocket("S9", 1, "SPKT-Normal-40T"), Sprocket("S10", 1, "SPKT-Normal-24T") }, new int[0]),
+                ["H"] = (new List<GameObject> { Sprocket("S0", 1, "SPKT-Normal-24T"), Sprocket("S13", 1, "SPKT-Normal-15T") }, new int[0]),
+                // 6P (low strength) on top, with an idler pressing on one span.
+                ["C"] = (new List<GameObject> { Sprocket("S4", 2, "VXSPROCKETS-6P 16T Sprocket"), Sprocket("S12", 2, "VXSPROCKETS-6P 8T Sprocket"), Sprocket("S5", 2, "VXSPROCKETS-6P 40T Sprocket"), Sprocket("S6", 2, "VXSPROCKETS-6P 24T Sprocket") }, new[] { 1 }),
+            };
+            // The arm: a collar clamped on S13 above the sprockets, a 1x2 C-channel screwed to its set-screw hole, and a
+            // collar under it as a stop.
+            var axle = Hole("S13");
+            var h = axle + up * 2.6f;
+            var r = Vector3.right;
+            var collarTurn = Quaternion.LookRotation(up, -r);
+            Part("CLMP-Normal-Normal", h - collarTurn * new Vector3(0f, 0.007f, 0f), collarTurn);
+            Part("CLMP-Normal-Normal", h - up * 0.65f - collarTurn * new Vector3(0f, 0.007f, 0f), collarTurn);
+            var channelTurn = Quaternion.LookRotation(-r, up);
+            Part("CCHL-1x2-5", h + r * (0.2165f + 0.0555f) + channelTurn * new Vector3(0.75f, 0f, 0f), channelTurn);
+            Screw(h + r * (0.2165f + 0.0625f), r, "1/4in");
+            return chains;
+        }
+
         /// <summary>A drivetrain: rails along z at x = ±5, a plate across their top flanges, a motor inside each
         /// rail at each end driving a 4" wheel outside it (omni at the front, traction at the back).</summary>
         public static List<GameObject> Drive(Vector3 origin) {

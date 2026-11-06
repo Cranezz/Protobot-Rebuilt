@@ -62,13 +62,10 @@ namespace Protobot.Motion {
         private readonly List<Run> runs = new();
         private readonly HashSet<MotorDrive> refused = new();
         private readonly HashSet<MotorDrive> idle = new();   // running with no shaft in them
-        private List<Rotor> rotors;
-        private bool stale = true;
 
         public static void Ensure() {
             if (host != null) return;
             host = new GameObject("Motor Runner").AddComponent<MotorRunner>();
-            StateSystem.OnChangeState += () => { if (host != null) host.stale = true; };
         }
 
         /// <summary>Whether a motor is turning (its own run or driven by another).</summary>
@@ -78,13 +75,7 @@ namespace Protobot.Motion {
             foreach (var motor in MotorDrive.Live()) motor.StopToggle();
         }
 
-        private List<Rotor> CurrentRotors() {
-            if (stale || rotors == null) {
-                rotors = GearTrain.Rotors();
-                stale = false;
-            }
-            return rotors;
-        }
+        private static List<Rotor> CurrentRotors() => GearTrain.Current();
 
         private void Update() {
             var motors = MotorDrive.Live();
@@ -109,7 +100,7 @@ namespace Protobot.Motion {
                 if (motor.gameObject.IsDeleted()) continue;
                 var system = GearTrain.SystemOf(motor, CurrentRotors());
                 if (system == null) {
-                    if (idle.Add(motor)) Interface.Interface.Say(motor.Label + " is running with nothing in it (put a shaft into its square hole)", true);
+                    idle.Add(motor);
                     continue;
                 }
                 if (system.jammed) {
@@ -133,12 +124,7 @@ namespace Protobot.Motion {
                 run.before = moved.Select(p => (IElement)new ObjectElement(p)).ToList();
                 foreach (var (chain, _, _) in system.chains) run.before.Add(new ChainLoop.PhaseElement(chain));
                 runs.Add(run);
-                var shafts = system.rotors.Count;
-                var others = system.Motors.Count(m => m != motor);
-                Interface.Interface.Say(motor.Label + (motor.Command > 0 ? " forward" : " in reverse") + " at " + Mathf.RoundToInt(Mathf.Abs(motor.Command) * motor.Rpm) + " rpm: "
-                                        + parts.Count(p => p.GetComponent<SavedObject>() != null) + " parts turn"
-                                        + (shafts > 1 ? " on " + shafts + " geared shafts" : "")
-                                        + (others > 0 ? " (" + others + (others == 1 ? " other motor" : " other motors") + " in the system)" : ""), true);
+
             }
 
             foreach (var motor in motors) motor.Level = idle.Contains(motor) ? motor.Command : 0f;
@@ -196,11 +182,6 @@ namespace Protobot.Motion {
                     after.Add(new ChainLoop.PhaseElement(chain));
                 }
             StateSystem.AddState(new State(after));
-            var motor = run.starter != null ? run.starter : run.system.Motors.FirstOrDefault();
-            var ratio = motor != null ? Mathf.Abs(run.system.MotorRatio(motor)) : 1f;
-            var shaftTurns = turns * ratio;
-            Interface.Interface.Say((motor != null ? motor.Label : "The motor") + " turned its shaft " + shaftTurns.ToString(shaftTurns < 10f ? "0.##" : "0")
-                                    + (Mathf.Approximately(shaftTurns, 1f) ? " turn" : " turns"), true);
         }
     }
 }

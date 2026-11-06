@@ -168,11 +168,16 @@ namespace Protobot {
             meshRenderer.enabled = placing;
         }
 
+        private Mesh displayMesh;  // V2
+
         public void StartPlacing(PlacementData newPlacementData) {
             currentPlacementData = newPlacementData;
             placing = true;
             rotating = false;
-            meshFilter.mesh = newPlacementData.GetDisplayMesh();
+            // V2: the preview's mesh is made for it each time: free the last one (they piled up, never freed).
+            if (displayMesh != null) Destroy(displayMesh);
+            displayMesh = newPlacementData.GetDisplayMesh();
+            meshFilter.mesh = displayMesh;
             freeRotation = startRotation = Quaternion.identity;  // V2
             snappedTurn = false;
 

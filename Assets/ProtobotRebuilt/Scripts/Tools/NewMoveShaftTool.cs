@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
@@ -42,7 +42,8 @@ namespace Protobot.Tools {
             curShaft = newShaft;
         }
 
-        public float GetShaftLength() => shaftObjLink.obj.GetComponent<MeshFilter>().mesh.bounds.extents.z;
+        // V2: sharedMesh (.mesh copies the mesh).
+        public float GetShaftLength() => shaftObjLink.obj.GetComponent<MeshFilter>().sharedMesh.bounds.extents.z;
         public Vector3 GetShaftExtents() => shaftObjLink.obj.GetComponent<MeshCollider>().bounds.extents;
 
         //<Summary> Returns the next object on the shaft in a certain direction from a starting position </Summary>

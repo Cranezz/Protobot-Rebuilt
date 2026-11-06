@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using Parts_List;
 using UnityEngine;
@@ -23,7 +23,19 @@ namespace Protobot {
 
         private float GetPos(int val, int max) => 0.5f * ((-max + 1) / 2f + val);
 
+        // V2: one mesh per plate size, shared by every plate that size (each plate made its own, and they were
+        // never freed: a 25x25 plate is 45,000 vertices). Drilling and cutting give a part a new mesh of its own.
+        private static readonly Dictionary<(int, int), Mesh> Meshes = new();
+
         public override Mesh GetMesh() {
+            if (Meshes.TryGetValue((Length, Width), out var made) && made != null) return made;
+            made = Combine();
+            made.name = "Plate " + Length + "x" + Width;
+            Meshes[(Length, Width)] = made;
+            return made;
+        }
+
+        private Mesh Combine() {
             CombineInstance[] combine = new CombineInstance[HoleCount];
 
             var i = 0;

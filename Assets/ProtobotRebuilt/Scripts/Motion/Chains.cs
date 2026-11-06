@@ -8,13 +8,13 @@ using UnityEngine;
 namespace Protobot.Motion {
     // V2: chains. VEX has three: Normal (the 10T-48T sprockets, 0.145" pitch as VEX-CAD models them), high
     // strength (6T-30T and the tank tread drive wheel, 0.385") and 6P (8T-40T, 0.25"). A sprocket's pitch radius is
-    // pitch / (2 sin(180° / teeth)). The high strength and 6P links are VEX-CAD's own models; the Normal link is
-    // modelled here (a roller chain: rollers between alternating inner and outer plates).
+    // pitch / (2 sin(180° / teeth)). The links are VEX-CAD's own models (the Normal chain's is the 6P link scaled to
+    // its pitch: VEX-CAD has no model of it).
     public class ChainFamily {
         public string key, name;
         public float pitch, width, gramsPerLink;
 
-        public static readonly ChainFamily Normal = new() { key = "Normal", name = "Normal chain", pitch = 0.145f, width = 0.14f, gramsPerLink = 0.3f };
+        public static readonly ChainFamily Normal = new() { key = "Normal", name = "Normal chain", pitch = 0.145f, width = 0.26f, gramsPerLink = 0.2f };
         public static readonly ChainFamily HighStrength = new() { key = "HS", name = "High strength chain", pitch = 0.385f, width = 0.57f, gramsPerLink = 1.1f };
         public static readonly ChainFamily SixP = new() { key = "6P", name = "6P chain", pitch = 0.25f, width = 0.44f, gramsPerLink = 0.6f };
         public static readonly ChainFamily[] All = { Normal, HighStrength, SixP };
@@ -41,7 +41,7 @@ namespace Protobot.Motion {
         public Mesh[] Links {
             get {
                 if (meshes != null && meshes[0] != null) return meshes;
-                meshes = this == Normal ? new[] { RollerLink(false), RollerLink(true) } : new[] { VexLink(), null };
+                meshes = new[] { VexLink(), null };
                 if (meshes[1] == null) meshes[1] = meshes[0];
                 return meshes;
             }
@@ -75,16 +75,18 @@ namespace Protobot.Motion {
         public float WidthFor(string style) => HasTreads && style != null && style != "chain" ? 1.5f : width;
 
         private Mesh VexLink() {
-            var path = this == SixP ? ("Part Prefabs/VEX/Motion Parts", "IQ Chain") : ("Part Prefabs/VEX/Chain 9P", "High Strength Chain Link");
+            // VEX-CAD has no model of the standard (Normal) chain's link: it's VEX's snap-together plastic link like
+            // the 6P one, so that one scaled to the standard pitch stands in for it.
+            var path = this != HighStrength ? ("Part Prefabs/VEX/Motion Parts", "IQ Chain") : ("Part Prefabs/VEX/Chain 9P", "High Strength Chain Link");
             var family = Resources.Load<GameObject>(path.Item1);
             var child = family != null ? family.GetComponentsInChildren<PartData>(true).FirstOrDefault(d => d.name == path.Item2) : null;
-            if (child == null || !child.TryGetComponent(out MeshFilter filter)) return RollerLink(false);
+            if (child == null || !child.TryGetComponent(out MeshFilter filter)) return new Mesh { name = name + " link (missing model)" };
             materials = child.GetComponent<MeshRenderer>().sharedMaterials;
             var source = filter.sharedMesh;
             // Into the chain's frame: pins along z, the next pin at +x, centred on z = 0.
             Quaternion turn;
             Vector3 shift;
-            if (this == SixP) {
+            if (this != HighStrength) {
                 turn = Quaternion.AngleAxis(180f, new Vector3(1f, 0f, 1f).normalized);   // the model runs along z, pins along x
                 shift = Vector3.zero;
             }
@@ -93,74 +95,15 @@ namespace Protobot.Motion {
                 shift = new Vector3(0f, 0f, -source.bounds.center.z);
             }
             var mesh = MeshAlign.Moved(source, turn, turn * shift);
+            if (this == Normal) {
+                var scale = pitch / SixP.pitch;
+                var vertices = mesh.vertices;
+                for (var i = 0; i < vertices.Length; i++) vertices[i] *= scale;
+                mesh.vertices = vertices;
+                mesh.RecalculateBounds();
+            }
             mesh.name = name + " link";
             return mesh;
-        }
-
-        // A roller chain link: a roller at x = 0 and two side plates to the next pin; outer links' plates sit wider.
-        private Mesh RollerLink(bool outer) {
-            var vertices = new List<Vector3>();
-            var triangles = new List<int>();
-            var height = pitch * 0.7f;
-            var plate = width * 0.13f;
-            var gap = width * 0.5f - plate * (outer ? 0.5f : 1.5f);
-            void Stadium(float z0, float z1) {
-                const int Steps = 10;
-                var outline = new List<Vector2>();
-                for (var i = 0; i <= Steps; i++) {
-                    var a = Mathf.PI / 2f + Mathf.PI * i / Steps;
-                    outline.Add(new Vector2(Mathf.Cos(a), Mathf.Sin(a)) * height / 2f);
-                }
-                for (var i = 0; i <= Steps; i++) {
-                    var a = -Mathf.PI / 2f + Mathf.PI * i / Steps;
-                    outline.Add(new Vector2(pitch + Mathf.Cos(a) * height / 2f, Mathf.Sin(a) * height / 2f));
-                }
-                Prism(vertices, triangles, outline, z0, z1);
-            }
-            Stadium(gap, gap + plate);
-            Stadium(-gap - plate, -gap);
-            if (!outer) {
-                var roller = new List<Vector2>();
-                for (var i = 0; i < 12; i++) {
-                    var a = Mathf.PI * 2f * i / 12f;
-                    roller.Add(new Vector2(Mathf.Cos(a), Mathf.Sin(a)) * pitch * 0.29f);
-                }
-                Prism(vertices, triangles, roller, -gap, gap);
-                var next = roller.Select(p => p + new Vector2(pitch, 0f)).ToList();
-                Prism(vertices, triangles, next, -gap, gap);
-            }
-            var mesh = new Mesh { name = name + (outer ? " outer link" : " inner link") };
-            mesh.SetVertices(vertices);
-            mesh.SetTriangles(triangles, 0);
-            mesh.RecalculateNormals();
-            mesh.RecalculateBounds();
-            return mesh;
-        }
-
-        // A convex outline extruded along z (flat-shaded sides).
-        private static void Prism(List<Vector3> vertices, List<int> triangles, List<Vector2> outline, float z0, float z1) {
-            var n = outline.Count;
-            var center = outline.Aggregate(Vector2.zero, (s, p) => s + p) / n;
-            foreach (var z in new[] { z0, z1 }) {
-                var start = vertices.Count;
-                vertices.Add(new Vector3(center.x, center.y, z));
-                foreach (var p in outline) vertices.Add(new Vector3(p.x, p.y, z));
-                for (var i = 0; i < n; i++) {
-                    int a = start + 1 + i, b = start + 1 + (i + 1) % n;
-                    if (z == z1) triangles.AddRange(new[] { start, a, b });
-                    else triangles.AddRange(new[] { start, b, a });
-                }
-            }
-            for (var i = 0; i < n; i++) {
-                var p = outline[i];
-                var q = outline[(i + 1) % n];
-                var start = vertices.Count;
-                vertices.Add(new Vector3(p.x, p.y, z0));
-                vertices.Add(new Vector3(q.x, q.y, z0));
-                vertices.Add(new Vector3(q.x, q.y, z1));
-                vertices.Add(new Vector3(p.x, p.y, z1));
-                triangles.AddRange(new[] { start, start + 1, start + 2, start, start + 2, start + 3 });
-            }
         }
     }
 
@@ -174,14 +117,19 @@ namespace Protobot.Motion {
     }
 
     // The chain's line in its plane: straight spans tangent to each pair of sprockets in turn and arcs round them,
-    // in the given ways (so a chain can wrap a sprocket from inside the loop); the slack sags the longest span.
+    // in the given ways (so a chain can wrap a sprocket from inside the loop). VEX chains are run tight: the loop is a
+    // whole number of links, the part of a link over or short shared by all of them (a few thousandths each).
     public class ChainPath {
         public readonly List<Vector2> points = new();
         public readonly List<float> along = new();
         public float length;       // the chain's own length (links x pitch)
-        public float tight;        // the length it would have pulled tight
+        public float tight;        // the loop's length round the sprockets
         public int links;
+        public float[] wrapAngles;  // how far round each sprocket the chain goes (radians)
         public string problem;
+
+        /// <summary>Teeth of a sprocket in the chain at once (fewer than 3 and it can skip under load).</summary>
+        public int TeethIn(int wrap, int teeth) => wrapAngles == null || wrap >= wrapAngles.Length ? 0 : Mathf.RoundToInt(wrapAngles[wrap] / (2f * Mathf.PI) * teeth);
         public bool Valid => problem == null;
 
         public static ChainPath Build(IList<ChainWrap> wraps, float pitch, Vector2 down) {
@@ -243,13 +191,10 @@ namespace Protobot.Motion {
                     }
             }
             path.tight = tight;
-            path.links = Mathf.Max(2, Mathf.CeilToInt(tight / pitch - 0.02f));
+            path.wrapAngles = new float[n];
+            for (var i = 0; i < n; i++) path.wrapAngles[i] = Mathf.Abs(sweeps[i]);
+            path.links = Mathf.Max(2, Mathf.RoundToInt(tight / pitch));
             path.length = path.links * pitch;
-            var slack = path.length - tight;
-
-            // The span the slack hangs in: the longest one, sagging the way down lies in the plane (else outward).
-            var longest = 0;
-            for (var i = 1; i < n; i++) if (spans[i] > spans[longest]) longest = i;
             for (var i = 0; i < n; i++) {
                 var w = wraps[i];
                 var from = Mathf.Atan2(inPoint[i].y - w.center.y, inPoint[i].x - w.center.x);
@@ -258,25 +203,48 @@ namespace Protobot.Motion {
                     var a = from + sweeps[i] * k / steps;
                     path.Add(w.center + new Vector2(Mathf.Cos(a), Mathf.Sin(a)) * w.radius);
                 }
-                var p = outPoint[i];
-                var q = inPoint[(i + 1) % n];
-                if (i == longest && slack > 1e-4f) {
-                    var dir = (q - p).normalized;
-                    var side = new Vector2(-dir.y, dir.x);
-                    // Toward down, or away from the loop's middle when the chain lies flat.
-                    var middle = wraps.Aggregate(Vector2.zero, (s, x) => s + x.center) / n;
-                    var sideways = Vector2.Dot(side, down);
-                    if (down.magnitude < 0.3f || Mathf.Abs(sideways) < 0.15f) sideways = Vector2.Dot(side, (p + q) / 2f - middle);
-                    if (sideways < 0f) side = -side;
-                    var sag = Mathf.Min(Mathf.Sqrt(3f * spans[i] * slack / 8f), spans[i] * 0.35f);
-                    for (var k = 1; k < 24; k++) {
-                        var t = k / 24f;
-                        path.Add(Vector2.Lerp(p, q, t) + side * (4f * sag * t * (1f - t)));
+            }
+            path.Close();
+
+            // What a real chain can't do: cross itself, or run through a sprocket it goes round.
+            for (var i = 0; i < n; i++) {
+                var a = outPoint[i];
+                var b = inPoint[(i + 1) % n];
+                for (var j = 0; j < n; j++) {
+                    if (j == i || j == (i + 1) % n) continue;
+                    if (DistanceToSegment(wraps[j].center, a, b) < wraps[j].radius - 0.02f) {
+                        path.problem = "The chain from sprocket " + (i + 1) + " to " + ((i + 1) % n + 1) + " would run through sprocket " + (j + 1) + ": pick them in the order the chain goes round, or flip one";
+                        return path;
+                    }
+                }
+                for (var j = i + 1; j < n; j++) {
+                    if (j == i + 1 || (i == 0 && j == n - 1)) continue;
+                    if (Crosses(a, b, outPoint[j], inPoint[(j + 1) % n])) {
+                        path.problem = "The chain would cross itself (between sprockets " + (i + 1) + " and " + ((i + 1) % n + 1) + "): a real chain can't, so pick them in another order or flip a side";
+                        return path;
                     }
                 }
             }
-            path.Close();
+            if (n == 2 && wraps[0].way != wraps[1].way) {
+                path.problem = "A chain round two sprockets wrapped opposite ways crosses itself: a real chain can't (use gears to turn one the other way)";
+                return path;
+            }
             return path;
+        }
+
+        private static float DistanceToSegment(Vector2 p, Vector2 a, Vector2 b) {
+            var ab = b - a;
+            var t = ab.sqrMagnitude > 1e-10f ? Mathf.Clamp01(Vector2.Dot(p - a, ab) / ab.sqrMagnitude) : 0f;
+            return Vector2.Distance(p, a + ab * t);
+        }
+
+        private static bool Crosses(Vector2 a, Vector2 b, Vector2 c, Vector2 d) {
+            float Side(Vector2 p, Vector2 q, Vector2 r) => (q.x - p.x) * (r.y - p.y) - (q.y - p.y) * (r.x - p.x);
+            var d1 = Side(c, d, a);
+            var d2 = Side(c, d, b);
+            var d3 = Side(a, b, c);
+            var d4 = Side(a, b, d);
+            return d1 * d2 < -1e-8f && d3 * d4 < -1e-8f;
         }
 
         private void Add(Vector2 p) {
@@ -292,8 +260,7 @@ namespace Protobot.Motion {
                 s += Vector2.Distance(points[i], points[(i + 1) % points.Count]);
             }
             along.Add(s);
-            // The sag's arc length is close to, not exactly, the slack: spacing the links by the drawn length makes
-            // the loop close.
+            // The links are spaced over the drawn loop, so it closes.
             drawn = s;
         }
 
@@ -356,6 +323,7 @@ namespace Protobot.Motion {
 
         private new void OnDestroy() {
             All.Remove(this);
+            if (band != null) Destroy(band);
             base.OnDestroy();
         }
 
@@ -453,25 +421,44 @@ namespace Protobot.Motion {
             Save();
         }
 
+        // Every sprocket in the build with its chain size, teeth and frame, kept until the build changes
+        // (Dynamics.Version): finding a chain's sprockets is then a short list, not the whole build.
+        private static readonly List<(GameObject part, ChainFamily family, int teeth, Vector3 center, Vector3 axis)> index = new();
+        private static long indexVersion = -1;
+
+        /// <summary>Every sprocket in the build (not deleted): its chain size, teeth, middle and axle.</summary>
+        public static List<(GameObject part, ChainFamily family, int teeth, Vector3 center, Vector3 axis)> AllSprockets() {
+            if (indexVersion == Dynamics.Version) return index;
+            index.Clear();
+            foreach (var saved in Object.FindObjectsByType<SavedObject>(FindObjectsSortMode.None)) {
+                var go = saved.gameObject;
+                if (go.IsDeleted()) continue;
+                var chainFamily = ChainFamily.ForSprocket(go);
+                if (chainFamily == null) continue;
+                var (c, axis) = SprocketFrame(go);
+                index.Add((go, chainFamily, GearTrain.Teeth(go, out _), c, axis));
+            }
+            indexVersion = Dynamics.Version;
+            return index;
+        }
+
         /// <summary>The sprockets it goes round (found by place), each with its wrap's index.</summary>
         public List<(GameObject part, int wrap)> Sprockets() {
             var result = new List<(GameObject, int)>();
-            var all = Object.FindObjectsByType<SavedObject>(FindObjectsSortMode.None);
+            var all = AllSprockets();
             for (var i = 0; i < wraps.Count; i++) {
                 var center = transform.TransformPoint(wraps[i].center);
                 GameObject best = null;
                 var bestDistance = 0.08f;
-                foreach (var saved in all) {
-                    if (saved.gameObject.IsDeleted() || saved.gameObject == gameObject || ChainFamily.ForSprocket(saved.gameObject) != family) continue;
-                    if (GearTrain.Teeth(saved.gameObject, out _) != wraps[i].teeth) continue;
-                    var (c, axis) = SprocketFrame(saved.gameObject);
+                foreach (var (part, chainFamily, teeth, c, axis) in all) {
+                    if (part == null || chainFamily != family || teeth != wraps[i].teeth) continue;
                     if (Mathf.Abs(Vector3.Dot(axis, Normal)) < 0.98f) continue;
                     var offset = c - center;
                     if (Mathf.Abs(Vector3.Dot(offset, Normal)) > 0.3f) continue;
                     var inPlane = Vector3.ProjectOnPlane(offset, Normal).magnitude;
                     if (inPlane < bestDistance) {
                         bestDistance = inPlane;
-                        best = saved.gameObject;
+                        best = part;
                     }
                 }
                 if (best != null) result.Add((best, i));
@@ -583,24 +570,60 @@ namespace Protobot.Motion {
                 link.transform.SetParent(transform, false);
                 link.AddComponent<MeshFilter>();
                 link.AddComponent<MeshRenderer>();
-                var box = link.AddComponent<BoxCollider>();
-                link.AddComponent<SelectAs>().target = gameObject;
                 links.Add(link.transform);
             }
             for (var i = 0; i < links.Count; i++) {
-                var mesh = meshes[i % 2];
-                links[i].GetComponent<MeshFilter>().sharedMesh = mesh;
-                var renderer = links[i].GetComponent<MeshRenderer>();
-                renderer.sharedMaterial = material;
-                var box = links[i].GetComponent<BoxCollider>();
-                box.center = new Vector3(family.pitch / 2f, 0f, 0f);
-                box.size = new Vector3(family.pitch * 1.2f, family.pitch * 0.8f + 0.04f, linkWidth);
+                links[i].GetComponent<MeshFilter>().sharedMesh = meshes[i % 2];
+                links[i].GetComponent<MeshRenderer>().sharedMaterial = material;
             }
+            Band(linkWidth, family.pitch * 0.8f + 0.04f);
             if (TryGetComponent(out Parts_List.PartName partName)) {
                 partName.name = family.name + " (" + count + " links)";
                 partName.weightInGrams = count * family.gramsPerLink;
             }
             Place(links, phase);
+        }
+
+        private Mesh band;
+
+        // V2: one collider round the loop to click the chain by (a flat band as wide and tall as the links), not a
+        // box on every link: running a chain moves no colliders, and a build has hundreds fewer of them.
+        private void Band(float width, float height) {
+            if (!TryGetComponent(out MeshCollider collider)) collider = gameObject.AddComponent<MeshCollider>();
+            if (Path == null || !Path.Valid || Path.points.Count < 3) {
+                collider.enabled = false;
+                return;
+            }
+            if (band == null) band = new Mesh { name = "Chain band" };
+            band.Clear();
+            var points = Path.points;
+            var n = points.Count;
+            var vertices = new List<Vector3>(n * 4);
+            for (var i = 0; i < n; i++) {
+                var tangent = (points[(i + 1) % n] - points[(i + n - 1) % n]).normalized;
+                var side = new Vector2(-tangent.y, tangent.x) * (height / 2f);
+                Vector2 outer = points[i] + side, inner = points[i] - side;
+                vertices.Add(new Vector3(outer.x, outer.y, width / 2f));
+                vertices.Add(new Vector3(outer.x, outer.y, -width / 2f));
+                vertices.Add(new Vector3(inner.x, inner.y, -width / 2f));
+                vertices.Add(new Vector3(inner.x, inner.y, width / 2f));
+            }
+            // Four faces round the loop, both ways (so a ray hits it from either side).
+            var triangles = new List<int>(n * 48);
+            for (var i = 0; i < n; i++) {
+                var a = i * 4;
+                var b = (i + 1) % n * 4;
+                for (var k = 0; k < 4; k++) {
+                    int a0 = a + k, a1 = a + (k + 1) % 4, b0 = b + k, b1 = b + (k + 1) % 4;
+                    triangles.AddRange(new[] { a0, b0, b1, a0, b1, a1, a0, b1, b0, a0, a1, b1 });
+                }
+            }
+            band.SetVertices(vertices);
+            band.SetTriangles(triangles, 0);
+            band.RecalculateBounds();
+            collider.sharedMesh = null;
+            collider.sharedMesh = band;
+            collider.enabled = true;
         }
 
         /// <summary>Puts links (its own or a copy's) along the chain at a phase.</summary>
@@ -698,14 +721,18 @@ namespace Protobot.Motion {
 
         public override List<string> GetParam1Options() => ChainFamily.All.Select(f => f.key).ToList();
         public override List<string> GetParam2Options() => new();
-        public override Mesh GetMesh() => new Mesh();
+        // Every chain's own mesh is empty (its links are its children): one shared.
+        private static Mesh empty;
+        private static Mesh Empty => empty != null ? empty : empty = new Mesh { name = "Chain (links are its children)" };
+
+        public override Mesh GetMesh() => Empty;
 
         private static Material chainMaterial;
 
         public override GameObject Generate(Vector3 position, Quaternion rotation) {
             var obj = new GameObject("Chain");
             obj.transform.SetPositionAndRotation(position, rotation);
-            obj.AddComponent<MeshFilter>().sharedMesh = new Mesh { name = "Chain (links are its children)" };
+            obj.AddComponent<MeshFilter>().sharedMesh = Empty;
             if (chainMaterial == null) {
                 var source = Interface.Interface.Instance != null ? Interface.Interface.Instance.plasticMaterial : null;
                 chainMaterial = source != null ? new Material(source) : new Material(Shader.Find("Universal Render Pipeline/Lit"));

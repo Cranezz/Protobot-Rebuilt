@@ -48,6 +48,11 @@ namespace Protobot.Interface {
             var custom = CustomOf(saved.gameObject);
             if (custom != null)
                 options.Add((custom.kind == CustomParts.Polycarbonate ? "Edit sketch" : "Edit holes", () => Edit(custom)));
+            // V2: a plastic piece's sketch edited where the piece is, with the robot around it.
+            if (custom != null && custom.kind == CustomParts.Polycarbonate) {
+                var piece = saved.gameObject;
+                options.Add(("Edit sketch on the robot", () => Polycarb.SheetEditor.EditInPlace(custom, piece)));
+            }
             // Moving parts: a cylinder extends and retracts, a motor runs.
             if (saved.TryGetComponent(out Motion.PneumaticCylinder cylinder) && cylinder.enabled)
                 options.Add(cylinder.Extended ? ("Retract", () => cylinder.Set(false)) : ("Extend", () => cylinder.Set(true)));

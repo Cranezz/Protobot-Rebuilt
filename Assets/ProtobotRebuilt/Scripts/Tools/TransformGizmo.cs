@@ -39,6 +39,10 @@ namespace Protobot.Tools {
         private static Vector3 MeasureCenter(GameObject obj) {
             if (!obj.TryGetComponent(out SavedObject _))
                 return Vector3.zero;  // a pivot of several selected parts already sits at their middle
+            // V2: on a joint to a grounded part it can only turn about the joint: the gizmo sits on it.
+            var pin = Motion.Linkage.GroundPin(obj);
+            if (pin.HasValue)
+                return Vector3.Scale(obj.transform.InverseTransformPoint(pin.Value), obj.transform.lossyScale);
             List<GameObject> group = obj.GetConnectedObjects(true);
             if (group == null || group.Count == 0)
                 group = new List<GameObject> { obj };

@@ -16,7 +16,11 @@ namespace Protobot.Tools {
         private Vector3 initRotVector; //the initial Vector to rotate about
 
         private Vector3 initMouseVector; //the initial Vector between the mouse position and the selection position
-        private Vector3 MouseVector => (MouseInput.Position - refCamera.WorldToScreenPoint(transform.position)).normalized;
+        // V2: measured from where the ring was when the drag began (a part turning about a joint carries the ring
+        // round with it, which made the angle jump).
+        private Vector3 MouseVector => (MouseInput.Position - (dragging ? initScreen : refCamera.WorldToScreenPoint(transform.position))).normalized;
+        private Vector3 initScreen;
+        private bool dragging;
         private Quaternion initRot; //the intiial rotation of the selection
         private Vector3 initPos, initOffset; // V2: where the part and the gizmo were when the drag started
 
@@ -46,7 +50,10 @@ namespace Protobot.Tools {
         }
 
         public override void Initialize() {
+            dragging = false;
+            initScreen = refCamera.WorldToScreenPoint(transform.position);
             initMouseVector = MouseVector;
+            dragging = true;
 
             initRot = refObj.transform.rotation;
             initPos = refObj.transform.position;
@@ -62,7 +69,7 @@ namespace Protobot.Tools {
         }
 
         public override void OnEndDrag() {
-
+            dragging = false;  // V2
         }
     }
 }

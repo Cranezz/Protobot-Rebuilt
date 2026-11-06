@@ -16,7 +16,15 @@ namespace Protobot.Motion {
         }
 
         /// <summary>A plain cylinder along z from -length to +head (a screw's length is its mesh minus 0.087").</summary>
+        private static readonly Dictionary<(float, float), Mesh> Made = new();
+
+        /// <summary>The thread's see-through mark (one per size, shared).</summary>
         public static Mesh ThreadMesh(float length, float radius) {
+            if (Made.TryGetValue((length, radius), out var made) && made != null) return made;
+            return Made[(length, radius)] = MakeThread(length, radius);
+        }
+
+        private static Mesh MakeThread(float length, float radius) {
             const int Sides = 20;
             const float Head = 0.087f;
             var vertices = new List<Vector3>();

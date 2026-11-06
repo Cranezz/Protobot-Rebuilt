@@ -219,6 +219,17 @@ namespace Protobot.Interface {
 
         // ------------------------------------------------------------------ the mesh's edges and corners
 
+        /// <summary>V2: the part's sharp edges in world space (for Convert Entities in the polycarbonate sketch).</summary>
+        public static List<(Vector3 a, Vector3 b)> SharpEdges(GameObject part) {
+            var list = new List<(Vector3, Vector3)>();
+            var edges = part != null ? EdgesOf(part) : null;
+            if (edges == null) return list;
+            var matrix = part.transform.localToWorldMatrix;
+            for (var i = 0; i < edges.a.Length; i++)
+                list.Add((matrix.MultiplyPoint3x4(edges.a[i]), matrix.MultiplyPoint3x4(edges.b[i])));
+            return list;
+        }
+
         private static Edges EdgesOf(GameObject part) {
             var filter = part.GetComponent<MeshFilter>();
             if (filter == null || filter.sharedMesh == null || !filter.sharedMesh.isReadable)

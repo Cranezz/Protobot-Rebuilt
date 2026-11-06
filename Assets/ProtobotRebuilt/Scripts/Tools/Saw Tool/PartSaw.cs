@@ -47,6 +47,12 @@ namespace Protobot.Tools {
         /// <summary>V2 (for fun): cut every part the plane goes through, not only the one picked.</summary>
         private static bool cutAll;
         private float planeHalfU = 1f, planeHalfV = 1f;
+        // V2: with All parts on, the plane is drawn over every part it cuts (its own middle and size), and those
+        // parts are outlined; worked out again when the plane moves.
+        private Vector3 drawCenter;
+        private float drawHalfU = 1f, drawHalfV = 1f;
+        private List<GameObject> crossed = new();
+        private (Vector3 center, Vector3 normal, bool all) crossedFor;
         private GameObject planeObject;
         private Material planeInstance;
         private GameObject hovered;
@@ -216,6 +222,7 @@ namespace Protobot.Tools {
         }
 
         private void EndCut() {
+            ClearCrossed();
             if (part != null) SetOutline(part, false);
             part = null;
             mode = Mode.Pick;
@@ -675,8 +682,9 @@ namespace Protobot.Tools {
                 planeObject.GetComponent<Renderer>().shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
             }
             planeObject.SetActive(true);
-            planeObject.transform.SetPositionAndRotation(center, Quaternion.LookRotation(normal, v));
-            planeObject.transform.localScale = new Vector3(planeHalfU * 2f, planeHalfV * 2f, 0.004f);
+            UpdateCrossed();
+            planeObject.transform.SetPositionAndRotation(drawCenter, Quaternion.LookRotation(normal, v));
+            planeObject.transform.localScale = new Vector3(drawHalfU * 2f, drawHalfV * 2f, 0.004f);
         }
 
         // URP Lit, see-through.
@@ -698,10 +706,48 @@ namespace Protobot.Tools {
             material.color = color;
         }
 
+        // V2: the parts the plane cuts with All parts on (outlined, and the plane covers them all); else just the
+        // picked part's size.
+        private void UpdateCrossed() {
+            var key = (center, normal, cutAll);
+            if (key == crossedFor && crossed.All(c => c != null)) return;
+            crossedFor = key;
+            foreach (var old in crossed)
+                if (old != null && old != part) SetOutline(old, false);
+            crossed = cutAll ? Crossed(out _) : new List<GameObject>();
+            drawCenter = center;
+            drawHalfU = planeHalfU;
+            drawHalfV = planeHalfV;
+            if (crossed.Count == 0) return;
+            float minU = -planeHalfU, maxU = planeHalfU, minV = -planeHalfV, maxV = planeHalfV;
+            foreach (var obj in crossed) {
+                if (obj != part) OutlineFeature.SetOutline(obj.GetComponent<MeshRenderer>(), true, CrossedColor);
+                foreach (var c in FeaturePicker.Corners(obj)) {
+                    var d = c - center;
+                    minU = Mathf.Min(minU, Vector3.Dot(d, u) - 0.25f);
+                    maxU = Mathf.Max(maxU, Vector3.Dot(d, u) + 0.25f);
+                    minV = Mathf.Min(minV, Vector3.Dot(d, v) - 0.25f);
+                    maxV = Mathf.Max(maxV, Vector3.Dot(d, v) + 0.25f);
+                }
+            }
+            drawCenter = center + u * (minU + maxU) / 2f + v * (minV + maxV) / 2f;
+            drawHalfU = (maxU - minU) / 2f;
+            drawHalfV = (maxV - minV) / 2f;
+        }
+
+        private static readonly Color CrossedColor = new(1f, 0.45f, 0.35f, 1f);
+
+        private void ClearCrossed() {
+            foreach (var old in crossed)
+                if (old != null && old != part) SetOutline(old, false);
+            crossed.Clear();
+            crossedFor = default;
+        }
+
         private void DrawPlaneOutline() {
             var corners = new[] {
-                center + u * planeHalfU + v * planeHalfV, center - u * planeHalfU + v * planeHalfV,
-                center - u * planeHalfU - v * planeHalfV, center + u * planeHalfU - v * planeHalfV,
+                drawCenter + u * drawHalfU + v * drawHalfV, drawCenter - u * drawHalfU + v * drawHalfV,
+                drawCenter - u * drawHalfU - v * drawHalfV, drawCenter + u * drawHalfU - v * drawHalfV,
             };
             var color = new Color(1f, 0.35f, 0.3f, 0.9f);
             for (var i = 0; i < 4; i++)
@@ -740,7 +786,9 @@ namespace Protobot.Tools {
             else Ui.Hint(bar, "R", "tilt", "Shift", "free", "Esc", "cancel");
             ToolOptions.Switch(bar, "All parts", cutAll, on => {
                 cutAll = on;
-                feedback.Show(on ? "The cut goes through every part the plane crosses" : "Only the picked part is cut", FeedbackDisplay.DisplayType.success);
+                if (!on) ClearCrossed();
+                var count = on ? Crossed(out _).Count : 1;
+                feedback.Show(on ? "The plane reaches every part it crosses: " + count + (count == 1 ? " part" : " parts") + " (outlined) will be cut" : "Only the picked part is cut", FeedbackDisplay.DisplayType.success);
             });
             var cut = Ui.Button(bar, "Cut", "Cut", ApplyCut, true, 5f);
             cut.Size(64f, 30f);
@@ -774,7 +822,9 @@ namespace Protobot.Tools {
             CloseEditField();
             var main = part;
             var targets = new List<GameObject> { main };
-            if (cutAll) targets.AddRange(Crossed().Where(p => p != main));
+            var grouped = 0;
+            if (cutAll) targets.AddRange(Crossed(out grouped).Where(p => p != main));
+            ClearCrossed();
             var before = new List<IElement>();
             var after = new List<IElement>();
             string mainResult = null;
@@ -801,23 +851,58 @@ namespace Protobot.Tools {
             StateSystem.AddState(new State(after));
 
             FindObjectOfType<PartListOutput>()?.CalculatePartsList();
-            feedback.Show(done == 1 ? "Cut " + mainResult : "Cut " + done + " parts along the plane", FeedbackDisplay.DisplayType.success);
+            var missed = targets.Count - done;
+            var note = (missed > 0 ? ", " + missed + " couldn't be cut there (a one-hole piece)" : "") + (grouped > 0 ? ", " + grouped + " in groups left alone (take them out of the group to cut them)" : "");
+            feedback.Show((done == 1 ? "Cut " + mainResult : "Cut " + done + " parts along the plane") + note, FeedbackDisplay.DisplayType.success);
         }
 
-        // V2: every cuttable part the (endless) plane goes through.
-        private List<GameObject> Crossed() {
+        // V2: every cuttable part the (endless) plane goes through, connected to the picked one or not: its mesh has
+        // points on both sides (its box isn't enough: a bent part's box can cross where the part doesn't). Parts in
+        // a group (a Pivot) are counted apart: they're cut on their own.
+        private List<GameObject> Crossed(out int grouped) {
+            grouped = 0;
             var list = new List<GameObject>();
             foreach (var obj in PartsManager.FindLoadedObjects()) {
                 if (obj == null || obj.IsDeleted() || !PartCutting.IsCuttable(obj)) continue;
+                if (!obj.TryGetComponent(out MeshFilter filter) || filter.sharedMesh == null) continue;
+                var t = obj.transform;
+                // Quick test on its box first.
                 float min = float.MaxValue, max = float.MinValue;
                 foreach (var c in FeaturePicker.Corners(obj)) {
                     var d = Vector3.Dot(c - center, normal);
                     min = Mathf.Min(min, d);
                     max = Mathf.Max(max, d);
                 }
-                if (min < -0.01f && max > 0.01f) list.Add(obj);
+                if (!(min < -0.01f && max > 0.01f)) continue;
+                // Then its points (in its own space: the plane taken there).
+                var localPoint = t.InverseTransformPoint(center);
+                var localNormal = t.InverseTransformDirection(normal);
+                var vertices = MeshVertices(filter.sharedMesh);
+                bool below = false, above = false;
+                var step = Mathf.Max(1, vertices.Length / 6000);
+                for (var i = 0; i < vertices.Length && !(below && above); i += step) {
+                    var d = Vector3.Dot(vertices[i] - localPoint, localNormal);
+                    if (d < -0.005f) below = true;
+                    else if (d > 0.005f) above = true;
+                }
+                if (!(below && above)) continue;
+                if (obj != part && obj.transform.parent != null && obj.transform.parent.GetComponent<Pivot>() != null) {
+                    grouped++;
+                    continue;
+                }
+                list.Add(obj);
             }
             return list;
+        }
+
+        private static readonly Dictionary<Mesh, Vector3[]> vertexCache = new();
+
+        private static Vector3[] MeshVertices(Mesh mesh) {
+            if (vertexCache.TryGetValue(mesh, out var v)) return v;
+            v = mesh.isReadable ? mesh.vertices : new Vector3[0];
+            if (vertexCache.Count > 400) vertexCache.Clear();
+            vertexCache[mesh] = v;
+            return v;
         }
 
         // Cuts the part in two; the undo elements go into before/after. False (with a message when it's the only

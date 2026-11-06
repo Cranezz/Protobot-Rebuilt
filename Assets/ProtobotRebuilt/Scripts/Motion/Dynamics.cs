@@ -63,6 +63,20 @@ namespace Protobot.Motion {
             saved.state = kept.Count > 0 ? string.Join(";", kept) + ";" : "";
         }
 
+        // ------------------------------------------------------------------ build version
+
+        private static int stateChanges;
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        private static void InitVersion() {
+            stateChanges = 0;
+            StateSystems.StateSystem.OnChangeState += () => stateChanges++;
+        }
+
+        /// <summary>Changes whenever the build does (an undo step, a part made, shown or removed): caches of it
+        /// (gear trains, the sprockets chains go round) compare this to know when to look again.</summary>
+        public static long Version => ((long)stateChanges << 32) | (uint)SavedObject.Changes;
+
         public static string Inches(float value) => value.ToString("0.###", CultureInfo.InvariantCulture) + "\"";
 
         // ------------------------------------------------------------------ a highlight like a hole's

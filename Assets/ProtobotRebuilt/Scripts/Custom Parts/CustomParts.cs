@@ -46,6 +46,9 @@ namespace Protobot.Custom {
         public const string Imported = "CUST", Polycarbonate = "POLY";
 
         private static readonly Dictionary<string, CustomPartData> parts = new();
+        // Deleted from the library (their files in the Deleted folder, to restore): still found by id, so copies
+        // in the open build keep their model and are saved in it, but not listed in the parts browser.
+        private static readonly Dictionary<string, CustomPartData> deleted = new();
         private static readonly Dictionary<string, Mesh> meshes = new();
         private static bool loaded;
 
@@ -53,6 +56,34 @@ namespace Protobot.Custom {
         public static event Action Changed;
 
         public static string LibraryFolder => Path.Combine(Application.persistentDataPath, "Custom Parts");
+        public static string DeletedFolder => Path.Combine(LibraryFolder, "Deleted");
+
+        /// <summary>Parts deleted from the library that can still be restored (newest first).</summary>
+        public static IEnumerable<CustomPartData> Deleted {
+            get {
+                EnsureLoaded();
+                return deleted.Values.Where(p => File.Exists(DeletedFile(p.key))).OrderByDescending(p => File.GetLastWriteTimeUtc(DeletedFile(p.key))).ToList();
+            }
+        }
+
+        public static bool IsDeleted(string key) {
+            EnsureLoaded();
+            return !parts.ContainsKey(key) && deleted.ContainsKey(key);
+        }
+
+        private static string LibraryFile(string key) => Path.Combine(LibraryFolder, key + ".json");
+        private static string DeletedFile(string key) => Path.Combine(DeletedFolder, key + ".json");
+
+        /// <summary>The size of a part's file on this computer (bytes; 0 if it has none).</summary>
+        public static long FileSize(CustomPartData part) {
+            try {
+                var file = new FileInfo(parts.ContainsKey(part.key) ? LibraryFile(part.key) : DeletedFile(part.key));
+                return file.Exists ? file.Length : 0;
+            }
+            catch {
+                return 0;
+            }
+        }
 
         public static IEnumerable<CustomPartData> All {
             get {
@@ -69,7 +100,7 @@ namespace Protobot.Custom {
             var split = id.Split('-');
             if (split.Length < 2 || (split[0] != Imported && split[0] != Polycarbonate)) return null;
             EnsureLoaded();
-            return parts.TryGetValue(split[1], out var part) ? part : null;
+            return parts.TryGetValue(split[1], out var part) || deleted.TryGetValue(split[1], out part) ? part : null;
         }
 
         public static string NewKey() => Guid.NewGuid().ToString("N").Substring(0, 8);
@@ -80,17 +111,21 @@ namespace Protobot.Custom {
             if (loaded) return;
             loaded = true;
             try {
-                if (!Directory.Exists(LibraryFolder)) return;
-                foreach (var file in Directory.GetFiles(LibraryFolder, "*.json")) {
-                    try {
-                        var part = JsonUtility.FromJson<CustomPartData>(File.ReadAllText(file));
-                        if (part != null && !string.IsNullOrEmpty(part.key))
-                            parts[part.key] = part;
-                    }
-                    catch (Exception e) {
-                        Debug.LogWarning("[Custom parts] Couldn't read " + file + ": " + e.Message);
+                void Read(string folder, Dictionary<string, CustomPartData> into) {
+                    if (!Directory.Exists(folder)) return;
+                    foreach (var file in Directory.GetFiles(folder, "*.json")) {
+                        try {
+                            var part = JsonUtility.FromJson<CustomPartData>(File.ReadAllText(file));
+                            if (part != null && !string.IsNullOrEmpty(part.key))
+                                into[part.key] = part;
+                        }
+                        catch (Exception e) {
+                            Debug.LogWarning("[Custom parts] Couldn't read " + file + ": " + e.Message);
+                        }
                     }
                 }
+                Read(LibraryFolder, parts);
+                Read(DeletedFolder, deleted);
             }
             catch (Exception e) {
                 Debug.LogWarning("[Custom parts] Couldn't read the library: " + e.Message);
@@ -101,11 +136,13 @@ namespace Protobot.Custom {
         public static void Add(CustomPartData part, bool save = true) {
             EnsureLoaded();
             parts[part.key] = part;
+            deleted.Remove(part.key);
             meshes.Remove(part.key);
             if (save) {
                 try {
                     Directory.CreateDirectory(LibraryFolder);
-                    File.WriteAllText(Path.Combine(LibraryFolder, part.key + ".json"), JsonUtility.ToJson(part));
+                    File.WriteAllText(LibraryFile(part.key), JsonUtility.ToJson(part));
+                    if (File.Exists(DeletedFile(part.key))) File.Delete(DeletedFile(part.key));
                 }
                 catch (Exception e) {
                     Debug.LogWarning("[Custom parts] Couldn't save " + part.name + ": " + e.Message);
@@ -115,19 +152,76 @@ namespace Protobot.Custom {
             Changed?.Invoke();
         }
 
-        public static void Remove(string key) {
+        /// <summary>A part carried in a build being opened: into the library, unless it was deleted from it (then it
+        /// only serves this build, and stays restorable).</summary>
+        public static void AddFromBuild(CustomPartData part) {
             EnsureLoaded();
-            if (!parts.Remove(key)) return;
-            meshes.Remove(key);
+            if (!parts.ContainsKey(part.key) && deleted.ContainsKey(part.key)) {
+                deleted[part.key] = part;
+                meshes.Remove(part.key);
+                CustomPartGenerator.Refresh();
+                return;
+            }
+            Add(part);
+        }
+
+        /// <summary>Deletes a part from the library: its file goes to the Deleted folder (Restore brings it back).
+        /// Copies in the open build keep working and are saved with it.</summary>
+        public static bool Remove(string key) {
+            EnsureLoaded();
+            if (!parts.TryGetValue(key, out var part)) return false;
             try {
-                var file = Path.Combine(LibraryFolder, key + ".json");
-                if (File.Exists(file)) File.Delete(file);
+                Directory.CreateDirectory(DeletedFolder);
+                var file = LibraryFile(key);
+                if (File.Exists(DeletedFile(key))) File.Delete(DeletedFile(key));
+                if (File.Exists(file)) File.Move(file, DeletedFile(key));
+                else File.WriteAllText(DeletedFile(key), JsonUtility.ToJson(part));
+                File.SetLastWriteTimeUtc(DeletedFile(key), DateTime.UtcNow);  // newest deleted first
             }
             catch (Exception e) {
                 Debug.LogWarning("[Custom parts] Couldn't delete " + key + ": " + e.Message);
+                return false;
             }
+            parts.Remove(key);
+            deleted[key] = part;
             CustomPartGenerator.Refresh();
             Changed?.Invoke();
+            return true;
+        }
+
+        /// <summary>Puts a deleted part back in the library.</summary>
+        public static bool Restore(string key) {
+            EnsureLoaded();
+            if (!deleted.TryGetValue(key, out var part)) return false;
+            try {
+                Directory.CreateDirectory(LibraryFolder);
+                if (File.Exists(LibraryFile(key))) File.Delete(LibraryFile(key));
+                if (File.Exists(DeletedFile(key))) File.Move(DeletedFile(key), LibraryFile(key));
+                else File.WriteAllText(LibraryFile(key), JsonUtility.ToJson(part));
+            }
+            catch (Exception e) {
+                Debug.LogWarning("[Custom parts] Couldn't restore " + key + ": " + e.Message);
+                return false;
+            }
+            deleted.Remove(key);
+            parts[key] = part;
+            CustomPartGenerator.Refresh();
+            Changed?.Invoke();
+            return true;
+        }
+
+        /// <summary>Deletes a deleted part's file for good (copies in the open build still work until it closes).</summary>
+        public static bool Purge(string key) {
+            EnsureLoaded();
+            try {
+                if (File.Exists(DeletedFile(key))) File.Delete(DeletedFile(key));
+            }
+            catch (Exception e) {
+                Debug.LogWarning("[Custom parts] Couldn't delete " + key + " for good: " + e.Message);
+                return false;
+            }
+            Changed?.Invoke();
+            return true;
         }
 
         // ------------------------------------------------------------------ meshes

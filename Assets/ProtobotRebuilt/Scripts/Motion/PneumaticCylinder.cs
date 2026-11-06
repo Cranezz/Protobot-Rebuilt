@@ -176,13 +176,28 @@ namespace Protobot.Motion {
                 Audio.Sounds.Play(Audio.Sounds.Error);
                 return;
             }
+            // What's on the rod is grounded: the rod stays and the cylinder (with what it's fastened to) moves the
+            // other way, as when a cylinder is mounted backwards.
+            var backwards = riders.Any(Linkage.IsGrounded);
+            if (backwards) {
+                var body = Dynamics.Fastened(new[] { gameObject }, new[] { thread.gameObject }, null, out _)
+                           .Where(o => o != null && o.GetComponent<SavedObject>() != null).ToList();
+                var grounded = body.FirstOrDefault(Linkage.IsGrounded);
+                if (grounded != null) {
+                    Interface.Interface.Say("Can't " + (extend ? "extend" : "retract") + ": what's on the rod and " + Interface.PartLabels.Short(grounded) + " on the cylinder's side are both grounded", false);
+                    Audio.Sounds.Play(Audio.Sounds.Error);
+                    return;
+                }
+                riders = body;
+            }
             var before = riders.Select(r => (IElement)new ObjectElement(r)).ToList();
             before.Add(new CylinderElement(this, Extended));
-            moving = StartCoroutine(Move(extend, riders, before));
+            moving = StartCoroutine(Move(extend, riders, before, backwards));
             Audio.Sounds.PlayAt(Audio.Sounds.Air, transform.position, 0.7f);
             var parts = riders.Count(r => r.GetComponent<SavedObject>() != null);
             Interface.Interface.Say((extend ? "Extended" : "Retracted") + " the " + name + " " + Dynamics.Inches(Stroke)
-                                    + (parts > 0 ? " (" + parts + (parts == 1 ? " part" : " parts") + " moved with it)" : ""), true);
+                                    + (backwards ? " (its rod is held: the cylinder moved instead" + (parts > 1 ? ", with " + (parts - 1) + (parts == 2 ? " part" : " parts") : "") + ")"
+                                       : parts > 0 ? " (" + parts + (parts == 1 ? " part" : " parts") + " moved with it)" : ""), true);
         }
 
         /// <summary>What's fastened to the rod's thread: parts it passes to a nut, and what's screwed to those.</summary>
@@ -194,7 +209,7 @@ namespace Protobot.Motion {
             return found.Where(o => o != null && !o.transform.IsChildOf(transform)).ToList();
         }
 
-        private IEnumerator Move(bool extend, List<GameObject> riders, List<IElement> before) {
+        private IEnumerator Move(bool extend, List<GameObject> riders, List<IElement> before, bool backwards = false) {
             var start = position;
             var end = extend ? 1f : 0f;
             var time = 0f;
@@ -203,10 +218,10 @@ namespace Protobot.Motion {
                 time += Time.deltaTime;
                 // Air: quick off the mark, slowing into the end of the stroke.
                 var k = 1f - Mathf.Pow(1f - Mathf.Clamp01(time / duration), 3f);
-                Slide(Mathf.Lerp(start, end, k), riders);
+                Slide(Mathf.Lerp(start, end, k), riders, backwards);
                 yield return null;
             }
-            Slide(end, riders);
+            Slide(end, riders, backwards);
             Audio.Sounds.PlayAt(Audio.Sounds.Clack, transform.position, 0.35f, 0.8f);
             SetInstant(extend);
             StateSystem.AddElements(before);
@@ -216,12 +231,14 @@ namespace Protobot.Motion {
             moving = null;
         }
 
-        private void Slide(float to, List<GameObject> riders) {
+        // Backwards: the riders are the cylinder's own side (the cylinder too), moved back as the rod goes out, so the
+        // rod stays where it is.
+        private void Slide(float to, List<GameObject> riders, bool backwards = false) {
             var delta = transform.TransformVector(axis * (Stroke * (to - position)));
             position = to;
             rod.localPosition = axis * (Stroke * position);
             foreach (var rider in riders)
-                if (rider != null) rider.transform.position += delta;
+                if (rider != null) rider.transform.position += backwards ? -delta : delta;
         }
 
         // Undo/redo: the rod goes back out or in with the parts (they ease back over 0.25 s).

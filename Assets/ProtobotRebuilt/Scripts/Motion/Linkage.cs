@@ -295,6 +295,9 @@ namespace Protobot.Motion {
             private readonly HashSet<Body> solved = new();
             private bool saidOnlyTurns;
 
+            /// <summary>The joint it turns about when it's on one to a grounded part (where the gizmo goes).</summary>
+            public Vector3? FirstPin => constrained && chain.Count > 0 ? chain[0].pin.point : null;
+
             public List<GameObject> PivotObjects(List<GameObject> all) =>
                 all.Where(o => o != null && (!mechanism.bodyOf.TryGetValue(o, out var b) || b == moving)).ToList();
 
@@ -395,6 +398,16 @@ namespace Protobot.Motion {
                 moved.AddRange(solved);
                 Linkage.Follow(mechanism, moved);
             }
+        }
+
+        /// <summary>The joint a part turns about when it's on one to a grounded part, or null.</summary>
+        public static Vector3? GroundPin(GameObject part) {
+            if (part == null || part.GetComponent<SavedObject>() == null) return null;
+            var group = part.GetConnectedObjects(true);
+            if (group == null || group.Count == 0) return null;
+            var mechanism = Analyze(group);
+            if (!mechanism.HasLinks || !mechanism.bodyOf.TryGetValue(part, out var body) || body.grounded) return null;
+            return new Plan(part.transform, mechanism, body).FirstPin;
         }
 
         /// <summary>A plan for moving <paramref name="mover"/> (and what it carries), or null when nothing in it is
