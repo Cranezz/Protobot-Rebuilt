@@ -188,6 +188,103 @@ namespace Protobot.EditorTools {
             return chains;
         }
 
+        /// <summary>
+        /// A flat 6-motor drivetrain on 3.25" omnis, 360 rpm (600 rpm motors, 36T driving 60T), built the way teams do
+        /// (the VEX Forum's "Catalogue of Drive Gearings", 6m 360 3.25): per side an inner and an outer 1x2 C-channel,
+        /// 2" apart, with a gear chain in one line between them: wheel 60T, motor 36T, wheel, motor, wheel, motor
+        /// (z = -5 .. 5, 2" apart: 60T + 36T pitch radii). Each wheel spins on a screw joint (its round insert; Linkage.SpinsOn): screw head, outer
+        /// channel, keps nut, 1/8" spacer, wheel, 60T gear screwed to the wheel (its round insert doesn't drive it),
+        /// 1/8" spacer, keps nut, inner channel, nylock (the 1/8" between wheel and keps on the outside has 0.04" to spare). Each motor sits inside the inner channel, screwed to it; its
+        /// shaft goes through the inner channel, spacers, the 36T, spacers and a bearing on the outer
+        /// channel. A standoff ties the channels at the back; three C-channels across the top flanges join the
+        /// sides. Wheels touch the ground at y = origin.y. Returns the parts; set the motors with FinishSixMotorDrive.
+        /// </summary>
+        public static List<GameObject> SixMotorDrive(Vector3 origin) {
+            var start = made.Count;
+            const float A = 5.75f;            // inner channel's web (its origin), from the middle
+            const float WebOut = 0.0555f, WebIn = 0.007f;
+            const float Gap = 2.05f;          // between the webs (the gear-to-wheel screws end 1/32" short of the outer one)
+            const float Axle = 1.625f;        // axles' height: the wheel's radius
+            const float H = Axle + 0.25f;     // channels' middle: axles on their lower row of holes
+            float[] wheels = { -5f, -1f, 3f };
+            float[] motors = { -3f, 1f, 5f };
+            var up = Vector3.up;
+            foreach (var s in new[] { -1f, 1f }) {
+                var o = Vector3.right * s;
+                Vector3 At(float x, float y, float z) => origin + new Vector3(x * s, y, z);
+                var xi = A + WebOut;                    // inner web's outer face
+                var B = xi + Gap + 0.055f;              // outer channel's origin
+                Part("CCHL-1x2-25", At(A, H, 0f), Quaternion.LookRotation(o, up));      // flanges inward
+                Part("CCHL-1x2-25", At(B, H, 0f), Quaternion.LookRotation(-o, up));     // flanges outward
+                var turn = Quaternion.LookRotation(o, up);
+                foreach (var z in wheels) {
+                    Nut(At(xi, Axle, z), -o);                                            // keps on the inner web
+                    Part("SPCR-Nylon-1/8in", At(xi + 0.2035f, Axle, z), turn);
+                    var gear = Part("GEAR-High Strength-60T", At(xi + 0.516f, Axle, z), turn);
+                    Part("OMNI-V2-3.25in", At(xi + 1.255f, Axle, z), turn);
+                    Part("SPCR-Nylon-1/8in", At(xi + 1.8065f, Axle, z), turn);
+                    Nut(At(xi + Gap, Axle, z), o);                                       // keps on the outer web
+                    Screw(At(B + WebIn, Axle, z), o, "2.50in");                          // head outside the outer web
+                    Part("NUT-Lock", At(A - WebIn, Axle, z), Quaternion.LookRotation(o)); // nylock inside the inner web
+                    // The gear screwed to the wheel through their matching holes, 1" out from the axle.
+                    foreach (var side in new[] { 1f, -1f }) {
+                        var offset = gear.transform.rotation * new Vector3(side, 0f, 0f);
+                        Screw(At(xi + 0.266f, Axle, z) + offset, -o, "1.75in");
+                        Nut(At(xi + 1.744f, Axle, z) + offset, -o);
+                    }
+                }
+                foreach (var z in motors) {
+                    Motor(At(A - WebIn, Axle, z), o, Vector3.back);
+                    foreach (var dz in new[] { 0.5f, 1.0f }) Screw(At(xi, Axle, z - dz), o);
+                    Part("SHFT-Normal-3", At(A + 1.1f, Axle, z), turn);                       // the 36T held by its insert
+                    Part("SPCR-Nylon-1/4in", At(xi + 0.133f, Axle, z), turn);
+                    Part("GEAR-High Strength-36T", At(xi + 0.516f, Axle, z), turn);
+                    Part("SPCR-Nylon-1/2in", At(xi + 1.016f, Axle, z), turn);
+                    Part("SPCR-Nylon-1/2in", At(xi + 1.516f, Axle, z), turn);
+                    Part("SPCR-Nylon-1/4in", At(xi + 1.891f, Axle, z), turn);
+                    // A bearing on the outer web, screwed through it into keps nuts.
+                    Part("BRNG-Normal", At(B + WebIn + 0.143f, Axle, z), turn);
+                    foreach (var dz in new[] { -0.5f, 0.5f }) {
+                        Screw(At(B + WebIn + 0.28f, Axle, z + dz), o, "3/8in");
+                        Nut(At(xi + Gap, Axle, z + dz), o);
+                    }
+                }
+                // A standoff between the channels at the back.
+                Part("SNDF-2.00in", At(xi + Gap / 2f, Axle, 6f), turn);
+                Screw(At(B + WebIn, Axle, 6f), o, "1/4in");
+                Screw(At(A - WebIn, Axle, 6f), -o, "1/4in");
+            }
+            // Across the top flanges, clear of the motors: screws down through both into nuts under the flange.
+            const float Top = H + 0.5f;
+            foreach (var z in new[] { -5.25f, -1.25f, 2.75f }) {
+                Part("CCHL-1x2-23", origin + new Vector3(0f, Top + 0.055f, z), Frame(Vector3.down, Vector3.right));
+                foreach (var s in new[] { -1f, 1f })
+                    foreach (var dz in new[] { -0.25f, 0.25f }) {
+                        var at = origin + new Vector3((A - 0.25f) * s, Top, z + dz);
+                        Screw(at + up * (0.0625f + 0.007f), up);
+                        Nut(at - up * 0.0625f, up);
+                    }
+            }
+            return made.GetRange(start, made.Count - start);
+        }
+
+        /// <summary>After the screws have connected (a few physics frames): motors get blue (600 rpm) cartridges,
+        /// sides and names, the right side reversed, split arcade. (The wheels spin on their screws by themselves:
+        /// Linkage.SpinsOn.)</summary>
+        public static void FinishSixMotorDrive(List<GameObject> parts) {
+            var motors = parts.Where(p => p != null && p.GetComponent<Motion.MotorDrive>() != null).OrderBy(p => p.transform.position.z).ToList();
+            foreach (var motor in motors) {
+                var left = motor.transform.position.x < 0f;
+                var drive = motor.GetComponent<Motion.MotorDrive>();
+                drive.SetCartridge(600, false);
+                Motion.Controls.SetSide(motor, left ? "L" : "R");
+                Motion.Controls.SetReversed(motor, !left);   // forward drives toward +z, the front the game guesses (right side x+)
+                var index = motors.Where(m => (m.transform.position.x < 0f) == left).ToList().IndexOf(motor);
+                Motion.Controls.SetName(motor, (left ? "Left " : "Right ") + new[] { "front", "middle", "back" }[index]);
+            }
+            Motion.Controls.Drive = Motion.Controls.DriveMode.SplitArcade;
+        }
+
         /// <summary>A drivetrain: rails along z at x = ±5, a plate across their top flanges, a motor inside each
         /// rail at each end driving a 4" wheel outside it (omni at the front, traction at the back).</summary>
         public static List<GameObject> Drive(Vector3 origin) {

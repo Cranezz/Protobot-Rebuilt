@@ -32,6 +32,7 @@ namespace Protobot.Builds {
                       (buildData.parts == null ? 0 : buildData.parts.Length) + " parts");
 
             PartsManager.DestroyLoadedObjects();
+            Motion.Controls.LoadDrive(buildData.drive);   // V2: the build's drive control
 
             //Camera Data
             CameraData camData = buildData.camera;
@@ -190,6 +191,7 @@ namespace Protobot.Builds {
             return new BuildData {
                 camera = newCameraData,
                 parts = newParts,
+                drive = Motion.Controls.DriveToken,   // V2
             };
         }
     }

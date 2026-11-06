@@ -10,8 +10,8 @@ namespace Protobot.Motion {
     // (several motors on one key run together), a speed (share of its cartridge's rpm), reversed (PROS's
     // "reversed" flag: forward turns the other way) and optionally a side of the drivetrain; a cylinder has one
     // key that extends and retracts it. Kept in each part's saved state ("fkey:E;rkey:Q;rev:1;speed:0.75;
-    // name:Arm;side:L"), so they go with the build. The drivetrain's control (tank, arcade, split arcade) is the
-    // driver's choice, kept in the preferences.
+    // name:Arm;side:L"), so they go with the build. The drivetrain's control (tank, arcade, split arcade) is saved
+    // in the build too (`BuildData.drive`); a build that never chose one uses the last one picked (preferences).
     public static class Controls {
         public const Key DefaultForward = Key.E, DefaultReverse = Key.Q, DefaultCylinder = Key.Space;
 
@@ -19,10 +19,29 @@ namespace Protobot.Motion {
 
         public static readonly string[] DriveModeNames = { "Tank", "Arcade", "Split arcade" };
 
+        /// <summary>The open build's drive control, or null if it never chose one.</summary>
+        public static DriveMode? BuildDrive;
+
         public static DriveMode Drive {
-            get => (DriveMode)Mathf.Clamp(PlayerPrefs.GetInt("V2.DriveMode", (int)DriveMode.SplitArcade), 0, 2);
-            set => PlayerPrefs.SetInt("V2.DriveMode", (int)value);
+            get => BuildDrive ?? (DriveMode)Mathf.Clamp(PlayerPrefs.GetInt("V2.DriveMode", (int)DriveMode.SplitArcade), 0, 2);
+            set {
+                BuildDrive = value;
+                PlayerPrefs.SetInt("V2.DriveMode", (int)value);
+            }
         }
+
+        /// <summary>The drive control as saved in a build file ("" when it never chose one).</summary>
+        public static string DriveToken => BuildDrive.HasValue ? BuildDrive.Value.ToString() : "";
+
+        public static void LoadDrive(string token) =>
+            BuildDrive = !string.IsNullOrEmpty(token) && System.Enum.TryParse(token, out DriveMode mode) ? mode : null;
+
+        /// <summary>The drivetrain's keys as (keys, what they do) lines, for the on-screen card.</summary>
+        public static (string keys, string action)[] DriveLayout(DriveMode mode) => mode switch {
+            DriveMode.Tank => new[] { ("W / S", "left side forward / back"), ("Up / Down", "right side forward / back") },
+            DriveMode.Arcade => new[] { ("W / S", "drive forward / back"), ("A / D", "turn left / right") },
+            _ => new[] { ("W / S", "drive forward / back"), ("Left / Right", "turn left / right") },
+        };
 
         public static string DriveHelp(DriveMode mode) => mode switch {
             DriveMode.Tank => "Left stick (W/S) drives the left side, right stick (Up/Down) the right side",

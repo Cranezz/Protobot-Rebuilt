@@ -105,6 +105,7 @@ namespace Protobot.Game {
                 game.savedAngles = PivotCamera.Main.transform.eulerAngles;
                 game.savedDistance = PivotCamera.Main.camera.transform.localPosition.z;
             }
+            game.HideGrid();
             game.best = PlayerPrefs.GetInt(game.BestKey, 0);
             game.DefaultStart();
             game.state = State.Setup;
@@ -118,6 +119,7 @@ namespace Protobot.Game {
             ClearHosting();
             if (field != null) Destroy(field.gameObject);
             if (tool != null) Destroy(tool.gameObject);
+            ShowGrid();
             SelectionSystem.SelectionManager.Blocked = savedBlocked;
             Sandbox.SetBuildInterface(true);
             GameUi.CloseAll();
@@ -135,6 +137,7 @@ namespace Protobot.Game {
         }
 
         private void OnDestroy() {
+            ShowGrid();
             if (Current == this) {
                 ClearHosting();
                 Current = null;
@@ -228,8 +231,24 @@ namespace Protobot.Game {
             var local = new Vector3(Mathf.Sin(heading * Mathf.Deg2Rad), 0f, Mathf.Cos(heading * Mathf.Deg2Rad));
             var rotation = Quaternion.FromToRotation(local, front);
             if (Mathf.Abs(Vector3.Dot(local, front) + 1f) < 1e-4f) rotation = Quaternion.AngleAxis(180f, Vector3.up);
-            field.transform.rotation = rotation;
-            field.transform.position = new Vector3(robotCenter.x, robotFloor, robotCenter.z) - rotation * new Vector3(x, 0f, y);
+            // The build never moves, the field does: the camera goes with the field, so on screen the field holds
+            // still and the robot is what moves and turns.
+            var t = field.transform;
+            var camera = PivotCamera.Main;
+            var keepView = camera != null && cameraFollows;
+            Vector3 focus = default, look = default;
+            if (keepView) {
+                focus = t.InverseTransformPoint(camera.transform.position);
+                look = (Quaternion.Inverse(t.rotation) * camera.transform.rotation).eulerAngles;
+            }
+            t.rotation = rotation;
+            t.position = new Vector3(robotCenter.x, robotFloor, robotCenter.z) - rotation * new Vector3(x, 0f, y);
+            if (keepView) {
+                var turn = (rotation * Quaternion.Euler(look)).eulerAngles;
+                turn.z = 0f;
+                camera.SetTransform(t.TransformPoint(focus), turn, camera.camera.transform.localPosition.z);
+            }
+            cameraFollows = true;
             if (tool != null) {
                 tool.localPosition = new Vector3(toolX, 0f, toolY);
                 tool.localRotation = Quaternion.Euler(0f, toolHeading, 0f);
@@ -237,6 +256,25 @@ namespace Protobot.Game {
             PlacePreloadGhost();
             Physics.SyncTransforms();
             Changed?.Invoke();
+        }
+
+        private bool cameraFollows;
+
+        // The build's grid planes would slide across the field as it moves: hidden while the game is open.
+        private readonly List<Renderer> hiddenGrid = new();
+
+        private void HideGrid() {
+            foreach (var r in FindObjectsByType<Renderer>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+                if (r.gameObject.layer == 9 && r.enabled && (r.name.Contains("Perspective Plane") || r.name.Contains("Orthographic Plane") || r.name == "AxisPlane")) {
+                    r.enabled = false;
+                    hiddenGrid.Add(r);
+                }
+        }
+
+        private void ShowGrid() {
+            foreach (var r in hiddenGrid)
+                if (r != null) r.enabled = true;
+            hiddenGrid.Clear();
         }
 
         public void SetPose(float newX, float newY, float newHeading) {

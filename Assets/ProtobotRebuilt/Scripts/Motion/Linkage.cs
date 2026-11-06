@@ -38,9 +38,51 @@ namespace Protobot.Motion {
         public static bool Fastens(GameObject a, GameObject b) {
             // A chain doesn't fasten its sprockets together: it turns them.
             if (a.GetComponent<ChainLoop>() != null || b.GetComponent<ChainLoop>() != null) return false;
+            if (SpinsOn(a, b) || SpinsOn(b, a)) return false;
             if (IsJoint(a)) return Threaded(a).Contains(b) || HeadPart(a) == b;
             if (IsJoint(b)) return Threaded(b).Contains(a) || HeadPart(b) == a;
             return true;
+        }
+
+        // V2: a screw through a wheel's, gear's or sprocket's middle hole is its axle: the round insert (bearing
+        // insert) there lets it spin, as teams build screw joints. The screw stays tight with everything else it goes
+        // through (channels, nuts, spacers); what's screwed to the wheel through its other holes (a gear) turns with
+        // it. No joint setting is needed. Worked out per pair, kept until the build changes.
+        private static readonly Dictionary<(int, int), bool> spins = new();
+        private static long spinsVersion = -1;
+
+        /// <summary>Whether <paramref name="part"/> spins on <paramref name="screw"/> (the screw goes through its
+        /// middle hole, along its axle).</summary>
+        public static bool SpinsOn(GameObject screw, GameObject part) {
+            if (screw == null || part == null || screw.GetComponent<Screw>() == null || part.GetComponent<Screw>() != null) return false;
+            if (spinsVersion != Dynamics.Version) {
+                spins.Clear();
+                spinsVersion = Dynamics.Version;
+            }
+            var key = (screw.GetInstanceID(), part.GetInstanceID());
+            if (spins.TryGetValue(key, out var known)) return known;
+            var result = false;
+            if (GearTrain.TurnsWithShaft(part) && part.TryGetComponent(out MeshFilter filter) && filter.sharedMesh != null) {
+                var middle = part.transform.TransformPoint(filter.sharedMesh.bounds.center);
+                HoleCollider axle = null;
+                var best = float.MaxValue;
+                foreach (var hole in part.GetComponentsInChildren<HoleCollider>(true)) {
+                    if (hole.transform.parent != part.transform) continue;
+                    var d = (hole.transform.position - middle).sqrMagnitude;
+                    if (d < best) {
+                        best = d;
+                        axle = hole;
+                    }
+                }
+                if (axle != null) {
+                    var t = screw.transform;
+                    var parallel = Mathf.Abs(Vector3.Dot(axle.transform.forward, t.forward)) > 0.98f;
+                    var off = Vector3.ProjectOnPlane(axle.transform.position - t.position, t.forward).magnitude;
+                    result = parallel && off < 0.06f;
+                }
+            }
+            spins[key] = result;
+            return result;
         }
 
         // ------------------------------------------------------------------ changing them (one undo step each)
@@ -165,7 +207,7 @@ namespace Protobot.Motion {
                 if (head != null) threaded.Add(head);
                 foreach (var next in GroupManager.Neighbours(obj)) {
                     if (!set.Contains(next)) continue;
-                    if (joint && !threaded.Contains(next)) pinned.Add((obj, next));
+                    if ((joint && !threaded.Contains(next)) || SpinsOn(obj, next)) pinned.Add((obj, next));
                     else Union(obj, next);
                 }
             }

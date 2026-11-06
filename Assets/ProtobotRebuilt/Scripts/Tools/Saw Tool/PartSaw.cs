@@ -33,7 +33,11 @@ namespace Protobot.Tools {
         private const float Step = 1f / 16f;
         private const float AngleStep = 5f;
 
-        private enum Mode { Pick, Move, Rotate, Reference, Target }
+        private enum Mode { Pick, Move, Rotate, Reference, Target, Chamfer }
+
+        // V2: chamfering a gear's teeth (GearChamfer): size and which face, remembered while the app runs.
+        private static int chamferSize = 1;
+        private static GearChamfer.Side chamferSide = GearChamfer.Side.Near;
 
         private Mode mode = Mode.Pick;
         private GameObject part;
@@ -114,7 +118,10 @@ namespace Protobot.Tools {
 
             if (!typing && keyboard != null) {
                 if (keyboard.escapeKey.wasPressedThisFrame) {
-                    if (mode == Mode.Reference || mode == Mode.Target || mode == Mode.Rotate) SetMode(Mode.Move);
+                    if (mode == Mode.Reference || mode == Mode.Target || mode == Mode.Rotate || mode == Mode.Chamfer) {
+                        if (mode == Mode.Chamfer) feedback.Show("Back to cutting", FeedbackDisplay.DisplayType.success);
+                        SetMode(Mode.Move);
+                    }
                     else {
                         EndCut();
                         feedback.Show("Cut cancelled", FeedbackDisplay.DisplayType.alert);
@@ -122,7 +129,11 @@ namespace Protobot.Tools {
                         return;
                     }
                 }
-                else if (keyboard.rKey.wasPressedThisFrame && mode != Mode.Reference && mode != Mode.Target)
+                else if (mode == Mode.Chamfer && (keyboard.enterKey.wasPressedThisFrame || keyboard.numpadEnterKey.wasPressedThisFrame)) {
+                    ApplyChamfer();
+                    return;
+                }
+                else if (keyboard.rKey.wasPressedThisFrame && mode != Mode.Reference && mode != Mode.Target && mode != Mode.Chamfer)
                     SetMode(mode == Mode.Rotate ? Mode.Move : Mode.Rotate);
                 else if (keyboard.enterKey.wasPressedThisFrame || keyboard.numpadEnterKey.wasPressedThisFrame) {
                     ApplyCut();
@@ -130,6 +141,12 @@ namespace Protobot.Tools {
                 }
             }
 
+            if (mode == Mode.Chamfer) {
+                KeepOutline();
+                if (planeObject != null) planeObject.SetActive(false);
+                DrawChamfer();
+                return;
+            }
             if (mode == Mode.Reference) UpdateReferencePick();
             else if (mode == Mode.Target) UpdateTargetPick();
             else UpdateHandles();
@@ -757,6 +774,10 @@ namespace Protobot.Tools {
         // ------------------------------------------------------------------ options bar
 
         private void BuildEditOptions(RectTransform bar) {
+            if (mode == Mode.Chamfer) {
+                BuildChamferOptions(bar);
+                return;
+            }
             var (behind, ahead) = Pieces();
             var name = NameOf(part);
             ToolOptions.Note(bar, name.Length > 34 ? name.Substring(0, 33) + "…" : name);
@@ -790,10 +811,73 @@ namespace Protobot.Tools {
                 var count = on ? Crossed(out _).Count : 1;
                 feedback.Show(on ? "The plane reaches every part it crosses: " + count + (count == 1 ? " part" : " parts") + " (outlined) will be cut" : "Only the picked part is cut", FeedbackDisplay.DisplayType.success);
             });
+            if (GearChamfer.IsGear(part)) {
+                var chamfer = Ui.Button(bar, "Chamfer", "Chamfer teeth", () => {
+                    SetMode(Mode.Chamfer);
+                    Dimension.Close();
+                    CloseEditField();
+                    feedback.Show("Chamfer: pick a size and face; the rings show where the bevel starts and ends", FeedbackDisplay.DisplayType.success);
+                }, false, 5f, Theme.FontSmall);
+                chamfer.Size(-1f, 30f);
+                Ui.Tip(chamfer, "Chamfer teeth", null, "Bevel the teeth round one face at 45°: a chamfered 48T fits inside a 2.75\" wheel, and chamfered teeth slide into mesh.");
+            }
             var cut = Ui.Button(bar, "Cut", "Cut", ApplyCut, true, 5f);
             cut.Size(64f, 30f);
             Ui.Tip(cut, "Cut", "Enter", "Cut the part in two along the plane.");
         }
+
+        // ------------------------------------------------------------------ chamfering gear teeth (V2)
+
+        private void BuildChamferOptions(RectTransform bar) {
+            var name = NameOf(part);
+            ToolOptions.Note(bar, name.Length > 30 ? name.Substring(0, 29) + "…" : name);
+            Ui.Divider(bar, true).Size(1f, 22f);
+            ToolOptions.Note(bar, "Chamfer");
+            var labels = GearChamfer.Sizes.Select(s => Inch.Format(s)).ToArray();
+            var size = Popup.Choice(bar, labels, chamferSize, i => {
+                chamferSize = i;
+                feedback.Show("Chamfer " + labels[i] + " at 45°", FeedbackDisplay.DisplayType.success);
+                ToolOptions.Rebuild();
+            }, 80f);
+            size.gameObject.AddComponent<WheelStep>().step = d => {
+                chamferSize = Mathf.Clamp(chamferSize + d, 0, GearChamfer.Sizes.Length - 1);
+                ToolOptions.Rebuild();
+            };
+            Ui.Tip(size, "Chamfer size", null, "How far the bevel cuts into the rim and the face (45°). The wheel over it steps sizes.");
+            ToolOptions.Segmented(bar, new[] { "Near face", "Far face", "Both" }, (int)chamferSide, i => {
+                chamferSide = (GearChamfer.Side)i;
+                feedback.Show(i == 2 ? "Both faces" : i == 0 ? "The face toward you" : "The face away from you", FeedbackDisplay.DisplayType.success);
+            });
+            Ui.Divider(bar, true).Size(1f, 22f);
+            Ui.Hint(bar, "Enter", "chamfer", "Esc", "back");
+            var back = Ui.Button(bar, "Back", "Back to cut", () => SetMode(Mode.Move), false, 5f, Theme.FontSmall);
+            back.Size(-1f, 30f);
+            var apply = Ui.Button(bar, "Apply", "Chamfer", ApplyChamfer, true, 5f);
+            apply.Size(-1f, 30f);
+            Ui.Tip(apply, "Chamfer", "Enter", "Cut the bevel into the gear (one undo step; saved with the build).");
+        }
+
+        private void DrawChamfer() {
+            if (part == null) return;
+            var t = part.transform;
+            var size = GearChamfer.Sizes[chamferSize];
+            var color = new Color(1f, 0.35f, 0.3f, 0.95f);
+            foreach (var face in GearChamfer.Picked(part, chamferSide, Overlay.ViewCamera != null ? Overlay.ViewCamera.transform.position : Vector3.zero)) {
+                var axis = t.TransformDirection(face.inward);
+                // Where the bevel starts on the face, and where it meets the tooth tips.
+                Overlay.WorldCircle(t.TransformPoint(face.center), axis, (face.radius - size) * t.lossyScale.x, color, 2f);
+                Overlay.WorldCircle(t.TransformPoint(face.center + face.inward * size), axis, face.radius * t.lossyScale.x, new Color(color.r, color.g, color.b, 0.55f), 1.5f);
+            }
+        }
+
+        private void ApplyChamfer() {
+            if (part == null || mode != Mode.Chamfer) return;
+            var camera = Overlay.ViewCamera != null ? Overlay.ViewCamera.transform.position : Vector3.zero;
+            var (message, ok) = GearChamfer.Apply(part, chamferSide, GearChamfer.Sizes[chamferSize], camera);
+            feedback.Show(NameOf(part) + ": " + message, ok ? FeedbackDisplay.DisplayType.success : FeedbackDisplay.DisplayType.alert);
+            if (ok) EndCut();
+        }
+
 
         private void LateUpdate() {
             // The options bar shows the live distance and pieces while dragging.

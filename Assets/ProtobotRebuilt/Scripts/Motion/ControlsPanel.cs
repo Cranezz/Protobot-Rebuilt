@@ -19,9 +19,12 @@ namespace Protobot.Motion {
         private RectTransform window, body;
         private TextMeshProUGUI title, status;
         private string shown;
-        private bool simulation;
+        private bool simulation, right;
 
-        public static void Open() {
+        /// <summary>Opens it; `right`: at the top right (beside the game's controls card) instead of by the tool rail.</summary>
+        public static void Open() => Open(false);
+
+        public static void Open(bool right) {
             if (open != null) {
                 if (open.simulation != Sandbox.Running) {
                     Destroy(open.gameObject);
@@ -32,6 +35,7 @@ namespace Protobot.Motion {
             var go = Ui.Rect("Controls Panel", Interface.Interface.Root).Fill().gameObject;
             open = go.AddComponent<ControlsPanel>();
             open.simulation = Sandbox.Running;
+            open.right = right;
             open.Build();
             if (!open.simulation) {
                 var motors = MotorDrive.Live().Count;
@@ -58,6 +62,10 @@ namespace Protobot.Motion {
             // In the build it sits beside the tool rail, under the tool's hints; in the sandbox those are hidden.
             window.anchoredPosition = simulation ? new Vector2(16f, -(Layout.TopBarBottom + 12f)) : new Vector2(76f, -(Layout.TopBarBottom + 60f));
             window.sizeDelta = new Vector2(450f, 0f);
+            if (right) {   // V2: the game's setup (its panel is down the left)
+                window.anchorMin = window.anchorMax = window.pivot = new Vector2(1f, 1f);
+                window.anchoredPosition = new Vector2(-330f, -(Layout.TopBarBottom + 12f));
+            }
             Ui.Column(window, 6f, new RectOffset(14, 14, 10, 14));
             window.gameObject.AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
             window.GetChild(0).gameObject.AddComponent<LayoutElement>().ignoreLayout = true;

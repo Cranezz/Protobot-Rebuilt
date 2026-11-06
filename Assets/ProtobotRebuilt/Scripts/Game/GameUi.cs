@@ -11,10 +11,17 @@ namespace Protobot.Game {
     // setup panel down the left (start position, legal-start checklist, saved starts, preload, alignment tool), the HUD
     // while a run is on (timer, live score, Match Loads, End run) and the results.
     public static class GameUi {
-        private static RectTransform setup, hud, perf;
+        private static RectTransform setup, hud, perf, controls;
         private static Dialog results;
 
         // FPS, frame time and the physics' share, under the view cube while a game is open.
+        // The robot's control layout, top right under the performance readout (saved with the build).
+        private static void ShowControls(bool editable) {
+            if (controls != null) Object.Destroy(controls.gameObject);
+            controls = (RectTransform)Motion.ControlsCard.Create(Interface.Interface.Root, Layout.TopBarBottom + 200f,
+                editable ? () => Motion.ControlsPanel.Open(true) : null).transform;
+        }
+
         private static void ShowPerf() {
             if (perf != null) return;
             perf = Ui.Rect("Game Performance", Interface.Interface.Root);
@@ -61,7 +68,9 @@ namespace Protobot.Game {
                 results.Close();
             }
             if (perf != null) Object.Destroy(perf.gameObject);
-            setup = hud = perf = null;
+            if (controls != null) Object.Destroy(controls.gameObject);
+            Motion.ControlsPanel.Close();
+            setup = hud = perf = controls = null;
             results = null;
         }
 
@@ -174,6 +183,7 @@ namespace Protobot.Game {
             builder.game = game;
             builder.Build();
             ShowPerf();
+            ShowControls(true);
         }
 
         private class SetupPanel : MonoBehaviour {
@@ -196,6 +206,8 @@ namespace Protobot.Game {
             public void Build() {
                 game.Changed -= MarkDirty;
                 game.Changed += MarkDirty;
+                // Rebuilt after every change (the wheel over a value changes it a step at a time): keep the scroll.
+                var scrolled = content != null && content.childCount > 0 ? ((RectTransform)content.GetChild(0)).anchoredPosition.y : 0f;
                 if (content != null) Destroy(content.gameObject);
                 var rect = (RectTransform)transform;
                 var frame = Ui.Rect("Frame", rect).Fill(1, 1, 1, 1);
@@ -238,9 +250,9 @@ namespace Protobot.Game {
                 var note = Ui.Text(column, "Frame", "Inches from the field's middle: X toward blue, Y away from the audience. Heading: degrees clockwise from +Y.", Theme.FontSmall - 1f, Theme.TextFaint);
                 note.textWrappingMode = TextWrappingModes.Normal;
                 note.Size(-1, 34f);
-                NumberRow(column, "X", game.x, v => game.SetPose(v, game.y, game.heading), "\"");
-                NumberRow(column, "Y", game.y, v => game.SetPose(game.x, v, game.heading), "\"");
-                NumberRow(column, "Heading", game.heading, v => game.SetPose(game.x, game.y, v), "°");
+                NumberRow(column, "X", () => game.x, v => game.SetPose(v, game.y, game.heading), "\"");
+                NumberRow(column, "Y", () => game.y, v => game.SetPose(game.x, v, game.heading), "\"");
+                NumberRow(column, "Heading", () => game.heading, v => game.SetPose(game.x, game.y, v), "°");
                 var nudges = Row(column, "Nudge", 32f);
                 Nudge(nudges, "-X", () => game.Nudge(-0.25f, 0f, 0f));
                 Nudge(nudges, "+X", () => game.Nudge(0.25f, 0f, 0f));
@@ -292,9 +304,9 @@ namespace Protobot.Game {
                     toolName.Size(-1, 30f, 1f);
                     var remove = Ui.Button(toolRow, "Remove", "Remove", () => game.RemoveTool(), false, 6f, Theme.FontSmall);
                     remove.Size(-1, 30f);
-                    NumberRow(column, "Tool X", game.toolX, v => game.SetTool(v, game.toolY, game.toolHeading), "\"");
-                    NumberRow(column, "Tool Y", game.toolY, v => game.SetTool(game.toolX, v, game.toolHeading), "\"");
-                    NumberRow(column, "Tool heading", game.toolHeading, v => game.SetTool(game.toolX, game.toolY, v), "°");
+                    NumberRow(column, "Tool X", () => game.toolX, v => game.SetTool(v, game.toolY, game.toolHeading), "\"");
+                    NumberRow(column, "Tool Y", () => game.toolY, v => game.SetTool(game.toolX, v, game.toolHeading), "\"");
+                    NumberRow(column, "Tool heading", () => game.toolHeading, v => game.SetTool(game.toolX, game.toolY, v), "°");
                 }
 
                 // The checklist.
@@ -314,6 +326,11 @@ namespace Protobot.Game {
                 start.Size(170f, 40f);
                 var exit = Ui.Button(buttons, "Exit", "Exit game", game.Exit, false, 7f);
                 exit.Size(-1, 40f);
+
+                if (scrolled > 0f) {
+                    LayoutRebuilder.ForceRebuildLayoutImmediate(column);
+                    column.anchoredPosition = new Vector2(0f, Mathf.Min(scrolled, Mathf.Max(0f, column.rect.height - frame.rect.height)));
+                }
             }
 
             private static RectTransform Row(RectTransform parent, string name, float height) {
@@ -328,8 +345,23 @@ namespace Protobot.Game {
                 b.Size(44f, 30f);
             }
 
-            private static void NumberRow(RectTransform parent, string label, float value, System.Action<float> set, string unit) {
+            // The wheel over a row steps it: inches by 1/4" (Shift 1/16", Ctrl 1"), degrees by 5° (Shift 0.5°, Ctrl 15°).
+            private static void NumberRow(RectTransform parent, string label, System.Func<float> get, System.Action<float> set, string unit) {
+                var value = get();
                 var row = Dialog.Row(parent, label, 34f, 110f);
+                var degrees = unit == "°";
+                var hit = row.gameObject.AddComponent<Image>();   // the whole row takes the wheel, not just its box
+                hit.color = Color.clear;
+                row.gameObject.AddComponent<WheelStep>().step = direction => {
+                    value = get();
+                    var keyboard = UnityEngine.InputSystem.Keyboard.current;
+                    var shift = keyboard != null && keyboard.shiftKey.isPressed;
+                    var ctrl = keyboard != null && keyboard.ctrlKey.isPressed;
+                    var step = degrees ? (shift ? 0.5f : ctrl ? 15f : 5f) : (shift ? 0.0625f : ctrl ? 1f : 0.25f);
+                    set(value + direction * step);
+                    Audio.Sounds.Play(Audio.Sounds.Tick);
+                };
+                Ui.Tip(row, label, null, degrees ? "Turn the wheel over it: 5° a step (Shift 0.5°, Ctrl 15°)" : "Turn the wheel over it: 1/4\" a step (Shift 1/16\", Ctrl 1\")");
                 var field = Ui.Field(row, "Value", SkillsGame.Number(value), text => {
                     var t = text.Trim().TrimEnd('"', '°', ' ').Replace(" in", "");
                     if (float.TryParse(t, NumberStyles.Float, CultureInfo.InvariantCulture, out var v) || Inch.TryParse(t, out v)) set(v);
@@ -351,6 +383,7 @@ namespace Protobot.Game {
             h.game = game;
             h.Build();
             ShowPerf();
+            ShowControls(false);
         }
 
         private class Hud : MonoBehaviour {

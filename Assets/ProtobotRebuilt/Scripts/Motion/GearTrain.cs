@@ -97,6 +97,19 @@ namespace Protobot.Motion {
                     Fill(rotor, holes, motors);
                     rotors.Add(rotor);
                 }
+            // A wheel, gear or sprocket spinning on a screw (Linkage.SpinsOn: a screw joint, as teams build drive
+            // wheels and idlers) is a rotor of its own: it and what's screwed to it turn about the screw, which stays
+            // with the frame.
+            var onScrews = new HashSet<GameObject>();
+            foreach (var screw in Object.FindObjectsByType<Screw>(FindObjectsSortMode.None)) {
+                if (screw.gameObject.IsDeleted()) continue;
+                foreach (var part in GroupManager.Neighbours(screw.gameObject)) {
+                    if (onScrews.Contains(part) || !Linkage.SpinsOn(screw.gameObject, part) || !MeasureScrew(screw, part, out var rotor)) continue;
+                    FillScrew(rotor, screw.gameObject, holes);
+                    foreach (var p in rotor.parts) onScrews.Add(p);
+                    rotors.Add(rotor);
+                }
+            }
             FindGears(rotors);
             FindChains();
             return rotors;
@@ -115,6 +128,37 @@ namespace Protobot.Motion {
                 width = Mathf.Min(t.TransformVector(Vector3.right * bounds.size.x).magnitude, t.TransformVector(Vector3.up * bounds.size.y).magnitude)
             };
             return true;
+        }
+
+        // A part spinning on a screw: the rotor is the part (its "shaft"), on the screw's line (its shank along its
+        // own z, 8-32: 0.164" across).
+        private static bool MeasureScrew(Screw screw, GameObject part, out Rotor rotor) {
+            rotor = null;
+            if (!screw.TryGetComponent(out MeshFilter filter) || filter.sharedMesh == null) return false;
+            var bounds = filter.sharedMesh.bounds;
+            var t = screw.transform;
+            var a = t.TransformPoint(new Vector3(0f, 0f, bounds.min.z));
+            var b = t.TransformPoint(new Vector3(0f, 0f, bounds.max.z));
+            if ((b - a).sqrMagnitude < 1e-6f) return false;
+            rotor = new Rotor { shaft = part, start = a, axis = (b - a).normalized, low = 0f, high = (b - a).magnitude, width = 0.164f };
+            return true;
+        }
+
+        // What turns with a part on a screw: what's fastened to it (a gear screwed to a wheel); it turns in whatever
+        // else is on the screw's line (channels, spacers, nuts), and is held still if it's also fastened to those.
+        private static void FillScrew(Rotor rotor, GameObject screw, List<HoleInfo> holes) {
+            var fastened = Dynamics.Fastened(new[] { rotor.shaft }, new HashSet<GameObject>(), o => o.GetComponent<Shaft>() != null, out _);
+            rotor.parts.Add(rotor.shaft);
+            foreach (var part in fastened)
+                if (!rotor.parts.Contains(part)) rotor.parts.Add(part);
+            var seen = new HashSet<GameObject>();
+            foreach (var info in holes) {
+                if (rotor.parts.Contains(info.part) || info.part == screw) continue;
+                if (Mathf.Abs(Vector3.Dot(info.forward, rotor.axis)) < 0.98f || !OnShaft(rotor, info.position) || !seen.Add(info.part)) continue;
+                rotor.bearings.Add((info.part, info.position));
+            }
+            // Screwed tight to what the screw also holds (the wheel bolted to the channel): it can't spin.
+            rotor.fixedToFrame = rotor.parts.Contains(screw) || GroupManager.Neighbours(screw).Any(n => n != rotor.shaft && rotor.parts.Contains(n) && Linkage.Fastens(screw, n));
         }
 
         /// <summary>Whether a point is on the rotor's shaft (on its line, within its length).</summary>

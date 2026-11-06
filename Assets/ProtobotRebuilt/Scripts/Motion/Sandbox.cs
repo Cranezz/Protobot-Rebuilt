@@ -288,7 +288,7 @@ namespace Protobot.Motion {
                 if (head != null) threaded.Add(head);
                 foreach (var next in GroupManager.Neighbours(part)) {
                     if (!parent.ContainsKey(next)) continue;
-                    if (joint && !threaded.Contains(next)) hinges.Add((part, next, part.transform.position, part.transform.forward, null));
+                    if ((joint && !threaded.Contains(next)) || Linkage.SpinsOn(part, next)) hinges.Add((part, next, part.transform.position, part.transform.forward, null));
                     else Union(part, next);
                 }
             }
@@ -303,6 +303,19 @@ namespace Protobot.Motion {
                 foreach (var (part, point) in rotor.bearings) hinges.Add((rotor.shaft, part, point, rotor.axis, null));
                 foreach (var motor in rotor.motors) hinges.Add((rotor.shaft, motor.gameObject, motor.ShaftPoint, rotor.axis, motor));
             }
+            // V2: a part held by nothing but one shaft (a spacer or washer between a bearing and a gear) rides on it.
+            // On its own hinge it weighed 5 g with almost no inertia: the gears and collars beside it spun it up to
+            // the speed limit and it rattled everything round it.
+            var alone = nodes.GroupBy(Find).Where(g => g.Count() == 1).Select(g => g.Key).ToHashSet();
+            var onShafts = new Dictionary<GameObject, int>();
+            foreach (var rotor in rotors)
+                foreach (var (part, _) in rotor.bearings)
+                    if (alone.Contains(part)) onShafts[part] = onShafts.TryGetValue(part, out var n) ? n + 1 : 1;
+            var screwed = new HashSet<GameObject>(hinges.Where(h => h.motor == null && h.a.GetComponent<Screw>() != null).SelectMany(h => new[] { h.a, h.b }));
+            foreach (var rotor in rotors)
+                foreach (var (part, _) in rotor.bearings)
+                    if (onShafts.TryGetValue(part, out var count) && count == 1 && !screwed.Contains(part) && part.GetComponent<MotorDrive>() == null)
+                        Union(rotor.shaft, part);
 
             // Bodies.
             var byRoot = new Dictionary<GameObject, SimBody>();
@@ -338,7 +351,7 @@ namespace Protobot.Motion {
                     var b = all[j];
                     if (a.attachedRigidbody == b.attachedRigidbody) continue;
                     var ba = a.bounds;
-                    ba.Expand(0.06f);
+                    ba.Expand(NearGap * 2f);
                     if (!ba.Intersects(b.bounds)) continue;
                     if (Physics.ComputePenetration(a, a.transform.position, a.transform.rotation, b, b.transform.position, b.transform.rotation, out _, out _)
                         || Near(a, b))
@@ -351,9 +364,13 @@ namespace Protobot.Motion {
             MakeSlides(cylinders);
         }
 
+        private const float NearGap = 0.1f;
+
         private static bool Near(Collider a, Collider b) {
             var p = b.ClosestPoint(a.bounds.center);
-            return (a.ClosestPoint(p) - p).sqrMagnitude < 0.03f * 0.03f;
+            // V2: 0.1" (was 0.03"): a turning gear's hull sways a few hundredths as it turns, and against a channel or
+            // bearing 0.09" away it struck it on every tooth.
+            return (a.ClosestPoint(p) - p).sqrMagnitude < NearGap * NearGap;
         }
 
         private static readonly Dictionary<float, PhysicsMaterial> Materials = new();
@@ -519,7 +536,8 @@ namespace Protobot.Motion {
                     floor = Mathf.Min(floor, renderer.bounds.min.y);
                 }
                 // Its shape for collisions (not screws and nuts: they're inside what they hold).
-                if (Hardware(node) || !node.TryGetComponent(out MeshFilter filter) || filter.sharedMesh == null || !filter.sharedMesh.isReadable) continue;
+                // V2: a screw or nut on its own (holding nothing) gets one, or it fell through the floor forever.
+                if ((Hardware(node) && body.nodes.Count > 1) || !node.TryGetComponent(out MeshFilter filter) || filter.sharedMesh == null || !filter.sharedMesh.isReadable) continue;
                 var size = node.TryGetComponent(out Renderer bounds) ? bounds.bounds.size : Vector3.one;
                 if (Mathf.Max(size.x, size.y, size.z) < 0.25f) continue;
                 var shape = new GameObject("Collider") { layer = Layer };
@@ -851,6 +869,8 @@ namespace Protobot.Motion {
         }
 
         // Omni wheels: no friction across them (the rollers), the tire's grip along the way they roll.
+        private const float RollerResistance = 0.05f;
+
         private void Omnis() {
             if (contacts.Count == 0) return;
             var total = bodies.Sum(b => b.mass);
@@ -873,6 +893,15 @@ namespace Protobot.Motion {
                 var j = Mathf.Clamp(-slip * mass, -most, most);
                 rb.AddForceAtPosition(along * j, point, ForceMode.Impulse);
                 if (other != null) other.AddForceAtPosition(-along * j, point, ForceMode.Impulse);
+                // V2: the rollers' own rolling resistance across the wheel (about 5% of the load): without it a robot
+                // on all omnis kept sliding sideways forever after a turn.
+                var across = Vector3.ProjectOnPlane(axis, normal);
+                if (across.sqrMagnitude < 1e-6f) continue;
+                across.Normalize();
+                var drift = Vector3.Dot(velocity, across);
+                var roll = Mathf.Clamp(-drift * total / touching, -RollerResistance * impulse, RollerResistance * impulse);
+                rb.AddForceAtPosition(across * roll, point, ForceMode.Impulse);
+                if (other != null) other.AddForceAtPosition(-across * roll, point, ForceMode.Impulse);
             }
             contacts.Clear();
         }

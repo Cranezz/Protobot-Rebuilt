@@ -38,7 +38,8 @@ namespace Protobot {
                     else if (HoverObj.CompareTag("Screw")) {
                         Screw screw = HoverObj.GetComponent<Screw>();
                         var offset = HoverObj.transform.forward * (partData.PrimaryHoleDepth / 2);
-                        displacement = new Displacement(screw.GetLowestPoint() - offset, HoverObj.GetAlignmentRotation());
+                        // V2: the free stretch of the screw nearest the mouse it fits in, not only past the end.
+                        displacement = new Displacement(screw.FreeSpot(mouseCast.hit.point, partData.PrimaryHoleDepth) - offset, HoverObj.GetAlignmentRotation());
                         return true;
                     }
                 }

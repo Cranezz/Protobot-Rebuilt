@@ -17,10 +17,14 @@ namespace Protobot.Builds {
 
         public string version = AppData.Version;
 
+        // V2: the drivetrain's control (Motion.Controls.DriveMode), "" or null when the build never chose one.
+        [System.Runtime.Serialization.OptionalField] public string drive;
+
         public bool CompareData(BuildData data) {
             if (data.parts.Length != parts.Length) {
                 return false;
             }
+            if ((data.drive ?? "") != (drive ?? "")) return false;   // V2
 
             foreach (ObjectData part in parts) {
                 if (!data.parts.Contains(part))

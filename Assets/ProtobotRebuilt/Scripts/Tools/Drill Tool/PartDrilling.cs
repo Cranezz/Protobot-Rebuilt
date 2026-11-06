@@ -198,6 +198,7 @@ namespace Protobot.Tools {
             if (!part.TryGetComponent(out SavedObject saved) || string.IsNullOrEmpty(saved.state))
                 return;
             foreach (var entry in saved.state.Split(';')) {
+                if (GearChamfer.ApplyEntry(part, entry)) continue;   // chamfered gear teeth
                 if (PartCutting.TryParse(entry, out var point, out var normal)) {
                     if (PartCutting.Cut(part, point, normal) && part.TryGetComponent(out Parts_List.PartName partName)
                         && !partName.name.EndsWith("(cut)"))
