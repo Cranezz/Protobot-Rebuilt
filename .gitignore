@@ -68,3 +68,7 @@ __pycache__/
 # The bug report webhook (Builds/BugReport.Webhook): built into the app, kept out of the repository
 /Assets/ProtobotRebuilt/Resources/Secrets/
 /Assets/ProtobotRebuilt/Resources/Secrets.meta
+
+# Notes for the AI agent working on this project: kept on this computer only
+/CLAUDE.md
+/AGENT_HANDOFF.md

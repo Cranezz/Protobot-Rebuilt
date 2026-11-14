@@ -31,8 +31,7 @@ app, with the same look, menus and behavior, moved to Unity 6 and grown from the
 4. Bug reports and player reports go to a Discord webhook read from `Assets/ProtobotRebuilt/Resources/Secrets/BugWebhook.txt`.
    That file isn't in the repository: without it, reports are saved on the computer instead.
 
-Notes for working on the code (structure, conventions, how to test) are in [CLAUDE.md](CLAUDE.md) and
-[AGENT_HANDOFF.md](AGENT_HANDOFF.md); the plan for what's next is in [Docs/Roadmap.md](Docs/Roadmap.md).
+The plan for what's next is in [Docs/Roadmap.md](Docs/Roadmap.md).
 
 ## Credits
 
