@@ -1,6 +1,9 @@
 # Roadmap (2026-11-14)
 
-Progress: Phase 0, Phase 1 and Phase 2 are done (2026-11-14, see each phase). Next: Phase 3 needs the user (GitHub).
+Progress: Phase 0, Phase 1 and Phase 2 are done (2026-11-14, see each phase). Phase 3: the GitHub repository and the
+links are done (Build 31); the installer and updates (Velopack) wait for the user's OK to install its tools and publish
+releases. Also done 2026-11-14: the Brain-style Devices panel with working sensors (the start of Phase 9's simulated
+hardware, Build 30).
 
 Everything still open, in the order it'll be done. Each phase ends with a play-test, a build-number bump and a commit.
 "You" = the user; everything else is done here.

@@ -40,7 +40,7 @@ namespace Protobot.Online {
         public static event Action<string> Ended;
 
         /// <summary>The download page for the latest version, when there is one (shown when versions differ).</summary>
-        public const string DownloadUrl = "";
+        public const string DownloadUrl = "https://github.com/Cranezz/Protobot-Rebuilt/releases/latest";
 
         // ------------------------------------------------------------------ the network
 

@@ -21,7 +21,7 @@ namespace Protobot.Builds {
     //   issue when the project's page is set (IssuesUrl).
     public class CrashGuard : MonoBehaviour {
         /// <summary>The GitHub "new issue" page reports open (empty: reports are saved and copied only).</summary>
-        public const string IssuesUrl = "";
+        public const string IssuesUrl = "https://github.com/Cranezz/Protobot-Rebuilt/issues/new";   // V2: the public repository
 
         public static string LogFolder => Path.Combine(Application.persistentDataPath, "Logs");
         public static string RecoveryFolder => Path.Combine(Application.persistentDataPath, "Recovery");
