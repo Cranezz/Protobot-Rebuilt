@@ -81,6 +81,11 @@ namespace Protobot.Game {
 
         // V2: an online match (Online/OnlineMatch) runs this game on every computer: the host simulates, the others show it.
         public bool online, onlineClient, onlineMayStart;
+        /// <summary>Online: Ready pressed (the start is sent; it can't change any more), and what Ready does.</summary>
+        public bool onlineLocked;
+        public Action onlineReady;
+        /// <summary>Online: Robots in the Midfield now, per Alliance (match scoring).</summary>
+        public Func<(int red, int blue)> onlineMidfield;
         /// <summary>Online: a Match Load asked for (the host drops it); true when it was sent.</summary>
         public Func<string, bool> onlineDrop;
         /// <summary>The score is about to be taken (the host sends the final positions first).</summary>
@@ -661,7 +666,7 @@ namespace Protobot.Game {
             Sandbox.DriveEnabled = false;
             Sandbox.BuildEnvironment = root => {
                 (pins, cups, toggles) = field.MakePieces(root);
-                if (preload) {
+                if (preload && !online) {   // (online, the host makes every robot's Preload)
                     var stock = field.StockPin(PreloadColors);
                     if (stock != null) {
                         var (p, r) = PreloadPose();
@@ -795,7 +800,7 @@ namespace Protobot.Game {
             var typing = InputEvents.TextInput.IsTyping || InputEvents.TextInput.ShortcutsPaused;
             switch (state) {
                 case State.Setup:
-                    if (online) break;   // V2: an online match sets every robot's start itself
+                    if (online && onlineLocked) break;   // V2: online, the start can't change after Ready
                     DrawSetup();
                     if (keyboard != null && !typing) SetupKeys(keyboard);
                     break;
@@ -862,8 +867,15 @@ namespace Protobot.Game {
             Changed?.Invoke();
         }
 
-        public SkillsScore Evaluate() => OverrideScoring.Evaluate(field, pins.Where(p => p != null).ToList(), cups.Where(c => c != null).ToList(),
-            toggles.Where(t => t != null).ToList(), RobotInMidfield());
+        public SkillsScore Evaluate() {
+            if (online && onlineMidfield != null) {   // V2: a match: each Alliance's score
+                var (red, blue) = onlineMidfield();
+                return OverrideScoring.Evaluate(field, pins.Where(p => p != null).ToList(), cups.Where(c => c != null).ToList(),
+                    toggles.Where(t => t != null).ToList(), false, true, red, blue, Red);
+            }
+            return OverrideScoring.Evaluate(field, pins.Where(p => p != null).ToList(), cups.Where(c => c != null).ToList(),
+                toggles.Where(t => t != null).ToList(), RobotInMidfield());
+        }
 
         // V2: the middle of the robot's bodies in the simulation (where the Midfield points rise from).
         private Vector3 RobotPoint() {

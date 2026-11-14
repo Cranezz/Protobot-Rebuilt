@@ -257,6 +257,12 @@ namespace Protobot.Game {
             done = true;
             var s = game.score;
             var rows = new List<(string label, string count, int points, bool heading)>();
+            if (s.match) {   // V2: an online match
+                rows.Add((s.red > s.blue ? "Red wins" : s.blue > s.red ? "Blue wins" : "A tie", "", -1, true));
+                rows.Add(("Red Alliance", "", s.red, false));
+                rows.Add(("Blue Alliance", "", s.blue, false));
+                rows.Add(("Your Alliance's points", "", -1, true));
+            }
             if (s.items.Count == 0) rows.Add(("No points this time", "", -1, false));
             foreach (var group in s.items.GroupBy(i => i.kind)) {
                 var each = group.First().points;

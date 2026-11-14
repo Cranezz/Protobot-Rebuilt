@@ -12,6 +12,9 @@ namespace Protobot.Game {
     //   with the Robot ending in the Midfield. The Robot ending in the Midfield is worth 8.
     public class SkillsScore {
         public int total, redBlue, yellow, midfieldPoints;
+        // V2: a match (online): each Alliance's own score; total is this player's Alliance's.
+        public bool match;
+        public int red, blue;
         public int scoredRedBlueHalves, scoredYellowHalves, placedPins, placedCups;
         public bool robotInMidfield;
         public readonly List<string> details = new();
@@ -30,8 +33,16 @@ namespace Protobot.Game {
             public bool upperHidden;
         }
 
-        public static SkillsScore Evaluate(GameField field, IList<Pin> pins, IList<Cup> cups, IList<Toggle> toggles, bool robotInMidfield) {
-            var score = new SkillsScore { robotInMidfield = robotInMidfield };
+        public static SkillsScore Evaluate(GameField field, IList<Pin> pins, IList<Cup> cups, IList<Toggle> toggles, bool robotInMidfield) =>
+            Evaluate(field, pins, cups, toggles, robotInMidfield, false, 0, 0, true);
+
+        /// <summary>V2: match scoring (SC3-SC6) when match: red halves score for red and blue for blue wherever they're
+        /// Placed; yellow halves for the Alliance whose color the Quadrant's Toggle is set to, or (the Midfield Goal) the
+        /// Alliance with more Robots in the Midfield; 8 for each Robot ending in the Midfield. total and items are
+        /// mineRed's Alliance's.</summary>
+        public static SkillsScore Evaluate(GameField field, IList<Pin> pins, IList<Cup> cups, IList<Toggle> toggles, bool robotInMidfield,
+                                           bool match, int redInMidfield, int blueInMidfield, bool mineRed) {
+            var score = new SkillsScore { robotInMidfield = robotInMidfield && !match, match = match };
             var placedPins = new Dictionary<Pin, Stacked>();
             var placedCups = new Dictionary<Cup, (GameField.Goal goal, bool opaqueDown)>();
 
@@ -89,6 +100,25 @@ namespace Protobot.Game {
                     var quadrant = stack.goal.quadrant;
                     var where = quadrant == Quadrant.Midfield ? "Midfield Goal" : quadrant + " Quadrant goal" + (stack.goal.alliance ? " (Alliance)" : "");
                     var middle = Vector3.Lerp(pin.transform.position, pin.End(half), 0.5f);
+                    if (match) {   // V2
+                        var forRed = color == PieceColor.Red;
+                        if (color == PieceColor.Yellow) {
+                            var owner = quadrant == Quadrant.Midfield
+                                ? (redInMidfield > blueInMidfield ? PieceColor.Red : blueInMidfield > redInMidfield ? PieceColor.Blue : PieceColor.Yellow)
+                                : toggles.FirstOrDefault(t => t.quadrant == quadrant)?.SetColor ?? PieceColor.Yellow;
+                            if (owner != PieceColor.Red && owner != PieceColor.Blue) continue;
+                            forRed = owner == PieceColor.Red;
+                        }
+                        else if (color != PieceColor.Blue && color != PieceColor.Red) continue;
+                        var value = color == PieceColor.Yellow ? YellowHalf : AllianceHalf;
+                        if (forRed) score.red += value;
+                        else score.blue += value;
+                        if (forRed != mineRed) continue;
+                        if (color == PieceColor.Yellow) { score.scoredYellowHalves++; score.yellow += value; }
+                        else { score.scoredRedBlueHalves++; score.redBlue += value; }
+                        score.items.Add(new ScoredItem { point = middle, points = value, kind = color == PieceColor.Yellow ? "Yellow pin halves" : (forRed ? "Red" : "Blue") + " pin halves", where = where, pin = pin });
+                        continue;
+                    }
                     if (color == PieceColor.Yellow) {
                         var owned = quadrant == Quadrant.Midfield
                             ? robotInMidfield
@@ -105,6 +135,20 @@ namespace Protobot.Game {
                         score.items.Add(new ScoredItem { point = middle, points = AllianceHalf, kind = (color == PieceColor.Red ? "Red" : "Blue") + " pin halves", where = where, pin = pin });
                     }
                 }
+            }
+            if (match) {   // V2: each Robot in the Midfield, for its Alliance
+                score.red += Midfield * redInMidfield;
+                score.blue += Midfield * blueInMidfield;
+                var mine = mineRed ? redInMidfield : blueInMidfield;
+                score.midfieldPoints = Midfield * mine;
+                for (var i = 0; i < mine; i++)
+                    score.items.Add(new ScoredItem { point = field.ToWorld(Vector2.zero, 8f), points = Midfield, kind = "Robots in the Midfield", where = "Midfield" });
+                score.total = mineRed ? score.red : score.blue;
+                score.details.Add($"Red {score.red} · Blue {score.blue}");
+                if (score.scoredRedBlueHalves > 0) score.details.Add($"Your {(mineRed ? "red" : "blue")} pin halves: {score.scoredRedBlueHalves} × {AllianceHalf} = {score.redBlue}");
+                if (score.scoredYellowHalves > 0) score.details.Add($"Yellow pin halves you own: {score.scoredYellowHalves} × {YellowHalf} = {score.yellow}");
+                if (mine > 0) score.details.Add($"Your robots in the Midfield: {mine} × {Midfield}");
+                return score;
             }
             if (robotInMidfield) score.midfieldPoints = Midfield;
             score.total = score.redBlue + score.yellow + score.midfieldPoints;

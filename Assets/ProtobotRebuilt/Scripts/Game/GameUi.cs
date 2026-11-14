@@ -278,7 +278,13 @@ namespace Protobot.Game {
 
                 // The start.
                 // V2: a match: the Alliance and its Quadrant, and the autonomous period.
-                if (game.mode == SkillsGame.Mode.Match) {
+                if (game.mode == SkillsGame.Mode.Match && game.online) {   // V2: online, the lobby set them
+                    Dialog.Heading(column, "Alliance and start");
+                    var seat = Row(column, "Seat", 30f);
+                    Ui.Text(seat, "Seat", (game.redAlliance ? "Red" : "Blue") + " Alliance · " + game.startQuadrant + " Quadrant (from the lobby)", Theme.FontSmall,
+                        game.redAlliance ? new Color(0.95f, 0.45f, 0.45f) : new Color(0.45f, 0.65f, 1f), Theme.Medium).Size(-1, 30f, 1f);
+                }
+                else if (game.mode == SkillsGame.Mode.Match) {
                     Dialog.Heading(column, "Alliance and start");
                     var allianceRow = Row(column, "Alliance", 34f);
                     foreach (var red in new[] { true, false }) {
@@ -428,10 +434,25 @@ namespace Protobot.Game {
 
                 var buttons = Row(column, "Buttons", 46f);
                 buttons.GetComponent<HorizontalLayoutGroup>().padding = new RectOffset(0, 0, 10, 0);
+                if (game.online) {   // V2: an online match: Ready (the host starts once everyone is), or leave
+                    if (game.onlineLocked) {
+                        var wait = Ui.Text(buttons, "Waiting", "Ready: waiting for the other players…", Theme.FontBody, Theme.Success, Theme.Medium);
+                        wait.Size(-1, 40f, 1f);
+                    }
+                    else {
+                        var ready = Ui.Button(buttons, "Ready", "Ready", () => game.onlineReady?.Invoke(), true, 7f, Theme.FontBody + 1f);
+                        ready.Size(170f, 40f);
+                        Ui.Tip(ready, "Ready", null, "Your start is sent to the others and can't change; the match starts when everyone is ready.");
+                    }
+                    var leave = Ui.Button(buttons, "Leave", "Leave match", game.Exit, false, 7f);
+                    leave.Size(-1, 40f);
+                }
+                else {
                 var start = Ui.Button(buttons, "Start", "Start run", game.StartRun, true, 7f, Theme.FontBody + 1f);
                 start.Size(170f, 40f);
                 var exit = Ui.Button(buttons, "Exit", "Exit game", game.Exit, false, 7f);
                 exit.Size(-1, 40f);
+                }
 
                 if (scrolled > 0f) {
                     LayoutRebuilder.ForceRebuildLayoutImmediate(column);
@@ -561,7 +582,7 @@ namespace Protobot.Game {
             private void Refresh() {
                 if (scoreText == null) return;
                 var s = game.score;
-                scoreText.text = s.total.ToString();
+                scoreText.text = s.match ? $"<color=#E5484D>{s.red}</color><size=55%> – </size><color=#3E8CF0>{s.blue}</color>" : s.total.ToString();   // V2: a match: both Alliances
                 details.text = s.details.Count > 0 ? string.Join("\n", s.details) : (game.state == SkillsGame.State.Countdown ? "Get ready…" : "Stack pins on goals: red halves in red Quadrants, blue in blue, yellow where your Toggle is set");
                 foreach (var (kind, text) in loadLabels) {
                     game.matchLoads.TryGetValue(kind, out var left);

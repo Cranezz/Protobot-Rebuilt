@@ -137,7 +137,7 @@ namespace Protobot.Online {
         }
 
         /// <summary>Joins by invite code (or by the server list's id); null when it worked, else what went wrong.</summary>
-        public static async Task<string> Join(string codeOrId, bool byId, string password) {
+        public static async Task<string> Join(string codeOrId, bool byId, string password, int attempt = 0) {
             if (!await OnlineServices.Start()) return OnlineServices.Problem;
             await Leave(null);
             SayWhoIAm();
@@ -156,6 +156,27 @@ namespace Protobot.Online {
                 Use(session);
                 ActionLog.Write("online", "joined \"" + session.Name + "\" (" + session.Id + ")");
                 return null;
+            }
+            catch (SessionException e) when (e.Error == SessionError.SessionConflict || (e.Message ?? "").Contains("already a member")) {
+                // V2: still in it (their app closed before the lobby noticed they'd gone): reconnect, and the match
+                // (if one is being played) sends them back in.
+                try {
+                    foreach (var id in await MultiplayerService.Instance.GetJoinedSessionIdsAsync()) {
+                        var session = await MultiplayerService.Instance.ReconnectToSessionAsync(id, new ReconnectSessionOptions { Type = SessionType });
+                        Use(session);
+                        ActionLog.Write("online", "reconnected to \"" + session.Name + "\" (" + session.Id + ")");
+                        return null;
+                    }
+                }
+                catch (Exception again) {
+                    Debug.LogWarning("[Online] Couldn't reconnect: " + again.Message);
+                }
+                // The lobby drops a player whose app closed a few seconds after the host notices: join again then.
+                if (attempt < 5) {
+                    await Task.Delay(3000);
+                    return await Join(codeOrId, byId, password, attempt + 1);
+                }
+                return "Couldn't get back into that match: try again in a moment.";
             }
             catch (SessionException e) when (e.Error == SessionError.SessionNotFound) {
                 return byId ? "That match has closed." : "No match has that code: check it, or ask for a new one.";
@@ -222,6 +243,11 @@ namespace Protobot.Online {
 
         private static void OnJoined(string id) {
             ActionLog.Write("online", "player joined " + id);
+            if (IsHost && OnlineMatch.Active && !OnlineMatch.HasSeat(id) && !banned.Contains(id)) {   // V2: a match is being played: only its players (coming back)
+                ActionLog.Write("online", "turned away " + id + " (a match is being played)");
+                _ = RemoveQuietly(Current, id);
+                return;
+            }
             if (IsHost && banned.Contains(id)) {   // kicked from this match: not back in
                 ActionLog.Write("online", "removed " + id + " again (kicked from this match)");
                 Kick(id);

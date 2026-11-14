@@ -111,6 +111,7 @@ namespace Protobot.Online {
         }
 
         /// <summary>Closes the home menu (the launch window) if it's open.</summary>
+        // (-autoready: OnlineMatch presses Ready by itself, at the default start.)
         public static void CloseLaunchWindow() {
             var launch = GameObject.Find("Launch Canvas");
             if (launch == null || !launch.activeInHierarchy) return;

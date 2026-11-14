@@ -1,5 +1,7 @@
 # Roadmap (2026-11-14)
 
+Progress: Phase 0, Phase 1 and Phase 2 are done (2026-11-14, see each phase). Next: Phase 3 needs the user (GitHub).
+
 Everything still open, in the order it'll be done. Each phase ends with a play-test, a build-number bump and a commit.
 "You" = the user; everything else is done here.
 
@@ -11,13 +13,13 @@ Everything still open, in the order it'll be done. Each phase ends with a play-t
   (line sensor bar, ultrasonic, optical shaft encoder, Line Tracker V2, and the rest of the sensors checked the same way).
 - **Online:** each computer simulates its own robot and what it touches; the host settles pieces and scores once.
 
-## Phase 0: housekeeping (short)
+## Phase 0: housekeeping (short) - DONE
 
 1. Commit Build 23 (ownership sync, reports, vote kick).
 2. Find what changes the 12" shaft template to 6" while the app runs (a part generator writing to the prefab asset
    instead of its copy) and stop it.
 
-## Phase 1: parts (1 session)
+## Phase 1: parts (1 session) - DONE (shoulder screws colored + 2.50", sensor holes from openings, Double bogie rocker, zip ties, plate undo, labels apart; spacer case re-checked: hole walls match the model to 0.001")
 
 1. **Shoulder screws:** read RoboSource's shoulder screw listings (lengths, shoulder lengths, head colors), add the
    missing sizes as parts and color each head by RoboSource's code.
@@ -27,7 +29,7 @@ Everything still open, in the order it'll be done. Each phase ends with a play-t
 4. **Small gaps:** zip ties for tubing, undo for license-plate text, motor labels not overlapping on a 6-motor drive.
 5. **Re-check:** the spacer-on-a-screw-inside-a-C-channel case (believed fixed).
 
-## Phase 2: online matches ready for real players (2-3 sessions)
+## Phase 2: online matches ready for real players (2-3 sessions) - DONE except the laptop test (you) and a real Discord report
 
 1. **Start setup online:** each player places their robot within the legal start (the same wall lock, slide, turn,
    Line up and Measure as Match practice) before the match; the host starts when everyone says ready.

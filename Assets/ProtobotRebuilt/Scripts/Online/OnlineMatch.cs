@@ -66,7 +66,8 @@ namespace Protobot.Online {
 
         private enum Msg : byte {
             Plan = 1, Robot = 2, Loaded = 3, Go = 4, Spawn = 7, Drop = 8, Finish = 9, Abort = 10, Chunk = 11, Final = 12,
-            State = 13, Claim = 14, Owner = 15, Release = 16, Collect = 17, Everything = 18,
+            State = 13, Claim = 14, Owner = 15, Release = 16, Collect = 17, Everything = 18, Hold = 19, Disable = 20,
+            Rejoin = 21, RejoinReady = 22, Sync = 23,
         }
         private const string Channel = "protobot.match";
         private const int ChunkSize = 1000;
@@ -84,13 +85,13 @@ namespace Protobot.Online {
 
         // ------------------------------------------------------------------ the network
 
-        private static NetworkManager listeningTo;
+        private static CustomMessagingManager listeningTo;   // (a new one each time the network starts again)
 
         /// <summary>Registers the match's messages on the running NetworkManager (once per start).</summary>
         private static void Listen() {
             var net = NetworkManager.Singleton;
-            if (net == null || !net.IsListening || net.CustomMessagingManager == null || listeningTo == net) return;
-            listeningTo = net;
+            if (net == null || !net.IsListening || net.CustomMessagingManager == null || listeningTo == net.CustomMessagingManager) return;
+            listeningTo = net.CustomMessagingManager;
             net.CustomMessagingManager.RegisterNamedMessageHandler(Channel, Receive);
         }
 
@@ -135,6 +136,14 @@ namespace Protobot.Online {
 
         private static void Dispatch(ulong sender, Msg type, byte[] data) {
             try {
+                if (type == Msg.Rejoin) {
+                    if (Current != null) Current.Abort(null, false);
+                    var go2 = new GameObject("Online Match");
+                    DontDestroyOnLoad(go2);
+                    Current = go2.AddComponent<OnlineMatch>();
+                    Current.BeginRejoin(JsonUtility.FromJson<RejoinInfo>(Unpack(data)));
+                    return;
+                }
                 if (type == Msg.Plan) {
                     if (Current != null) Current.Abort(null, false);
                     var go = new GameObject("Online Match");
@@ -235,7 +244,6 @@ namespace Protobot.Online {
             }
             if (newPlan.seats.Count < 2) return "A match needs two players at least.";
             newPlan.hostRobot = newPlan.seats.FirstOrDefault(s => s.playerId == OnlineServices.PlayerId)?.robot ?? 0;
-            MatchSessions.Lock(true);
             var data = Bytes(JsonUtility.ToJson(newPlan));
             ToClients(Msg.Plan, data, true);
             Dispatch(NetworkManager.ServerClientId, Msg.Plan, data);
@@ -274,15 +282,40 @@ namespace Protobot.Online {
             game.SetAlliance(seat.red);
             game.SetQuadrant((Quadrant)seat.quadrant);
             game.SetSkipAutonomous(plan.skipAutonomous);
-            var preload = game.preload;
-            game.preload = false;   // the host makes every robot's Preload
             game.Apply();
             game.Exited += OnExited;
             game.Finishing += OnFinishing;
-            GameUi.CloseAll();
-            Interface.Interface.Say("Setting up the match: loading the other robots…", false);
-            var mine = MakePacket(seat, preload);
-            Debug.Log("[Match] seat " + me + (seat.red ? " red " : " blue ") + (Quadrant)seat.quadrant + ", robot " + mine.build.parts.Length + " parts, host " + IsHost);
+            game.onlineMidfield = MidfieldCounts;
+            // V2: each player sets their own start (on their wall, in their Quadrant), then Ready sends it.
+            game.onlineReady = () => Ready(seat);
+            GameUi.ShowSetup(game);
+            Debug.Log("[Match] seat " + me + (seat.red ? " red " : " blue ") + (Quadrant)seat.quadrant + ", setting up");
+            if (AutoReady) StartCoroutine(ReadySoon(seat));
+        }
+
+        /// <summary>Testing: "-autoready" presses Ready by itself (at the default start).</summary>
+        private static readonly bool AutoReady = Environment.GetCommandLineArgs().Contains("-autoready");
+
+        /// <summary>Testing only (set by "-autoready", or from a script): Ready accepts a start that isn't legal (test
+        /// robots like the samples, with spare parts set aside in their builds).</summary>
+        public static bool TestAllowIllegal = AutoReady;
+
+        private IEnumerator ReadySoon(Seat seat) {
+            yield return new WaitForSeconds(2f);
+            Ready(seat);
+        }
+
+        /// <summary>Ready: a legal start (SG1) is sent to the host and stays as it is.</summary>
+        private void Ready(Seat seat) {
+            if (game == null || game.onlineLocked) return;
+            if (!game.Legal && !TestAllowIllegal) {
+                Interface.Interface.Say("That start isn't legal yet (see the checklist): fix it, then Ready", false);
+                return;
+            }
+            game.onlineLocked = true;
+            var mine = MakePacket(seat, game.preload);
+            Debug.Log("[Match] ready: robot " + mine.build.parts.Length + " parts at x " + mine.x.ToString("F1") + ", y " + mine.y.ToString("F1") + ", heading " + mine.heading.ToString("F0"));
+            GameUi.ShowSetup(game);
             ToHost(Msg.Robot, Pack(JsonUtility.ToJson(mine)), true);
         }
 
@@ -328,7 +361,7 @@ namespace Protobot.Online {
             return Quaternion.Inverse(rotation);
         }
 
-        private IEnumerator LoadRobots() {
+        private IEnumerator LoadRobots(RejoinInfo rejoin = null) {
             var field = game.field.transform;
             foreach (var p in packets.Values.OrderBy(p => p.robot)) {
                 if (p.robot == me || p.build?.parts == null) continue;
@@ -363,7 +396,8 @@ namespace Protobot.Online {
             Debug.Log("[Match] loaded " + remoteParts.Count + " parts of the other robots");
             for (var i = 0; i < 10; i++) yield return new WaitForFixedUpdate();
             yield return new WaitForSeconds(0.5f);
-            ToHost(Msg.Loaded, BitConverter.GetBytes(me), true);
+            if (rejoin != null) GoRejoin(rejoin);
+            else ToHost(Msg.Loaded, BitConverter.GetBytes(me), true);
         }
 
         // ------------------------------------------------------------------ messages
@@ -385,6 +419,8 @@ namespace Protobot.Online {
                         foreach (var each in packets.Values) ToClients(Msg.Robot, Pack(JsonUtility.ToJson(each)), true);
                     if (game != null && !loadStarted) {
                         loadStarted = true;
+                        GameUi.CloseAll();   // (everyone is ready: the setup panel goes)
+                        Interface.Interface.Say("Everyone is ready: loading the other robots…", false);
                         StartCoroutine(LoadRobots());
                     }
                     break;
@@ -423,6 +459,18 @@ namespace Protobot.Online {
                     break;
                 case Msg.Everything:
                     if (!IsHost) ReadEverything(data);
+                    break;
+                case Msg.Hold:
+                    if (!IsHost) ShowHold(data);
+                    break;
+                case Msg.RejoinReady:
+                    if (IsHost) HostRejoined(sender);
+                    break;
+                case Msg.Sync:
+                    if (!IsHost) ReadEverything(data, false);
+                    break;
+                case Msg.Disable:
+                    if (!IsHost) ApplyDisable(BitConverter.ToInt32(data, 0));
                     break;
                 case Msg.Spawn:
                     if (!IsHost) ReadSpawn(data);
@@ -572,7 +620,10 @@ namespace Protobot.Online {
             for (var i = 0; i < game.Pins.Count; i++) if (game.Pins[i] != null) KeyBody(Hash("pin:" + i), game.Pins[i].body);
             for (var i = 0; i < game.Cups.Count; i++) if (game.Cups[i] != null) KeyBody(Hash("cup:" + i), game.Cups[i].body);
             for (var i = 0; i < game.Toggles.Count; i++) if (game.Toggles[i] != null) KeyBody(Hash("toggle:" + i), game.Toggles[i].body);
-            if (IsHost) MakePreloads();
+            if (IsHost) {
+                MakePreloads();
+                NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
+            }
             foreach (var seat in plan.seats) seatHeardAt[seat.robot] = Time.time;
             MakePing();
             Debug.Log("[Match] running: " + keyed.Count + " bodies and pieces keyed, " + keyed.Values.Count(k => k.owner == me) + " simulated here");
@@ -638,6 +689,7 @@ namespace Protobot.Online {
         private void Announce(string kind, Rigidbody body) {
             var key = Hash("spawn:" + nextSpawn++);
             KeyBody(key, body);
+            spawned.Add(new SpawnInfo { key = key, kind = kind });
             var t = game.field.transform;
             using var stream = new MemoryStream();
             using (var w = new BinaryWriter(stream)) {
@@ -748,6 +800,7 @@ namespace Protobot.Online {
                 using (var w = new BinaryWriter(stream)) {
                     w.Write(me);
                     w.Write(tick);
+                    w.Write((byte)(Trying() ? 1 : 0));
                     var count = Math.Min(perPacket, Math.Max(0, entries.Count - start));
                     w.Write((ushort)count);
                     for (var i = start; i < start + count; i++) {
@@ -776,6 +829,7 @@ namespace Protobot.Online {
             using var r = new BinaryReader(new MemoryStream(data));
             var seat = r.ReadInt32();
             var at = r.ReadUInt32();
+            trying[seat] = r.ReadByte() == 1;
             var count = r.ReadUInt16();
             seatHeardAt[seat] = Time.time;
             for (var i = 0; i < count; i++) {
@@ -944,6 +998,186 @@ namespace Protobot.Online {
             }
         }
 
+        // ------------------------------------------------------------------ robots in the Midfield (scoring)
+
+        /// <summary>SC6: Robots with any part in the Midfield (the 34.05" diamond, any height), per Alliance.</summary>
+        private (int red, int blue) MidfieldCounts() {
+            if (game == null || game.field == null) return (0, 0);
+            var t = game.field.transform;
+            var hits = Physics.OverlapBox(game.field.ToWorld(Vector2.zero, 30f), new Vector3(17.025f, 30f, 17.025f), t.rotation * Quaternion.Euler(0f, 45f, 0f),
+                1 << Sandbox.Layer, QueryTriggerInteraction.Ignore);
+            var robots = new HashSet<int>();
+            foreach (var h in hits)
+                if (h.attachedRigidbody != null && byBody.TryGetValue(h.attachedRigidbody, out var k) && k.robot >= 0) robots.Add(k.robot);
+            int red = 0, blue = 0;
+            foreach (var r in robots) {
+                var seat = plan.seats.FirstOrDefault(s => s.robot == r);
+                if (seat == null) continue;
+                if (seat.red) red++;
+                else blue++;
+            }
+            return (red, blue);
+        }
+
+        // ------------------------------------------------------------------ holding (GG17)
+
+        // GG17: no Holding (Pinning, Trapping) an opposing Robot for more than a 3-count. The host watches: a robot
+        // touching an opponent that is trying to drive but stuck against the field or another robot. The holder gets a
+        // red outline and a count on every screen; past 3 it's warned, and still holding at 5 it's disabled for the rest
+        // of the match. The count pauses when they're 2 ft apart or either has moved 2 ft from where it started.
+        private readonly Dictionary<int, bool> trying = new();
+        private readonly HashSet<int> disabled = new();
+        private class Hold {
+            public int holder, held;
+            public float count, quietSince = -1f;
+            public Vector3 heldStart, holderStart;
+            public bool warned;
+        }
+        private Hold hold;
+        private float nextHoldCheck;
+        private string holdShown;
+
+        private bool Trying() {
+            if (!Sandbox.DriveEnabled || disabled.Contains(me)) return false;
+            var (left, right) = Sandbox.DrivePower();
+            return Mathf.Abs(left) > 0.15f || Mathf.Abs(right) > 0.15f;
+        }
+
+        private Vector3 RobotMiddle(int seat) {
+            var sum = Vector3.zero;
+            var n = 0;
+            foreach (var k in keyed.Values)
+                if (k.robot == seat && k.rb != null) {
+                    sum += k.rb.worldCenterOfMass;
+                    n++;
+                }
+            return n > 0 ? sum / n : Vector3.zero;
+        }
+
+        /// <summary>How fast a robot's frame (its heaviest body) moves: its wheels spin even when it's stuck.</summary>
+        private float RobotSpeed(int seat) {
+            Keyed frame = null;
+            foreach (var k in keyed.Values)
+                if (k.robot == seat && k.rb != null && (frame == null || k.rb.mass > frame.rb.mass)) frame = k;
+            if (frame == null) return 0f;
+            return frame.owner == me ? frame.rb.linearVelocity.magnitude : frame.v.magnitude;
+        }
+
+        /// <summary>Whether a robot's bodies touch (within 0.15") what the test says.</summary>
+        private bool RobotTouches(int seat, Func<Collider, bool> what) {
+            foreach (var k in keyed.Values) {
+                if (k.robot != seat || k.rb == null) continue;
+                foreach (var c in k.colliders) {
+                    if (c == null) continue;
+                    var b = c.bounds;
+                    var n = Physics.OverlapBoxNonAlloc(b.center, b.extents + Vector3.one * 0.15f, overlaps, Quaternion.identity,
+                        (1 << Sandbox.Layer) | (1 << Sandbox.FieldLayer) | (1 << Sandbox.ElementLayer), QueryTriggerInteraction.Ignore);
+                    for (var i = 0; i < n; i++)
+                        if (overlaps[i].attachedRigidbody != k.rb && what(overlaps[i])) return true;
+                }
+            }
+            return false;
+        }
+
+        private int SeatOf(Collider c) => c.attachedRigidbody != null && byBody.TryGetValue(c.attachedRigidbody, out var k) ? k.robot : -1;
+
+        private void CheckHolding() {
+            if (game.state != SkillsGame.State.Running || game.InAutonomous || Time.time < nextHoldCheck) return;
+            const float Step = 0.1f;
+            nextHoldCheck = Time.time + Step;
+            if (hold != null) {
+                var stillTouching = RobotTouches(hold.held, c => SeatOf(c) == hold.holder);
+                var apart = Vector3.Distance(RobotMiddle(hold.held), hold.heldStart) > 24f || Vector3.Distance(RobotMiddle(hold.holder), hold.holderStart) > 24f;
+                if (!stillTouching || apart || disabled.Contains(hold.holder)) {
+                    if (hold.quietSince < 0f) hold.quietSince = Time.time;
+                    if (apart || disabled.Contains(hold.holder) || Time.time - hold.quietSince > 0.5f) EndHold();
+                    return;
+                }
+                hold.quietSince = -1f;
+                hold.count += Step;
+                if (hold.count > 3f && !hold.warned) {
+                    hold.warned = true;
+                    var name = SeatName(hold.holder);
+                    Record("violation", hold.holder, name + " held " + SeatName(hold.held) + " past a 3-count (GG17): warned");
+                }
+                if (hold.count > 5f) {
+                    Record("violation", hold.holder, SeatName(hold.holder) + " kept holding past 5 s: disabled");
+                    Disable(hold.holder, SeatName(hold.holder) + "'s robot is disabled for holding (GG17)");
+                    EndHold();
+                    return;
+                }
+                SendHold();
+                return;
+            }
+            // A new hold: a stuck opponent that's trying to drive, touched by a robot of the other Alliance, and pressed
+            // against the field or another robot.
+            foreach (var held in plan.seats) {
+                var stuck = trying.TryGetValue(held.robot, out var t) && t && RobotSpeed(held.robot) < 3f && !disabled.Contains(held.robot);
+                if (held.robot == me) stuck = Trying() && RobotSpeed(held.robot) < 3f && !disabled.Contains(me);
+                if (!stuck) continue;
+                foreach (var holder in plan.seats) {
+                    if (holder.red == held.red || disabled.Contains(holder.robot)) continue;
+                    if (!RobotTouches(held.robot, c => SeatOf(c) == holder.robot)) continue;
+                    if (!RobotTouches(held.robot, c => c.gameObject.layer == Sandbox.FieldLayer || (SeatOf(c) >= 0 && SeatOf(c) != holder.robot && SeatOf(c) != held.robot))) continue;
+                    hold = new Hold { holder = holder.robot, held = held.robot, heldStart = RobotMiddle(held.robot), holderStart = RobotMiddle(holder.robot) };
+                    SendHold();
+                    return;
+                }
+            }
+        }
+
+        private string SeatName(int seat) => plan.seats.FirstOrDefault(s => s.robot == seat)?.name ?? "robot " + seat;
+
+        private void EndHold() {
+            hold = null;
+            SendHold();
+        }
+
+        private void SendHold() {
+            var data = hold == null ? Pair(-1, 0) : Pair(hold.holder, Mathf.CeilToInt(hold.count * 10f));
+            ToClients(Msg.Hold, data, true);
+            ShowHold(data);
+        }
+
+        // Everyone: the holding robot outlined red, with its count above it.
+        private int holdSeat = -1;
+        private float holdCount;
+
+        private void ShowHold(byte[] data) {
+            holdSeat = BitConverter.ToInt32(data, 0);
+            holdCount = BitConverter.ToInt32(data, 4) / 10f;
+            var key = holdSeat + "|" + Mathf.FloorToInt(holdCount);
+            if (key == holdShown) return;
+            holdShown = key;
+            if (holdSeat < 0) {
+                Highlights.Clear("holding");
+                return;
+            }
+            var parts = FindObjectsByType<NetPart>(FindObjectsSortMode.None).Where(n => n.robot == holdSeat).Select(n => n.gameObject).ToList();
+            Highlights.Set("holding", parts, new Color(0.95f, 0.15f, 0.12f, 1f), true);
+        }
+
+        private void DrawHold() {
+            if (holdSeat < 0 || game == null) return;
+            Overlay.Begin();
+            var middle = RobotMiddle(holdSeat) + Vector3.up * 10f;
+            if (Overlay.ToScreen(middle, out var at)) {
+                var left = Mathf.Max(0f, 3f - holdCount);
+                Overlay.Text(at, holdCount <= 3f ? "Holding " + Mathf.CeilToInt(left) : "Holding! Back away", new Color(0.95f, 0.2f, 0.15f), null, true);
+            }
+        }
+
+        private void Disable(int seat, string why) {
+            ToClients(Msg.Disable, BitConverter.GetBytes(seat), true);
+            ApplyDisable(seat);
+            Interface.Interface.Say(why, false);
+        }
+
+        private void ApplyDisable(int seat) {
+            disabled.Add(seat);
+            if (seat == me) Interface.Interface.Say("Your robot is disabled for the rest of the match (holding an opponent past the 5-second limit)", false);
+        }
+
         // ------------------------------------------------------------------ checks and the match record (for reports)
 
         private readonly Dictionary<int, float> lastFlag = new();
@@ -1010,6 +1244,9 @@ namespace Protobot.Online {
             close.Size(110f, 34f);
             // (votes change while it's open: it shows them as they were when opened)
         }
+
+        /// <summary>Whether a player has a seat in the match being played (others are turned away while it runs).</summary>
+        public static bool HasSeat(string playerId) => Current != null && Current.plan != null && Current.plan.seats.Any(s => s.playerId == playerId);
 
         /// <summary>The players in this match: seat, name, player id.</summary>
         public IEnumerable<Seat> Seats => plan?.seats ?? new List<Seat>();
@@ -1107,8 +1344,8 @@ namespace Protobot.Online {
             LastRecording = recording.ToString();
         }
 
-        private void ReadEverything(byte[] data) {
-            Freeze();
+        private void ReadEverything(byte[] data, bool freeze = true) {
+            if (freeze) Freeze();
             using var r = new BinaryReader(new MemoryStream(data));
             var count = r.ReadInt32();
             for (var i = 0; i < count; i++) {
@@ -1117,9 +1354,151 @@ namespace Protobot.Online {
                 if (!keyed.TryGetValue(key, out var k)) continue;
                 k.p = p;
                 k.r = q;
+                k.heard = true;
+                k.heardAt = Time.time;
                 PlaceExact(k);
             }
             Physics.SyncTransforms();
+        }
+
+        // ------------------------------------------------------------------ rejoining (a player who left comes back)
+
+        [Serializable]
+        private class SpawnInfo {
+            public int key;
+            public string kind;
+        }
+
+        [Serializable]
+        private class RejoinInfo {
+            public MatchPlan plan;
+            public List<string> packets = new();   // each robot's packet (JSON)
+            public List<SpawnInfo> spawns = new();
+            public float timeLeft;
+            public bool running;
+        }
+
+        private readonly List<SpawnInfo> spawned = new();   // the host: every piece it made (preloads, match loads)
+
+        /// <summary>The host: a player of this match connected again (they left, or their app closed): they get the
+        /// whole match to catch up with.</summary>
+        private void OnClientConnected(ulong clientId) {
+            if (!IsHost || game == null || !running) return;
+            var player = MatchSessions.PlayerOfClient(clientId);
+            var seat = plan.seats.FirstOrDefault(s => s.playerId == player);
+            if (seat == null || seat.robot == me) return;
+            var info = new RejoinInfo { plan = plan, timeLeft = game.timeLeft, running = game.state == SkillsGame.State.Running };
+            foreach (var p in packets.Values.OrderBy(p => p.robot)) info.packets.Add(JsonUtility.ToJson(p));
+            info.spawns.AddRange(spawned);
+            Send(clientId, Msg.Rejoin, Pack(JsonUtility.ToJson(info)), true);
+            Debug.Log("[Match] " + seat.name + " is back: sending the match");
+            Record("rejoin", seat.robot, seat.name + " rejoined");
+        }
+
+        /// <summary>The player coming back: the game round their own robot (its start as it was), every other robot
+        /// loaded, then straight into the running match.</summary>
+        private void BeginRejoin(RejoinInfo info) {
+            plan = info.plan;
+            var seat = plan.seats.FirstOrDefault(s => s.playerId == OnlineServices.PlayerId);
+            if (seat == null) {
+                Abort(null, false);
+                return;
+            }
+            me = seat.robot;
+            foreach (var json in info.packets) {
+                var p = JsonUtility.FromJson<RobotPacket>(json);
+                packets[p.robot] = p;
+            }
+            OnlineWindow.Close();
+            OnlineLaunch.CloseLaunchWindow();
+            Dialog.CloseAll();
+            Popup.Close();
+            if (SkillsGame.Active) SkillsGame.Current.Exit();
+            if (Sandbox.Running) Sandbox.Stop();
+            var games = GameDefinition.All();
+            var settings = Protobot.GraphicsQuality.GraphicsSettingsManager.Current;
+            var light = settings != null && settings.preset <= Protobot.GraphicsQuality.GraphicsPreset.Low;
+            SkillsGame.Open(games.Length > 0 ? games[0] : null, light, SkillsGame.Mode.Match);
+            game = SkillsGame.Current;
+            if (game == null || !packets.TryGetValue(me, out var mine)) {
+                Interface.Interface.Say("Couldn't rejoin the match: open the same robot and try again", false);
+                Abort(null, false);
+                return;
+            }
+            game.online = true;
+            game.onlineClient = true;
+            game.onlineLocked = true;
+            game.SetAlliance(seat.red);
+            game.SetQuadrant((Quadrant)seat.quadrant);
+            game.SetSkipAutonomous(plan.skipAutonomous);
+            game.SetPose(mine.x, mine.y, mine.heading);
+            game.Exited += OnExited;
+            game.Finishing += OnFinishing;
+            game.onlineMidfield = MidfieldCounts;
+            MakePacket(seat, game.preload);   // (numbers this computer's parts as before)
+            GameUi.CloseAll();
+            Interface.Interface.Say("Rejoining the match…", false);
+            loadStarted = true;
+            StartCoroutine(LoadRobots(info));
+        }
+
+        private void GoRejoin(RejoinInfo info) {
+            Go();
+            if (!running) return;
+            var field = game.field;
+            foreach (var s in info.spawns) {
+                Rigidbody body;
+                if (s.kind == "Cup") {
+                    var stock = field.StockCup();
+                    if (stock == null) continue;
+                    var cup = field.MakeCup(stock.transform, Sandbox.Instance.Root, field.transform.position, field.transform.rotation, false);
+                    game.Cups.Add(cup);
+                    body = cup.body;
+                }
+                else {
+                    var stock = field.StockPin(s.kind);
+                    if (stock == null) continue;
+                    var pin = field.MakePin(stock.transform, Sandbox.Instance.Root, field.transform.position, field.transform.rotation, false);
+                    game.Pins.Add(pin);
+                    body = pin.body;
+                }
+                KeyBody(s.key, body);
+            }
+            // Straight into the match as it is now.
+            game.countdown = 0f;
+            game.timeLeft = info.timeLeft;
+            game.state = info.running ? SkillsGame.State.Running : SkillsGame.State.Countdown;
+            Sandbox.DriveEnabled = info.running && !game.InAutonomous;
+            ToHost(Msg.RejoinReady, BitConverter.GetBytes(me), true);
+        }
+
+        /// <summary>The host: the player is set up again: their robot back to them, everyone's owners, where everything is.</summary>
+        private void HostRejoined(ulong sender) {
+            var player = MatchSessions.PlayerOfClient(sender);
+            var seat = plan.seats.FirstOrDefault(s => s.playerId == player);
+            if (seat == null) return;
+            departed.Remove(seat.robot);
+            seatHeardAt[seat.robot] = Time.time;
+            foreach (var k in keyed.Values.Where(k => k.robot == seat.robot)) SetOwner(k, seat.robot);
+            using (var owners = new MemoryStream()) {
+                foreach (var k in keyed.Values) {
+                    owners.Write(BitConverter.GetBytes(k.key), 0, 4);
+                    owners.Write(BitConverter.GetBytes(k.owner), 0, 4);
+                }
+                ToClients(Msg.Owner, owners.ToArray(), true);
+            }
+            var t = game.field.transform;
+            var inverse = Quaternion.Inverse(t.rotation);
+            using var stream = new MemoryStream();
+            using (var w = new BinaryWriter(stream)) {
+                w.Write(keyed.Count);
+                foreach (var k in keyed.Values) {
+                    w.Write(k.key);
+                    WritePose(w, t.InverseTransformPoint(k.Position), inverse * k.Rotation);
+                }
+            }
+            Send(sender, Msg.Sync, stream.ToArray(), true);
+            Interface.Interface.Say(seat.name + " rejoined the match", false);
         }
 
         private void Update() {
@@ -1134,14 +1513,17 @@ namespace Protobot.Online {
                 if (IsHost) HostEnding();
                 return;
             }
+            if (disabled.Contains(me)) Sandbox.DriveEnabled = false;   // (switched off for the rest of the match)
             Claims();
             RecordRobots();
+            DrawHold();
             if (Time.unscaledTime >= nextState) {
                 nextState = Time.unscaledTime + StateEvery;
                 SendState();
             }
             if (IsHost) {
                 if (Time.time - startedAt > 3f) TakeOverDeparted();
+                CheckHolding();
                 HostEnding();
             }
         }
@@ -1171,6 +1553,8 @@ namespace Protobot.Online {
         }
 
         private void Cleanup() {
+            Highlights.Clear("holding");
+            if (NetworkManager.Singleton != null) NetworkManager.Singleton.OnClientConnectedCallback -= OnClientConnected;
             if (ping != null) Destroy(ping.gameObject);
             if (TestDrive != 0f) Sandbox.TestSticks = null;
             Sandbox.RobotOf = null;
