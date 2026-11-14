@@ -38,6 +38,25 @@ namespace Protobot.Motion {
         /// <summary>Off before a match starts and after it ends: motors and cylinders take no commands.</summary>
         public static bool DriveEnabled = true;
 
+        // V2 online matches (Scripts/Online/OnlineMatch): several robots in one simulation, each driven by its player.
+        /// <summary>A robot's controls for this frame: drive power per side and its keys.</summary>
+        public struct DriveInput {
+            public float left, right;
+            public System.Func<Key, bool> held, pressed;
+        }
+        /// <summary>Which robot a part belongs to (null: one robot).</summary>
+        public static System.Func<GameObject, int> RobotOf;
+        /// <summary>A robot's controls; null (or a null answer) is this computer's keys and gamepad.</summary>
+        public static System.Func<int, DriveInput?> InputOf;
+        /// <summary>The robot the camera follows when there are several.</summary>
+        public static int LocalRobot;
+        /// <summary>Another computer runs the simulation: this one only shows where everything is (OnlineMatch sets it).</summary>
+        public static bool Puppet;
+
+        /// <summary>The simulation's bodies: the nodes each holds (parts, rods, leaves) and its rigid body.</summary>
+        public IEnumerable<(IReadOnlyList<GameObject> nodes, Rigidbody rb)> Bodies() =>
+            bodies.Where(b => b.rb != null).Select(b => ((IReadOnlyList<GameObject>)b.nodes, b.rb));
+
         // Which simulation layers touch: the robot everything, the ground the robot and game elements, game elements
         // everything, the field's fixed parts the robot and game elements.
         private static bool Touches(int a, int b) {
@@ -56,6 +75,9 @@ namespace Protobot.Motion {
             var now = Matrix4x4.TRS(body.rb.position, body.rb.rotation, Vector3.one);
             return now.MultiplyPoint3x4(body.startInverse.MultiplyPoint3x4(world));
         }
+
+        /// <summary>V2: whether a part is one of the simulation's bodies (or rides on one).</summary>
+        public static bool Simulated(GameObject part) => instance != null && part != null && instance.bodyOf.TryGetValue(part, out var body) && body.rb != null;
 
         public static Vector3 SimDirection(GameObject part, Vector3 direction) {
             if (instance == null || part == null || !instance.bodyOf.TryGetValue(part, out var body) || body.rb == null) return direction;
@@ -161,13 +183,17 @@ namespace Protobot.Motion {
         // ------------------------------------------------------------------ starting and stopping
 
         public static void Toggle() {
+            if (Hosted) {   // V2: a game (or an online match) runs it: its own buttons stop it
+                Interface.Interface.Say("The game is running the simulation: use its own buttons (Leave match, End run)", false);
+                return;
+            }
             if (Running) Stop();
             else Begin();
         }
 
         public static void Begin() {
             if (Running) return;
-            if (InputEvents.TextInput.ShortcutsPaused) {
+            if (InputEvents.TextInput.ShortcutsPaused && RobotOf == null) {   // (an online match closes them itself)
                 Interface.Interface.Say("Close the open window first", false);
                 return;
             }
@@ -406,6 +432,8 @@ namespace Protobot.Motion {
             foreach (var body in bodies)
                 if (body.rb != null) body.startInverse = Matrix4x4.TRS(body.rb.position, body.rb.rotation, Vector3.one).inverse;
             main = bodies.OrderByDescending(b => b.mass).First();
+            if (RobotOf != null)   // V2: several robots: the camera follows this computer's
+                main = bodies.Where(b => b.nodes.Any(n => RobotOf(n) == LocalRobot)).OrderByDescending(b => b.mass).FirstOrDefault() ?? main;
 
             // Ground: the grid, or the build's lowest point if it's below it.
             var ground = new GameObject("Ground") { layer = GroundLayer };
@@ -415,6 +443,7 @@ namespace Protobot.Motion {
             box.center = new Vector3(0f, (FloorHeight ?? floor) - 1f, 0f);
             box.sharedMaterial = Material(1f);
             BuildEnvironment?.Invoke(root);   // V2: a game's field and game elements
+            if (Puppet) Physics.simulationMode = SimulationMode.Script;   // V2: positions come from the host
 
             // Collisions within the robot only where parts don't start out touching (gears in mesh, a wheel on its
             // channel would fight).
@@ -715,7 +744,7 @@ namespace Protobot.Motion {
         private void BogieFriction() {
             const float PinFriction = 0.25f, PinRadius = 0.08f;
             foreach (var (wheel, frame, joint, axisLocal) in bogieWheels) {
-                if (wheel == null || frame == null) continue;
+                if (wheel == null || frame == null || wheel.isKinematic) continue;
                 var axis = wheel.transform.TransformDirection(axisLocal);
                 var spin = Vector3.Dot(wheel.angularVelocity - frame.angularVelocity, axis);
                 if (Mathf.Abs(spin) < 1e-4f) continue;
@@ -1215,13 +1244,31 @@ namespace Protobot.Motion {
                 Stop();
                 return;
             }
+            if (Puppet) {   // V2: another computer simulates; motors only make their sound
+                foreach (var train in trains)
+                    foreach (var (motor, _) in train.motors) motor.Sound(0f);
+                return;
+            }
             var typing = InputEvents.TextInput.IsTyping || InputEvents.TextInput.ShortcutsPaused || !DriveEnabled;
             var (left, right) = DriveEnabled ? DrivePower() : (0f, 0f);
+            // V2: a robot driven from another computer (an online match) takes its player's controls.
+            DriveInput? InputFor(GameObject part) => InputOf?.Invoke(RobotOf?.Invoke(part) ?? 0);
             foreach (var train in trains)
                 foreach (var (motor, _) in train.motors) {
                     var side = Controls.Side(motor.gameObject);
+                    var remote = InputFor(motor.gameObject);
                     float direction;
-                    if (side == "L") direction = left;
+                    if (remote is DriveInput r) {
+                        direction = 0f;
+                        if (!DriveEnabled) { }
+                        else if (side == "L") direction = r.left;
+                        else if (side == "R") direction = r.right;
+                        else {
+                            if (r.held(Controls.ForwardKey(motor.gameObject))) direction += 1f;
+                            if (r.held(Controls.ReverseKey(motor.gameObject))) direction -= 1f;
+                        }
+                    }
+                    else if (side == "L") direction = left;
                     else if (side == "R") direction = right;
                     else {
                         direction = 0f;
@@ -1232,7 +1279,10 @@ namespace Protobot.Motion {
                 }
             // V2: one key per cylinder. Air to both ends: out, in. Air to one end: that way (stiff), then loose.
             foreach (var slide in slides) {
-                if (typing || !Controls.Pressed(Controls.CylinderKey(slide.cylinder.gameObject))) continue;
+                var key = Controls.CylinderKey(slide.cylinder.gameObject);
+                var remote = InputFor(slide.cylinder.gameObject);
+                var pressed = remote is DriveInput r ? DriveEnabled && r.pressed(key) : !typing && Controls.Pressed(key);
+                if (!pressed) continue;
                 if (slide.ports == PneumaticCylinder.AirPorts.Both) {
                     slide.extended = !slide.extended;
                     slide.loose = false;
@@ -1269,7 +1319,8 @@ namespace Protobot.Motion {
         }
 
         private void FixedUpdate() {
-            foreach (var train in trains) Turn(train);
+            foreach (var train in trains)
+                if (!train.rotors.Any(r => r.rb != null && r.rb.isKinematic)) Turn(train);   // V2: (another computer drives that robot)
             RunChains(Time.fixedDeltaTime);
             foreach (var slide in slides) slide.rod.WakeUp();
             Omnis();
@@ -1341,7 +1392,7 @@ namespace Protobot.Motion {
             var touching = Mathf.Max(1, contacts.Select(c => c.collider).Distinct().Count());
             foreach (var (collider, point, normalIn, impulse, other) in contacts) {
                 var wheel = omnis.FirstOrDefault(w => w.collider == collider);
-                if (wheel == null || wheel.rb == null) continue;
+                if (wheel == null || wheel.rb == null || wheel.rb.isKinematic) continue;
                 var rb = wheel.rb;
                 var axis = WheelAxis(wheel);
                 var normal = normalIn;

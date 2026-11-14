@@ -191,6 +191,24 @@ namespace Protobot.Builds {
             }
         }
 
+        /// <summary>V2: a message with a file to the developer's Discord channel (player reports use it too); done(true)
+        /// when it went.</summary>
+        public static IEnumerator Post(string content, byte[] file, string fileName, Action<bool> done) {
+            if (string.IsNullOrEmpty(Webhook)) {
+                done?.Invoke(false);
+                yield break;
+            }
+            var form = new List<IMultipartFormSection> {
+                new MultipartFormDataSection("payload_json", "{\"content\":" + Json(content) + "}"),
+                new MultipartFormFileSection("files[0]", file, fileName, "application/zip"),
+            };
+            using var request = UnityWebRequest.Post(Webhook, form);
+            request.timeout = 60;
+            yield return request.SendWebRequest();
+            if (request.result != UnityWebRequest.Result.Success) Debug.LogWarning("[BugReport] Couldn't send: " + request.error);
+            done?.Invoke(request.result == UnityWebRequest.Result.Success);
+        }
+
         private static string Json(string s) {
             var sb = new StringBuilder("\"");
             foreach (var c in s) {

@@ -298,6 +298,12 @@ namespace Protobot.Game {
 
             buttons.gameObject.SetActive(true);
             buttons.gameObject.AddComponent<FadeIn>().delay = delay + 0.2f;
+            if (game.online) {   // V2: an online match goes back to its lobby (the host starts the next one)
+                var lobby = Ui.Button(buttons, "Lobby", "Back to the lobby", game.Exit, true, 8f);
+                lobby.Size(200f, 40f);
+                Audio.Sounds.Play(Audio.Sounds.Pop, 0.5f);
+                return;
+            }
             var exit = Ui.Button(buttons, "Exit", "Exit game", game.Exit, false, 8f);
             exit.targetGraphic.color = new Color(1f, 1f, 1f, 0.1f);
             exit.Size(140f, 40f);

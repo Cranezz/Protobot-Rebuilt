@@ -58,6 +58,8 @@ if __name__ == "__main__":
         args = {"action": "execute", "code": open(raw, encoding="utf-8").read()}
     else:
         args = json.load(open(raw, encoding="utf-8")) if os.path.exists(raw) else json.loads(raw)
+    # Only ever this project's editor (another Unity project may be open on this computer).
+    args.setdefault("unity_instance", "ProtobotRebuiltV2@689891f909fd4217")
     for m in call(tool, args):
         res = m.get("result") or m.get("error")
         if isinstance(res, dict) and "content" in res:

@@ -56,6 +56,11 @@ namespace Protobot.Interface {
             Destroy(gameObject);
         }
 
+        /// <summary>Closes every open window (an online match starting: it needs the keys and the view).</summary>
+        public static void CloseAll() {
+            foreach (var dialog in FindObjectsByType<Dialog>(FindObjectsSortMode.None)) dialog.Close();
+        }
+
         private void OnDestroy() {
             OpenCount = Mathf.Max(0, OpenCount - 1);
             OnClose?.Invoke();

@@ -259,6 +259,27 @@ namespace Protobot.Online {
             }
         }
 
+        /// <summary>V2: Report and Vote kick for another player (the lobby's rows and the match's Players window).</summary>
+        public static void PlayerButtons(Transform row, string id, string who) {
+            var report = Ui.Button(row, "Report", "Report", () => PlayerReports.Open(id, who), false, 8f, Theme.FontSmall);
+            report.targetGraphic.color = new Color(1f, 1f, 1f, 0.08f);
+            report.Size(-1, 30f);
+            Ui.Tip(report, "Report " + who, null, "Tell the moderators about cheating or unfair play. The match record goes with it.");
+            var session = MatchSessions.Current;
+            if (session == null || id == session.Host) return;
+            var votes = MatchSessions.KickVotes(id);
+            var needed = MatchSessions.KickVotesNeeded();
+            var voted = MatchSessions.VotedFor(id);
+            var vote = Ui.Button(row, "Vote kick", (voted ? "Take back vote" : "Vote kick") + (votes > 0 ? "  " + votes + "/" + needed : ""),
+                () => MatchSessions.VoteKick(id), false, 8f, Theme.FontSmall);
+            vote.targetGraphic.color = voted ? new Color(0.9f, 0.3f, 0.3f, 0.35f) : new Color(1f, 1f, 1f, 0.08f);
+            vote.Size(-1, 30f);
+            vote.interactable = MatchSessions.CanVoteKick(id);
+            Ui.Tip(vote, "Vote kick", null, session.Players.Count >= 3
+                ? "They're removed when " + needed + " players vote (more than half of the others), and can't come back to this match."
+                : "Needs 3 players or more (with two, leave the match, or the host can remove them).");
+        }
+
         private void BackToMenu() {
             Close();
             var splash = Resources.FindObjectsOfTypeAll<Button>().FirstOrDefault(b => b.name == "Splash Screen Button" && b.gameObject.scene.IsValid());
@@ -616,6 +637,7 @@ namespace Protobot.Online {
                 var robot = MatchSessions.Get(player, MatchSessions.RobotKey);
                 Ui.Text(row, "Robot", string.IsNullOrEmpty(robot) ? "no robot yet" : robot, Theme.FontSmall, new Color(1f, 1f, 1f, string.IsNullOrEmpty(robot) ? 0.4f : 0.7f)).Size(200f, 40f);
                 Ui.Text(row, "Ready", ready ? "Ready" : "Not ready", Theme.FontSmall, ready ? Theme.Success : new Color(1f, 1f, 1f, 0.45f), Theme.Medium, TextAlignmentOptions.Center).Size(80f, 40f);
+                if (player.Id != me) PlayerButtons(row, player.Id, who);
                 if (session.IsHost && player.Id != me) {
                     var id = player.Id;
                     var kick = Ui.Button(row, "Remove", "Remove", () => MatchSessions.Kick(id), false, 8f, Theme.FontSmall);
@@ -659,8 +681,10 @@ namespace Protobot.Online {
             if (myReady) readyButton.targetGraphic.color = new Color(1f, 1f, 1f, 0.08f);
             readyButton.Size(120f, 40f);
             if (session.IsHost) {
-                var start = Ui.Button(choices, "Start", "Start match", () =>
-                    Interface.Interface.Say("Everyone is connected. Playing the match on one field is the next part being built.", false), true, 8f);
+                var start = Ui.Button(choices, "Start", "Start match", () => {
+                    var problem = OnlineMatch.HostStart();
+                    if (problem != null) Interface.Interface.Say(problem, false);
+                }, true, 8f);
                 start.Size(150f, 40f);
                 start.interactable = everyoneReady;
                 Ui.Tip(start, "Start match", null, everyoneReady ? "Everyone is ready." : "Waiting until every player has an alliance and is ready (2 players at least).");

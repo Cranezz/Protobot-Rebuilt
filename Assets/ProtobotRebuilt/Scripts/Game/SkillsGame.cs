@@ -79,6 +79,23 @@ namespace Protobot.Game {
 
         public event Action Changed;
 
+        // V2: an online match (Online/OnlineMatch) runs this game on every computer: the host simulates, the others show it.
+        public bool online, onlineClient, onlineMayStart;
+        /// <summary>Online: a Match Load asked for (the host drops it); true when it was sent.</summary>
+        public Func<string, bool> onlineDrop;
+        /// <summary>The score is about to be taken (the host sends the final positions first).</summary>
+        public event Action Finishing;
+        /// <summary>The game was left (Exit).</summary>
+        public event Action Exited;
+        public List<Pin> Pins => pins;
+        public List<Cup> Cups => cups;
+        public List<Toggle> Toggles => toggles;
+        /// <summary>Online: the host said the run is over: take the score now (the positions are the host's).</summary>
+        public void FinishNow() {
+            if (state == State.Running || state == State.Countdown) EndRun();
+            if (state == State.Ending) Finish();
+        }
+
         // ------------------------------------------------------------------ opening and closing
 
         public static void Open(GameDefinition definition, bool lightField, Mode mode = Mode.Skills) {
@@ -137,6 +154,7 @@ namespace Protobot.Game {
         }
 
         public void Exit() {
+            Exited?.Invoke();
             if (Sandbox.Running) Sandbox.Stop();
             ClearHosting();
             if (field != null) Destroy(field.gameObject);
@@ -619,6 +637,7 @@ namespace Protobot.Game {
 
         public void StartRun() {
             if (state != State.Setup && state != State.Results) return;
+            if (online && !onlineMayStart) return;   // V2: the host starts an online match
             if (Sandbox.Running) Sandbox.Stop();
             field.ShowOriginals();
             if (!Legal) Interface.Interface.Say("Not a legal start (see the checklist): running it as practice", false);
@@ -717,9 +736,26 @@ namespace Protobot.Game {
                 Interface.Interface.Say("No " + LoadName(kind) + " left", false);
                 return;
             }
+            if (onlineDrop != null) {   // V2: online, the host drops it (into this player's Alliance's Loader)
+                if (onlineDrop(kind)) {
+                    matchLoads[kind] = left - 1;
+                    Audio.Sounds.Play(Audio.Sounds.Tick);
+                    Changed?.Invoke();
+                }
+                return;
+            }
+            SpawnMatchLoad(kind, Red, loader);
+            matchLoads[kind] = left - 1;
+            Audio.Sounds.Play(Audio.Sounds.Tick);
+            Interface.Interface.Say($"Match Load: {LoadName(kind)} into the {(loader == 0 ? "first" : "second")} {(Red ? "red" : "blue")} Loader ({left - 1} left)", true);
+            Changed?.Invoke();
+        }
+
+        /// <summary>V2: a Match Load of a kind into an Alliance's Loader (on top of what's in it); the piece made.</summary>
+        public Component SpawnMatchLoad(string kind, bool red, int loaderIndex) {
             var root = Sandbox.Instance.Root;
             // Into the Loader, on top of whatever is already in it (a drive team feeds it from above).
-            var at = field.LoaderDrop(loader, Red);
+            var at = field.LoaderDrop(loaderIndex, red);
             var floor = field.HeightOf(at) - 15.5f;
             var stack = 0f;
             foreach (var body in root.GetComponentsInChildren<Rigidbody>())
@@ -729,27 +765,25 @@ namespace Protobot.Game {
             var up = Quaternion.LookRotation(Vector3.up, field.transform.forward);
             if (kind == "Cup") {
                 var stock = field.StockCup();
-                if (stock == null) return;
+                if (stock == null) return null;
                 var cup = field.MakeCup(stock.transform, root, at, up, false);
                 // Opaque half up, as the cups start on the field.
                 if (Vector3.Dot(cup.transform.TransformDirection(cup.opaqueDirection), Vector3.up) < 0f)
                     cup.transform.rotation = Quaternion.AngleAxis(180f, field.transform.right) * cup.transform.rotation;
                 cups.Add(cup);
+                return cup;
             }
             else {
                 var stock = field.StockPin(kind);
-                if (stock == null) return;
+                if (stock == null) return null;
                 var pin = field.MakePin(stock.transform, root, at, up, false);
                 // Its alliance color on top.
                 var colored = pin.halves.FindIndex(h => h.color != PieceColor.Yellow);
                 if (colored >= 0 && Vector3.Dot(pin.transform.TransformDirection(pin.halves[colored].direction), Vector3.up) < 0f)
                     pin.transform.rotation = Quaternion.AngleAxis(180f, field.transform.right) * pin.transform.rotation;
                 pins.Add(pin);
+                return pin;
             }
-            matchLoads[kind] = left - 1;
-            Audio.Sounds.Play(Audio.Sounds.Tick);
-            Interface.Interface.Say($"Match Load: {LoadName(kind)} into the {(loader == 0 ? "first" : "second")} {(Red ? "red" : "blue")} Loader ({left - 1} left)", true);
-            Changed?.Invoke();
         }
 
         public static string LoadName(string kind) => kind switch {
@@ -761,6 +795,7 @@ namespace Protobot.Game {
             var typing = InputEvents.TextInput.IsTyping || InputEvents.TextInput.ShortcutsPaused;
             switch (state) {
                 case State.Setup:
+                    if (online) break;   // V2: an online match sets every robot's start itself
                     DrawSetup();
                     if (keyboard != null && !typing) SetupKeys(keyboard);
                     break;
@@ -773,7 +808,7 @@ namespace Protobot.Game {
                         Audio.Sounds.Play(Audio.Sounds.Tick);
                         Interface.Interface.Say(InAutonomous ? "Autonomous: 0:15 (robot code comes later: your robot waits)" : "Go!", true);
                     }
-                    if (keyboard != null && keyboard.escapeKey.wasPressedThisFrame && !typing) BackToSetup();
+                    if (keyboard != null && keyboard.escapeKey.wasPressedThisFrame && !typing && !online) BackToSetup();
                     break;
                 case State.Running:
                     var wasAutonomous = InAutonomous;
@@ -788,11 +823,12 @@ namespace Protobot.Game {
                         timeLeft = 0f;
                         EndRun();
                     }
-                    else if (keyboard != null && keyboard.escapeKey.wasPressedThisFrame && !typing) EndRun();
+                    else if (keyboard != null && keyboard.escapeKey.wasPressedThisFrame && !typing && !online) EndRun();
                     break;
                 case State.Ending:
                     // SC1: the score is taken when everything is still, or 5 seconds after the end.
-                    if (Time.time - endingSince > 5f || (Time.time - endingSince > 0.5f && Still())) Finish();
+                    // V2: online, the host decides (its pieces are the real ones) and tells the others (FinishNow).
+                    if (!onlineClient && (Time.time - endingSince > 5f || (Time.time - endingSince > 0.5f && Still()))) Finish();
                     break;
             }
             if ((state == State.Running || state == State.Ending || state == State.Countdown) && Time.time >= nextScore) {
@@ -809,6 +845,8 @@ namespace Protobot.Game {
         }
 
         private void Finish() {
+            Finishing?.Invoke();   // V2: online, the host sends the final positions first
+            if (onlineClient) Physics.SyncTransforms();
             score = Evaluate();
             state = State.Results;
             Sandbox.DriveEnabled = false;
@@ -848,7 +886,7 @@ namespace Protobot.Game {
         // ------------------------------------------------------------------ setup view
 
         private void SetupKeys(Keyboard k) {
-            if (k.escapeKey.wasPressedThisFrame && !Popup.IsOpen && Dialog.OpenCount == 0 && !setupTools.UsedEscape) {
+            if (k.escapeKey.wasPressedThisFrame && !Popup.IsOpen && Dialog.OpenCount == 0 && !setupTools.UsedEscape && !online) {
                 Exit();
                 return;
             }

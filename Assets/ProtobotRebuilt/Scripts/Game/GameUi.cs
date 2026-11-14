@@ -531,10 +531,19 @@ namespace Protobot.Game {
                 loaderText.rectTransform.Fill();
 
                 // End / back.
+                if (game.online) {   // V2: an online match runs to its end; leaving leaves the robot switched off
+                    var leave = Ui.Button(transform, "Leave", "Leave match", game.Exit, false, 7f);
+                    ((RectTransform)leave.transform).Place(new Vector2(1f, 0f), new Vector2(1f, 0f), new Vector2(-14f, 14f), new Vector2(150f, 40f));
+                    var players = Ui.Button(transform, "Players", "Players…", Online.OnlineMatch.PlayersDialog, false, 7f);
+                    ((RectTransform)players.transform).Place(new Vector2(1f, 0f), new Vector2(1f, 0f), new Vector2(-174f, 14f), new Vector2(150f, 40f));
+                    Ui.Tip(players, "Players", null, "Who's playing: report a player, or vote to kick one.");
+                }
+                else {
                 var end = Ui.Button(transform, "End", "End run (Esc)", () => game.EndRun(), false, 7f);
                 ((RectTransform)end.transform).Place(new Vector2(1f, 0f), new Vector2(1f, 0f), new Vector2(-14f, 14f), new Vector2(150f, 40f));
                 var setupButton = Ui.Button(transform, "Setup", "Back to setup", game.BackToSetup, false, 7f);
                 ((RectTransform)setupButton.transform).Place(new Vector2(1f, 0f), new Vector2(1f, 0f), new Vector2(-174f, 14f), new Vector2(150f, 40f));
+                }
 
                 countdown = Ui.Text(transform, "Countdown", "", 140f, Color.white, Theme.Bold, TextAlignmentOptions.Center);
                 countdown.rectTransform.Place(new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0f, 40f), new Vector2(600f, 200f));

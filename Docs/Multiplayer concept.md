@@ -80,6 +80,30 @@ Play game > Play online…, or File > Play online….
 
 ## 3. 2v2 matches
 
+**Built (2026-11-14, first version, `Scripts/Online/OnlineMatch.cs`):**
+- The host presses Start match: seats by Alliance and join order (red Left then Bottom, blue Right then Top).
+- Every computer opens Match practice round its own robot, sends its build (gzipped JSON, in 1 KB pieces) and loads the
+  others' robots at their default starts. The host simulates everything; the others don't simulate and follow the
+  host's poses (20 a second, in the field's frame, smoothed); their controls go to the host 30 times a second.
+- Preloads and Match Loads are made by the host and announced. The host takes the score and sends the final
+  positions, so every computer shows the same score; then everyone goes back to the lobby.
+- A player who leaves mid-match: their robot stays, switched off (no controls arrive). The host leaving ends it.
+- Tested with two copies on one computer: both robots end within 0.01" of each other on both screens, every body is
+  followed, two matches in a row, a player quitting mid-match, a Match Load from the joining player.
+
+**Ownership (built 2026-11-14):** each player's computer simulates their own robot and the pieces it touches (the host
+settles who owns a piece), so driving and picking up have no delay for anyone, the host included; the others follow at
+the owner's positions carried on by their speeds. Robot vs robot: you feel the other robot as solid at once, it moves
+when its owner's computer gets the push. Final positions come from each owner; the host scores once. The host checks
+robot moves (impossible speeds, jumps) and records them for reports. Player reports (to the Discord channel, with the
+match record) and vote kick (3+ players, more than half of the others) are built.
+
+**Not built yet:** setting up your start in an online match (everyone starts at the default), alliance scores (red
+vs blue: the score is Match practice's for now), autonomous (needs robot code), Rejoin, rules (pinning, disabling),
+stats.
+
+The plan:
+
 - **Host authority.** The host's computer runs the field and all four robots (`Sandbox` with every robot):
   - Each player sends their controls about 60 times a second.
   - The host sends the poses of moving bodies about 30 times a second.
@@ -136,9 +160,9 @@ uses.
 
 ## Order
 
-1. Lobby (done). Next: link the project, then test with two copies.
+1. Lobby (done; linked to Unity Cloud and tested with two copies).
 2. Accounts, the skills leaderboard, rule checks, replays, reports.
-3. Robots synced over the network, 2v2 match flow, rules in matches, stats.
+3. Robots synced over the network, 2v2 match flow (first version done), rules in matches, stats.
 4. Voice chat.
 5. The controller screen.
 6. Robot code: the libraries and simulated hardware, the compiler and sandbox, the editor tab, file watching.

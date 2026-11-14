@@ -27,6 +27,8 @@ namespace Protobot.Online {
         public const string GameKey = "game", ModeKey = "mode", BuildKey = "build", VersionKey = "version", HostKey = "hostname";
         // Player property keys.
         public const string NameKey = "name", TeamKey = "team", ReadyKey = "ready", RobotKey = "robot";
+        /// <summary>V2: the player this player votes to kick ("" none).</summary>
+        public const string KickKey = "kick";
 
         public static readonly string[] Modes = { "2v2 match", "1v1 match", "Skills race" };
         public static readonly int[] ModePlayers = { 4, 2, 8 };
@@ -64,6 +66,9 @@ namespace Protobot.Online {
 
         /// <summary>Which session player each network connection is (filled on the host).</summary>
         private static readonly Dictionary<ulong, string> players = new();
+
+        /// <summary>The host: which session player a network connection is ("" when unknown).</summary>
+        public static string PlayerOfClient(ulong clientId) => players.TryGetValue(clientId, out var id) ? id : "";
 
         /// <summary>Tells the host who this is when connecting (the services' player id).</summary>
         private static void SayWhoIAm() =>
@@ -161,6 +166,8 @@ namespace Protobot.Online {
                 if (text.IndexOf("password", StringComparison.OrdinalIgnoreCase) >= 0 || e is SessionException s && s.Error == SessionError.Forbidden)
                     return string.IsNullOrEmpty(password) ? "This match has a password." : "Wrong password.";
                 if (text.IndexOf("full", StringComparison.OrdinalIgnoreCase) >= 0) return "That match is full.";
+                // V2: the host removes a player it kicked as soon as they're in, which breaks the join half way.
+                if (text.Contains("23006")) return "That match turned you away (players removed from a match can't join it again).";
                 return "Couldn't join: " + OnlineServices.Explain(e);
             }
         }
@@ -185,6 +192,8 @@ namespace Protobot.Online {
 
         private static void Use(ISession session) {
             Current = session;
+            banned.Clear();
+            removing.Clear();
             session.Changed += Notify;
             session.PlayerJoined += OnJoined;
             session.PlayerHasLeft += OnLeft;
@@ -206,9 +215,18 @@ namespace Protobot.Online {
             if (Current == session) Current = null;
         }
 
-        private static void Notify() => Changed?.Invoke();
+        private static void Notify() {
+            CountVotes();
+            Changed?.Invoke();
+        }
+
         private static void OnJoined(string id) {
             ActionLog.Write("online", "player joined " + id);
+            if (IsHost && banned.Contains(id)) {   // kicked from this match: not back in
+                ActionLog.Write("online", "removed " + id + " again (kicked from this match)");
+                Kick(id);
+                return;
+            }
             Audio.Sounds.Play(Audio.Sounds.Tick);
             Notify();
         }
@@ -268,6 +286,7 @@ namespace Protobot.Online {
             [TeamKey] = new(team < 0 ? "" : team == 0 ? "red" : "blue"),
             [ReadyKey] = new("0"),
             [RobotKey] = new(RobotName()),
+            [KickKey] = new(""),
         };
 
         public static string RobotName() {
@@ -293,9 +312,40 @@ namespace Protobot.Online {
 
         public static bool IsHost => Current != null && Current.IsHost;
 
-        /// <summary>The host removes a player.</summary>
+        // ------------------------------------------------------------------ vote kick
+
+        // V2: any player can vote to kick another (not the host: the host can remove players, and leaving the host's
+        // match is the way out of it). With 3 players or more, a player is removed when more than half of the others
+        // (2 at least) vote for it, and can't come back to that match.
+        private static readonly HashSet<string> banned = new(), removing = new();
+
+        public static int KickVotes(string target) => Current == null ? 0 : Current.Players.Count(p => p.Id != target && Get(p, KickKey) == target);
+        public static int KickVotesNeeded() => Current == null ? 2 : Math.Max(2, (Current.Players.Count - 1) / 2 + 1);
+        public static bool CanVoteKick(string target) => Current != null && Current.Players.Count >= 3 && target != Current.Host && target != Current.CurrentPlayer?.Id;
+        public static bool VotedFor(string target) => Current != null && Get(Current.CurrentPlayer, KickKey) == target;
+
+        /// <summary>This player's vote to kick a player (again: takes it back).</summary>
+        public static void VoteKick(string target) {
+            if (!CanVoteKick(target)) return;
+            Set(KickKey, VotedFor(target) ? "" : target);
+            ActionLog.Write("online", (VotedFor(target) ? "voted to kick " : "took back the vote to kick ") + target);
+        }
+
+        private static void CountVotes() {
+            var session = Current;
+            if (session == null || !session.IsHost || session.Players.Count < 3) return;
+            foreach (var p in session.Players.ToList()) {
+                if (p.Id == session.Host || removing.Contains(p.Id) || KickVotes(p.Id) < KickVotesNeeded()) continue;
+                removing.Add(p.Id);
+                ActionLog.Write("online", "voted out " + Get(p, NameKey) + " (" + p.Id + ")");
+                Kick(p.Id);
+            }
+        }
+
+        /// <summary>The host removes a player (they can't come back to this match).</summary>
         public static async void Kick(string playerId) {
             if (!IsHost) return;
+            banned.Add(playerId);
             try { await Current.AsHost().RemovePlayerAsync(playerId); }
             catch (Exception e) { Interface.Interface.Say("Couldn't remove them: " + OnlineServices.Explain(e), false); }
         }
