@@ -1,0 +1,1 @@
+var et = UnityEngine.Object.FindFirstObjectByType<Protobot.Motion.ElasticTool>(); return "et " + (et != null) + " active " + (et != null && et.isActiveAndEnabled) + " path " + (et != null ? et.transform.parent.name : "") + " timeScale " + Time.timeScale;

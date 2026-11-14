@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Protobot {
 [RequireComponent(typeof(Camera))]
@@ -40,19 +40,28 @@ namespace Protobot {
         private RaycastHit Cast() {
             var mouseRay = ray;
             if (Physics.Raycast(mouseRay, out RaycastHit lastHit, Mathf.Infinity, layerMask)) {
-                if (lastHit.collider.gameObject.transform.root.gameObject.layer != Placement.PLACEMENT_LAYER)
+                if (lastHit.collider.gameObject.transform.root.gameObject.layer != Placement.PLACEMENT_LAYER) {
+                    // V2: while placing, a hole near the mouse wins over the part around it: ports sit a little inside
+                    // a valve's or cylinder's body and small holes are hard to hit, so a fitting, screw or standoff
+                    // over the body beside a hole goes into the hole.
+                    if (Placement.IsPlacing && !lastHit.collider.CompareTag("HoleCollider") && (layerMask & (1 << HoleCollider.HOLE_COLLISIONS_LAYER)) != 0) {
+                        var near = NearestHole(mouseRay, lastHit.distance + 0.35f);
+                        if (near.collider != null) return near;
+                    }
                     return lastHit;
+                }
                 return new RaycastHit();
             }
 
             // V2: holes are small and nearly edge-on from most angles; when only holes can be picked, a hole
             // near the mouse counts too.
-            if (layerMask == LayerMask.GetMask("HoleCollisions"))
-                return NearestHole(mouseRay);
+            if (layerMask == LayerMask.GetMask("HoleCollisions") || (Placement.IsPlacing && (layerMask & (1 << HoleCollider.HOLE_COLLISIONS_LAYER)) != 0))
+                return NearestHole(mouseRay, Mathf.Infinity);
             return new RaycastHit();
         }
 
-        private RaycastHit NearestHole(Ray mouseRay) {
+        // maxDistance: how far from the camera the hole's near face may be (behind the part hit, it's hidden).
+        private RaycastHit NearestHole(Ray mouseRay, float maxDistance) {
             Vector2 mouse = MouseInput.Position;
             var best = new RaycastHit();
             var bestPixels = HolePickPixels * Mathf.Max(1f, Screen.dpi / 96f);
@@ -60,7 +69,12 @@ namespace Protobot {
                 var hole = candidate.collider.transform;
                 if (hole.root.gameObject.layer == Placement.PLACEMENT_LAYER)
                     continue;
-                var screen = camera.WorldToScreenPoint(hole.position);
+                var axis = hole.forward;
+                var facing = Vector3.Dot(axis, mouseRay.direction) > 0f ? -axis : axis;
+                var nearFace = hole.position + facing * hole.lossyScale.z / 2f;
+                if (Vector3.Distance(mouseRay.origin, nearFace) > maxDistance)
+                    continue;
+                var screen = camera.WorldToScreenPoint(nearFace);   // V2: the face the part goes on, not the hole's middle
                 if (screen.z <= 0f)
                     continue;
                 var pixels = Vector2.Distance(mouse, screen);
@@ -69,9 +83,8 @@ namespace Protobot {
                 bestPixels = pixels;
                 best = candidate;
                 // The hole's face that looks at the camera, as a direct hit on it would give.
-                var axis = hole.forward;
-                best.normal = Vector3.Dot(axis, mouseRay.direction) > 0f ? -axis : axis;
-                best.point = hole.position;
+                best.normal = facing;
+                best.point = nearFace;
             }
             return best;
         }

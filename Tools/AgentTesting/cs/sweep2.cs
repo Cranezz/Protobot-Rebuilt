@@ -1,0 +1,27 @@
+var log = new System.Text.StringBuilder();
+var pt = System.Type.GetType("Protobot.Editor.Playtest, Protobot.Editor");
+System.Action<int> F = n => pt.GetMethod("Frames").Invoke(null, new object[] { n });
+System.Action<string, System.Func<string>> Step = (name, a) => { try { var r = a(); F(3); log.Append("ok " + name + " " + r + "\n"); } catch (System.Exception e) { var x = e.InnerException ?? e; log.Append("FAIL " + name + ": " + x.GetType().Name + " " + x.Message + " @ " + (x.StackTrace ?? "").Split('\n')[0] + "\n"); } };
+System.Func<string, GameObject> Find = prefix => { foreach (var s in UnityEngine.Object.FindObjectsByType<Protobot.SavedObject>(FindObjectsSortMode.None)) if (s.id.StartsWith(prefix) && s.gameObject.layer == 0) return s.gameObject; return null; };
+System.Action Undo = () => { foreach (var b in Resources.FindObjectsOfTypeAll<UnityEngine.UI.Button>()) if (b.name == "Undo" && b.gameObject.scene.IsValid() && b.transform.parent != null && b.transform.parent.name == "Functions Bar") { b.onClick.Invoke(); return; } };
+System.Action Redo = () => { foreach (var b in Resources.FindObjectsOfTypeAll<UnityEngine.UI.Button>()) if (b.name == "Redo" && b.gameObject.scene.IsValid() && b.transform.parent != null && b.transform.parent.name == "Functions Bar") { b.onClick.Invoke(); return; } };
+int before = Protobot.PartsManager.FindLoadedObjects().Count;
+Step("mirror a channel", () => { var c = Find("CCHL"); Protobot.Tools.MirrorTool.Mirror(new System.Collections.Generic.List<GameObject> { c }, c.transform.right, c.transform.position + c.transform.right * 3f, 3f); return "count " + Protobot.PartsManager.FindLoadedObjects().Count; });
+Step("undo mirror", () => { Undo(); F(10); int live = 0; foreach (var o in Protobot.PartsManager.FindLoadedObjects()) if (o.activeInHierarchy) live++; return "live " + live + " (before " + before + ")"; });
+Step("redo mirror", () => { Redo(); F(10); int live = 0; foreach (var o in Protobot.PartsManager.FindLoadedObjects()) if (o.activeInHierarchy) live++; return "live " + live; });
+Step("cut a channel", () => { var c = Find("CCHL"); var mf = c.GetComponent<MeshFilter>(); var ok = Protobot.Tools.PartCutting.Cut(c, c.transform.position, c.transform.right); return "cut " + ok; });
+Step("drill a plate/channel", () => { var c = Find("CCHL"); var holes = Protobot.Tools.PartDrilling.Holes(c); var ok = holes.Count > 0 && Protobot.Tools.PartDrilling.Drill(c, 0, 0.25f); return "holes " + holes.Count + " drilled " + ok; });
+Step("motors run", () => { var n = 0; foreach (var m in Protobot.Motion.MotorDrive.Live()) { m.Run(1); n++; } F(20); foreach (var m in Protobot.Motion.MotorDrive.Live()) m.StopToggle(); return n + " motors"; });
+Step("cylinder", () => { var c = UnityEngine.Object.FindFirstObjectByType<Protobot.Motion.PneumaticCylinder>(); if (c == null) return "none"; c.Set(true); F(30); c.Set(false); return "toggled"; });
+Step("undo x6", () => { for (var i = 0; i < 6; i++) { Undo(); F(4); } return "done"; });
+Step("redo x6", () => { for (var i = 0; i < 6; i++) { Redo(); F(4); } return "done"; });
+Step("save round trip", () => {
+  var data = Protobot.Builds.SceneBuild.ToBuildData(); data.name = "roundtrip";
+  var path = @"C:/Dev/ProtobotRebuiltV2/ProtobotRebuiltV2/Tools/AgentTesting/roundtrip.pbb";
+  var write = typeof(Protobot.Builds.BuildFile).GetMethod("Write"); if (write == null) return "no Write";
+  var ps = write.GetParameters(); string sig = ""; foreach (var p in ps) sig += p.ParameterType.Name + " ";
+  if (ps.Length == 2) write.Invoke(null, ps[0].ParameterType == typeof(string) ? new object[] { path, data } : new object[] { data, path }); else return "Write(" + sig + ")";
+  var back = Protobot.Builds.BuildFile.Read(path);
+  return "saved " + data.parts.Length + " read back " + back.parts.Length;
+});
+return log.ToString();

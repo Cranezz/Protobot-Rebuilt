@@ -1,0 +1,13 @@
+var sb = new System.Text.StringBuilder();
+var pc = UnityEngine.Object.FindFirstObjectByType<Protobot.Motion.PneumaticCylinder>();
+var thread = pc.Thread;
+sb.Append("thread connects " + thread.GetComponent<Protobot.Screw>().CanFormConnection + " neighbours " + string.Join(",", System.Linq.Enumerable.Select(Protobot.GroupManager.Neighbours(thread.gameObject), g => g.name)) + "\n");
+var group = Protobot.ConnectedObjExtensions.GetConnectedObjects(pc.gameObject, true);
+var mech = Protobot.Motion.Linkage.Analyze(group);
+var bodies = mech.bodies;
+sb.Append("group " + group.Count + " bodies " + bodies.Count + "\n");
+var mount = GameObject.Find("Cylinder Mount(Clone)"); var before = mount.transform.position;
+pc.BeginManual(); pc.ManualTo(0.5f); pc.EndManual();
+sb.Append("rod half: mount moved " + Vector3.Distance(before, mount.transform.position).ToString("F3") + " (stroke/2 " + (pc.Stroke / 2f).ToString("F3") + ") token " + Protobot.Motion.Dynamics.Token(pc.gameObject, "piston") + "\n");
+pc.BeginManual(); pc.ManualTo(2f); pc.EndManual(); sb.Append("asked 2.0 -> position " + pc.Position + "\n");
+return sb.ToString();

@@ -1,0 +1,1 @@
+return "running " + Protobot.Motion.Sandbox.Running + " playing " + EditorApplication.isPlaying + " paused " + EditorApplication.isPaused + " rbs " + UnityEngine.Object.FindObjectsByType<Rigidbody>(FindObjectsSortMode.None).Length;

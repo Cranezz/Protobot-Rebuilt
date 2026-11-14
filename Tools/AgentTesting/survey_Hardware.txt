@@ -1,0 +1,90 @@
+0	1/4" screw	SCRW-1/4in	
+1	3/8" screw	SCRW-3/8in	
+2	1/2" screw	SCRW-1/2in	
+3	5/8" screw	SCRW-5/8in	
+4	3/4" screw	SCRW-3/4in	
+5	7/8" screw	SCRW-7/8in	
+6	1.00" screw	SCRW-1.00in	
+7	1.25" screw	SCRW-1.25in	
+8	1.50" screw	SCRW-1.50in	
+9	1.75" screw	SCRW-1.75in	
+10	2.00" screw	SCRW-2.00in	
+11	2.25" screw	SCRW-2.25in	
+12	2.50" screw	SCRW-2.50in	
+13	0.29" Shoulder Screw (0.09" shoulder)	VXHARDWARE-0.29" Shoulder Screw (0.09" shoulder)	holes 0 size (0.31, 0.31, 0.38)
+14	3/8" Shoulder Screw (0.12" shoulder)	VXHARDWARE-3/8" Shoulder Screw (0.12" shoulder)	holes 0 size (0.31, 0.31, 0.46)
+15	1/2" Shoulder Screw (0.04" shoulder)	VXHARDWARE-1/2" Shoulder Screw (0.04" shoulder)	holes 0 size (0.31, 0.31, 0.59)
+16	1/2" Shoulder Screw (0.18" shoulder)	VXHARDWARE-1/2" Shoulder Screw (0.18" shoulder)	holes 0 size (0.31, 0.31, 0.59)
+17	1.00" Shoulder Screw (0.12" shoulder)	VXHARDWARE-1.00" Shoulder Screw (0.12" shoulder)	holes 0 size (0.31, 0.31, 1.09)
+18	1.50" Shoulder Screw (0.18" shoulder)	VXHARDWARE-1.50" Shoulder Screw (0.18" shoulder)	holes 0 size (0.31, 0.31, 1.59)
+19	2.00" Shoulder Screw (0.04" shoulder)	VXHARDWARE-2.00" Shoulder Screw (0.04" shoulder)	holes 0 size (0.31, 0.31, 2.09)
+20	Lock nut	NUT-Lock	
+21	Keps nut	NUT-Keps	
+22	Hex nut	NUT-Hex	
+23	Low Profile nut	NUT-Low Profile	
+24	1/4" standoff	SNDF-1/4in	
+25	1/2" standoff	SNDF-1/2in	
+26	3/4" standoff	SNDF-3/4in	
+27	1.00" standoff	SNDF-1.00in	
+28	1.50" standoff	SNDF-1.50in	
+29	2.00" standoff	SNDF-2.00in	
+30	2.50" standoff	SNDF-2.50in	
+31	3.00" standoff	SNDF-3.00in	
+32	4.00" standoff	SNDF-4.00in	
+33	5.00" standoff	SNDF-5.00in	
+34	6.00" standoff	SNDF-6.00in	
+35	1/8" nylon spacer	SPCR-Nylon-1/8in	
+36	1/4" nylon spacer	SPCR-Nylon-1/4in	
+37	3/8" nylon spacer	SPCR-Nylon-3/8in	
+38	1/2" nylon spacer	SPCR-Nylon-1/2in	
+39	7/8" Nylon Spacer	VXSPACERS-7/8" Nylon Spacer (3/8" OD)	holes 1 size (0.38, 0.38, 0.88)
+40	1.00" Nylon Spacer	VXSPACERS-1.00" Nylon Spacer (3/8" OD)	holes 1 size (0.38, 0.38, 1.00)
+41	1/8" Nylon Spacer	VXSPACERS-1/8" Nylon Spacer (5/16" OD)	holes 1 size (0.37, 0.37, 0.13)
+42	1/4" Nylon Spacer	VXSPACERS-1/4" Nylon Spacer (5/16" OD)	holes 1 size (0.37, 0.37, 0.25)
+43	3/8" Nylon Spacer	VXSPACERS-3/8" Nylon Spacer (5/16" OD)	holes 1 size (0.38, 0.37, 0.38)
+44	1/2" Nylon Spacer	VXSPACERS-1/2" Nylon Spacer (5/16" OD)	holes 1 size (0.38, 0.37, 0.50)
+45	7/8" Nylon Spacer	VXSPACERS-7/8" Nylon Spacer (5/16" OD)	holes 1 size (0.38, 0.38, 0.88)
+46	1/8" Black Nylon Spacer	VXSPACERS-1/8" Black Nylon Spacer (1/2" OD)	holes 1 size (0.50, 0.50, 0.13)
+47	1/4" Black Nylon Spacer	VXSPACERS-1/4" Black Nylon Spacer (1/2" OD)	holes 1 size (0.50, 0.50, 0.25)
+48	3/8" Black Nylon Spacer	VXSPACERS-3/8" Black Nylon Spacer (1/2" OD)	holes 1 size (0.50, 0.50, 0.38)
+49	1/2" Black Nylon Spacer	VXSPACERS-1/2" Black Nylon Spacer (1/2" OD)	holes 1 size (0.50, 0.50, 0.50)
+50	1/8" White Nylon Spacer	VXSPACERS-1/8" White Nylon Spacer (1/2" OD)	holes 1 size (0.50, 0.50, 0.13)
+51	1/4" White Nylon Spacer	VXSPACERS-1/4" White Nylon Spacer (1/2" OD)	holes 1 size (0.50, 0.50, 0.25)
+52	3/8" White Nylon Spacer	VXSPACERS-3/8" White Nylon Spacer (1/2" OD)	holes 1 size (0.50, 0.50, 0.38)
+53	1/2" White Nylon Spacer	VXSPACERS-1/2" White Nylon Spacer (1/2" OD)	holes 1 size (0.50, 0.50, 0.50)
+54	1/16" HS spacer	SPCR-High Strength-1/16in	
+55	1/8" HS spacer	SPCR-High Strength-1/8in	
+56	1/4" HS spacer	SPCR-High Strength-1/4in	
+57	1/2" HS spacer	SPCR-High Strength-1/2in	
+58	4.6mm plastic spacer	SPCR-Plastic-4.6mm	
+59	8mm plastic spacer	SPCR-Plastic-8mm	
+60	1/16" Click On Spacer	VXSPACERS-1/16" Click On Spacer	holes 1 size (0.34, 0.37, 0.06)
+61	1/8" Click On Spacer	VXSPACERS-1/8" Click On Spacer	holes 1 size (0.34, 0.37, 0.13)
+62	1/4" Click On Spacer	VXSPACERS-1/4" Click On Spacer	holes 1 size (0.34, 0.37, 0.25)
+63	0.02" (3/8" OD)	VXSPACERS-0.02" Steel Washer (3/8" OD)	holes 1 size (0.37, 0.37, 0.02)
+64	0.03" (3/8" OD)	VXSPACERS-0.03" Steel Washer (3/8" OD)	holes 1 size (0.37, 0.37, 0.03)
+65	1/16" (3/8" OD)	VXSPACERS-1/16" Steel Washer (3/8" OD)	holes 1 size (0.37, 0.37, 0.06)
+66	0.03" (3/8" OD)	VXSPACERS-0.03" Teflon Washer (3/8" OD)	holes 1 size (0.37, 0.37, 0.03)
+67	0.04" (3/8" OD)	VXSPACERS-0.04" Teflon Washer (3/8" OD)	holes 1 size (0.37, 0.37, 0.04)
+68	1/16" (3/8" OD)	VXSPACERS-1/16" Teflon Washer (3/8" OD)	holes 1 size (0.37, 0.37, 0.06)
+69	0.04" (1/2" OD)	VXSPACERS-0.04" Teflon Washer (1/2" OD)	holes 1 size (0.50, 0.50, 0.04)
+70	Shaft collar	CLMP-Normal-Normal	
+71	Clamping shaft collar	CLMP-Clamping-Normal	
+72	HS clamping shaft collar	CLMP-Clamping-High Strength	
+73	Low profile HS clamping shaft collar	CLMP-Clamping-Low Profile HS	
+74	Rubber Shaft Collar	VXSHAFTPARTS-Rubber Shaft Collar	holes 1 size (0.43, 0.38, 0.25)
+75	Nut retainer	HexNR-Nut Retainer	
+76	1 Post Hex Nut Retainer	VXSTRUCTUREPARTS-1 Post Hex Nut Retainer	holes 2 size (0.85, 0.46, 0.37)
+77	4 Post Hex Nut Retainer	VXSTRUCTUREPARTS-4 Post Hex Nut Retainer	holes 4 size (0.68, 0.68, 0.37)
+78	1 Post Standoff Retainer	VXSTRUCTUREPARTS-1 Post Standoff Retainer	holes 1 size (0.79, 0.37, 0.37)
+79	4 Post Standoff Retainer	VXSTRUCTUREPARTS-4 Post Standoff Retainer	holes 1 size (0.68, 0.68, 0.37)
+80	Bearing retainer	HexNR-Bearing Retainer	
+81	Square retainer	HexNR-Square Retainer	
+82	1 Post Bearing Flat Hex Retainer	VXMOTIONPARTS-1 Post Bearing Flat Hex Retainer	holes 2 size (1.25, 0.46, 0.37)
+83	1 Post Bearing Flat Standoff Retainer	VXMOTIONPARTS-1 Post Bearing Flat Standoff Retainer	holes 2 size (1.25, 0.37, 0.37)
+84	Coupler	VXHARDWARE-Coupler	holes 0 size (0.16, 0.16, 0.50)
+85	1/2" Hex Coupler	VXHARDWARE-1/2" Hex Coupler	holes 0 size (0.16, 0.16, 0.50)
+86	1.00" Hex Coupler	VXHARDWARE-1.00" Hex Coupler	holes 0 size (0.16, 0.16, 1.00)
+87	1/2" Star Coupler	VXHARDWARE-1/2" Star Coupler	holes 0 size (0.16, 0.16, 0.50)
+88	1.00" Star Coupler	VXHARDWARE-1.00" Star Coupler	holes 0 size (0.16, 0.16, 1.00)
+89	Rubber Link	VXHARDWARE-Rubber Link	holes 0 size (0.41, 0.41, 1.23)

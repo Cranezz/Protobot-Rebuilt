@@ -1,0 +1,1 @@
+return "elastic " + Protobot.Motion.ElasticTool.Active + " tube " + Protobot.Motion.TubeTool.Active + " placing " + Protobot.Placement.IsPlacing + " frame " + Time.frameCount + " mouse " + UnityEngine.InputSystem.Mouse.current.position.ReadValue();

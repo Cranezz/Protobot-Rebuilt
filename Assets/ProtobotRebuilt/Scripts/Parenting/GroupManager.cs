@@ -26,6 +26,20 @@ namespace Protobot {
             }
         }
         
+        /// <summary>V2: holds two parts together without a screw (a slide truck in its slide member).</summary>
+        public static void Link(GameObject a, GameObject b) {
+            if (a == null || b == null) return;
+            Graph.TryAdd(a, new HashSet<GameObject>());
+            Graph.TryAdd(b, new HashSet<GameObject>());
+            Graph[a].Add(b);
+            Graph[b].Add(a);
+        }
+
+        public static void Unlink(GameObject a, GameObject b) {
+            if (a != null && Graph.ContainsKey(a)) Graph[a].Remove(b);
+            if (b != null && Graph.ContainsKey(b)) Graph[b].Remove(a);
+        }
+
         /// <summary>
         /// Destroys the connection formed between these two objects
         /// </summary>

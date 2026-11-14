@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -106,7 +106,7 @@ namespace Protobot.Builds {
                 Interface.Interface.Say("Couldn't save the build: " + e.Message, false);
                 return;
             }
-            Interface.Interface.Say("Saved " + PathToFileName(buildPath));
+            Interface.Interface.Announce("Saved " + PathToFileName(buildPath));
 
             savedBuildData = sceneBuildData;
             OnSaveBuild?.Invoke(sceneBuildData);
@@ -193,6 +193,12 @@ namespace Protobot.Builds {
         /// <param name="newData"></param>
         /// <param name="newPath"></param>
         public void AttemptLoad(BuildData newData, string newPath) {
+            // V2: a copy of this build saved before Protobot closed unexpectedly, newer than the file: offered first.
+            if (!skipRecoveryCheck && CrashGuard.OfferForOpen(newPath, () => {
+                    skipRecoveryCheck = true;
+                    AttemptLoad(newData, newPath);
+                    skipRecoveryCheck = false;
+                })) return;
             attemptData = newData;
             attemptPath = newPath;
 
@@ -211,6 +217,17 @@ namespace Protobot.Builds {
                 return;
             }
             SaveThen(LoadAttempt);  // V2
+        }
+
+        private bool skipRecoveryCheck;
+
+        /// <summary>V2: a recovery copy (CrashGuard) opened as the build at <paramref name="originalPath"/>, with its
+        /// changes unsaved (saving writes them to that file).</summary>
+        public void LoadRecovered(BuildData data, string originalPath) {
+            SceneBuild.GenerateBuild(data);
+            buildPath = originalPath ?? "";
+            savedBuildData = buildPath != "" && File.Exists(buildPath) ? ParsePath(buildPath) ?? SceneBuild.DefaultBuild : SceneBuild.DefaultBuild;
+            FindObjectOfType<PartListOutput>()?.CalculatePartsList();
         }
 
         public void LoadAttempt() {

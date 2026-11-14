@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Experimental.Rendering;
 using UnityEngine.Rendering;
@@ -20,6 +20,9 @@ namespace Protobot.Rendering
 
         /// <summary>The per-renderer outline colour (MaterialPropertyBlock), read by the mask shader.</summary>
         public static readonly int ObjectColorId = Shader.PropertyToID("_OutlineObjectColor");
+
+        /// <summary>V2: no outlines while set (a saved picture of the robot).</summary>
+        public static bool Suppressed;
 
         /// <summary>Outlines a renderer in <paramref name="color"/>, or stops outlining it.</summary>
         public static void SetOutline(Renderer renderer, bool on, Color color = default)
@@ -76,7 +79,7 @@ namespace Protobot.Rendering
                 return;
             if (renderingData.cameraData.renderType == CameraRenderType.Overlay)
                 return;  // the hand-held tool camera
-            if (!AnyOutlined())
+            if (Suppressed || !AnyOutlined())
                 return;
             if (maskMaterial == null)
                 maskMaterial = CoreUtils.CreateEngineMaterial(maskShader);

@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using Protobot.Builds;
 using System;
@@ -14,6 +14,9 @@ namespace Protobot.UI {
         public void UpdateUI(string path, BuildsManager _buildsManager) {
             buildPath = path;
             buildNameText.text = BuildsManager.PathToFileName(path);
+            // V2: a long name stays on one line, cut short (long ones ran over the next row).
+            buildNameText.textWrappingMode = TextWrappingModes.NoWrap;
+            buildNameText.overflowMode = TextOverflowModes.Ellipsis;
             buildsManager = _buildsManager;
         }
 

@@ -1,0 +1,25 @@
+0	25mm cylinder	PNMT-25mm-Normal	
+1	50mm cylinder	PNMT-50mm-Normal	
+2	75mm cylinder	PNMT-75mm-Normal	
+3	Cylinder Mount	VXPNEUMATICS-Cylinder Mount	holes 3 size (0.50, 0.60, 0.75)
+4	Cylinder Rod Pivot	VXPNEUMATICS-Cylinder Rod Pivot	holes 4 size (1.40, 0.67, 0.58)
+5	Piston Nut	VXPNEUMATICS-Piston Nut	holes 1 size (0.31, 0.11, 0.36)
+6	V5 reservoir	TANK-V5	
+7	Legacy reservoir	TANK-Legacy	
+8	Fitting for Cylinders	VXPNEUMATICS-Fitting for Cylinders	holes 0 size (0.31, 0.31, 0.74)
+9	Fitting for Reservoir	VXPNEUMATICS-Fitting for Reservoir	holes 0 size (0.51, 0.44, 0.87)
+10	Fitting for Valves	VXPNEUMATICS-Fitting for Valves	holes 0 size (0.31, 0.31, 0.64)
+11	T Fitting	VXPNEUMATICS-T Fitting	holes 4 size (1.42, 0.42, 1.04)
+12	Air Flow Valve Fitting	VXPNEUMATICS-Air Flow Valve Fitting	holes 1 size (0.99, 0.44, 1.08)
+13	Elbow Fitting	VXPNEUMATICS-Elbow Fitting	holes 1 size (0.45, 0.92, 1.11)
+14	Pneumatic Fitting Plug	VXPNEUMATICS-Pneumatic Fitting Plug	holes 0 size (0.19, 0.19, 1.08)
+15	Straight Pneumatic Fitting	VXPNEUMATICS-Straight Pneumatic Fitting	holes 1 size (0.45, 0.39, 0.87)
+16	Tee Fittings	VXPNEUMATICS-Tee Fittings	holes 5 size (1.47, 0.44, 0.96)
+17	Pneumatic Hand Valve	VXPNEUMATICS-Pneumatic Hand Valve	holes 6 size (1.83, 1.62, 0.70)
+18	Schrader Valve	VXPNEUMATICS-Schrader Valve	holes 1 size (1.24, 0.45, 0.39)
+19	Flow Meter	VXPNEUMATICS-Flow Meter	holes 1 size (0.87, 0.38, 1.22)
+20	On Off Switch	VXPNEUMATICS-On Off Switch	holes 4 size (1.87, 0.71, 1.61)
+21	Pressure Regulator	VXPNEUMATICS-Pressure Regulator	holes 2 size (1.13, 0.42, 2.20)
+22	Solenoid   Double Acting	VXPNEUMATICS-Solenoid   Double Acting	holes 7 size (2.22, 0.65, 1.61)
+23	Solenoid   Single Acting	VXPNEUMATICS-Solenoid   Single Acting	holes 5 size (0.90, 0.83, 1.40)
+24	Manifold Assembly	VXPNEUMATICS-Manifold Assembly	holes 6 size (1.43, 1.00, 1.29)

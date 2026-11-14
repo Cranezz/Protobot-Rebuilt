@@ -20,6 +20,10 @@ namespace Protobot {
             partTypes = partTypes.Concat(Custom.CustomPartGenerator.CreateTypes()).ToArray();
             // V2: chains (made round sprockets by the chain tool).
             partTypes = partTypes.Append(Motion.ChainPartGenerator.CreateType()).ToArray();
+            // V2: rubber bands and latex tubing (loops round posts) and pneumatic tubing (routed between fittings).
+            partTypes = partTypes.Append(Motion.ElasticPartGenerator.CreateType()).ToArray();
+            partTypes = partTypes.Append(Motion.TubePartGenerator.CreateType()).ToArray();
+            partTypes = partTypes.Append(Motion.WirePartGenerator.CreateType()).ToArray();   // V2: cables
         }
 
         public static PartType GetPartType(string id) {
@@ -97,8 +101,12 @@ namespace Protobot {
 
         /// <Summary> Destroys all loaded parts in the current scene </Summary>
         public static void DestroyLoadedObjects() {
-            foreach (var obj in FindLoadedObjects())
+            // V2: switched off first: Destroy waits for the frame's end, and a build opened in the same frame (the same
+            // build again, or parts in the same places) had its screws find these holes, then sort destroyed ones.
+            foreach (var obj in FindLoadedObjects()) {
+                obj.SetActive(false);
                 GameObject.Destroy(obj);
+            }
         }
     }
 }

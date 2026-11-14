@@ -344,6 +344,30 @@ namespace Protobot.Motion {
                         }
                     }
             }
+            // V2: universal joints: the shaft in one yoke turns the shaft in the other (the same way along the path
+            // the turn takes through the joint). Done after the gears, over every rotor the system reached.
+            for (var i = 0; i < system.rotors.Count; i++) {
+                var rotor = system.rotors[i];
+                foreach (var part in rotor.parts) {
+                    var joint = part != null ? part.GetComponentInParent<UniversalJoint>() : null;
+                    if (joint == null || joint.Yoke == null) continue;
+                    foreach (var other in all) {
+                        if (other == rotor || !other.parts.Any(p => p != null && p != rotor.shaft && p.GetComponentInParent<UniversalJoint>() == joint)) continue;
+                        var c = joint.Cross;
+                        Vector3 Middle(Rotor r) => r.start + r.axis * ((r.low + r.high) / 2f);
+                        var ratio = system.ratio[rotor] * Mathf.Sign(Vector3.Dot(rotor.axis, c - Middle(rotor))) * Mathf.Sign(Vector3.Dot(other.axis, Middle(other) - c));
+                        if (system.ratio.TryGetValue(other, out var known)) {
+                            if (Mathf.Abs(known - ratio) > 0.01f * Mathf.Abs(known) && !system.jammed) {
+                                system.jammed = true;
+                                system.jamReason = "a universal joint and the gears drive a shaft two ways at once";
+                            }
+                            continue;
+                        }
+                        system.ratio[other] = ratio;
+                        system.rotors.Add(other);
+                    }
+                }
+            }
             var stuck = system.rotors.FirstOrDefault(r => r.fixedToFrame);
             if (stuck != null && !system.jammed) {
                 system.jammed = true;

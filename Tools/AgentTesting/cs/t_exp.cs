@@ -1,0 +1,11 @@
+var pic = Protobot.Builds.PictureSaver.Save();
+var t = typeof(Protobot.Builds.ModelExport);
+var gather = t.GetMethod("Gather", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+var shapes = gather.Invoke(null, new object[] { null });
+var obj = t.GetMethod("WriteObj", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+var stl = t.GetMethod("WriteStl", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+var sw = System.Diagnostics.Stopwatch.StartNew();
+var n1 = obj.Invoke(null, new object[] { @"C:/Users/kille/AppData/Local/Temp/claude/5b0c4ec0a185a9e3/4fe6ed7d-e179-4b4f-b31d-ea600198646e/scratchpad/robot.obj", shapes, 25.4f });
+var t1 = sw.ElapsedMilliseconds; sw.Restart();
+var n2 = stl.Invoke(null, new object[] { @"C:/Users/kille/AppData/Local/Temp/claude/5b0c4ec0a185a9e3/4fe6ed7d-e179-4b4f-b31d-ea600198646e/scratchpad/robot.stl", shapes, 25.4f });
+return "pic " + pic + " | obj tris " + n1 + " in " + t1 + " ms | stl tris " + n2 + " in " + sw.ElapsedMilliseconds + " ms";

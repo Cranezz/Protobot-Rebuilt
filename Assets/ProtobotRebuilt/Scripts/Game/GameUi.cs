@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 using System.Linq;
 using Protobot.GraphicsQuality;
 using Protobot.Interface;
@@ -60,6 +60,12 @@ namespace Protobot.Game {
             }
         }
 
+        /// <summary>V2: the run's HUD goes when the score reveal starts.</summary>
+        public static void HideHud() {
+            if (hud != null) Object.Destroy(hud.gameObject);
+            hud = null;
+        }
+
         public static void CloseAll() {
             if (setup != null) Object.Destroy(setup.gameObject);
             if (hud != null) Object.Destroy(hud.gameObject);
@@ -101,7 +107,21 @@ namespace Protobot.Game {
                 if (close != null) close.onClick.Invoke();
                 OpenPlay();
             });
-            var y = -100f;
+            // V2: Multiplayer under Play game (the online screen: server list, leaderboard, matches).
+            var multiplayer = Object.Instantiate(open.gameObject, open.transform.parent);
+            multiplayer.name = "Multiplayer Button";
+            ((RectTransform)multiplayer.transform).anchoredPosition = ((RectTransform)open.transform).anchoredPosition + new Vector2(0f, -50f);
+            var multiplayerLabel = multiplayer.GetComponentInChildren<TextMeshProUGUI>(true);
+            if (multiplayerLabel != null) multiplayerLabel.text = "Multiplayer";
+            var multiplayerButton = multiplayer.GetComponent<Button>();
+            multiplayerButton.onClick = new Button.ButtonClickedEvent();
+            multiplayerButton.onClick.AddListener(() => {
+                if (close != null) close.onClick.Invoke();
+                Online.OnlineWindow.Open();
+            });
+            // The recent builds list moves down to make room (it has space left at the bottom).
+            if (open.transform.parent.parent.Find("Builds Menu") is RectTransform recent) recent.anchoredPosition += new Vector2(0f, -25f);
+            var y = -125f;
             foreach (var name in new[] { "Report Bugs Button", "Patch Notes Button", "Credits" }) {
                 var other = open.transform.parent.Find(name) as RectTransform;
                 if (other == null) continue;
@@ -130,10 +150,11 @@ namespace Protobot.Game {
             var gameRow = Dialog.Row(body, "Game", 40f, 130f);
             Popup.Choice(gameRow, games.Select(g => g.Name).ToArray(), 0, i => chosen = i, 380f);
 
+            // V2: Robot Skills or a match (practice on your own), each with its own start, preload and timing.
             var modeRow = Dialog.Row(body, "Mode", 40f, 130f);
-            var mode = Ui.Text(modeRow, "Mode", "Driving Skills · 1:00", Theme.FontBody, Theme.Text, Theme.Medium);
-            mode.Size(-1, 40f);
-            var later = Ui.Text(body, "Later", "Autonomous Coding Skills and matches against other players are coming later.", Theme.FontSmall, Theme.TextFaint);
+            var modeChoice = 0;
+            Popup.Choice(modeRow, new[] { "Driving Skills · 1:00", "Match practice · 0:15 + 1:45" }, 0, i => modeChoice = i, 380f);
+            var later = Ui.Text(body, "Later", "Match practice starts like a match: one Quadrant on your Alliance's side, your Alliance's preload. Against other players: Multiplayer.", Theme.FontSmall, Theme.TextFaint);
             later.margin = new Vector4(138, 0, 0, 0);
             later.textWrappingMode = TextWrappingModes.Normal;
             later.Size(-1, 34f);
@@ -147,7 +168,7 @@ namespace Protobot.Game {
             var open = Ui.Button(robotRow, "Open", "Open a build…", () => {
                 dialog.Close();
                 if (manager != null) manager.OpenBuild();
-                Interface.Interface.Say("Open your robot, then File > Play game… again", true);
+                Interface.Interface.Say("Open your robot, then File > Play game… again", false);
             }, false, 6f);
             open.Size(-1, 34f);
 
@@ -158,11 +179,17 @@ namespace Protobot.Game {
             fieldNote.textWrappingMode = TextWrappingModes.Normal;
             fieldNote.Size(-1, 34f);
 
+            // V2: online matches (Online/OnlineWindow).
+            var online = Ui.Button(dialog.Footer, "Online", "Multiplayer…", () => {
+                dialog.Close();
+                Online.OnlineWindow.Open();
+            }, false, 6f);
+            online.Size(-1f, 36f);
             var cancel = Ui.Button(dialog.Footer, "Cancel", "Cancel", dialog.Close, false, 6f);
             cancel.Size(-1f, 36f);
             var start = Ui.Button(dialog.Footer, "Start", "Set up the field", () => {
                 dialog.Close();
-                SkillsGame.Open(games[chosen], light);
+                SkillsGame.Open(games[chosen], light, modeChoice == 1 ? SkillsGame.Mode.Match : SkillsGame.Mode.Skills);
             }, true, 6f);
             start.Size(-1f, 36f);
             start.interactable = count > 0;
@@ -196,14 +223,18 @@ namespace Protobot.Game {
             private void OnDisable() { if (game != null) game.Changed -= MarkDirty; }
             private void MarkDirty() => dirty = true;
 
+            private float built;
+
             private void LateUpdate() {
-                if (dirty && !InputEvents.TextInput.IsTyping) {
+                // V2: at most ten times a second (dragging the robot changes it every frame).
+                if (dirty && !InputEvents.TextInput.IsTyping && Time.unscaledTime - built > 0.1f) {
                     dirty = false;
                     Build();
                 }
             }
 
             public void Build() {
+                built = Time.unscaledTime;
                 game.Changed -= MarkDirty;
                 game.Changed += MarkDirty;
                 // Rebuilt after every change (the wheel over a value changes it a step at a time): keep the scroll.
@@ -227,9 +258,9 @@ namespace Protobot.Game {
                 scroll.movementType = ScrollRect.MovementType.Clamped;
                 scroll.scrollSensitivity = 30f;
 
-                var title = Ui.Text(column, "Title", "Driving Skills", Theme.FontTitle + 4f, Theme.Text, Theme.Medium);
+                var title = Ui.Text(column, "Title", game.ModeName, Theme.FontTitle + 4f, Theme.Text, Theme.Medium);
                 title.Size(-1, 30f);
-                var sub = Ui.Text(column, "Sub", $"{game.definition.Name} · {Clock(game.definition.skillsSeconds)}", Theme.FontSmall, Theme.TextDim);
+                var sub = Ui.Text(column, "Sub", $"{game.definition.Name} · " + (game.mode == SkillsGame.Mode.Skills ? Clock(game.definition.skillsSeconds) : "0:15 autonomous + 1:45 driver"), Theme.FontSmall, Theme.TextDim);
                 sub.Size(-1, 20f);
 
                 // The robot.
@@ -246,28 +277,80 @@ namespace Protobot.Game {
                 Ui.Tip(frontRow, "The robot's front", null, "Which side of the build is its front (the yellow arrow points to it). Headings are the way the front faces.");
 
                 // The start.
+                // V2: a match: the Alliance and its Quadrant, and the autonomous period.
+                if (game.mode == SkillsGame.Mode.Match) {
+                    Dialog.Heading(column, "Alliance and start");
+                    var allianceRow = Row(column, "Alliance", 34f);
+                    foreach (var red in new[] { true, false }) {
+                        var picked = game.redAlliance == red;
+                        var b = Ui.Button(allianceRow, red ? "Red" : "Blue", red ? "Red" : "Blue", () => game.SetAlliance(red), picked, 6f, Theme.FontSmall);
+                        if (picked) b.targetGraphic.color = red ? new Color(0.85f, 0.25f, 0.25f) : new Color(0.2f, 0.45f, 0.9f);
+                        b.Size(70f, 30f);
+                    }
+                    var quadrantRow = Row(column, "Quadrant", 34f);
+                    foreach (var q in game.redAlliance ? new[] { Quadrant.Left, Quadrant.Bottom } : new[] { Quadrant.Right, Quadrant.Top }) {
+                        var b = Ui.Button(quadrantRow, q.ToString(), q.ToString(), () => game.SetQuadrant(q), game.startQuadrant == q, 6f, Theme.FontSmall);
+                        b.Size(80f, 30f);
+                    }
+                    Ui.Tip(quadrantRow, "Start Quadrant", null, "SG1: each robot starts in its own Quadrant on its Alliance's side of the Autonomous Line (the dashed diagonal), touching the Field Perimeter.");
+                    ToolOptions.Switch(column, "Skip autonomous (robot code comes later)", game.skipAutonomous, game.SetSkipAutonomous);
+                }
+
+                // V2: the robot always touches its wall (SG1): where along it, and which way it's turned.
                 Dialog.Heading(column, "Start position");
-                var note = Ui.Text(column, "Frame", "Inches from the field's middle: X toward blue, Y away from the audience. Heading: degrees clockwise from +Y.", Theme.FontSmall - 1f, Theme.TextFaint);
+                var note = Ui.Text(column, "Frame", "Your robot starts touching the wall (SG1). Drag it on the field to slide it along the wall; drag the blue ring to turn it.", Theme.FontSmall - 1f, Theme.TextFaint);
                 note.textWrappingMode = TextWrappingModes.Normal;
                 note.Size(-1, 34f);
-                NumberRow(column, "X", () => game.x, v => game.SetPose(v, game.y, game.heading), "\"");
-                NumberRow(column, "Y", () => game.y, v => game.SetPose(game.x, v, game.heading), "\"");
-                NumberRow(column, "Heading", () => game.heading, v => game.SetPose(game.x, game.y, v), "°");
+                NumberRow(column, "Along wall", () => game.Slide, game.SetSlide, "\"");
+                // V2: how far the robot's footprint is from each end of its wall (teams measure from the corners).
+                var (toNear, toFar) = game.CornerGaps();
+                var gaps = Ui.Text(column, "Gaps", "Gap to the corners: " + Inch.Format(toNear) + " (−) · " + Inch.Format(toFar) + " (+)", Theme.FontSmall - 1f, Theme.TextDim);
+                gaps.Size(-1, 20f);
+                NumberRow(column, "Angle", () => game.Turn, game.SetTurn, "°");
                 var nudges = Row(column, "Nudge", 32f);
-                Nudge(nudges, "-X", () => game.Nudge(-0.25f, 0f, 0f));
-                Nudge(nudges, "+X", () => game.Nudge(0.25f, 0f, 0f));
-                Nudge(nudges, "-Y", () => game.Nudge(0f, -0.25f, 0f));
-                Nudge(nudges, "+Y", () => game.Nudge(0f, 0.25f, 0f));
-                Nudge(nudges, "-5°", () => game.Nudge(0f, 0f, -5f));
-                Nudge(nudges, "+5°", () => game.Nudge(0f, 0f, 5f));
-                var hint = Ui.Hint(column, "Arrows", "1/4\" (Shift 1/16\")", "Q/E", "5° (Shift 0.5°)");
+                foreach (var (label, action) in new (string, System.Action)[] {
+                             ("Slide −", () => { game.PushUndo(); game.SlideBy(-0.25f); }), ("Slide +", () => { game.PushUndo(); game.SlideBy(0.25f); }),
+                             ("Turn −", () => { game.PushUndo(); game.TurnBy(-5f); }), ("Turn +", () => { game.PushUndo(); game.TurnBy(5f); }),
+                         }) {
+                    var b = Ui.Button(nudges, label, label, action, false, 5f, Theme.FontSmall);
+                    b.Size(-1, 30f);
+                }
+                var hint = Ui.Hint(column, "Arrows", "slide", "Q/E", "turn", "Ctrl+Z", "undo");
                 hint.Size(-1, 22f);
                 var tools = Row(column, "Tools", 34f);
-                var back = Ui.Button(tools, "Back up", "Back up to contact", game.BackUp, false, 6f, Theme.FontSmall);
-                back.Size(-1, 30f);
-                Ui.Tip(back, "Back up to contact", null, "Slides the robot straight back until it touches the wall, a Goal or the alignment tool.");
-                var reset = Ui.Button(tools, "Default", "Default start", () => { game.DefaultStart(); Interface.Interface.Say("Default start: against the red wall, facing the field", true); }, false, 6f, Theme.FontSmall);
+                var square = Ui.Button(tools, "Square", "Square to the wall", () => { game.PushUndo(); game.SetTurn(0f); }, false, 6f, Theme.FontSmall);
+                square.Size(-1, 30f);
+                var reset = Ui.Button(tools, "Default", "Default start", () => { game.PushUndo(); game.DefaultStart(); }, false, 6f, Theme.FontSmall);
                 reset.Size(-1, 30f);
+
+                // V2: Line up (a simple mate) and Measure, on the field.
+                Dialog.Heading(column, "Line up and measure");
+                var modes = Row(column, "Modes", 34f);
+                var setupTools = game.setupTools;
+                foreach (var (label, m, tip) in new[] {
+                             ("Line up", SetupTools.Mode.LineUp, "Click a face or point on your robot, then a face on the alignment tool or the field: the robot goes against it (turning to face it when you picked a face), still touching its wall."),
+                             ("Measure", SetupTools.Mode.Measure, "Click two points on the robot, the tool or the field: the distance, and how far apart they are along X, Y and up."),
+                         }) {
+                    var on = setupTools != null && setupTools.mode == m;
+                    var b = Ui.Button(modes, label, label, () => setupTools?.SetMode(on ? SetupTools.Mode.Move : m), on, 6f, Theme.FontSmall);
+                    b.Size(-1, 30f);
+                    Ui.Tip(b, label, "Esc stops", tip);
+                }
+                if (setupTools != null) {
+                    var instructions = Ui.Text(column, "Instructions", setupTools.Instructions, Theme.FontSmall - 1f, setupTools.mode == SetupTools.Mode.Move ? Theme.TextFaint : Theme.Accent);
+                    instructions.textWrappingMode = TextWrappingModes.Normal;
+                    instructions.Size(-1, 34f);
+                    if (setupTools.Readout.Length > 0) {
+                        var readout = Ui.Text(column, "Readout", setupTools.Readout, Theme.FontSmall, Theme.Dimension, Theme.Medium);
+                        readout.textWrappingMode = TextWrappingModes.Normal;
+                        readout.Size(-1, 34f);
+                    }
+                    if (!string.IsNullOrEmpty(setupTools.message)) {
+                        var said = Ui.Text(column, "Message", setupTools.message, Theme.FontSmall - 1f, Theme.Warning);
+                        said.textWrappingMode = TextWrappingModes.Normal;
+                        said.Size(-1, 34f);
+                    }
+                }
 
                 // Saved starts.
                 Dialog.Heading(column, "Saved starts");
@@ -287,21 +370,44 @@ namespace Protobot.Game {
                 // Preload and alignment tool.
                 Dialog.Heading(column, "Preload");
                 var preloadRow = Row(column, "Preload", 34f);
-                var pre = Ui.Button(preloadRow, "Preload", game.preload ? "Red/yellow pin in front: on" : "Preload: off", () => game.SetPreload(!game.preload), game.preload, 6f, Theme.FontSmall);
+                var pre = Ui.Button(preloadRow, "Preload", game.preload ? char.ToUpper(SkillsGame.LoadName(game.PreloadColors)[0]) + SkillsGame.LoadName(game.PreloadColors).Substring(1) + ": on" : "Preload: off", () => game.SetPreload(!game.preload), game.preload, 6f, Theme.FontSmall);
                 pre.Size(-1, 30f);
+                // V2: where it touches the robot (SG5).
+                if (game.preload) {
+                    var spotRow = Row(column, "Where", 34f);
+                    foreach (SkillsGame.PreloadSpot spot in System.Enum.GetValues(typeof(SkillsGame.PreloadSpot))) {
+                        var b = Ui.Button(spotRow, spot.ToString(), spot == SkillsGame.PreloadSpot.Top ? "On top" : spot.ToString(), () => game.SetPreloadSpot(spot), game.preloadSpot == spot, 6f, Theme.FontSmall - 1f);
+                        b.Size(-1, 28f);
+                    }
+                    Ui.Tip(spotRow, "Preload", null, "SG5: one Pin of your Alliance's color, touching your robot (the dashed yellow outline) and nothing else.");
+                }
 
+                // V2: the alignment tool from a build file or a saved group; it appears beside the robot.
                 Dialog.Heading(column, "Alignment tool");
                 if (game.tool == null) {
-                    var load = Ui.Button(column, "Load tool", "Load a tool (a build file)…", game.LoadTool, false, 6f, Theme.FontSmall);
-                    load.Size(-1, 32f);
-                    var toolNote = Ui.Text(column, "Tool Note", "Build your alignment jig (a few C-channels) as its own build, load it here, place it, then Back up to it. It's removed when the run starts, like a real one.", Theme.FontSmall - 1f, Theme.TextFaint);
+                    var loadRow = Row(column, "Load", 34f);
+                    var load = Ui.Button(loadRow, "Load tool", "Build file…", game.LoadTool, false, 6f, Theme.FontSmall);
+                    load.Size(-1, 30f);
+                    Button groups = null;
+                    groups = Ui.Button(loadRow, "Groups", "Saved group…", () => {
+                        var names = Builds.SavedGroups.Names();
+                        if (names.Count == 0) {
+                            Interface.Interface.Say("No saved groups yet: in build mode, right-click a part > Save group", false);
+                            return;
+                        }
+                        Popup.Open((RectTransform)groups.transform, names.ToArray(), -1, i => game.LoadToolGroup(names[i]));
+                    }, false, 6f, Theme.FontSmall);
+                    groups.Size(-1, 30f);
+                    var toolNote = Ui.Text(column, "Tool Note", "Build your jig as its own build (or save it as a group). It appears beside your robot against the wall: drag it to move it (it sits flat on a wall when it's near one), drag its ring to turn it, then Line up your robot against it. It's removed when the run starts, like a real one.", Theme.FontSmall - 1f, Theme.TextFaint);
                     toolNote.textWrappingMode = TextWrappingModes.Normal;
-                    toolNote.Size(-1, 50f);
+                    toolNote.Size(-1, 66f);
                 }
                 else {
                     var toolRow = Row(column, "Tool", 32f);
                     var toolName = Ui.Text(toolRow, "Name", game.toolName, Theme.FontSmall, Theme.Text, Theme.Medium);
                     toolName.Size(-1, 30f, 1f);
+                    var beside = Ui.Button(toolRow, "Beside", "Beside robot", () => { game.PushUndo(); game.ToolBesideRobot(); }, false, 6f, Theme.FontSmall);
+                    beside.Size(-1, 30f);
                     var remove = Ui.Button(toolRow, "Remove", "Remove", () => game.RemoveTool(), false, 6f, Theme.FontSmall);
                     remove.Size(-1, 30f);
                     NumberRow(column, "Tool X", () => game.toolX, v => game.SetTool(v, game.toolY, game.toolHeading), "\"");
@@ -310,7 +416,7 @@ namespace Protobot.Game {
                 }
 
                 // The checklist.
-                Dialog.Heading(column, "Legal start (SG1, RSC2)");
+                Dialog.Heading(column, game.mode == SkillsGame.Mode.Skills ? "Legal start (SG1, RSC2)" : "Legal start (SG1, SG5)");
                 foreach (var (rule, ok) in game.Checks()) {
                     var check = Row(column, "Check", 22f);
                     var dot = Ui.Image(check, "Dot", ok ? Theme.Success : Theme.Danger);
@@ -388,7 +494,7 @@ namespace Protobot.Game {
 
         private class Hud : MonoBehaviour {
             public SkillsGame game;
-            private TextMeshProUGUI clock, scoreText, details, countdown, loadsTitle;
+            private TextMeshProUGUI clock, scoreText, details, countdown, loadsTitle, label;
             private readonly System.Collections.Generic.Dictionary<string, TextMeshProUGUI> loadLabels = new();
             private Button loaderButton;
 
@@ -399,7 +505,7 @@ namespace Protobot.Game {
                 clock.rectTransform.Place(new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(14f, -10f), new Vector2(150f, 56f));
                 scoreText = Ui.Text(card, "Score", "0", 44f, Theme.Accent, Theme.Bold, TextAlignmentOptions.Center);
                 scoreText.rectTransform.Place(new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(-14f, -10f), new Vector2(150f, 56f));
-                var label = Ui.Text(card, "Label", "TIME            SCORE", 11f, Theme.TextFaint, Theme.Medium, TextAlignmentOptions.Center);
+                label = Ui.Text(card, "Label", "TIME            SCORE", 11f, Theme.TextFaint, Theme.Medium, TextAlignmentOptions.Center);
                 label.rectTransform.Place(new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -28f), new Vector2(120f, 18f));
                 details = Ui.Text(card, "Details", "", Theme.FontSmall, Theme.TextDim, null, TextAlignmentOptions.Top);
                 details.textWrappingMode = TextWrappingModes.Normal;
@@ -407,19 +513,19 @@ namespace Protobot.Game {
 
                 // Match Loads.
                 var loads = Ui.Panel(transform, "Match Loads", Theme.Panel, 12f).rectTransform;
-                loads.Place(new Vector2(0f, 0f), new Vector2(0f, 0f), new Vector2(14f, 14f), new Vector2(300f, 196f));
+                loads.Place(new Vector2(0f, 0f), new Vector2(0f, 0f), new Vector2(14f, 14f), new Vector2(300f, 82f + 38f * game.matchLoads.Count));
                 var column = Ui.Rect("Column", loads).Fill(14, 12, 14, 12);
                 Ui.Column(column, 6f);
-                loadsTitle = Ui.Text(column, "Title", "Match Loads (red Loaders)", Theme.FontBody, Theme.Text, Theme.Medium);
+                loadsTitle = Ui.Text(column, "Title", "Match Loads (" + (game.Red ? "red" : "blue") + " Loaders)", Theme.FontBody, Theme.Text, Theme.Medium);
                 loadsTitle.Size(-1, 22f);
-                foreach (var kind in new[] { "Red-Neutral", "Blue-Neutral", "Cup" }) {
+                foreach (var kind in new System.Collections.Generic.List<string>(game.matchLoads.Keys)) {   // V2: Skills' or the match's
                     var b = Ui.Button(column, kind, null, () => game.DropMatchLoad(kind), false, 6f, Theme.FontSmall);
                     b.Size(-1, 32f);
                     var text = Ui.Text(b.transform, "Text", "", Theme.FontSmall, Theme.Text, Theme.Medium, TextAlignmentOptions.Center);
                     text.rectTransform.Fill();
                     loadLabels[kind] = text;
                 }
-                loaderButton = Ui.Button(column, "Loader", null, () => { game.loader = 1 - game.loader; Refresh(); Interface.Interface.Say("Match Loads go into the " + (game.loader == 0 ? "first" : "second") + " red Loader", true); }, false, 6f, Theme.FontSmall);
+                loaderButton = Ui.Button(column, "Loader", null, () => { game.loader = 1 - game.loader; Refresh(); Interface.Interface.Say("Match Loads go into the " + (game.loader == 0 ? "first" : "second") + (game.Red ? " red" : " blue") + " Loader", true); }, false, 6f, Theme.FontSmall);
                 loaderButton.Size(-1, 30f);
                 var loaderText = Ui.Text(loaderButton.transform, "Text", "", Theme.FontSmall, Theme.TextDim, null, TextAlignmentOptions.Center);
                 loaderText.rectTransform.Fill();
@@ -452,15 +558,17 @@ namespace Protobot.Game {
                     game.matchLoads.TryGetValue(kind, out var left);
                     text.text = $"{char.ToUpper(SkillsGame.LoadName(kind)[0])}{SkillsGame.LoadName(kind).Substring(1)}  ({left} left)";
                 }
-                loaderButton.GetComponentInChildren<TextMeshProUGUI>().text = "Into the " + (game.loader == 0 ? "first" : "second") + " red Loader (click to switch)";
+                loaderButton.GetComponentInChildren<TextMeshProUGUI>().text = "Into the " + (game.loader == 0 ? "first" : "second") + (game.Red ? " red" : " blue") + " Loader (click to switch)";
             }
 
             private void Update() {
                 if (game == null || clock == null) return;
-                clock.text = Clock(game.timeLeft);
+                // V2: a match shows its period (autonomous counts its own 0:15).
+                clock.text = Clock(game.InAutonomous ? game.timeLeft - SkillsGame.DriverSeconds : game.timeLeft);
+                if (label != null) label.text = game.mode == SkillsGame.Mode.Skills ? "TIME            SCORE" : game.InAutonomous ? "AUTONOMOUS        SCORE" : "DRIVER            SCORE";
                 clock.color = game.state == SkillsGame.State.Running && game.timeLeft < 10f ? Theme.Danger : Theme.Text;
                 if (game.state == SkillsGame.State.Countdown) countdown.text = Mathf.CeilToInt(game.countdown).ToString();
-                else if (game.state == SkillsGame.State.Running && game.definition.skillsSeconds - game.timeLeft < 0.8f) countdown.text = "GO";
+                else if (game.state == SkillsGame.State.Running && game.RunSeconds - game.timeLeft < 0.8f) countdown.text = game.InAutonomous ? "AUTO" : "GO";
                 else if (game.state == SkillsGame.State.Ending) countdown.text = "";
                 else countdown.text = "";
             }

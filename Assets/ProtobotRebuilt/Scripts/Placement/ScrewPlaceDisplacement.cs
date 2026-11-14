@@ -17,11 +17,31 @@ namespace Protobot {
             if (currentHoleFace.direction != Vector3.zero) // this has to return true if it doesn't this script wont do anything
             {
                 //TODO: have a list of ids that are checked for screw placement instead of hardcoding it for better compatibility in the future
-                if (placementData.objectId.Contains("SCRW") || placementData.objectId.Contains("RBMP")) // || is OR in C# so in coding if I have a integer and I want it to return true only if the value is 1 or 2 I would do if (value == 1 || value == 2)
+                // V2: a pneumatic fitting threads only into a port its size (a threaded hole within 0.05").
+                if (FittingOf(placementData, out var thread)) {
+                    var hole = currentHoleFace.hole;
+                    if (!currentHoleFace.gameObject.activeInHierarchy || hole == null || hole.source == null || !hole.source.TryGetComponent(out HoleCollider port) || port.holeType != HoleCollider.HoleType.Threaded
+                        || Mathf.Abs(Mathf.Min(hole.size.x, hole.size.y) - thread) > (thread > 0.3f ? 0.05f : 0.02f)) {   // V2: M5 apart from a 4mm socket
+                        displacement = null;
+                        return false;
+                    }
+                    displacement = new Displacement(currentHoleFace.position, currentHoleFace.LookRotation);
+                    return true;
+                }
+                var shoulder = ShoulderOf(placementData);   // V2: VEX shoulder screws
+                if (StudOf(placementData, out var insert) && currentHoleFace.gameObject.activeInHierarchy) {
+                    // V2: a threaded stud goes in tip first: half a coupler, or the rubber link's stud (its rubber on
+                    // the face); the rest stands out for the next standoff or part.
+                    var inward = -currentHoleFace.direction.normalized;
+                    displacement = new Displacement(currentHoleFace.position + SlideOffset(currentHoleFace) + inward * insert, Quaternion.LookRotation(inward, currentHoleFace.transform.up));
+                    return true;
+                }
+                if (placementData.objectId.Contains("SCRW") || placementData.objectId.Contains("RBMP") || shoulder > 0f) // || is OR in C# so in coding if I have a integer and I want it to return true only if the value is 1 or 2 I would do if (value == 1 || value == 2)
                 {
                     if (currentHoleFace.gameObject.activeInHierarchy)
                     {
-                        displacement = new Displacement(currentHoleFace.position + SlideOffset(currentHoleFace), currentHoleFace.LookRotation);
+                        var rise = shoulder > 0f ? ShoulderRise(currentHoleFace, shoulder, ShankOf(placementData)) : 0f;
+                        displacement = new Displacement(currentHoleFace.position + SlideOffset(currentHoleFace) + currentHoleFace.direction.normalized * rise, currentHoleFace.LookRotation);
                         return true;
                     }
                 }
@@ -29,6 +49,84 @@ namespace Protobot {
 
             displacement = null;
                 return false;
+        }
+
+        // V2: a shoulder screw's smooth shoulder (0.18" across) goes into plain holes like the rest of the screw, but not
+        // into a thread: in a standoff, a coupler, a nut or a tapped hole the shoulder's end stops on it and only the
+        // thread goes in (the head stands off the face by what's left of the shoulder; a part on the shoulder pivots).
+        private static float ShoulderOf(PlacementData data) {
+            if (data is PartPlacementData part && part.partGenerator is ChildPartGenerator && ChildPartGenerator.IsShoulderScrew(part.partGenerator.GetId()))
+                return ChildPartGenerator.ShoulderLength(part.partGenerator.GetId());
+            if (data.TryParse(out GameObjectPlacementData moving) && moving.GetGameObject() != null && moving.GetGameObject().TryGetComponent(out SavedObject saved)
+                && ChildPartGenerator.IsShoulderScrew(saved.id))
+                return ChildPartGenerator.ShoulderLength(saved.id);
+            return 0f;
+        }
+
+        // A stud being placed, and how far its tip goes in: a coupler half its length, the rubber link its stud.
+        private static readonly Dictionary<Mesh, float> linkStuds = new();
+
+        private static bool FittingOf(PlacementData data, out float diameter) {
+            diameter = 0f;
+            Mesh mesh = null;
+            if (data is PartPlacementData part && part.partGenerator != null) mesh = part.partGenerator.GetMesh();
+            else if (data.TryParse(out GameObjectPlacementData moving) && moving.GetGameObject() != null) mesh = moving.GetGameObject().GetComponent<MeshFilter>()?.sharedMesh;
+            return mesh != null && ChildPartGenerator.fittingDiameters.TryGetValue(mesh, out diameter);
+        }
+
+        private static bool StudOf(PlacementData data, out float insert) {
+            insert = 0f;
+            Mesh mesh = null;
+            string id = null;
+            if (data is PartPlacementData part && part.partGenerator != null) {
+                id = part.partGenerator.GetId();
+                mesh = part.partGenerator.GetMesh();
+            }
+            else if (data.TryParse(out GameObjectPlacementData moving) && moving.GetGameObject() != null && moving.GetGameObject().TryGetComponent(out SavedObject saved)) {
+                id = saved.id;
+                mesh = moving.GetGameObject().GetComponent<MeshFilter>()?.sharedMesh;
+            }
+            if (id == null || mesh == null) return false;
+            var name = id.IndexOf('-') > 0 ? id.Substring(id.IndexOf('-') + 1) : id;
+            if (!ChildPartGenerator.IsStud(id, name)) return false;
+            var length = mesh.bounds.size.z;
+            insert = length / 2f;
+            if (name == "Rubber Link") {
+                // The stud: from the tip (z = 0) down to where the rubber starts (wider than the thread).
+                if (!linkStuds.TryGetValue(mesh, out var top)) {
+                    top = float.MinValue;
+                    foreach (var v in mesh.vertices)
+                        if (new Vector2(v.x, v.y).magnitude > 0.12f) top = Mathf.Max(top, v.z);
+                    linkStuds[mesh] = top;
+                }
+                insert = top > float.MinValue && top < 0f ? -top : length / 2f;
+            }
+            return true;
+        }
+
+        private static float ShankOf(PlacementData data) {
+            if (data is PartPlacementData part && part.partGenerator != null) {
+                var mesh = part.partGenerator.GetMesh();
+                return mesh != null ? mesh.bounds.size.z - 0.087f : 0.5f;
+            }
+            if (data.TryParse(out GameObjectPlacementData moving) && moving.GetGameObject() != null && moving.GetGameObject().TryGetComponent(out Screw screw))
+                return screw.ScrewLength;
+            return 0.5f;
+        }
+
+        /// <summary>V2: how far a shoulder screw's head stays off the face: the shoulder's end on the first threaded
+        /// hole along the screw (if the screw reaches it), never below the face.</summary>
+        public static float ShoulderRise(HoleFace face, float shoulder, float shank) {
+            var inward = -face.direction.normalized;
+            var start = face.position - inward * 0.01f;
+            var hits = Physics.RaycastAll(start, inward, shank + 0.01f, 1 << HoleCollider.HOLE_COLLISIONS_LAYER, QueryTriggerInteraction.Collide);
+            var nearest = float.MaxValue;
+            foreach (var hit in hits) {
+                if (!hit.collider.TryGetComponent(out HoleCollider hole) || hole.holeType != HoleCollider.HoleType.Threaded) continue;
+                nearest = Mathf.Min(nearest, hit.distance - 0.01f);
+            }
+            if (nearest == float.MaxValue) return 0f;
+            return Mathf.Max(0f, shoulder - Mathf.Max(0f, nearest));
         }
 
         /// <summary>V2: where the screw goes in the hole, from its middle: toward the mouse, as far as the hole lets it

@@ -37,13 +37,18 @@ namespace Protobot.Interface {
             if (!mouse.rightButton.wasReleasedThisFrame || !pressed) return;
             pressed = false;
             if ((mouse.position.ReadValue() - pressedAt).magnitude > 5f || Time.unscaledTime - pressedTime > 0.5f) return;
-            if (InputEvents.TextInput.ShortcutsPaused || Motion.Sandbox.Running || Motion.ChainTool.Active) return;
+            if (InputEvents.TextInput.ShortcutsPaused || Motion.Sandbox.Running || Motion.ChainTool.Active || Motion.ElasticTool.Active || Motion.TubeTool.Active) return;
 
             var camera = Camera.main;
             if (camera == null || !Physics.Raycast(camera.ScreenPointToRay(pressedAt), out var hit, Mathf.Infinity, LayerMask.GetMask("Default", "HoleCollisions")))
                 return;
             var saved = hit.collider.GetComponentInParent<SavedObject>();
             if (saved == null) return;
+            // V2: in the Paint tool a right-click lists the part's colors to change.
+            if (ToolRail.Current == "Paint") {
+                Tools.PaintTool.EditColorsOf(SelectAs.Resolve(hit.collider.gameObject) ?? saved.gameObject, hit.collider.GetComponent<Renderer>());
+                return;
+            }
             var options = new System.Collections.Generic.List<(string label, System.Action action)>();
             var custom = CustomOf(saved.gameObject);
             if (custom != null)
@@ -53,9 +58,27 @@ namespace Protobot.Interface {
                 var piece = saved.gameObject;
                 options.Add(("Edit sketch on the robot", () => Polycarb.SheetEditor.EditInPlace(custom, piece)));
             }
+            if (saved.TryGetComponent(out Motion.UniversalJoint uj) && uj.enabled)
+                options.Add(("Bend joint…", () => Motion.UniversalJoint.Edit(uj)));
+            // V2: a hinge's angle.
+            if (saved.TryGetComponent(out Motion.HingePart hinge) && hinge.enabled)
+                options.Add(("Hinge angle…", () => Motion.HingePart.Edit(hinge)));
+            // V2: a band's posts, count and wraps; tubing from a fitting's end.
+            if (saved.TryGetComponent(out Motion.ElasticBand band))
+                options.Add(("Edit band", () => Motion.BandEditor.Select(band)));
+            var port = Motion.TubeTool.PortNear(saved.gameObject, hit.point);
+            if (port != null)
+                options.Add(("Run tubing from here", () => Motion.TubeTool.Begin(port)));
+            // V2: a license plate's team number.
+            if (Motion.LicensePlate.Is(saved.gameObject)) {
+                var plate = saved.gameObject;
+                options.Add(("Team number…", () => Motion.LicensePlate.Edit(plate)));
+            }
             // Moving parts: a cylinder extends and retracts, a motor runs.
-            if (saved.TryGetComponent(out Motion.PneumaticCylinder cylinder) && cylinder.enabled)
+            if (saved.TryGetComponent(out Motion.PneumaticCylinder cylinder) && cylinder.enabled) {
                 options.Add(cylinder.Extended ? ("Retract", () => cylinder.Set(false)) : ("Extend", () => cylinder.Set(true)));
+                options.Add(("Rod position and air…", () => Motion.CylinderDialog.Open(cylinder)));   // V2
+            }
             if (saved.TryGetComponent(out Motion.MotorDrive motor)) {
                 options.Add(("Control this motor (keys, speed)", () => Motion.MotorControls.Control(new[] { motor })));
                 if (motor.Toggled != 0) options.Add(("Stop", () => motor.Run(0)));
@@ -79,6 +102,8 @@ namespace Protobot.Interface {
                                                          : ("Make it a joint (parts turn on it)", () => Motion.Linkage.SetJoint(part, true)));
             options.Add(Motion.Linkage.IsGrounded(part) ? ("Unground", () => Motion.Linkage.SetGrounded(part, false))
                                                         : ("Ground (fix in place)", () => Motion.Linkage.SetGrounded(part, true)));
+            options.Add(("Mirror…", () => Tools.MirrorTool.OpenFor(part)));   // V2: was in the Select tool
+            options.Add(("Save group…", () => Builds.SavedGroups.SaveDialog(part)));   // V2: a sub-assembly to place again
             if (options.Count == 0) return;
 
             if (anchor == null) anchor = Ui.Rect("Part Menu Anchor", Interface.Root);

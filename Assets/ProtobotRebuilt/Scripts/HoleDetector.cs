@@ -49,6 +49,7 @@ namespace Protobot {
         }
 
         public List<GameObject> GetObjects() {
+            holes.RemoveWhere(h => h == null);   // V2: (see GetOrderedHoles)
             return holes.Select(col => col.holeData.part).ToList();
         }
 
@@ -57,6 +58,7 @@ namespace Protobot {
         /// </summary>
         /// <returns></returns>
         public List<HoleCollider> GetOrderedHoles() {
+            holes.RemoveWhere(h => h == null);   // V2: a hole destroyed with its part (a build cleared) isn't one
             return holes.OrderBy(x => Vector3.Distance(transform.parent.position, x.transform.position))
                         .ToList();
         }
@@ -94,8 +96,25 @@ namespace Protobot {
 
         private void OnTriggerStay(Collider other) {
             if (other.TryGetComponent(out HoleCollider hole))
-                if (!hole.IsOccupied && !IsHoleIntersecting(hole))
+                if (!hole.IsOccupied && !IsHoleIntersecting(hole) && Along(hole))
                     AddHole(hole);
+        }
+
+        // V2: a hole the detector only crosses isn't one it goes through (a screw through a hole drilled across a
+        // standoff passes its threaded bore at right angles): the hole's axis must lie along one of the detector's
+        // lines (a bent rubber link has a second one along its far stud).
+        private CapsuleCollider[] lines;
+        private int linesFor = -1;
+
+        private bool Along(HoleCollider hole) {
+            if (lines == null || linesFor != transform.childCount) {
+                lines = GetComponentsInChildren<CapsuleCollider>(true);
+                linesFor = transform.childCount;
+            }
+            var axis = hole.transform.forward;
+            foreach (var line in lines)
+                if (line != null && line.enabled && Mathf.Abs(Vector3.Dot(axis, line.transform.up)) > 0.82f) return true;
+            return lines.Length == 0;
         }
 
         private void OnTriggerExit(Collider other) {

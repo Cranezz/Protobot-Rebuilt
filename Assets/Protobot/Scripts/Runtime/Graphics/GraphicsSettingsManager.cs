@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -61,6 +61,9 @@ namespace Protobot.GraphicsQuality
             {
                 settings = new GraphicsSettingsData();
                 settings.SetQualityFromPreset(GraphicsHardwareDetector.RecommendPreset());
+                // V2: a PC that gets Very Low (integrated graphics, old cards, little memory) also starts with tiny
+                // far-away parts skipped (under 5 px on screen; drawn again in full as soon as they're bigger).
+                if (settings.preset == GraphicsPreset.VeryLow) settings.smallPartCulling = 2;
                 Debug.Log($"[Graphics] First launch on '{SystemInfo.graphicsDeviceName}', picked preset {settings.preset}.");
             }
 

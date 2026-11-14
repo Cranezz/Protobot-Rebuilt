@@ -1,0 +1,15 @@
+var sb = new System.Text.StringBuilder();
+Protobot.PartsManager.DestroyLoadedObjects();
+var a = Protobot.PartsManager.GeneratePart("CCHL-1x2-20", new Vector3(0f, 0f, 0f), Quaternion.identity);
+var b = Protobot.PartsManager.GeneratePart("CCHL-1x2-20", new Vector3(0f, 0f, 6f), Quaternion.identity);
+var saw = UnityEngine.Object.FindFirstObjectByType<Protobot.Tools.PartSaw>(FindObjectsInactive.Include);
+var T = typeof(Protobot.Tools.PartSaw); var F = System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Static;
+T.GetField("cutAll", F).SetValue(null, true);
+T.GetMethod("BeginCut", F).Invoke(saw, new object[] { a });
+T.GetMethod("UpdateCrossed", F).Invoke(saw, null);
+var crossed = (System.Collections.IList)T.GetField("crossed", F).GetValue(saw);
+sb.Append("a bounds " + a.GetComponent<Renderer>().bounds.size.ToString("F2") + " crossed " + crossed.Count + " drawHalfU " + ((float)T.GetField("drawHalfU", F).GetValue(saw)).ToString("F2") + " V " + ((float)T.GetField("drawHalfV", F).GetValue(saw)).ToString("F2") + "\n");
+T.GetMethod("ApplyCut", F).Invoke(saw, null);
+sb.Append("parts after " + Protobot.PartsManager.FindLoadedObjects().Count + "\n");
+T.GetField("cutAll", F).SetValue(null, false);
+return sb.ToString();

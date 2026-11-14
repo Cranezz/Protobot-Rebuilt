@@ -47,6 +47,14 @@ namespace Protobot {
                 else
                     FormConnection();
             };
+            // V2: a part slid onto a screw that already has its nut (a spacer, a wheel) joins it too; and one taken
+            // off leaves. Before, only a nut coming or going changed what the screw holds.
+            holeDetector.OnAddHole += () => {
+                if (CanFormConnection) FormConnection();
+            };
+            holeDetector.OnRemoveHole += () => {
+                if (CanFormConnection) FormConnection();
+            };
         }
         
         public void OnEnable() {

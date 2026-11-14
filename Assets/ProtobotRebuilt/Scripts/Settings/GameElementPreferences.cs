@@ -29,6 +29,13 @@ namespace Protobot {
             });
         }
 
+        /// <summary>V2: set from the Preferences window (this pop-up page isn't shown any more).</summary>
+        public static void Set(string key, bool value) {
+            PlayerPrefs.SetInt(key, value ? 1 : 0);
+            PlayerPrefs.Save();
+            Changed?.Invoke();
+        }
+
         // Keep every generator registered so preferences never affect saved builds.
         public static bool IsVisible(PartType part) {
             string key;

@@ -65,18 +65,19 @@ namespace Protobot.Motion {
             window = Ui.Rect("Window", transform);
             window.anchorMin = window.anchorMax = new Vector2(1f, 1f);
             window.pivot = new Vector2(1f, 1f);
-            window.sizeDelta = new Vector2(360f, 40f);
+            window.sizeDelta = new Vector2(380f, 40f);
             var parts = PlayerPrefs.GetString(PositionKey, "").Split(',');
             window.anchoredPosition = parts.Length == 2 && float.TryParse(parts[0], NumberStyles.Float, CultureInfo.InvariantCulture, out var x)
                                       && float.TryParse(parts[1], NumberStyles.Float, CultureInfo.InvariantCulture, out var y)
                 ? new Vector2(x, y) : new Vector2(-380f, -(Layout.TopBarBottom + 120f));  // left of the parts list
 
             header = Ui.Panel(window, "Header", Theme.PanelRaised, 10f).rectTransform;
-            header.Place(new Vector2(1f, 1f), new Vector2(1f, 1f), Vector2.zero, new Vector2(360f, 34f));
+            header.Place(new Vector2(1f, 1f), new Vector2(1f, 1f), Vector2.zero, new Vector2(380f, 38f));
             header.GetChild(0).GetComponent<Image>().raycastTarget = true;
             header.gameObject.AddComponent<Mover>().owner = this;
             title = Ui.Text(header, "Title", "Motor", Theme.FontBody, Theme.Text, Theme.Medium);
-            title.rectTransform.Place(new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(12f, 0f), new Vector2(270f, 30f));
+            title.rectTransform.Place(new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(14f, 0f), new Vector2(290f, 30f));
+            title.overflowMode = TextOverflowModes.Ellipsis;
             var close = Ui.Button(header, "Close", "×", () => {
                 Release();
                 Interface.Interface.Say("Not controlling motors", true);
@@ -90,9 +91,9 @@ namespace Protobot.Motion {
             body = Ui.Panel(window, "Body", Theme.Panel, 10f).rectTransform;
             body.anchorMin = body.anchorMax = new Vector2(1f, 1f);
             body.pivot = new Vector2(1f, 1f);
-            body.anchoredPosition = new Vector2(0f, -38f);
-            body.sizeDelta = new Vector2(360f, 0f);
-            Ui.Column(body, 6f, new RectOffset(12, 12, 10, 12));
+            body.anchoredPosition = new Vector2(0f, -42f);
+            body.sizeDelta = new Vector2(380f, 0f);
+            Ui.Column(body, 4f, new RectOffset(14, 14, 6, 14));
             body.gameObject.AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
             body.GetChild(0).gameObject.AddComponent<LayoutElement>().ignoreLayout = true;
             minimized = PlayerPrefs.GetInt(MinimizedKey, 0) == 1;
@@ -129,6 +130,9 @@ namespace Protobot.Motion {
             var tool = ToolRail.Current;
             if (tool != "Select" && tool != "Transform") return;
             if (Placement.IsPlacing || InputEvents.TextInput.ShortcutsPaused) return;
+            // V2: not while a tool with its own clicks has the mouse (or the click that just finished it: a cable or
+            // tube plugged into a motor's port was also taking control of the motor).
+            if (SelectionSystem.SelectionManager.Blocked != null && SelectionSystem.SelectionManager.Blocked()) return;
             var ctrl = Keyboard.current != null && (Keyboard.current.leftCtrlKey.isPressed || Keyboard.current.rightCtrlKey.isPressed);
             MotorDrive motor = null;
             var camera = Camera.main;
@@ -159,59 +163,61 @@ namespace Protobot.Motion {
                                                                          + Controls.ReverseKey(m.gameObject) + ":" + Controls.Reversed(m.gameObject) + ":" + m.Label))
                                       + "#" + string.Join(",", MotorDrive.Live().Select(m => m.Label)) + "#" + stateVersion;
 
+        // V2: laid out like the app's other windows: small headed sections (Keys, Gearbox, Speed, Motors, Geared
+        // system), the keys as two cards side by side, the gearbox as three buttons, the system's state in a box.
         private void Rebuild() {
             for (var i = body.childCount - 1; i >= 1; i--) Destroy(body.GetChild(i).gameObject);
             var motors = controlled.ToList();
             var first = motors[0].gameObject;
-            title.text = motors.Count == 1 ? motors[0].Label + " · " + motors[0].Kind : string.Join(", ", motors.Select(m => m.Label));
+            title.text = motors.Count == 1 ? motors[0].Label + "  ·  " + motors[0].Kind + " · " + motors[0].Rpm + " rpm" : motors.Count + " motors, controlled together";
 
-            // Keys.
-            var keys = Row("Keys");
-            Label(keys, "Forward", 58f);
-            var forwardMixed = motors.Select(m => Controls.ForwardKey(m.gameObject)).Distinct().Count() > 1;
-            MotionUi.KeyChip(keys, Controls.ForwardKey(first), key => SetKey(key, true), "Forward key", "Hold it to run " + Names(motors) + " forward.", forwardMixed);
-            Label(keys, "Reverse", 58f);
-            var reverseMixed = motors.Select(m => Controls.ReverseKey(m.gameObject)).Distinct().Count() > 1;
-            MotionUi.KeyChip(keys, Controls.ReverseKey(first), key => SetKey(key, false), "Reverse key", "Hold it to run " + Names(motors) + " in reverse.", reverseMixed);
+            // Keys: Forward and Reverse cards.
+            Section("Keys");
+            var keys = Ui.Rect("Keys", body);
+            var keysLayout = Ui.Row(keys, 8f);
+            keysLayout.childForceExpandWidth = true;
+            keys.Size(-1, 62f);
+            KeyCard(keys, true, motors);
+            KeyCard(keys, false, motors);
+            status = Ui.Text(body, "Status", "", Theme.FontSmall, Theme.TextDim);
+            status.Size(-1, 18f);
 
-            // Gearbox.
+            // Gearbox: one button per cartridge.
+            Section("Gearbox");
             var eleven = motors.Where(m => m.HasCartridge).ToList();
-            var gearbox = Row("Gearbox");
-            Label(gearbox, "Gearbox", 58f);
             if (eleven.Count > 0) {
-                var labels = MotorDrive.Cartridges.Select(r => char.ToUpper(MotorDrive.CartridgeName(r)[0]) + MotorDrive.CartridgeName(r).Substring(1) + " · " + r + " rpm").ToArray();
+                var gearbox = Row("Gearbox");
+                gearbox.Size(-1, 34f);
                 var chosen = eleven.Select(m => m.Rpm).Distinct().Count() == 1 ? System.Array.IndexOf(MotorDrive.Cartridges, eleven[0].Rpm) : -1;
-                var choice = Popup.Choice(gearbox, labels, chosen, i => {
+                var labels = MotorDrive.Cartridges.Select(r => char.ToUpper(MotorDrive.CartridgeName(r)[0]) + MotorDrive.CartridgeName(r).Substring(1) + "  " + r).ToArray();
+                ToolOptions.Segmented(gearbox, labels, chosen, i => {
                     foreach (var m in eleven) m.SetCartridge(MotorDrive.Cartridges[i], false);
                     Interface.Interface.Say(Names(eleven) + ": " + MotorDrive.CartridgeName(MotorDrive.Cartridges[i]) + " cartridge, " + MotorDrive.Cartridges[i] + " rpm", true);
                     Audio.Sounds.Play(Audio.Sounds.Tick);
-                }, 200f);
-                if (chosen < 0) choice.GetComponentInChildren<TextMeshProUGUI>().text = "mixed";
-                Ui.Tip(choice, "Gearbox cartridge", null, "Red 36:1, 100 rpm, 2.1 N·m (arms, lifts) · Green 18:1, 200 rpm, 1.05 N·m (drives) · Blue 6:1, 600 rpm, 0.35 N·m (flywheels, intakes).");
-                if (eleven.Count < motors.Count) Label(gearbox, "5.5W: 200 rpm", 90f, true);
+                    shown = null;
+                });
+                Ui.Tip(gearbox.GetComponentInChildren<Button>(), "Gearbox cartridge", null, "Red 36:1, 100 rpm, 2.1 N·m (arms, lifts) · Green 18:1, 200 rpm, 1.05 N·m (drives) · Blue 6:1, 600 rpm, 0.35 N·m (flywheels, intakes).");
+                var note = chosen < 0 ? "Different cartridges: pick one for all of them." : "Red: arms, lifts · Green: drives · Blue: flywheels";
+                if (eleven.Count < motors.Count) note = "The 5.5W motors keep 200 rpm.";
+                Ui.Text(body, "Gearbox Note", note, Theme.FontSmall - 1f, Theme.TextFaint).Size(-1, 18f);
             }
-            else Label(gearbox, "None: the 5.5W motor turns at 200 rpm (0.5 N·m)", 260f, true);
+            else Ui.Text(body, "Gearbox Note", "The 5.5W motor has no cartridge: 200 rpm, 0.5 N·m.", Theme.FontSmall, Theme.TextDim).Size(-1, 22f);
 
             // Speed.
+            Section("Speed");
             var speedRow = Row("Speed");
-            Label(speedRow, "Speed", 58f);
             var share = Controls.Speed(first);
-            var slider = MotionUi.Slider(speedRow, share, 0.05f, 0.05f, v => Mathf.RoundToInt(v * 100f) + "% · " + Mathf.RoundToInt(v * motors[0].Rpm) + " rpm",
+            var slider = MotionUi.Slider(speedRow, share, 0.05f, 0.05f, v => Mathf.RoundToInt(v * 100f) + "%  ·  " + Mathf.RoundToInt(v * motors[0].Rpm) + " rpm",
                 v => { foreach (var m in motors) Controls.SetSpeed(m.gameObject, v); },
                 v => Interface.Interface.Say(Names(motors) + ": " + Mathf.RoundToInt(v * 100f) + "% speed", true));
-            slider.Size(-1, 26f, 1f);
+            slider.Size(-1, 28f, 1f);
 
-            // Each controlled motor: its name and which way is forward for it (paired motors are listed here).
-            var listHeading = Ui.Text(body, "Controlled", motors.Count == 1 ? "This motor" : "Controlled together", Theme.FontSmall, Theme.Text, Theme.Medium);
-            listHeading.Size(-1, 22f);
+            // Each controlled motor: name, kind, reversed.
+            Section(motors.Count == 1 ? "Motor" : "Motors");
             foreach (var motor in motors) MotorRow(motor, motors.Count > 1);
-
-            status = Ui.Text(body, "Status", "", Theme.FontSmall, Theme.TextDim);
-            status.Size(-1, 22f);
 
             // The systems these motors drive, and the motors in them not controlled.
             var rotors = GearTrain.Current();
-            // V2: one entry per system (two motors on one system each find it; list it once).
             var found = new List<DriveSystem>();
             foreach (var m in motors) {
                 if (found.Any(s => s.Motors.Contains(m))) continue;
@@ -220,14 +226,12 @@ namespace Protobot.Motion {
             }
             systems = found.ToArray();
             geared = systems.SelectMany(s => s.Motors).Distinct().Where(m => !controlled.Contains(m)).ToList();
-            Ui.Divider(body);
+            Section("Geared system");
             var shafts = systems.SelectMany(s => s.rotors).Distinct().Count();
             var gears = systems.SelectMany(s => s.meshes).Select(m => m.a.GetHashCode() < m.b.GetHashCode() ? (m.a, m.b) : (m.b, m.a)).Distinct().Count();
-            var summary = systems.Length == 0 ? "No shaft in " + (motors.Count == 1 ? "its" : "their") + " square hole yet: put one in to turn things"
-                : shafts + (shafts == 1 ? " shaft turns" : " geared shafts turn") + (gears > 0 ? " (" + gears + (gears == 1 ? " gear mesh)" : " gear meshes)") : "");
-            var info = Ui.Text(body, "System", summary, Theme.FontSmall, Theme.TextDim);
-            info.textWrappingMode = TextWrappingModes.Normal;
-            info.Size(-1, 20f);
+            var summary = systems.Length == 0 ? "Nothing to turn yet: put a shaft in " + (motors.Count == 1 ? "its" : "their") + " square hole."
+                : shafts + (shafts == 1 ? " shaft turns" : " shafts turn") + (gears > 0 ? ", " + gears + (gears == 1 ? " gear mesh" : " gear meshes") : "") + ".";
+            Callout(summary, Theme.TextDim);
             // Controlled motors in one system that would turn it opposite ways fight each other.
             foreach (var system in systems.Distinct()) {
                 var mine = motors.Where(m => system.Motors.Contains(m)).ToList();
@@ -235,41 +239,68 @@ namespace Protobot.Motion {
                 float Way(MotorDrive m) => Mathf.Sign(system.MotorRatio(m)) * (Controls.Reversed(m.gameObject) ? -1f : 1f);
                 var against = mine.Where(m => Way(m) != Way(mine[0])).ToList();
                 if (against.Count == 0) continue;
-                var warn = Ui.Text(body, "Against", Names(against) + " would turn the gears the other way from " + mine[0].Label + ": reverse " + (against.Count == 1 ? "it" : "them") + " so they work together.", Theme.FontSmall, Theme.Warning);
-                warn.textWrappingMode = TextWrappingModes.Normal;
-                warn.Size(-1, 34f);
+                Callout(Names(against) + " would turn the gears the other way from " + mine[0].Label + ": reverse " + (against.Count == 1 ? "it" : "them") + " so they work together.", Theme.Warning);
             }
-            foreach (var jam in systems.Where(s => s.jammed).Select(s => s.jamReason).Distinct()) {
-                var warn = Ui.Text(body, "Jammed", "Can't turn: " + jam, Theme.FontSmall, Theme.Danger);
-                warn.textWrappingMode = TextWrappingModes.Normal;
-                warn.Size(-1, 34f);
-            }
+            foreach (var jam in systems.Where(s => s.jammed).Select(s => s.jamReason).Distinct())
+                Callout("Can't turn: " + jam, Theme.Danger);
             if (geared.Count > 0) {
-                var heading = Ui.Text(body, "Geared", "Also in this system (red), turned along but not controlled:", Theme.FontSmall, Theme.Text);
-                heading.textWrappingMode = TextWrappingModes.Normal;
-                heading.Size(-1, 34f);
+                Ui.Text(body, "Geared", "Also in this system (outlined red), turned along:", Theme.FontSmall, Theme.TextDim).Size(-1, 20f);
                 foreach (var other in geared) {
                     var row = Row(other.Label);
                     var dot = Ui.Image(row, "Cartridge", other.Color, 5f);
                     dot.Size(10f, 10f);
-                    var name = Ui.Text(row, "Name", other.Label + " · " + other.Kind + " · " + other.Rpm + " rpm", Theme.FontBody, Theme.Text);
+                    var name = Ui.Text(row, "Name", other.Label, Theme.FontBody, Theme.Text);
                     name.Size(-1, 28f, 1f);
+                    name.overflowMode = TextOverflowModes.Ellipsis;
+                    Ui.Text(row, "Kind", other.Kind + " · " + other.Rpm, Theme.FontSmall, Theme.TextFaint).Size(74f, 28f);
                     var target = other;
                     var pair = Ui.Button(row, "Pair", "Pair", () => {
                         Control(new[] { target }, true);
                         Interface.Interface.Say(target.Label + " paired: it's controlled with " + Names(controlled.Where(m => m != target)), true);
                         Audio.Sounds.Play(Audio.Sounds.Tick);
                     }, true, 5f, Theme.FontSmall);
-                    pair.Size(-1, 26f);
-                    Ui.Tip(pair, "Pair", null, "Controls " + other.Label + " with these (it gets their keys, speed and gearbox; set them to match).");
+                    pair.Size(58f, 26f);
+                    Ui.Tip(pair, "Pair", null, "Controls " + other.Label + " with these (it gets their keys, speed and gearbox).");
                 }
             }
         }
 
+        private void Section(string text) {
+            var heading = Dialog.Heading(body, text);
+            heading.margin = new Vector4(0, 6, 0, 0);
+            heading.Size(-1, 24f);
+        }
+
+        private void Callout(string text, Color color) {
+            var box = Ui.Image(body, "Callout", Theme.PanelRaised, 7f);
+            Ui.Column(box.rectTransform, 0f, new RectOffset(10, 10, 6, 6));
+            var label = Ui.Text(box.transform, "Text", text, Theme.FontSmall, color);
+            label.textWrappingMode = TextWrappingModes.Normal;
+            var lines = Mathf.Max(1, Mathf.CeilToInt(text.Length / 46f));
+            label.Size(-1, 16f * lines + 2f);
+            box.Size(-1, 16f * lines + 14f);
+        }
+
+        // A key card: its label and the key (click it, press a key).
+        private void KeyCard(RectTransform parent, bool forward, List<MotorDrive> motors) {
+            var card = Ui.Image(parent, forward ? "Forward" : "Reverse", Theme.PanelRaised, 8f);
+            var column = Ui.Column(card.rectTransform, 4f, new RectOffset(10, 10, 6, 8));
+            column.childForceExpandWidth = true;
+            card.Size(-1, 62f, 1f);
+            Ui.Text(card.transform, "Label", forward ? "Forward" : "Reverse", Theme.FontSmall, Theme.TextDim).Size(-1, 18f);
+            var keyOf = forward ? (System.Func<GameObject, Key>)Controls.ForwardKey : Controls.ReverseKey;
+            var mixed = motors.Select(m => keyOf(m.gameObject)).Distinct().Count() > 1;
+            var chip = MotionUi.KeyChip(card.transform, keyOf(motors[0].gameObject), key => SetKey(key, forward),
+                forward ? "Forward key" : "Reverse key", "Hold it to run " + Names(motors) + (forward ? " forward." : " in reverse."), mixed);
+            chip.Size(-1, 28f);
+        }
+
         private void MotorRow(MotorDrive motor, bool canUnpair) {
             var row = Row(motor.Label);
+            row.Size(-1, 32f);
             var dot = Ui.Image(row, "Cartridge", motor.Color, 5f);
             dot.Size(10f, 10f);
+            Ui.Tip(dot, "Cartridge color", null, motor.Kind == "11W" ? MotorDrive.CartridgeName(motor.Rpm) + ", " + motor.Rpm + " rpm" : "5.5W motor, 200 rpm");
             var field = Ui.Field(row, "Name", Controls.GivenName(motor.gameObject) ?? "", value => {
                 var before = motor.Label;
                 Controls.SetName(motor.gameObject, value);
@@ -282,25 +313,26 @@ namespace Protobot.Motion {
                 field.placeholder = hint;
             }
             Ui.Tip(field, "Name", null, "A name for this motor (\"Left drive\", \"Arm\"); empty: Motor " + motor.Number + ".");
-            var kind = Ui.Text(row, "Kind", motor.Kind, Theme.FontSmall, Theme.TextDim);
-            kind.Size(34f, 26f);
             var reversed = Controls.Reversed(motor.gameObject);
-            var rev = Ui.Button(row, "Reversed", "Rev", () => {
+            var rev = Ui.Button(row, "Reversed", reversed ? "Reversed" : "Normal", () => {
                 Controls.SetReversed(motor.gameObject, !Controls.Reversed(motor.gameObject));
-                Interface.Interface.Say(motor.Label + (Controls.Reversed(motor.gameObject) ? " reversed: forward turns the other way" : " not reversed"), true);
+                Interface.Interface.Say(motor.Label + (Controls.Reversed(motor.gameObject) ? " reversed: forward turns the other way" : " turns the normal way"), true);
                 Audio.Sounds.Play(Audio.Sounds.Tick);
                 shown = null;
             }, reversed, 5f, Theme.FontSmall);
-            rev.Size(-1, 26f);
-            if (!reversed) rev.targetGraphic.color = Theme.Field;
-            Ui.Tip(rev, "Reversed", null, "Forward turns this motor the other way (two motors facing each other on one system).");
+            rev.Size(84f, 28f);
+            if (!reversed) {
+                rev.targetGraphic.color = Theme.Field;
+                rev.GetComponentInChildren<TextMeshProUGUI>().color = Theme.TextDim;
+            }
+            Ui.Tip(rev, "Direction", null, "Reversed: forward turns this motor the other way (two motors facing each other on one system, or the right side of a drive).");
             if (canUnpair) {
                 var off = Ui.Button(row, "Unpair", "×", () => {
                     controlled.Remove(motor);
                     motor.StopToggle();
                     Interface.Interface.Say(motor.Label + " isn't controlled with the others now", true);
                 }, false, 5f, Theme.FontBody);
-                off.Size(26f, 26f);
+                off.Size(28f, 28f);
                 Ui.Tip(off, "Unpair", null, "Stops controlling " + motor.Label + " with these.");
             }
         }

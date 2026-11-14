@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -400,7 +400,7 @@ namespace Protobot.Custom {
             CustomParts.Add(part);
             PartsRecent.Use(part.Id);
             dialog.Close();
-            Interface.Interface.Say("Added " + part.name + " to your parts");
+            Interface.Interface.Announce("Added " + part.name + " to your parts");
             PartsBrowser.Instance?.PlaceCustom(part);
         }
 

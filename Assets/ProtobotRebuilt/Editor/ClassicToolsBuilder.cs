@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using Protobot;
 using Protobot.InputEvents;
@@ -42,6 +42,8 @@ public static class ClassicToolsBuilder {
         var serializedMeasure = new SerializedObject(measure);
         serializedMeasure.FindProperty("feedback").objectReferenceValue = feedback;
         serializedMeasure.ApplyModifiedPropertiesWithoutUndo();
+        // V2: the Bend tool (key 7): HS shafts, standoffs and the rubber link.
+        AddBend(sidebar, toggles, keybindings);
         // V2: the Join tool was removed (its objects go); the Select tool (key V, the cursor) takes its place.
         RemoveTool("Join", sidebar, toggles, keybindings);
         AddTool<SelectTool>("Select", "Select", "Assets/ProtobotRebuilt/Sprites/V2 Icons/SelectIcon.png", "v", -269.5f, sidebar, toggles, keybindings);
@@ -51,6 +53,23 @@ public static class ClassicToolsBuilder {
         EditorSceneManager.SaveScene(scene);
         Debug.Log("[Classic] Built the Saw and Drill tools.");
     }
+
+    /// <summary>V2: only the Bend tool (Tools > Protobot > Add Bend Tool), without rebuilding the others.</summary>
+    [MenuItem("Tools/Protobot/Add Bend Tool")]
+    public static void BuildBend() {
+        var scene = EditorSceneManager.GetActiveScene();
+        if (scene.path != ScenePath)
+            scene = EditorSceneManager.OpenScene(ScenePath);
+        var roots = scene.GetRootGameObjects();
+        AddBend(roots.First(r => r.name == "Build Canvas").transform.Find("Tools Sidebar"),
+                roots.First(r => r.name == "Tool Toggles").transform, roots.First(r => r.name == "Keybindings").transform);
+        EditorSceneManager.MarkSceneDirty(scene);
+        EditorSceneManager.SaveScene(scene);
+        Debug.Log("[Classic] Added the Bend tool.");
+    }
+
+    private static void AddBend(Transform sidebar, Transform toggles, Transform keybindings) =>
+        AddTool<BendTool>("Bend", "Bend (HS shafts, standoffs, rubber link)", "Assets/ProtobotRebuilt/Sprites/V2 Icons/BendIcon.png", "7", -310f, sidebar, toggles, keybindings);
 
     public static void RemoveTool(string name, Transform sidebar, Transform toggles, Transform keybindings) {
         foreach (var old in new[] { sidebar.Find(name + " Tool"), toggles.Find(name + " Tool Toggle") })

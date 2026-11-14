@@ -36,6 +36,7 @@ namespace Protobot.Tools {
             if (part == null) {
                 ToolOptions.Note(bar, "Click a part to select it");
                 Ui.Hint(bar, "Right-click", "a plastic or imported part to edit it");
+                Ui.Hint(bar, "C", "over a hole: screw + nut", "Hold F", "screw or nut", "Hold E", "spacer");  // V2: QuickPlace
                 return;
             }
             var custom = PartMenu.CustomOf(part);
@@ -48,6 +49,9 @@ namespace Protobot.Tools {
                     ? "Opens this piece's sketch; every copy in the build updates when you make it again."
                     : "Opens this part's model to add, pick or remove holes.");
             }
+            var mirror = Ui.Button(bar, "Mirror", "Mirror", MirrorTool.Open, false, 6f, Theme.FontSmall);   // V2
+            mirror.Size(80f, 30f);
+            Ui.Tip(mirror, "Mirror", Keybinds.Label("Mirror"), "Arrows appear on each side of the part: click one to copy it mirrored to that side, drag it out for a gap.");
             Ui.Hint(bar, "Esc", "clear");
         }
 

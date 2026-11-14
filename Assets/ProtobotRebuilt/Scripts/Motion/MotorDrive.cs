@@ -41,8 +41,32 @@ namespace Protobot.Motion {
         public static string CartridgeName(int rpm) => rpm == 100 ? "red" : rpm == 600 ? "blue" : "green";
         public Color Color => CartridgeColor(Rpm);
 
-        /// <summary>1, 2... in the order they were added.</summary>
-        public int Number => Live().IndexOf(this) + 1;
+        /// <summary>V2: the brain port it's wired to (a smart cable from it to the brain), else 1, 2... in the order
+        /// they were added, skipping the numbers wired motors have.</summary>
+        public int Number {
+            get {
+                var port = Port;
+                if (port != null) return port.number;
+                var live = Live();
+                var used = new HashSet<int>(live.Select(m => m.Port).Where(p => p != null).Select(p => p.number));
+                var n = 0;
+                foreach (var m in live) {
+                    if (m.Port != null) continue;
+                    do n++;
+                    while (used.Contains(n));
+                    if (m == this) return n;
+                }
+                return n + 1;
+            }
+        }
+
+        /// <summary>V2: the brain's smart port it's wired to, or null.</summary>
+        public WirePort Port {
+            get {
+                var port = WirePorts.BrainPortOf(gameObject);
+                return port != null && port.kind == WireKind.Smart ? port : null;
+            }
+        }
 
         /// <summary>Its given name, or "Motor 1".</summary>
         public string Label => Controls.GivenName(gameObject) ?? "Motor " + Number;
@@ -83,6 +107,9 @@ namespace Protobot.Motion {
             }
             Rpm = rpm;
             Dynamics.SetToken(gameObject, "cartridge", rpm.ToString());
+            // V2: the material the window shows now (loading a build's colors swaps the materials for copies).
+            if (cartridge != null && TryGetComponent(out MeshRenderer shown) && shown.sharedMaterials.Length > 1 && shown.sharedMaterials[1] != null)
+                cartridge = shown.sharedMaterials[1];
             if (cartridge != null) {
                 var color = CartridgeColor(rpm);
                 cartridge.color = color;
@@ -194,19 +221,23 @@ namespace Protobot.Motion {
                         }
             }
 
+            bool OnCartridge(Vector3 point) {
+                if (!grid.TryGetValue(Vector3Int.FloorToInt(point / Cell), out var near)) return false;
+                foreach (var (a, b, c) in near)
+                    if ((ClosestOnTriangle(point, a, b, c) - point).sqrMagnitude < 0.03f * 0.03f) return true;
+                return false;
+            }
             var vertices = motor.vertices;
             var triangles = motor.triangles;
             var rest = new List<int>();
             var window = new List<int>();
             for (var i = 0; i < triangles.Length; i += 3) {
-                var centre = (vertices[triangles[i]] + vertices[triangles[i + 1]] + vertices[triangles[i + 2]]) / 3f;
-                var onCartridge = false;
-                if (grid.TryGetValue(Vector3Int.FloorToInt(centre / Cell), out var near))
-                    foreach (var (a, b, c) in near)
-                        if ((ClosestOnTriangle(centre, a, b, c) - centre).sqrMagnitude < 0.03f * 0.03f) {
-                            onCartridge = true;
-                            break;
-                        }
+                var p0 = vertices[triangles[i]];
+                var p1 = vertices[triangles[i + 1]];
+                var p2 = vertices[triangles[i + 2]];
+                // V2: the whole triangle on the cartridge (its corners and middle), not only its middle: a big housing
+                // triangle reaching into the window showed the color past it.
+                var onCartridge = OnCartridge((p0 + p1 + p2) / 3f) && OnCartridge(p0) && OnCartridge(p1) && OnCartridge(p2);
                 (onCartridge ? window : rest).Add(triangles[i]);
                 (onCartridge ? window : rest).Add(triangles[i + 1]);
                 (onCartridge ? window : rest).Add(triangles[i + 2]);

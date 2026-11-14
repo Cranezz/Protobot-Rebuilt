@@ -1,0 +1,1 @@
+var et = UnityEngine.Object.FindFirstObjectByType<Protobot.Motion.ElasticTool>(); try { typeof(Protobot.Motion.ElasticTool).GetMethod("Update", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).Invoke(et, null); return "ran ok"; } catch (System.Exception e) { return e.InnerException != null ? e.InnerException.ToString() : e.ToString(); }

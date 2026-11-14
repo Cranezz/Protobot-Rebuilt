@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 namespace Protobot.Motion {
@@ -8,7 +8,9 @@ namespace Protobot.Motion {
         public static (Quaternion turn, Vector3 shift, float error) Find(IList<Vector3> from, IList<Vector3> to) {
             var a = Sample(from, 300);
             var b = Sample(to, 300);
-            var boxB = Box(b);
+            // V2: the boxes from every point (a sample of 300 could miss a thin part, like a goal's pole).
+            var boxA = Box(new List<Vector3>(from));
+            var boxB = Box(new List<Vector3>(to));
             // Every point of the target, by cell, for exact nearest points.
             var grid = new Dictionary<Vector3Int, List<Vector3>>();
             foreach (var p in to) {
@@ -24,7 +26,7 @@ namespace Protobot.Motion {
                     var turn = Quaternion.LookRotation(forward, up);
                     var turned = new List<Vector3>(a.Count);
                     foreach (var p in a) turned.Add(turn * p);
-                    var box = Box(turned);
+                    var box = new Bounds(turn * boxA.center, Abs(turn * boxA.size));   // exact for square turns
                     if ((box.size - boxB.size).magnitude > boxB.size.magnitude * 0.25f) continue;  // other proportions
                     var shift = boxB.center - box.center;
                     var error = 0f;
@@ -77,6 +79,8 @@ namespace Protobot.Motion {
             for (var i = 0; i < points.Count; i += step) list.Add(points[i]);
             return list;
         }
+
+        private static Vector3 Abs(Vector3 v) => new(Mathf.Abs(v.x), Mathf.Abs(v.y), Mathf.Abs(v.z));
 
         private static Bounds Box(List<Vector3> points) {
             var box = new Bounds(points[0], Vector3.zero);

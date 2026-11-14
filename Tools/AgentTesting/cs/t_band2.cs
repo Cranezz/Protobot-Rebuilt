@@ -1,0 +1,16 @@
+var close = GameObject.Find("Close Button"); if (close != null) close.GetComponent<UnityEngine.UI.Button>()?.onClick.Invoke();
+Protobot.PartsManager.DestroyLoadedObjects();
+var sb = new System.Text.StringBuilder();
+var pt = System.Type.GetType("Protobot.Editor.Playtest, Protobot.Editor");
+var point = pt.GetMethod("PointAt", new[] { typeof(Vector3) });
+var g = Protobot.PartsManager.GetPartType("SNDF").GetComponent<Protobot.PartGenerator>();
+g.param1.value = "2.00in";
+var a = g.Generate(new Vector3(0f, 1f, 0f), Quaternion.Euler(-90f, 0f, 0f));
+var b = g.Generate(new Vector3(5f, 1f, 0f), Quaternion.Euler(-90f, 0f, 0f));
+var c = g.Generate(new Vector3(2.5f, 1f, 2.5f), Quaternion.Euler(-90f, 0f, 0f));
+var ch = Protobot.PartsManager.GetPartType("CCHL").GetComponent<Protobot.PartGenerator>();
+ch.param1.value = ch.GetParam1Options()[0]; ch.param2.value = ch.GetParam2Options().Count > 10 ? ch.GetParam2Options()[10] : ch.param2.value;
+var chan = ch.Generate(new Vector3(2.5f, 0f, -3f), Quaternion.identity);
+Protobot.PivotCamera.Main.SetTransform(new Vector3(2.5f, 1f, 0f), new Vector3(55f, 0f, 0f), -14f);
+Physics.SyncTransforms();
+return "set up";

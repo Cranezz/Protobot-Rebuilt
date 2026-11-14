@@ -1,0 +1,26 @@
+// Adds a band between the two fittings' channel... then saves, clears and loads the build.
+var sb = new System.Text.StringBuilder();
+var m = GameObject.Find("Primary Selection Manager").GetComponent<Protobot.SelectionSystem.SelectionManager>();
+m.ClearCurrent();
+GameObject chan = null;
+foreach (var s0 in UnityEngine.Object.FindObjectsByType<Protobot.SavedObject>(FindObjectsSortMode.None)) if (s0.id != null && s0.id.StartsWith("CCHL")) chan = s0.gameObject;
+var g = Protobot.PartsManager.GetPartType("SNDF").GetComponent<Protobot.PartGenerator>();
+g.param1.value = "2.00in";
+var a = g.Generate(new Vector3(2f, 1f, 4f), Quaternion.Euler(-90f, 0f, 0f));
+var holes = chan.GetComponentsInChildren<Protobot.HoleCollider>();
+var hole = holes[0];
+var posts = new System.Collections.Generic.List<Protobot.Motion.BandPost>();
+posts.Add(new Protobot.Motion.BandPost { part = a, local = Vector3.zero, axisLocal = a.transform.InverseTransformDirection(Vector3.up), radius = 0.144f });
+posts.Add(new Protobot.Motion.BandPost { part = chan, local = chan.transform.InverseTransformPoint(hole.transform.position), axisLocal = chan.transform.InverseTransformDirection(hole.transform.forward), radius = 0.02f, hole = true });
+var bt = Protobot.PartsManager.GetPartType("BAND").GetComponent<Protobot.PartGenerator>();
+bt.param1.value = "BP64";
+var band = bt.Generate(posts[0].Center, Quaternion.identity).GetComponent<Protobot.Motion.ElasticBand>();
+band.Set(posts, 3, 2, 0f, Vector3.up);
+sb.Append("before: band " + band.Describe() + "\n");
+foreach (var t in Protobot.Motion.PneumaticTube.All) sb.Append("before: tube " + t.nodes.Count + " " + t.Length.ToString("F3") + "\n");
+var data = Protobot.Builds.SceneBuild.ToBuildData();
+var path = System.IO.Path.GetFullPath("Temp/roundtrip.pbb");
+Protobot.Builds.BuildFile.Write(path, data);
+Protobot.PartsManager.DestroyLoadedObjects();
+Protobot.Builds.SceneBuild.GenerateBuild(Protobot.Builds.BuildFile.Read(path));
+return sb.ToString();

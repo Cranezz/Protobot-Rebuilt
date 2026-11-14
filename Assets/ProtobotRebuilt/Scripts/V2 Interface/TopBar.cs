@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Protobot.Builds;
@@ -59,7 +59,7 @@ namespace Protobot.Interface {
             var e = FindObjectsByType<InputEvent>(FindObjectsInactive.Include, FindObjectsSortMode.None).FirstOrDefault(i => i.name == inputEvent);
             if (e == null) return "";
             try {
-                return e.GetCurrentKeybind().Replace("Control", "Ctrl").Replace(" | ", "+");
+                return e.CurrentKeysText;   // V2: after a change in Edit > Keyboard shortcuts
             }
             catch {
                 return "";
@@ -69,6 +69,7 @@ namespace Protobot.Interface {
         private void Build() {
             var buildCanvas = GameObject.Find("Build Canvas");
             old = buildCanvas != null ? buildCanvas.transform.Find("Top Bar") : null;
+            Builds.PartsListWindow.TextExport = () => Press(OldButton("Export Parts List"));   // V2: in the Parts list window now
             builds = FindFirstObjectByType<BuildsManager>(FindObjectsInactive.Include);
             if (old != null) {
                 var group = old.gameObject.GetOrAdd<CanvasGroup>();
@@ -151,6 +152,10 @@ namespace Protobot.Interface {
             chip.Size(-1, 30f);
             Ui.Tip(chip, "Plastic", null, "The polycarbonate in this build, against the rules: click to see it laid out on sheets.");
 
+            // V2: a picture of the robot (see-through or white background).
+            var picture = Ui.Button(right, "Picture", "Picture", Builds.PictureSaver.Open, false, 6f, Theme.FontSmall);
+            picture.Size(-1, 30f);
+            Ui.Tip(picture, "Save a picture", null, "The robot as you see it, with a see-through or white background, saved in Pictures\\Protobot (for notebooks, shirts and slides).");
             // V2: the simulation sandbox.
             // V2: games on a competition field (Robot Skills for now).
             var play = Ui.Button(right, "Play", "Play game", () => {
@@ -185,10 +190,13 @@ namespace Protobot.Interface {
             new Item { label = Builds.AutoSave.Enabled ? "Autosave every minute: on" : "Autosave every minute: off", action = Builds.AutoSave.Toggle },
             new Item { divider = true },
             new Item { label = "Play game…", action = Game.GameUi.OpenPlay },
+            new Item { label = "Multiplayer…", action = Online.OnlineWindow.Open },   // V2
             new Item { divider = true },
             new Item { label = "Import part…", action = Custom.ImportDialog.Choose },
             new Item { label = "Custom parts library…", action = Custom.LibraryDialog.Open },
-            new Item { label = "Export parts list", action = () => Press(OldButton("Export Parts List")) },
+            new Item { label = "Parts list…", action = Builds.PartsListWindow.Open },   // V2: its exports (spreadsheet, text) are in it
+            new Item { label = "Export 3D model (OBJ, STL)…", action = Builds.ModelExport.Open },   // V2
+            new Item { label = "Save picture…", action = Builds.PictureSaver.Open },   // V2
             new Item { divider = true },
             new Item { label = "Exit", action = () => Press(OldButton("File Menu/Exit Button")) },
         };
@@ -208,9 +216,11 @@ namespace Protobot.Interface {
             } },
             new Item { label = "Controls (motors, cylinders, drive)…", action = () => Motion.ControlsPanel.Open() },
             new Item { label = "Make a chain…", action = () => Motion.ChainTool.Begin() },
+            new Item { label = "Mirror", shortcut = Tools.Keybinds.Label("Mirror"), action = Tools.MirrorTool.Open },
             new Item { divider = true },
             new Item { label = "Graphics…", action = GraphicsWindow.Open },
-            new Item { label = "Preferences…", action = () => Press(OldButton("Edit Menu/Preferences Button")) },
+            new Item { label = "Keyboard shortcuts…", action = Tools.KeybindsWindow.Open },
+            new Item { label = "Preferences…", action = PreferencesWindow.Open },   // V2: its own window now
         };
 
         private List<Item> PlasticMenu() => new() {
@@ -219,7 +229,9 @@ namespace Protobot.Interface {
         };
 
         private List<Item> HelpMenu() => new() {
-            new Item { label = "Report a bug", action = () => Press(OldButton("Help Menu/Report a Bug Button")) },
+            new Item { label = "Report a bug…", action = () => Builds.CrashGuard.ReportDialog(false) },   // V2: with the bug log
+            new Item { label = "Request a part…", action = () => Builds.CrashGuard.ReportDialog(true) },   // V2
+            new Item { label = "Open bug log folder", action = () => Application.OpenURL("file:///" + Builds.CrashGuard.LogFolder.Replace('\\', '/')) },
             new Item { label = "Patch notes", action = () => Press(OldButton("Help Menu/Patch Notes Button")) },
             new Item { label = "Official website", action = () => Press(OldButton("Help Menu/Website Button")) },
         };

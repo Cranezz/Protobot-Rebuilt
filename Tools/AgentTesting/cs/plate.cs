@@ -1,0 +1,10 @@
+UnityEditor.EditorApplication.isPaused = false;
+var close = GameObject.Find("Close Button"); if (close != null) close.GetComponent<UnityEngine.UI.Button>().onClick.Invoke();
+var p = Protobot.PartsManager.GeneratePart("VXMISCELLANEOUS-Red License Plate", new Vector3(0f, 2f, 0f), Quaternion.identity);
+var lp = p.GetComponent<Protobot.Motion.LicensePlate>();
+if (lp == null) return "no LicensePlate component";
+lp.Set("1234A", 1, 0);
+var r = p.GetComponent<Renderer>().bounds;
+Protobot.PivotCamera.Main.SetTransform(r.center, new Vector3(10f, 0f, 0f), -14f);
+var mf = p.GetComponent<MeshFilter>().sharedMesh.bounds;
+return "plate mesh size " + mf.size.ToString("F2") + " state " + p.GetComponent<Protobot.SavedObject>().state;

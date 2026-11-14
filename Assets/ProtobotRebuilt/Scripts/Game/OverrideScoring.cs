@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -15,6 +15,8 @@ namespace Protobot.Game {
         public int scoredRedBlueHalves, scoredYellowHalves, placedPins, placedCups;
         public bool robotInMidfield;
         public readonly List<string> details = new();
+        /// <summary>V2: each thing that scored and where (the end-of-run reveal lights them up one by one).</summary>
+        public readonly List<ScoredItem> items = new();
     }
 
     public static class OverrideScoring {
@@ -85,6 +87,8 @@ namespace Protobot.Game {
                     if (hidden) continue;
                     var color = pin.ColorOf(half);
                     var quadrant = stack.goal.quadrant;
+                    var where = quadrant == Quadrant.Midfield ? "Midfield Goal" : quadrant + " Quadrant goal" + (stack.goal.alliance ? " (Alliance)" : "");
+                    var middle = Vector3.Lerp(pin.transform.position, pin.End(half), 0.5f);
                     if (color == PieceColor.Yellow) {
                         var owned = quadrant == Quadrant.Midfield
                             ? robotInMidfield
@@ -92,11 +96,13 @@ namespace Protobot.Game {
                         if (!owned) continue;
                         score.scoredYellowHalves++;
                         score.yellow += YellowHalf;
+                        score.items.Add(new ScoredItem { point = middle, points = YellowHalf, kind = "Yellow pin halves", where = where, pin = pin });
                     }
                     else if (color == PieceColor.Red || color == PieceColor.Blue) {
                         if (quadrant != Quadrant.Midfield && GameField.ColorOf(quadrant) != color) continue;
                         score.scoredRedBlueHalves++;
                         score.redBlue += AllianceHalf;
+                        score.items.Add(new ScoredItem { point = middle, points = AllianceHalf, kind = (color == PieceColor.Red ? "Red" : "Blue") + " pin halves", where = where, pin = pin });
                     }
                 }
             }

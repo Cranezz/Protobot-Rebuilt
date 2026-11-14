@@ -1,4 +1,4 @@
-using Protobot.Interface;
+﻿using Protobot.Interface;
 using TMPro;
 using UnityEngine;
 
@@ -33,7 +33,7 @@ namespace Protobot.Builds {
                 try {
                     var backup = BuildFile.Upgrade(path, SceneBuild.ToBuildData());
                     builds.MarkSaved();
-                    Interface.Interface.Say("Upgraded " + name + " (the old file is saved as " + System.IO.Path.GetFileName(backup) + ")");
+                    Interface.Interface.Announce("Upgraded " + name + " (the old file is saved as " + System.IO.Path.GetFileName(backup) + ")");
                 }
                 catch (System.Exception e) {
                     Debug.LogError("Couldn't upgrade " + path + ": " + e);

@@ -1,0 +1,1 @@
+Protobot.Motion.BandPost p; var ok = Protobot.Motion.ElasticTool.PostUnderMouse(Camera.main, out p); return "post " + ok + " " + (p != null ? p.what : "") + " overUI " + Protobot.MouseInput.overUI + " mouse " + UnityEngine.InputSystem.Mouse.current.position.ReadValue() + " paused " + UnityEditor.EditorApplication.isPaused + " frame " + Time.frameCount;

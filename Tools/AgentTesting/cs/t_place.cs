@@ -1,0 +1,22 @@
+// Setup: start placing PLACE, aim the camera at port INDEX of TARGET from outside, point the mouse at it.
+var placeId = "VXPNEUMATICS-Straight Pneumatic Fitting";
+var targetName = "T_PNMT-50mm-Normal";
+var index = 1;
+var target = GameObject.Find(targetName);
+var holes = new System.Collections.Generic.List<Protobot.HoleCollider>();
+foreach (var hc in target.GetComponentsInChildren<Protobot.HoleCollider>()) if (hc.holeType == Protobot.HoleCollider.HoleType.Threaded) holes.Add(hc);
+var h = holes[index];
+var center = target.GetComponent<Renderer>().bounds.center;
+var a = h.transform.position + h.transform.forward * h.transform.lossyScale.z / 2f;
+var b = h.transform.position - h.transform.forward * h.transform.lossyScale.z / 2f;
+var face = (a - center).magnitude > (b - center).magnitude ? a : b;
+var outward = (face - h.transform.position).normalized;
+var look = Quaternion.LookRotation(-outward + Vector3.down * 0.25f + Vector3.left * 0.15f).eulerAngles;
+Protobot.PivotCamera.Main.SetTransform(face, look, -2.5f);
+var type = Protobot.PartsManager.GetPartType(placeId);
+var gen = type.GetComponent<Protobot.PartGenerator>();
+gen.param1.value = placeId.Split('-')[1];
+var placement = Protobot.Placement.Instance;
+if (!Protobot.Placement.IsPlacing) placement.StartPlacing(new Protobot.PartPlacementData(gen, type, placement.transform));
+System.IO.File.WriteAllText("Temp/face.txt", face.x + "," + face.y + "," + face.z);
+return "face " + face.ToString("F3") + " outward " + outward.ToString("F2");

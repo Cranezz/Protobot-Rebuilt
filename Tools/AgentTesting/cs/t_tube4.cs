@@ -1,0 +1,25 @@
+var sb = new System.Text.StringBuilder();
+var tube = Protobot.Motion.PneumaticTube.All[0];
+var m = GameObject.Find("Primary Selection Manager").GetComponent<Protobot.SelectionSystem.SelectionManager>();
+m.SetCurrent(new Protobot.SelectionSystem.ObjectSelection { gameObject = tube.gameObject });
+var pt = System.Type.GetType("Protobot.Editor.Playtest, Protobot.Editor");
+var frames = pt.GetMethod("Frames");
+var mouse = UnityEngine.InputSystem.Mouse.current;
+System.Action<Vector3, bool> Set = (world, down) => {
+  var screen = Camera.main.WorldToScreenPoint(world);
+  UnityEngine.InputSystem.LowLevel.InputState.Change(mouse, new UnityEngine.InputSystem.LowLevel.MouseState { position = new Vector2(screen.x, screen.y), buttons = (ushort)(down ? 1 : 0) });
+};
+var line = tube.Line;
+var mid = line[line.Count / 4];
+var before = tube.nodes.Count;
+var undoBefore = Protobot.StateSystems.StateSystem.states != null ? Protobot.StateSystems.StateSystem.states.Count : -1;
+Set(mid, false); frames.Invoke(null, new object[] { 3 });
+sb.Append("busy over line " + Protobot.Motion.TubeEditor.Busy + "\n");
+Set(mid, true); frames.Invoke(null, new object[] { 2 });
+sb.Append("nodes after press " + tube.nodes.Count + " (was " + before + ")\n");
+Set(mid + new Vector3(0f, 1.5f, 0.5f), true); frames.Invoke(null, new object[] { 3 });
+sb.Append("length while dragging " + tube.Length.ToString("F2") + "\n");
+Set(mid + new Vector3(0f, 1.5f, 0.5f), false); frames.Invoke(null, new object[] { 3 });
+sb.Append("after release: nodes " + tube.nodes.Count + " length " + tube.Length.ToString("F2") + " editing " + tube.editing + "\n");
+UnityEditor.EditorApplication.isPaused = false;
+return sb.ToString();

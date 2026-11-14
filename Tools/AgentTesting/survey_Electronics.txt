@@ -1,0 +1,31 @@
+0	11W motor	MOTR-11W	
+1	5.5W motor	MOTR-5.5W	
+2	Brain	BRAN-	
+3	Brain Mount (long)	VXV5ELECTRONICS-Brain Mount (long)	holes 3 size (0.73, 3.45, 0.37)
+4	Brain Mount (short)	VXV5ELECTRONICS-Brain Mount (short)	holes 2 size (0.73, 1.98, 0.37)
+5	Battery	BTRY-	
+6	Radio	RDIO-	
+7	Battery clip	BTCL-	
+8	Potentiometer sensor	SNSR-Potentiometer-V5	
+9	Distance sensor	SNSR-Distance-V5	
+10	Rotation sensor	SNSR-Rotation-V5	
+11	Optical sensor	SNSR-Optical-V5	
+12	Vision sensor	SNSR-Vision-V5	
+13	Inertial sensor	SNSR-Inertial-V5	
+14	Potentiometer V2	VXSENSORS-Potentiometer V2	holes 4 size (2.01, 0.73, 0.68)
+15	GPS Sensor	VXSENSORS-GPS Sensor	holes 2 size (1.50, 1.00, 1.50)
+16	Distance sensor (3-wire)	SNSR-Distance-Cortex	
+17	Rotation sensor (3-wire)	SNSR-Rotation-Cortex	
+18	Optical sensor (3-wire)	SNSR-Optical-Cortex	
+19	Line Tracker sensor (3-wire)	SNSR-Line Tracker-Cortex	
+20	Analog Accelerometer	VXSENSORS-Analog Accelerometer	holes 2 size (1.20, 1.00, 0.57)
+21	Light Sensor	VXSENSORS-Light Sensor	holes 5 size (1.02, 1.93, 0.43)
+22	Line Sensor Mounting Bar	VXSENSORS-Line Sensor Mounting Bar	holes 5 size (0.75, 3.50, 0.75)
+23	Line Tracker V2	VXSENSORS-Line Tracker V2	holes 3 size (0.50, 2.23, 0.80)
+24	Optical Shaft Encoder	VXSENSORS-Optical Shaft Encoder	holes 4 size (2.66, 1.99, 0.80)
+25	Ultrasonic Range Finder	VXSENSORS-Ultrasonic Range Finder	holes 2 size (3.20, 1.19, 0.81)
+26	Yaw Rate Gyroscope Sensor	VXSENSORS-Yaw Rate Gyroscope Sensor	holes 2 size (1.20, 1.00, 0.57)
+27	Bumper switch (V5)	SWCH-Bumper-V5	
+28	Bumper switch (3-wire)	SWCH-Bumper-Cortex	
+29	Limit switch	SWCH-Limit-Cortex	
+30	V5 3 Wire Expander	VXSENSORS-V5 3 Wire Expander	holes 3 size (1.05, 3.00, 0.86)

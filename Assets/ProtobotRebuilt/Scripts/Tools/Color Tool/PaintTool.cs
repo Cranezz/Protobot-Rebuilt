@@ -52,22 +52,30 @@ namespace Protobot.Tools {
             SelectionManager.Blocked = () => ToolRail.Current == "Paint";
         }
 
-        private static void BuildOptions(RectTransform bar) {
-            ToolOptions.Segmented(bar, new[] { "Paint", "Part colors" }, editColors ? 1 : 0, i => {
-                FinishColorEdit();
-                editColors = i == 1;
-                editing = null;
-                Interface.Interface.Say(editColors ? "Click a part to see its colors" : "Click a part to paint it");
-                ToolOptions.Rebuild();
-                OpenPicker();
-            });
-            Ui.Divider(bar, true).Size(1f, 22f);
+        /// <summary>V2: right-click on a part in the Paint tool: its colors listed, to change each.</summary>
+        public static void EditColorsOf(GameObject part, Renderer clicked) {
+            // V2: any part's colors can be changed (not only the original's paintable metal).
+            var renderer = clicked != null && clicked.GetComponentInParent<SavedObject>() == part?.GetComponent<SavedObject>() ? clicked : part != null ? part.GetComponent<Renderer>() : null;
+            if (renderer == null || renderer.sharedMaterials.Length == 0) {
+                Interface.Interface.Say("This part has no colors to change", false);
+                return;
+            }
+            editColors = true;
+            StartColorEdit(renderer);
+        }
 
-            if (editColors) {
-                if (editing == null) {
-                    ToolOptions.Note(bar, "Click a part to list its colors");
-                    return;
-                }
+        private static void BuildOptions(RectTransform bar) {
+            if (editColors && editing != null) {
+                var back = Ui.Button(bar, "Back", "Back to painting", () => {
+                    FinishColorEdit();
+                    editing = null;
+                    editColors = false;
+                    ToolOptions.Rebuild();
+                    OpenPicker();
+                    Interface.Interface.Say("Click a part to paint it");
+                }, false, 5f, Theme.FontSmall);
+                back.Size(-1f, 30f);
+                Ui.Divider(bar, true).Size(1f, 22f);
                 ToolOptions.Note(bar, PartLabels.Short(editing.gameObject) + ":").color = Theme.Text;
                 for (var i = 0; i < partColors.Count; i++) {
                     var index = i;
@@ -104,7 +112,7 @@ namespace Protobot.Tools {
                 Ui.Tip(chip, "#" + ColorUtility.ToHtmlStringRGB(color));
             }
             Ui.Divider(bar, true).Size(1f, 22f);
-            Ui.Hint(bar, "Click", "paint", "Alt+Click", "pick up");
+            Ui.Hint(bar, "Click", "paint", "Alt+Click", "pick up", "Right-click", "a part's colors");
         }
 
         private static void OpenPicker() {
@@ -156,9 +164,19 @@ namespace Protobot.Tools {
                 Interface.Interface.Say("Picked up #" + ColorUtility.ToHtmlStringRGB(Current));
                 return;
             }
-            if (editColors) {
-                StartColorEdit(renderer);
-                return;
+            if (editColors && editing != null) {
+                // V2: a click while changing a part's colors: a click on it picks the color under the mouse to
+                // change; on another part it goes back to painting.
+                if (renderer == editing) {
+                    var color = renderer.sharedMaterials[materialIndex].color;
+                    var index = partColors.FindIndex(c => Same(c, color));
+                    if (index >= 0) ChooseColor(index);
+                    return;
+                }
+                FinishColorEdit();
+                editing = null;
+                editColors = false;
+                ToolOptions.Rebuild();
             }
             Paint(renderer, materialIndex, Current);
         }

@@ -126,6 +126,7 @@ namespace Protobot.Motion {
         public float tight;        // the loop's length round the sprockets
         public int links;
         public float[] wrapAngles;  // how far round each sprocket the chain goes (radians)
+        public Vector2[] spanFrom, spanTo;   // V2: the straight run leaving each sprocket for the next
         public string problem;
 
         /// <summary>Teeth of a sprocket in the chain at once (fewer than 3 and it can skip under load).</summary>
@@ -162,6 +163,9 @@ namespace Protobot.Motion {
                 inPoint[(i + 1) % n] = b.center - sb * left;
                 spans[i] = straight;
             }
+            path.spanFrom = outPoint;
+            path.spanTo = new Vector2[n];
+            for (var i = 0; i < n; i++) path.spanTo[i] = inPoint[(i + 1) % n];
             // The tight length: spans and arcs.
             var sweeps = new float[n];
             var tight = 0f;

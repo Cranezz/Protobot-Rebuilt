@@ -1,0 +1,14 @@
+var close = GameObject.Find("Close Button"); if (close != null) close.GetComponent<UnityEngine.UI.Button>()?.onClick.Invoke();
+Protobot.PartsManager.DestroyLoadedObjects();
+var sb = new System.Text.StringBuilder();
+var brain = Protobot.PartsManager.GetPartType("BRAN").GetComponent<Protobot.PartGenerator>().Generate(new Vector3(0f, 1f, 0f), Quaternion.identity);
+var mg = Protobot.PartsManager.GetPartType("MOTR").GetComponent<Protobot.PartGenerator>(); mg.param1.value = "11W";
+var motor = mg.Generate(new Vector3(-1f, 1f, -6f), Quaternion.Euler(0f, 90f, 0f));
+var sg = Protobot.PartsManager.GetPartType("SWCH").GetComponent<Protobot.PartGenerator>(); sg.param1.value = "Limit"; sg.param2.value = "Cortex";
+var sw = sg.Generate(new Vector3(6f, 1f, 1f), Quaternion.identity);
+Physics.SyncTransforms();
+var bp = Protobot.Motion.WirePorts.Of(brain);
+var mp = Protobot.Motion.WirePorts.Of(motor);
+sb.Append("brain ports " + bp.Count + " motor ports " + mp.Count + (mp.Count > 0 ? " at " + mp[0].Position.ToString("F2") + " out " + mp[0].Out.ToString("F2") : "") + "\n");
+Protobot.PivotCamera.Main.SetTransform(new Vector3(0f, 1f, -2.5f), new Vector3(45f, 180f, 0f), -11f);
+return sb.ToString();

@@ -87,7 +87,7 @@ namespace Protobot.Builds {
             }
             // Replace the old file only once the new one is complete.
             if (File.Exists(path)) {
-                Backup(path);
+                if (!path.StartsWith(CrashGuard.RecoveryFolder, StringComparison.OrdinalIgnoreCase)) Backup(path);   // (not the crash copy)
                 File.Delete(path);
             }
             File.Move(temp, path);

@@ -1,0 +1,10 @@
+var sb = new System.Text.StringBuilder();
+var pt = System.Type.GetType("Protobot.Editor.Playtest, Protobot.Editor");
+var w = new Vector3(0.12f, 1.4f, 0f);
+pt.GetMethod("PointAt", new[] { typeof(Vector3) }).Invoke(null, new object[] { w });
+var cam = Camera.main;
+sb.Append("cam " + cam.name + " pos " + cam.transform.position.ToString("F1") + " screen " + cam.WorldToScreenPoint(w).ToString("F0") + " mouse " + Protobot.MouseInput.Position.ToString("F0") + "\n");
+var ray = cam.ScreenPointToRay(Protobot.MouseInput.Position);
+foreach (var h in Physics.RaycastAll(ray, 1000f, ~0, QueryTriggerInteraction.Collide)) sb.Append(" hit " + h.collider.name + " layer " + LayerMask.LayerToName(h.collider.gameObject.layer) + " d " + h.distance.ToString("F1") + "\n");
+foreach (var s0 in UnityEngine.Object.FindObjectsByType<Protobot.SavedObject>(FindObjectsSortMode.None)) sb.Append(" part " + s0.id + " layer " + LayerMask.LayerToName(s0.gameObject.layer) + " at " + s0.transform.position.ToString("F1") + " col " + (s0.GetComponent<Collider>() != null) + "\n");
+return sb.ToString();

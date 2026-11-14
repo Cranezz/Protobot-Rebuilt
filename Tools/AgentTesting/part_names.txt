@@ -1,0 +1,126 @@
+== VXADVANCEDGEARS (Advanced Gears): 12T Bevel Gear | 24T Bevel Gear | 36T Bevel Gear | 36T Worm Wheel | Bevel Gearbox Bracket | Cam Follower | Cam Follower Mounting Bracket | Differential | Drop Off Cam | Hand Crank | Lead Screw Bracket | Lead Screw Nut | Lead Screw Segment | Rack Gear | Rack Gearbox Bracket | Ratchet Gear | Universal Joint | Winch Bracket | Winch Drum | Winch Pawl | Worm Gear | Worm Gearbox Bracket
+== VXANGLESTOCK (Angle Stock): 1x1 Aluminum Angle (35) | 2x2 Aluminum Angle (35) | 2x2 Steel Angle (35) | 3x3 Steel Angle (35)
+== VXBALLBEARINGS (Ball Bearings): Ball Bearing | Ball Bearing Circle Insert | Ball Bearing Housing | Ball Bearing Square Insert | Set Screw | Normal Clamping Shaft Collar
+== VXBRACKETS (Brackets): Bevel Gearbox Bracket | Rack Gearbox Bracket | Rack Gearbox Bracket V2 | Swerve Bracket | Winch Bracket | Worm Gearbox Bracket
+== VXCCHANNELSTOCK (C-Channel Stock): 1x2x1 Aluminum C Channel (35) | 1x3x1 Aluminum C Channel (35) | 1x5x1 Aluminum C Channel (35) | 2x2x2 Aluminum C Channel (20) | 1x2x1 Steel C Channel (35) | 1x5x1 Steel C Channel (35)
+== VXCHAIN9P (Chain 9P): Chain Attachment Link | High Strength Chain Link | Medium Flap | Short Flap | Tall Flap | Tank Tread Traction Link | Tread Link
+== VXCHASSISRAILS (Chassis Rails): 2x1 Aluminum Chassis Rail (25) | 2x1 Steel Chassis Rail (16) | 2x1 Steel Chassis Rail (25) | 2x1 Steel Chassis Rail (35) | 3x2 Steel Chassis Rail (35)
+== VXGEARS (Gears): Normal 12T Gear | Normal 12T Steel Gear | Normal 36T Gear | Normal 60T Gear | Normal 84T Gear | HS 12T Gear | HS 24T Gear | HS 36T Gear | HS 48T Gear | HS 60T Gear | HS 72T Gear | HS 84T Gear
+== VXGUSSETSVEX (Gussets (VEX)): 30 Degree Bent | 45 Degree Bent | 45 Degree Flat | 45 Degree Gusset (old) | 60 Degree Bent | 60 Degree Flat | 90 Degree Angle | 90 Degree Bent | 90 Degree Flat | 90 Degree Plate | Angle Corner | Angle Coupler | Angle Gusset | C Channel Coupler | Pivot Gusset | Plus Gusset
+== VXHARDWARE (Hardware): Coupler | 1/2" Hex Coupler | 1.00" Hex Coupler | 1/2" Star Coupler | 1.00" Star Coupler | Rubber Bumper Smooth | Rubber Bumper Threaded | Rubber Link | Rubber Link bent | 0.29" Shoulder Screw (0.09" shoulder) | 3/8" Shoulder Screw (0.12" shoulder) | 1/2" Shoulder Screw (0.04" shoulder) | 1/2" Shoulder Screw (0.18" shoulder) | 1.00" Shoulder Screw (0.12" shoulder) | 1.50" Shoulder Screw (0.18" shoulder) | 2.00" Shoulder Screw (0.04" shoulder) | 0.29" Shoulder Screw (0.09" shoulder), threads shown | 3/8" Shoulder Screw (0.12" shoulder), threads shown | 1/2" Shoulder Screw (0.04" shoulder), threads shown | 1/2" Shoulder Screw (0.18" shoulder), threads shown | 1.00" Shoulder Screw (0.12" shoulder), threads shown | 1.50" Shoulder Screw (0.18" shoulder), threads shown | 2.00" Shoulder Screw (0.04" shoulder), threads shown | 1/4" Hex Screw | 3/8" Hex Screw | 1/2" Hex Screw | 5/8" Hex Screw | 3/4" Hex Screw | 7/8" Hex Screw | 1.00" Hex Screw | 1.13" Hex Screw | 1.25" Hex Screw | 1.50" Hex Screw | 1.75" Hex Screw | 2.00" Hex Screw | 2.25" Hex Screw | 2.50" Hex Screw | 1/4" Hex Screw, threads shown | 3/8" Hex Screw, threads shown | 1/2" Hex Screw, threads shown | 5/8" Hex Screw, threads shown | 3/4" Hex Screw, threads shown | 7/8" Hex Screw, threads shown | 1.00" Hex Screw, threads shown | 1.13" Hex Screw, threads shown | 1.25" Hex Screw, threads shown | 1.50" Hex Screw, threads shown | 1.75" Hex Screw, threads shown | 2.00" Hex Screw, threads shown | 2.25" Hex Screw, threads shown | 2.50" Hex Screw, threads shown | 1/4" Star Screw | 0.29" Star Screw | 3/8" Star Screw | 1/2" Star Screw | 5/8" Star Screw | 3/4" Star Screw | 7/8" Star Screw | 1.00" Star Screw | 1.25" Star Screw | 1.50" Star Screw | 1.75" Star Screw | 2.00" Star Screw | 2.25" Star Screw | 2.50" Star Screw | 1/4" Star Screw, threads shown | 0.29" Star Screw, threads shown | 3/8" Star Screw, threads shown | 1/2" Star Screw, threads shown | 5/8" Star Screw, threads shown | 3/4" Star Screw, threads shown | 7/8" Star Screw, threads shown | 1.00" Star Screw, threads shown | 1.25" Star Screw, threads shown | 1.50" Star Screw, threads shown | 1.75" Star Screw, threads shown | 2.00" Star Screw, threads shown | 2.25" Star Screw, threads shown | 2.50" Star Screw, threads shown | VEX IQ Pin
+== VXHIGHSTRENGTHSH (High Strength Shaft Parts): HS Bearing Flat | 1/8" HS Bushing | 5/16" HS Bushing | HS Lock Bar (3 hole) | HS Lock Bar (5 hole) | HS Lock Bar (7 hole) | HS Block Bearing | HS Clamping Shaft Collar | HS Spacer | 1/16" HS Spacer | 1/8" HS Spacer | 1/4" HS Spacer | 1/2" HS Spacer | Low Profile HS Clamping Shaft Collar | 24" HS Shaft
+== VXHINGES (Hinges): 2 Hole Hinge (bottom) | 2 Hole Hinge Pin | 2 Hole Hinge (top) | 3 Hole Hinge (bottom) | 3 Hole Hinge Pin | 3 Hole Hinge (top) | 4 Hole Hinge (bottom) | 4 Hole Hinge Pin | 4 Hole Hinge (top) | 5 Hole Hinge (bottom) | 5 Hole Hinge Pin | 5 Hole Hinge (top)
+== VXMISCELLANEOUS (Miscellaneous): Blue License Plate | Red License Plate
+== VXMOTIONPARTS (Motion Parts): 1 Post Bearing Flat Hex Retainer | 1 Post Bearing Flat Standoff Retainer | IQ Chain | HS Shaft Adapter Circle | HS Shaft Adapter Square | Insert Circle | Insert Square | Pulley | Shaft Collar Retainer with Bearing Flat | V5 Flywheel Weight
+== VXPLATESTOCK (Plate Stock): Aluminum Plate (5x25) | Steel Plate (5x25)
+== VXPNEUMATICS (Pneumatics): Cylinder Mount | Cylinder Rod Pivot | Fitting for Cylinders | Fitting for Reservoir | Fitting for Valves | Flow Meter | On Off Switch | Piston Nut | Pressure Regulator | Legacy Pneumatic Air Reservoir | Solenoid   Double Acting | Solenoid   Single Acting | T Fitting | Air Flow Valve Fitting | V5 Pneumatic Air Reservoir | Elbow Fitting | Manifold Assembly | Pneumatic Fitting Plug | Pneumatic Hand Valve | Schrader Valve | Straight Pneumatic Fitting | Tee Fittings | 25mm Piston (body) | 25mm Piston (rod) | 50mm Piston (body) | 50mm Piston (rod) | 75mm Piston (body) | 75mm Piston (rod) | Legacy Double Acting Piston (body) | Legacy Double Acting Piston (rod) | Legacy Single Acting Piston (body) | Legacy Single Acting Piston (rod)
+== VXSEGMENTEDANGLE (Segmented Angle): 1x1 Segmented Angle (25) | 1x1 Segmented Angle (35)
+== VXSENSORS (Sensors): Analog Accelerometer | Cortex Bumper Switch | V5 Bumper Switch | Light Sensor | Limit Switch | Line Sensor Mounting Bar | Line Tracker | Line Tracker V2 | Optical Shaft Encoder | Potentiometer | Potentiometer V2 | Ultrasonic Range Finder | V5 3 Wire Expander | Distance Sensor | GPS Sensor | Inertial Sensor | Optical Sensor | Rotation Sensor | Vision Sensor | Yaw Rate Gyroscope Sensor
+== VXSHAFTPARTS (Shaft Parts): Bearing Flat | Low Profile Bearing Flat | Metal Lock Bar | Plastic Lock Bar | Block Bearing | Shaft Collar (hex screw) | Shaft Collar (hex screw, threads shown) | Shaft Collar (no screw) | Shaft Collar (set screw) | Shaft Collar (star screw) | Shaft Collar (star screw, threads shown) | Rubber Shaft Collar | 6" Capped Shaft | 12" Shaft
+== VXSLIDEASSEMBLYP (Slide Assembly Parts): Inner Acetal Slide Truck | Inner Slide Member | Outer Slide Member
+== VXSLOTTEDANGLE (Slotted Angle): Slotted Angle | Slotted Angle, Inverse
+== VXSPACERS (Spacers): Nylon Spacer (5/16" OD) | 1/8" Nylon Spacer (5/16" OD) | 1/4" Nylon Spacer (5/16" OD) | 3/8" Nylon Spacer (5/16" OD) | 1/2" Nylon Spacer (5/16" OD) | 7/8" Nylon Spacer (5/16" OD) | Nylon Spacer (3/8" OD) | 1/8" Nylon Spacer (3/8" OD) | 1/4" Nylon Spacer (3/8" OD) | 3/8" Nylon Spacer (3/8" OD) | 1/2" Nylon Spacer (3/8" OD) | 7/8" Nylon Spacer (3/8" OD) | 1.00" Nylon Spacer (3/8" OD) | Nylon Spacer (1/2" OD) | 1/8" Black Nylon Spacer (1/2" OD) | 1/4" Black Nylon Spacer (1/2" OD) | 3/8" Black Nylon Spacer (1/2" OD) | 1/2" Black Nylon Spacer (1/2" OD) | 1/8" White Nylon Spacer (1/2" OD) | 1/4" White Nylon Spacer (1/2" OD) | 3/8" White Nylon Spacer (1/2" OD) | 1/2" White Nylon Spacer (1/2" OD) | Spacer Nylon Click On | 1/16" Click On Spacer | 1/8" Click On Spacer | 1/4" Click On Spacer | Spacer Plastic | 4.6mm Plastic Spacer | 8mm Plastic Spacer | Washer Steel | 0.02" Steel Washer (3/8" OD) | 0.03" Steel Washer (3/8" OD) | 1/16" Steel Washer (3/8" OD) | Washer Teflon | 0.03" Teflon Washer (3/8" OD) | 0.04" Teflon Washer (3/8" OD) | 1/16" Teflon Washer (3/8" OD) | 0.04" Teflon Washer (1/2" OD)
+== VXSPROCKETS (Sprockets): Normal 10T Sprocket | Normal 12T Sprocket | Normal 24T Sprocket | Normal 40T Sprocket | Normal 48T Sprocket | 9P 15T Drive Wheel | 6P 16T Sprocket | 6P 24T Sprocket | 6P 32T Sprocket | 6P 40T Sprocket | 6P 8T Sprocket | HS 12T Sprocket | HS 18T Sprocket | HS 24T Sprocket | HS 30T Sprocket | HS 6T Sprocket
+== VXSTANDOFFVEX (Standoff (VEX)): 1/4" Standoff | 1/2" Standoff | 3/4" Standoff | 7/8" Standoff | 1.00" Standoff | 1.50" Standoff | 2.00" Standoff | 2.50" Standoff | 3.00" Standoff | 4.00" Standoff | 5.00" Standoff | 6.00" Standoff
+== VXSTRUCTUREPARTS (Structure Parts): 1 Post Hex Nut Retainer | 1 Post Standoff Retainer | 4 Post Hex Nut Retainer | 4 Post Standoff Retainer | Standoff
+== VXV5ELECTRONICS (V5 Electronics): V5 3 Wire Expander | Battery | Battery Clip | Brain | Brain Mount (long) | Brain Mount (short) | 11W Motor | 5.5W Motor | Radio | Battery (simple) | Brain (simple) | 11W Motor (simple) | Radio (simple)
+== VXWHEELS (Wheels): 6 Wheel Leg | Bogie Wheel Double | Bogie Wheel Single | 1.625" Flex Wheel | 1.625" Flex Wheel, 30A, 1/8" wide | 1.625" Flex Wheel, 30A, 1/4" wide | 1.625" Flex Wheel, 30A, 3/8" wide | 1.625" Flex Wheel, 30A, 1/2" wide | 1.625" Flex Wheel, 40A, 1/8" wide | 1.625" Flex Wheel, 40A, 1/4" wide | 1.625" Flex Wheel, 40A, 3/8" wide | 1.625" Flex Wheel, 40A, 1/2" wide | 1.625" Flex Wheel, 60A, 1/8" wide | 1.625" Flex Wheel, 60A, 1/4" wide | 1.625" Flex Wheel, 60A, 3/8" wide | 1.625" Flex Wheel, 60A, 1/2" wide | 2" Flex Wheel | 2" Flex Wheel, 30A, 1/8" wide | 2" Flex Wheel, 30A, 1/4" wide | 2" Flex Wheel, 30A, 3/8" wide | 2" Flex Wheel, 30A, 1/2" wide | 2" Flex Wheel, 40A, 1/8" wide | 2" Flex Wheel, 40A, 1/4" wide | 2" Flex Wheel, 40A, 3/8" wide | 2" Flex Wheel, 40A, 1/2" wide | 2" Flex Wheel, 60A, 1/8" wide | 2" Flex Wheel, 60A, 1/4" wide | 2" Flex Wheel, 60A, 3/8" wide | 2" Flex Wheel, 60A, 1/2" wide | 3" Flex Wheel | 3" Flex Wheel, 30A, 1/8" wide | 3" Flex Wheel, 30A, 1/4" wide | 3" Flex Wheel, 30A, 3/8" wide | 3" Flex Wheel, 30A, 1/2" wide | 3" Flex Wheel, 30A, 3/4" wide | 3" Flex Wheel, 30A, 1.00" wide | 3" Flex Wheel, 40A, 1/8" wide | 3" Flex Wheel, 40A, 1/4" wide | 3" Flex Wheel, 40A, 3/8" wide | 3" Flex Wheel, 40A, 1/2" wide | 3" Flex Wheel, 40A, 3/4" wide | 3" Flex Wheel, 40A, 1.00" wide | 3" Flex Wheel, 60A, 1/8" wide | 3" Flex Wheel, 60A, 1/4" wide | 3" Flex Wheel, 60A, 3/8" wide | 3" Flex Wheel, 60A, 1/2" wide | 3" Flex Wheel, 60A, 3/4" wide | 3" Flex Wheel, 60A, 1.00" wide | 4" Flex Wheel | 4" Flex Wheel, 30A, 1/8" wide | 4" Flex Wheel, 30A, 1/4" wide | 4" Flex Wheel, 30A, 3/8" wide | 4" Flex Wheel, 30A, 1/2" wide | 4" Flex Wheel, 30A, 3/4" wide | 4" Flex Wheel, 30A, 1.00" wide | 4" Flex Wheel, 40A, 1/8" wide | 4" Flex Wheel, 40A, 1/4" wide | 4" Flex Wheel, 40A, 3/8" wide | 4" Flex Wheel, 40A, 1/2" wide | 4" Flex Wheel, 40A, 3/4" wide | 4" Flex Wheel, 40A, 1.00" wide | 4" Flex Wheel, 60A, 1/8" wide | 4" Flex Wheel, 60A, 1/4" wide | 4" Flex Wheel, 60A, 3/8" wide | 4" Flex Wheel, 60A, 1/2" wide | 4" Flex Wheel, 60A, 3/4" wide | 4" Flex Wheel, 60A, 1.00" wide | 1/8" VersaHex Adapter | 1/4" VersaHex Adapter | VersaHub | Intake Roller | 2" Anti Static Omni Wheel | 2.75" Omni Wheel (old) | 2" Mecanum Wheel (left) | 2" Mecanum Wheel (right) | 2.75" Omni Wheel | 2.75" Anti Static Omni Wheel | 2.75" Traction Wheel | 2.75" Anti Static Traction Wheel | 3.25" Omni Wheel | 3.25" Anti Static Omni Wheel | 3.25" Traction Wheel | 3.25" Anti Static Traction Wheel | 4" Mecanum Wheel (left) | 4" Mecanum Wheel (right) | 4" Omni Wheel | 4" Anti Static Omni Wheel | 4" Omni Wheel (locked) | 4" Traction Wheel | 4" Traction Wheel (169) | 4" Anti Static Traction Wheel | 4" Traction Tire | 5" Traction Wheel
+== BLOK (Block): Red | Blue
+== CGOL (Center Goal)
+== FELD (High Stakes Field): With walls | Without walls
+== LOAD (Loader)
+== LGOL (Long Goal)
+== OVAG (Override Alliance Goal): Red | Blue
+== OVCP (Override Cup)
+== OVFL (Override Field): Empty | Match
+== OVGL (Override Goal): Short | Tall | Red Alliance | Blue Alliance
+== OVLD (Override Loader): Red | Blue
+== OVPN (Override Pin): Red Blue | Red Yellow | Blue Yellow | Yellow
+== OVSG (Override Short Goal)
+== OVTG (Override Tall Goal)
+== OVTO (Override Toggle)
+== PUBA (Push Back Field)
+== RING (Ring): Red | Blue
+== DISC (Spin Up Disc)
+== SAKE (Stake)
+== BTRY (Battery)
+== BTCL (Battery Clip)
+== BRAN (Brain)
+== MOTR (Motor): 11W | 5.5W
+== RDIO (Radio)
+== SNSR (Sensor): Potentiometer | Distance | Rotation | Optical | Vision | Inertial | Line Tracker
+   Potentiometer -> V5
+   Distance -> V5 | Cortex
+   Rotation -> V5 | Cortex
+   Optical -> V5 | Cortex
+   Vision -> V5
+   Inertial -> V5
+   Line Tracker -> Cortex
+== SWCH (Switch): Bumper | Limit
+   Bumper -> V5 | Cortex
+   Limit -> Cortex
+== PNMT (Cylinder): 25mm | 50mm | 75mm
+   25mm -> Normal | Extended
+   50mm -> Normal | Extended
+   75mm -> Normal | Extended
+== TANK (Reservoir): V5 | Legacy
+== BLCK (Block Bearing): Normal | High Strength
+== BRNG (Flat Bearing): Normal | High Strength | Low Profile | Collar Retainer
+== GEAR (Gear): Normal | High Strength | High Strength v2
+   Normal -> 12T | 36T | 60T | 84T
+   High Strength -> 12T | 36T | 60T | 84T
+   High Strength v2 -> 24T | 36T | 48T | 60T | 72T | 84T
+== SPKT (Sprocket): Normal | High Strength
+   Normal -> 10T | 15T | 24T | 40T | 48T
+   High Strength -> 6T | 12T | 18T | 24T | 30T
+== HexNR (Hex Nut Retainer): Nut Retainer | Bearing Retainer | Square Retainer
+== LMTK (Linear Motion Kit): Inner Slide Trunk | Outer Slide Trunk | Linear Slide Bracket
+== LKBR (Lock Bar): Metal | Plastic
+== MCMS (Mechanisms): Bevel Gear | Drop Off Cam | Screw Kit | Cam Follower | Rack | Hand Crank | Worm and Wheel
+   Bevel Gear -> 16T | 32T
+   Drop Off Cam -> 
+   Screw Kit -> Bracket | Worm Nut | Worm Gear
+   Cam Follower -> 
+   Rack -> 
+   Hand Crank -> 
+   Worm and Wheel -> Gear | Worm
+== RAIL (Rails): Rail
+== RBMP (Rubber Bumper)
+== SHFT (Shaft): Normal | High Strength
+== CLMP (Shaft Collar): Normal | Clamping
+   Normal -> Normal
+   Clamping -> Normal | High Strength | Low Profile HS
+== SPCR (Spacer): Nylon | Plastic | High Strength
+   Nylon -> 1/8in | 1/4in | 3/8in | 1/2in
+   Plastic -> 4.6mm | 8mm
+   High Strength -> 1/16in | 1/8in | 1/4in | 1/2in
+== WSHR (Washer): Steel | Teflon
+== FWHL (Flex Wheel): With Adapters | No Adapters
+   With Adapters -> 1.625in | 2.00in | 3.00in | 4.00in
+   No Adapters -> 1.625in | 2.00in | 3.00in | 4.00in
+== MECN (Mecanum Wheel)
+== OMNI (Omni Wheel): V1 | V2
+   V1 -> 2.75in | 3.25in | 4.00in
+   V2 -> 2.00in | 2.75in | 3.25in | 4.00in
+== TWHL (Traction Wheel): V1 | V2
+   V1 -> 2.75in | 3.25in | 4.00in | 5.00in
+   V2 -> 2.75in | 3.25in | 4.00in
+== ANGL (Angle): 1x1 | 2x2 | 3x3
+== BSPT (Base Plate)
+== CCHL (C-Channel): 1x2 | 1x3 | 1x5
+== GSET (Gussets): Coupler | 30 Degree | 45 Degree | 60 Degree | 90 Degree | Pack
+   Coupler -> Angle | Angle Corner | Channel
+   30 Degree -> Flat | Bent
+   45 Degree -> Flat | Bent | Plate
+   60 Degree -> Flat | Bent
+   90 Degree -> Flat | Bent | Angle | Plate
+   Pack -> Angle | Pivot | Plus
+== NUT (Nut): Lock | Keps | Hex | Low Profile
+== PLTE (Plate):  
+== RAILS (Rail): 2x25 | 2x35
+== SCRW (Screw): 1/4in | 3/8in | 1/2in | 5/8in | 3/4in | 7/8in | 1.00in | 1.25in | 1.50in | 1.75in | 2.00in | 2.25in | 2.50in
+== SNDF (Standoff): 1/4in | 1/2in | 3/4in | 1.00in | 1.50in | 2.00in | 2.50in | 3.00in | 4.00in | 5.00in | 6.00in
+== UCHL (U-Channel): 2x2
+== CUST (Custom Part): d2f27741 | c65c825f | b1c38462
+== POLY (Polycarbonate): 6729ed28 | 4ca5ede9 | 9dde0179 | 463411f6 | 4aa13db5 | 179f1507
+== CHAN (Chain): Normal | HS | 6P

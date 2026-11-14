@@ -109,6 +109,7 @@ namespace Protobot {
         public void RemoveDetector(HoleDetector detector) {
             detectors.Remove(detector);
             Track();  // V2
+            OnSetDetector?.Invoke(null);  // V2: the insert goes when the screw or shaft comes out
         }
 
         private void OnDisable() {

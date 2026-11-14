@@ -2,7 +2,11 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 
 namespace Protobot.Tools {
-    public abstract class ClickDragTool : MonoBehaviour, IEndDragHandler, IDragHandler, IPointerDownHandler, IPointerUpHandler {
+    public abstract class ClickDragTool : MonoBehaviour, IEndDragHandler, IDragHandler, IPointerDownHandler, IPointerUpHandler, IInitializePotentialDragHandler {
+        // V2: an arrow or ring follows the mouse from the first pixel (the event system waited for a 10 px drag, then
+        // the part jumped the whole way at once).
+        public void OnInitializePotentialDrag(PointerEventData eventData) => eventData.useDragThreshold = false;
+
         public MovementManager movementManager;
         public GameObject refObj => movementManager.MovingObj;
 

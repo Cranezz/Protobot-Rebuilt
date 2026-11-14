@@ -1,0 +1,10 @@
+var g = Protobot.Game.SkillsGame.Current;
+g.SetSkipAutonomous(false);
+g.StartRun();
+g.countdown = 0.01f;
+var t = System.Type.GetType("Protobot.Editor.Playtest, Protobot.Editor");
+t.GetMethod("Frames").Invoke(null, new object[] { 3 });
+var a = "state " + g.state + " time " + g.timeLeft.ToString("0.0") + " auto " + g.InAutonomous + " drive " + Protobot.Motion.Sandbox.DriveEnabled;
+g.timeLeft = 105.05f;
+t.GetMethod("Frames").Invoke(null, new object[] { 6 });
+return a + " | after: time " + g.timeLeft.ToString("0.0") + " auto " + g.InAutonomous + " drive " + Protobot.Motion.Sandbox.DriveEnabled;

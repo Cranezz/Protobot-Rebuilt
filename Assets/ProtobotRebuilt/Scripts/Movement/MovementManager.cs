@@ -127,6 +127,14 @@ namespace Protobot {
             if (!displaceContinous) {
                 FormPivot(PivotObjs());
             }
+            else {
+                // V2: while an arrow or ring is dragged the parts are where the mouse says at once (a new 0.25 s
+                // tween every frame left them trailing behind the mouse).
+                movementTween?.Kill();
+                movementPivot.transform.position = displacement.translation.Position;
+                if (displacement.rotation != null) movementPivot.transform.localRotation = displacement.rotation.Orientation;
+                duration = 0f;
+            }
             movementTween = displacement.Displace(movementPivot.gameObject, duration);
         }
 

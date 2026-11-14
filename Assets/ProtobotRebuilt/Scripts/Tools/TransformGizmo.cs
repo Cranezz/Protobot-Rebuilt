@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Protobot.StateSystems;
 using UnityEngine;
 
@@ -40,6 +40,9 @@ namespace Protobot.Tools {
             if (!obj.TryGetComponent(out SavedObject _))
                 return Vector3.zero;  // a pivot of several selected parts already sits at their middle
             // V2: on a joint to a grounded part it can only turn about the joint: the gizmo sits on it.
+            // V2: a fitting turns in its thread: the gizmo on the thread's axis (its origin), so it stays in the port.
+            if (ChildPartGenerator.IsFittingPart(obj) && System.Linq.Enumerable.Any(GroupManager.Neighbours(obj)))
+                return Vector3.zero;
             var pin = Motion.Linkage.GroundPin(obj);
             if (pin.HasValue)
                 return Vector3.Scale(obj.transform.InverseTransformPoint(pin.Value), obj.transform.lossyScale);

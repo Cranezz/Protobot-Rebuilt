@@ -19,6 +19,7 @@ namespace Protobot {
         public bool placing;
         public static Placement Instance { get; private set; }  // V2
         public static bool IsPlacing => Instance != null && Instance.placing;  // V2
+        public string PlacingId => currentPlacementData?.objectId;  // V2: the action log says what's being placed
         public bool rotating;
 
         private PlacementData currentPlacementData;
@@ -67,7 +68,11 @@ namespace Protobot {
         private void Awake() {
             Instance = this;  // V2
             rotateRing = transform.Find("Rotate Ring Canvas");
+            AxlePlaceDisplacement.AddTo(this, placePositions);    // V2: round parts onto screws, shafts and holes
             ThreadPlaceDisplacement.AddTo(this, placePositions);  // V2: a cylinder held by its thread
+            CappedShaftPlaceDisplacement.AddTo(this, placePositions);  // V2: the capped shaft into holes
+            MountPlaceDisplacement.AddTo(this, placePositions);  // V2: pneumatic mounts onto cylinders
+            Motion.SlidePlaceDisplacement.AddTo(this, placePositions);  // V2: slide trucks into slide members
             placing = false;
             rotating = false;
             
@@ -113,6 +118,7 @@ namespace Protobot {
 
         void Update() {
             ThreadPlaceDisplacement.WatchClicks(this);  // V2
+            if (!(placing && rotating)) Interface.RingDial.Clear();  // V2
             if (placing) {
                 if (rotating) {
                     /*
@@ -137,12 +143,14 @@ namespace Protobot {
                     
                     Rotate();
                     if (!snappedTurn) freeRotation = currentDisplacement.rotation.Orientation;  // V2
+                    // V2: the dial (tick marks and the angle turned so far) round the turning point.
+                    Interface.RingDial.Draw(ringPosition, -initRotVector * Mathf.Sign(Vector3.Dot(refCamera.transform.forward, initRotVector)), initMouseScreen, MouseInput.Position, lastAngle, 22.5f);
                     if (rotateRing != null)
                         rotateRing.SetPositionAndRotation(ringPosition, ringRotation);
                 }
                 else {
                     // V2: T: back to the turn placing began with.
-                    if (UnityEngine.InputSystem.Keyboard.current != null && UnityEngine.InputSystem.Keyboard.current.tKey.wasPressedThisFrame
+                    if (Tools.Keybinds.Pressed("ResetTurn")
                         && !InputEvents.TextInput.IsTyping && !InputEvents.TextInput.ShortcutsPaused) {
                         freeRotation = startRotation;
                         currentDisplacement = new Displacement(currentDisplacement.translation.Position, freeRotation);
@@ -157,8 +165,15 @@ namespace Protobot {
                                 newDisplacement = new Displacement(displacement.translation.Position, freeRotation);
                             }
 
+                            // V2: a new part on the grid has its model's middle under the cursor (some VEX parts'
+                            // models sit away from their origin: chassis rails spawned off to the side).
+                            if (placePosition is PlanePlaceDisplacement && currentPlacementData is PartPlacementData && displayMesh != null) {
+                                var middle = newDisplacement.rotation.Orientation * displayMesh.bounds.center;
+                                newDisplacement = new Displacement(newDisplacement.translation.Position - new Vector3(middle.x, 0f, middle.z), newDisplacement.rotation.Orientation);
+                            }
+
                             currentDisplacement = newDisplacement;
-                            newDisplacement.Displace(gameObject);
+                            newDisplacement.Displace(gameObject, 0.05f);   // V2: was 0.25 s: the part trailed the mouse
                             break;
                         }
                     }
@@ -171,6 +186,10 @@ namespace Protobot {
         private Mesh displayMesh;  // V2
 
         public void StartPlacing(PlacementData newPlacementData) {
+            // V2: a part from the parts list is placed with the tools down: the drill or saw would act on the click
+            // that places it (a screw placed with the drill drilled the hole).
+            if (newPlacementData is PartPlacementData && Interface.ToolRail.Current != "Transform" && Interface.ToolRail.Current != "Move")
+                Interface.ToolRail.Select("Transform");
             currentPlacementData = newPlacementData;
             placing = true;
             rotating = false;
@@ -221,6 +240,11 @@ namespace Protobot {
             StartCoroutine(WaitStopPlacing());
         }
 
+        /// <summary>V2: places what's being placed where it is now (quick placing lets go of a key to place).</summary>
+        public void PlaceNow() {
+            if (placing && currentPlacementData != null) Place();
+        }
+
         private void Place() {
             bool isPartPlacement = currentPlacementData.GetType() == typeof(PartPlacementData);
             bool isGameObjectPlacement = currentPlacementData.GetType() == typeof(GameObjectPlacementData);
@@ -231,6 +255,7 @@ namespace Protobot {
             if (isPartPlacement) {
                 var generator = ((PartPlacementData)currentPlacementData).partGenerator;
                 GameObject placedObj = generator.Generate(displacePos, displaceRot);
+                Interface.PartsRecent.Use(generator.GetId());   // V2: Recent lists what was placed, not only picked
 
                 // Call OutputPartsList to update the weight display after placing a part
                 PartListOutput partListOutput = FindObjectOfType<PartListOutput>();
@@ -253,8 +278,14 @@ namespace Protobot {
             rotating = false;
             OnStopRotate?.Invoke();
         }
+        private Vector2 initMouseScreen;   // V2: the rotate dial
+        private float lastAngle;
+
         public void InitRotation() {
             initMouseVector = MouseVector;
+            initMouseScreen = MouseInput.Position;
+            lastAngle = 0f;
+            ringPosition = transform.position;
             if (rotateRing != null) {
                 ringRotation = rotateRing.rotation;
                 // V2: on the point the part turns about (the hole it's held by), so the ring stays on the part
@@ -269,6 +300,7 @@ namespace Protobot {
         public void Rotate() {
             float angle = Vector2.SignedAngle(MouseVector, initMouseVector);
             angle = Mathf.Round(angle * 1 / 22.5f) * 22.5f; //force values to round at 22.5 degree increments
+            lastAngle = angle;  // V2
             float camDot = Vector3.Dot(refCamera.transform.forward, initRotVector); //finds the dot product between the camera direction vs. the look direction of this rotate ring
             Quaternion newRot = Quaternion.AngleAxis(angle, -initRotVector * Mathf.Sign(camDot)) * initRot;
 

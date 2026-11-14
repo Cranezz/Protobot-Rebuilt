@@ -1,0 +1,30 @@
+0	Red Blue pin	OVPN-Red Blue	
+1	Red Yellow pin	OVPN-Red Yellow	
+2	Blue Yellow pin	OVPN-Blue Yellow	
+3	Yellow pin	OVPN-Yellow	
+4	Cup	OVCP-	
+5	Short goal	OVGL-Short	
+6	Tall goal	OVGL-Tall	
+7	Red Alliance goal	OVGL-Red Alliance	
+8	Blue Alliance goal	OVGL-Blue Alliance	
+9	Short goal	OVSG-	
+10	Tall goal	OVTG-	
+11	Red alliance goal	OVAG-Red	
+12	Blue alliance goal	OVAG-Blue	
+13	Empty field	OVFL-Empty	
+14	Match field	OVFL-Match	
+15	Red loader	OVLD-Red	
+16	Blue loader	OVLD-Blue	
+17	Toggle	OVTO-	
+18	Red block	BLOK-Red	
+19	Blue block	BLOK-Blue	
+20	Push Back field	PUBA-	
+21	Long goal	LGOL-	
+22	Center goal	CGOL-	
+23	Loader	LOAD-	
+24	Red ring	RING-Red	
+25	Blue ring	RING-Blue	
+26	With walls field	FELD-With walls	
+27	Without walls field	FELD-Without walls	
+28	Stake	SAKE-	
+29	Disc	DISC-	

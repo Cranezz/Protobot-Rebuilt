@@ -1,0 +1,20 @@
+VXWHEELS-Bogie Wheel Single: mesh centre (0.00, 0.03, 0.46) size (0.96, 1.56, 1.56), 4 holes
+   (-0.246, -0.144, 0.000) axis (0.0, 1.0, 0.0) size 0.170x0.170 depth 0.500 Threaded
+   (0.250, -0.144, 0.000) axis (0.0, 1.0, 0.0) size 0.170x0.170 depth 0.500 Threaded
+   (-0.254, 0.457, 0.000) axis (0.0, 1.0, 0.0) size 0.170x0.170 depth 0.701 Normal
+   (0.250, 0.457, 0.000) axis (0.0, 1.0, 0.0) size 0.170x0.170 depth 0.701 Normal
+VXWHEELS-Bogie Wheel Double: mesh centre (0.00, 0.03, -0.87) size (1.95, 1.56, 2.32), 4 holes
+   (-0.250, -0.144, -1.594) axis (0.0, 1.0, 0.0) size 0.170x0.170 depth 0.500 Threaded
+   (0.254, -0.144, -1.594) axis (0.0, 1.0, 0.0) size 0.170x0.170 depth 0.500 Threaded
+   (-0.250, 0.457, -1.594) axis (0.0, 1.0, 0.0) size 0.170x0.170 depth 0.701 Normal
+   (0.246, 0.457, -1.594) axis (0.0, 1.0, 0.0) size 0.170x0.170 depth 0.701 Normal
+VXWHEELS-6 Wheel Leg: mesh centre (0.00, 0.00, -0.38) size (6.00, 6.00, 1.00), 9 holes
+   (0.000, -1.000, -0.150) axis (0.0, 0.0, 1.0) size 0.169x0.169 depth 0.300 Normal
+   (0.000, -0.504, -0.150) axis (0.0, 0.0, 1.0) size 0.170x0.170 depth 0.300 Normal
+   (-1.000, 0.000, -0.150) axis (0.0, 0.0, 1.0) size 0.169x0.169 depth 0.300 Normal
+   (-0.504, 0.000, -0.150) axis (0.0, 0.0, 1.0) size 0.170x0.170 depth 0.300 Normal
+   (0.504, 0.000, -0.150) axis (0.0, 0.0, 1.0) size 0.170x0.170 depth 0.300 Normal
+   (1.000, 0.000, -0.150) axis (0.0, 0.0, 1.0) size 0.169x0.169 depth 0.300 Normal
+   (0.000, 0.504, -0.150) axis (0.0, 0.0, 1.0) size 0.170x0.170 depth 0.300 Normal
+   (0.000, 1.000, -0.150) axis (0.0, 0.0, 1.0) size 0.169x0.169 depth 0.300 Normal
+   (0.000, 0.000, -0.380) axis (0.0, 0.0, 1.0) size 0.148x0.148 depth 0.959 Normal

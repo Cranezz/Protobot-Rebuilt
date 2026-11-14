@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Protobot.GraphicsQuality;
@@ -713,7 +713,7 @@ namespace Protobot.Interface {
             dialog.gameObject.SetActive(true);
             ShowTab(Tab.Benchmark);
             var pick = BenchmarkPick();
-            Interface.Say(pick.HasValue ? "Benchmark done: " + GraphicsBenchmark.PresetName(pick.Value) + " runs best here" : "Benchmark stopped");
+            Interface.Announce(pick.HasValue ? "Benchmark done: " + GraphicsBenchmark.PresetName(pick.Value) + " runs best here" : "Benchmark stopped");
         }
 
         /// <summary>The best preset the last benchmark ran smoothly: 60 FPS on average with its slow frames over 40, else 30/20.</summary>

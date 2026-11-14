@@ -1,0 +1,24 @@
+var close = GameObject.Find("Close Button"); if (close != null) close.GetComponent<UnityEngine.UI.Button>()?.onClick.Invoke();
+Protobot.PartsManager.DestroyLoadedObjects();
+string gid = null; foreach (var n in Protobot.Interface.PartsCatalog.Nodes) foreach (var l in n.Leaves()) if (l.typeId == "GEAR" && gid == null && l.p2 == "36T") gid = "GEAR-" + l.p1 + "-" + l.p2;
+var gear = Protobot.PartsManager.GeneratePart(gid, new Vector3(0, 1, 0), Quaternion.identity);
+Protobot.PivotCamera.Main.SetTransform(new Vector3(0, 1, 0), new Vector3(10f, 15f, 0f), -4f);
+Protobot.Interface.ToolRail.Select("Saw");
+var saw = UnityEngine.Object.FindFirstObjectByType<Protobot.Tools.PartSaw>();
+var T = typeof(Protobot.Tools.PartSaw);
+var bf = System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Static;
+T.GetMethod("BeginCut", bf).Invoke(saw, new object[] { gear });
+Protobot.Tools.GearTeeth.Measure(gear, out var m);
+T.GetField("gearTeeth", bf).SetValue(saw, m);
+T.GetField("gearMeasured", bf).SetValue(saw, true);
+T.GetField("teethMode", bf).SetValue(null, true);
+var modeType = T.GetNestedType("Mode", bf);
+T.GetMethod("SetMode", bf).Invoke(saw, new object[] { System.Enum.Parse(modeType, "Chamfer") });
+// A point on tooth 3, off its middle toward its side, halfway between root and tip, on the near face.
+var t = gear.transform;
+var cam = Camera.main.transform.position;
+var toward = Vector3.Dot(t.TransformDirection(m.axis), cam - t.TransformPoint(m.center)) > 0f ? 1f : -1f;
+var a = m.AngleOf(3) + m.HalfPitch * 0.45f;
+var local = m.center + m.axis * (toward * m.thickness / 2f) + m.Radial(a) * (m.root * 0.4f + m.tip * 0.6f);
+System.IO.File.WriteAllText("Temp/face.txt", string.Join(",", new[] { t.TransformPoint(local).x, t.TransformPoint(local).y, t.TransformPoint(local).z }));
+return "gear " + gid + " teeth " + m.teeth;

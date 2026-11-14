@@ -1,0 +1,47 @@
+Hardware | Screws (13): 1/4" screw; 3/8" screw; 1/2" screw; 5/8" screw; 3/4" screw; 7/8" screw; 1.00" screw; 1.25" screw; 1.50" screw; 1.75" screw; 2.00" screw; 2.25" screw; 2.50" screw; 
+Hardware | Shoulder screws (7): 0.29" Shoulder Screw (0.09" shoulder); 3/8" Shoulder Screw (0.12" shoulder); 1/2" Shoulder Screw (0.04" shoulder); 1/2" Shoulder Screw (0.18" shoulder); 1.00" Shoulder Screw (0.12" shoulder); 1.50" Shoulder Screw (0.18" shoulder); 2.00" Shoulder Screw (0.04" shoulder); 
+Hardware | Nuts (4): Lock nut; Keps nut; Hex nut; Low Profile nut; 
+Hardware | Standoffs (11): 1/4" standoff; 1/2" standoff; 3/4" standoff; 1.00" standoff; 1.50" standoff; 2.00" standoff; 2.50" standoff; 3.00" standoff; 4.00" standoff; 5.00" standoff; 6.00" standoff; 
+Hardware | Spacers (28): [Nylon (3/8" OD) 6] [Nylon (5/16" OD) 5] [Nylon (1/2" OD) 8] [High strength 4] [Plastic 2] [Click-on 3] 
+Hardware | Washers (7): [Steel 3] [Teflon 4] 
+Hardware | Shaft collars (5): Shaft collar; Clamping shaft collar; HS clamping shaft collar; Low profile HS clamping shaft collar; Rubber Shaft Collar; 
+Hardware | Retainers (9): [Nut retainers 3] [Standoff retainers 2] [Bearing retainers 4] 
+Hardware | Couplers (5): Coupler; [Hex couplers 2] [Star couplers 2] 
+Hardware | Rubber Link (1)
+Structure | C-Channels (4): 1x2 C-channel; 1x3 C-channel; 1x5 C-channel; 2x2 U-channel; 
+Structure | Angles (6): [Angles 3] [Slotted angles 2] 1x1 Segmented Angle (35); 
+Structure | Plates (2): Plate; Base plate; 
+Structure | Rails (8): Rail; [Rail stock 2] [Chassis rails 5] 
+Structure | Gussets (17): [Couplers 3] [30 Degree 2] [45 Degree 3] [60 Degree 2] [90 Degree 4] [Others 3] 
+Structure | Brackets (7): Bevel Gearbox Bracket; Rack Gearbox Bracket V2; Swerve Bracket; Winch Bracket; Worm Gearbox Bracket; Linear slide bracket; Cam Follower Mounting Bracket; 
+Structure | License plates (2): Blue License Plate; Red License Plate; 
+Motion | Shafts (3): Shaft; High strength shaft; 6" capped shaft; 
+Motion | Bearings (6): [Flat bearings 4] [Block bearings 2] 
+Motion | Ball bearings (6): Ball Bearing; Ball Bearing Circle Insert; Ball Bearing Housing; Ball Bearing Square Insert; 1/8" HS Bushing; 5/16" HS Bushing; 
+Motion | Wheels (25): [Omni wheels 4] [Traction wheels 4] [Anti-static omni wheels 4] [Anti-static traction wheels 3] [Mecanum wheels 3] [Older wheels (V1) 7] 
+Motion | Flex wheels (21): [With adapters 4] [No adapters 4] [1.625" by hardness 3] [2" by hardness 3] [3" by hardness 3] [4" by hardness 3] V5 Flywheel Weight; 
+Motion | Special wheels (7): 6 Wheel Leg; Bogie Wheel Double; Bogie Wheel Single; 1/8" VersaHex Adapter; 1/4" VersaHex Adapter; VersaHub; Intake Roller; 
+Motion | Gears (15): [Normal 4] [High strength 4] [High strength v2 6] Normal 12T Steel Gear; 
+Motion | Sprockets (17): [Normal 5] [High strength 5] [6P (low strength) 5] 9P 15T Drive Wheel; Make a chain; 
+Motion | Lock bars (5): [Normal 2] [High strength 3] 
+Motion | Advanced Gear Kit (21): [Bevel gears 5] [Worm and lead screw 6] [Cams and cranks 4] [Winch and ratchet 3] [Differential and joints 2] Pulley; 
+Motion | Linear motion (2): Inner slide truck; Outer slide truck; 
+Motion | Hinges (12): [2 hole 3] [3 hole 3] [4 hole 3] [5 hole 3] 
+Motion | Rubber bumper (1)
+Electronics | Motors (2): 11W motor; 5.5W motor; 
+Electronics | Brain (3): Brain; Brain Mount (long); Brain Mount (short); 
+Electronics | Battery (1)
+Electronics | Radio (1)
+Electronics | Battery clip (1)
+Electronics | Sensors (19): [V5 sensors 8] [3-wire (legacy) sensors 11] 
+Electronics | Switches (3): [Bumper switches 2] Limit switch; 
+Electronics | V5 3 Wire Expander (1)
+Pneumatics | Cylinders (3): 25mm cylinder; 50mm cylinder; 75mm cylinder; 
+Pneumatics | Cylinder mounts (3): Cylinder Mount; Cylinder Rod Pivot; Piston Nut; 
+Pneumatics | Reservoirs (2): V5 reservoir; Legacy reservoir; 
+Pneumatics | Fittings (11): [Part fittings 3] [Tubing fittings 6] [Valves 2] 
+Pneumatics | Solenoids and controls (6): Flow Meter; On Off Switch; Pressure Regulator; Solenoid   Double Acting; Solenoid   Single Acting; Manifold Assembly; 
+Field | Override (2026-27) (18): [Game elements 5] [Goals 8] [Field parts 5] 
+Field | Push Back (2025-26) (6): [Game elements 2] [Field parts 4] 
+Field | High Stakes (2024-25) (5): [Game elements 2] [Field parts 3] 
+Field | Disc (1)

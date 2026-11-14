@@ -9,34 +9,40 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace Protobot.Interface {
-    // V2: the parts browser (replaces the original's add-parts list). Parts are in sections in the order teams
-    // use them (PartsCatalog: hardware first, then structure, motion, electronics, pneumatics, field elements and
-    // your own parts), most common first. A tile with a corner badge is a family: clicking it opens a menu of its
-    // parts, and kinds open further menus beside it (Wheels > Omni wheels > 4"). Sort by Common, A-Z or Recent;
-    // search finds any part by name. Choosing a part starts placing it, as the original did (click to place, R
-    // to turn it, Esc to stop), and its sizes show at the bottom (a C-channel's hole count...). The Custom
-    // section has "Import part" (+) and "Polycarbonate"; right-click a custom part to remove or edit it.
+    // V2: the parts menu (replaces the original's add-parts list), laid out like the app's other windows:
+    // - Search on top (covers every part), then the categories as pills (Recent, Hardware, Structure, Motion,
+    //   Electronics, Pneumatics, Field, Custom).
+    // - The chosen category lists its families as rows (a picture, the name, how many parts); click one and it opens
+    //   in place with its parts as tiles, three to a row (kinds as sub-headings: Spacers > Nylon (3/8" OD) > 1/8"...).
+    //   Open families are remembered. Search and Recent show tiles straight away.
+    // - Clicking a part starts placing it (click in the build to place, again for another; R turns it, Esc stops); its
+    //   sizes show at the bottom. Right-click a custom part to edit or remove it.
+    // Parts come from PartsCatalog (its sections and families in the order teams use them).
     public class PartsBrowser : MonoBehaviour {
-        private static readonly string[] Categories = { "All", "Hardware", "Structure", "Motion", "Electronics", "Pneumatics", "Field", "Custom" };
-        private static readonly string[] Sorts = { "Common", "A-Z", "Recent" };
-        private const string CategoryKey = "V2.PartsCategory2", SortKey = "V2.PartsSort";
-        private const float PanelWidth = 340f;
+        private static readonly string[] Categories = { "Recent", "Hardware", "Structure", "Motion", "Electronics", "Pneumatics", "Field", "Custom" };
+        private static readonly string[] CategoryIcons = { null, "SCRW", "CCHL", "GEAR", "MOTR", "PNMT", "OVPN", null };
+        private const string CategoryKey = "V2.PartsCategory3", FoldedKey = "V2.PartsOpen3";   // V2: open families now
+        private const float PanelWidth = 420f, RailWidth = 0f, TileHeight = 104f, PillsHeight = 66f;
+        private const int Columns = 3;
+        private static readonly Color RailColor = new(0.075f, 0.082f, 0.098f, 1f);
 
-        private RectTransform panel, content, footer, tab;
+        private RectTransform panel, content, footer, tab, rail;
         private TMP_InputField search;
         private TextMeshProUGUI countLabel;
         private ScrollRect scroll;
         private RectTransform scrollArea;
         private System.Action<int> stepHoles;  // V2: Ctrl+wheel while placing: one hole more or less
-        private readonly List<(Button button, TextMeshProUGUI label)> categoryButtons = new();
+        private readonly List<(Button button, Image background, TextMeshProUGUI label)> categoryButtons = new();
         private readonly List<(CatalogNode node, Image tile)> tiles = new();
-        private int category, sort;
+        private readonly Dictionary<CatalogNode, RectTransform> headings = new();
+        private readonly HashSet<string> folded = new();
+        private int category;
         private CatalogNode selected;
         private Placement placement;
         private bool collapsed;
         private RectTransform cameraOptions;
         private Vector2 cameraOptionsHome;
-        private bool waitingForParts, dirty;
+        private bool waitingForParts, dirty, railIcons;
 
         public static PartsBrowser Instance { get; private set; }
 
@@ -47,8 +53,9 @@ namespace Protobot.Interface {
 
         private void Build() {
             placement = FindFirstObjectByType<Placement>(FindObjectsInactive.Include);
-            category = Mathf.Clamp(PlayerPrefs.GetInt(CategoryKey, 0), 0, Categories.Length - 1);
-            sort = Mathf.Clamp(PlayerPrefs.GetInt(SortKey, 0), 0, Sorts.Length - 1);
+            category = Mathf.Clamp(PlayerPrefs.GetInt(CategoryKey, 1), 0, Categories.Length - 1);
+            foreach (var key in PlayerPrefs.GetString(FoldedKey, "").Split('|'))
+                if (key.Length > 0) folded.Add(key);
 
             // The original's add-parts panel stays (placement still reports to it) but out of sight.
             var buildCanvas = GameObject.Find("Build Canvas");
@@ -69,19 +76,12 @@ namespace Protobot.Interface {
             panel.sizeDelta = new Vector2(PanelWidth, 0f);
             var inner = PanelWidth - 28f;
 
-            // Header: title, count, sort and fold.
+            // Header: title, count, fold.
             var header = Ui.Rect("Header", panel).Place(new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(16f, -12f), new Vector2(inner + 2f, 30f));
             var title = Ui.Text(header, "Title", "Parts", Theme.FontTitle + 2f, Theme.Text, Theme.Medium);
             title.rectTransform.Fill(0, 0, 200, 0);
             countLabel = Ui.Text(header, "Count", "", Theme.FontSmall, Theme.TextFaint);
-            countLabel.rectTransform.Fill(62, 0, 154, 0);
-            var sortButton = Popup.Choice(header, Sorts, sort, i => {
-                sort = i;
-                PlayerPrefs.SetInt(SortKey, i);
-                Refresh();
-            }, 112f);
-            ((RectTransform)sortButton.transform).Place(new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(-36f, 0f), new Vector2(112f, 28f));
-            Ui.Tip(sortButton, "Sort", null, "Common: the parts teams use most first. A-Z: by name. Recent: what you used lately first.");
+            countLabel.rectTransform.Fill(62, 0, 40, 0);
             var fold = Ui.Button(header, "Fold", ">", () => SetCollapsed(true), false, 6f, Theme.FontBody);
             ((RectTransform)fold.transform).Place(new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), Vector2.zero, new Vector2(30f, 30f));
             fold.targetGraphic.color = new Color(1f, 1f, 1f, 0f);
@@ -89,25 +89,40 @@ namespace Protobot.Interface {
 
             search = Ui.Field(panel, "Search", "", null, Theme.FontBody);
             ((RectTransform)search.transform).Place(new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(14f, -50f), new Vector2(inner, 34f));
-            AddPlaceholder(search, "Search all parts");
+            AddPlaceholder(search, "Search every part (spacer 1/4, omni 3.25...)");
             search.onValueChanged.AddListener(_ => Refresh());
 
-            var chips = Ui.Rect("Categories", panel).Place(new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(14f, -94f), new Vector2(inner, 58f));
-            var chipGrid = chips.gameObject.AddComponent<GridLayoutGroup>();
-            chipGrid.cellSize = new Vector2((inner - 15f) / 4f, 26f);
-            chipGrid.spacing = new Vector2(5f, 6f);
+            // The categories: two rows of pills under the search box.
+            rail = Ui.Rect("Categories", panel).Place(new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(14f, -92f), new Vector2(inner, PillsHeight));
+            var pills = rail.gameObject.AddComponent<GridLayoutGroup>();
+            pills.cellSize = new Vector2((inner - 3 * 6f) / 4f, 30f);
+            pills.spacing = new Vector2(6f, 6f);
+            pills.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
+            pills.constraintCount = 4;
             for (var i = 0; i < Categories.Length; i++) {
                 var index = i;
-                var button = Ui.Button(chips, Categories[i], Categories[i], () => SetCategory(index), false, 13f, 12.5f);
-                categoryButtons.Add((button, button.GetComponentInChildren<TextMeshProUGUI>()));
+                var item = Ui.Image(rail, Categories[i], Theme.Field, 15f, true);
+                var button = item.gameObject.AddComponent<Button>();
+                button.transition = Selectable.Transition.None;
+                var nav = button.navigation;
+                nav.mode = Navigation.Mode.None;
+                button.navigation = nav;
+                button.onClick.AddListener(() => SetCategory(index));
+                var label = Ui.Text(item.transform, "Label", Categories[i], 12.5f, Theme.TextDim, Theme.Medium, TextAlignmentOptions.Center);
+                label.rectTransform.Fill(4, 0, 4, 1);
+                label.enableAutoSizing = true;
+                label.fontSizeMin = 10f;
+                label.fontSizeMax = 12.5f;
+                categoryButtons.Add((button, item, label));
+                item.gameObject.AddComponent<HoverTint>().target = item;
             }
 
-            // The sections and their tiles.
+            // The parts.
             scrollArea = Ui.Rect("Scroll", panel);
             scrollArea.anchorMin = new Vector2(0f, 0f);
             scrollArea.anchorMax = new Vector2(1f, 1f);
             scrollArea.offsetMin = new Vector2(10f, 10f);
-            scrollArea.offsetMax = new Vector2(-10f, -162f);
+            scrollArea.offsetMax = new Vector2(-8f, -(100f + PillsHeight));
             var viewport = Ui.Rect("Viewport", scrollArea).Fill();
             viewport.gameObject.AddComponent<RectMask2D>();
             viewport.gameObject.AddComponent<Image>().color = new Color(0f, 0f, 0f, 0f);  // scroll anywhere
@@ -117,14 +132,14 @@ namespace Protobot.Interface {
             content.pivot = new Vector2(0.5f, 1f);
             content.sizeDelta = Vector2.zero;
             content.anchoredPosition = Vector2.zero;
-            Ui.Column(content, 4f, new RectOffset(4, 4, 2, 10));
+            Ui.Column(content, 6f, new RectOffset(4, 6, 2, 12));
             content.gameObject.AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
             scroll = scrollArea.gameObject.AddComponent<ScrollRect>();
             scroll.viewport = viewport;
             scroll.content = content;
             scroll.horizontal = false;
             scroll.movementType = ScrollRect.MovementType.Clamped;
-            scroll.scrollSensitivity = 30f;
+            scroll.scrollSensitivity = 34f;
 
             // Sizes of the chosen part.
             footer = Ui.Panel(panel, "Sizes", Theme.PanelRaised, 8f).rectTransform;
@@ -169,12 +184,13 @@ namespace Protobot.Interface {
             field.placeholder = placeholder;
         }
 
+        // Shown or folded into its tab: no message (it's only the panel).
         private void SetCollapsed(bool value) {
             collapsed = value;
             PlayerPrefs.SetInt("V2.PartsFolded", value ? 1 : 0);
             panel.gameObject.SetActive(!value);
             tab.gameObject.SetActive(value);
-            if (value) PartsFlyout.Close();
+            PartsFlyout.Close();
         }
 
         private void SetCategory(int index) {
@@ -182,10 +198,18 @@ namespace Protobot.Interface {
             PlayerPrefs.SetInt(CategoryKey, index);
             for (var i = 0; i < categoryButtons.Count; i++) {
                 var on = i == index;
-                categoryButtons[i].button.targetGraphic.color = on ? Theme.Accent : Theme.Field;
-                categoryButtons[i].label.color = on ? Color.white : Theme.TextDim;
+                var (_, background, label) = categoryButtons[i];
+                background.GetComponent<HoverTint>().enabled = !on;
+                background.color = on ? Theme.Accent : Theme.Field;
+                label.color = on ? Color.white : Theme.TextDim;
+                var icon = background.transform.Find("Icon")?.GetComponent<Image>();
+                if (icon != null && icon.sprite != null) icon.color = on ? Color.white : Theme.TextDim;
+                var letter = background.GetComponentsInChildren<TextMeshProUGUI>().FirstOrDefault(t => t.name == "Letter");
+                if (letter != null) letter.color = on ? Color.white : Theme.TextDim;
             }
+            if (search != null && search.text.Length > 0) search.SetTextWithoutNotify("");
             Refresh();
+            if (content != null) content.anchoredPosition = Vector2.zero;
         }
 
         // ------------------------------------------------------------------ filling
@@ -193,6 +217,7 @@ namespace Protobot.Interface {
         private bool Visible(CatalogNode node) {
             if (node.action != null || node.customId != null) return true;
             return node.Leaves().Any(l => {
+                if (l.action != null) return true;   // V2: bands, tubing, chains (made by their tools)
                 var type = PartsCatalog.Type(l.typeId);
                 return type != null && GameElementPreferences.IsVisible(type);
             });
@@ -203,64 +228,84 @@ namespace Protobot.Interface {
             // The part types load after the scene wakes up.
             waitingForParts = PartsManager.partTypes == null;
             if (waitingForParts) return;
+            railIcons = true;
             PartsFlyout.Close();
             foreach (Transform child in content) Destroy(child.gameObject);
             content.DetachChildren();
             tiles.Clear();
+            headings.Clear();
 
             var nodes = PartsCatalog.Nodes.Where(Visible).ToList();
             var text = search.text.Trim().ToLowerInvariant();
             var shown = 0;
             if (text.Length > 0) {
+                // Every part whose name (with its family's) has all the words, under its family's name.
                 var words = text.Split(new[] { ' ' }, System.StringSplitOptions.RemoveEmptyEntries);
-                var results = new List<CatalogNode>();
-                foreach (var node in nodes)
-                    Collect(node, node.IsGroup ? node.name : "", words, results);
-                results = results.Take(150).ToList();
-                if (results.Count > 0) Section("Results", results);
-                shown = results.Count;
+                foreach (var node in nodes) {
+                    var found = new List<(string path, CatalogNode leaf)>();
+                    Collect(node, node.IsGroup ? node.name : "", words, found);
+                    if (found.Count == 0) continue;
+                    foreach (var group in found.GroupBy(f => f.path)) {
+                        Heading(null, group.Key.Length > 0 ? group.Key : node.section, group.Count(), false);
+                        Tiles(group.Select(g => g.leaf).ToList());
+                    }
+                    shown += found.Count;
+                    if (shown > 200) break;
+                }
+                if (shown == 0) Note("No parts match \"" + search.text.Trim() + "\"");
+            }
+            else if (category == 0) {
+                var recent = RecentNodes(nodes);
+                Heading(null, "Used lately", recent.Count, false);
+                if (recent.Count > 0) Tiles(recent);
+                else Note("Parts you place show here, the latest first.");
+                shown = recent.Count;
             }
             else {
-                if (sort == 2) {
-                    var recent = RecentNodes(nodes);
-                    if (recent.Count > 0 && (category == 0 || category == 7 || recent.Any(r => r.section == Categories[category]))) {
-                        var inCategory = category == 0 ? recent : recent.Where(r => r.section == Categories[category]).ToList();
-                        if (inCategory.Count > 0) Section("Recently used", inCategory);
-                    }
+                var section = Categories[category];
+                var list = nodes.Where(n => n.section == section).ToList();
+                var families = list.Where(n => n.IsGroup).ToList();
+                var loose = list.Where(n => !n.IsGroup).ToList();
+                if (loose.Count > 0) {
+                    Heading(null, section, loose.Count, false);
+                    Tiles(loose);
                 }
-                foreach (var name in PartsCatalog.Sections) {
-                    if (category > 0 && Categories[category] != name) continue;
-                    var list = nodes.Where(n => n.section == name).ToList();
-                    if (sort == 1) list = list.OrderBy(n => n.action != null ? 0 : 1).ThenBy(n => n.name).ToList();
-                    if (list.Count == 0) continue;
-                    Section(name, list);
-                    shown += list.Sum(n => n.action != null ? 0 : n.Count);
-                }
+                foreach (var family in families) Family(family);
+                shown = list.Sum(n => n.action != null ? 0 : n.Count);
             }
             countLabel.text = shown + (shown == 1 ? " part" : " parts");
-            if (tiles.Count == 0) {
-                var none = Ui.Text(content, "None", "No parts match", Theme.FontBody, Theme.TextFaint, null, TextAlignmentOptions.Center);
-                none.Size(-1, 60f);
-            }
             Highlight();
             dirty = false;
         }
 
-        private static void Collect(CatalogNode node, string path, string[] words, List<CatalogNode> results) {
+        // The categories' icons: a part each (screw, C-channel, gear, motor, cylinder, pin).
+        private void RailIcons() {
+            railIcons = true;
+            for (var i = 0; i < categoryButtons.Count; i++) {
+                if (CategoryIcons[i] == null) continue;
+                var icon = categoryButtons[i].background.transform.Find("Icon")?.GetComponent<Image>();
+                var sprite = PartsCatalog.Type(CategoryIcons[i])?.icon ?? PartsManager.partTypes.FirstOrDefault(t => t != null && t.id == CategoryIcons[i])?.icon;
+                if (icon == null || sprite == null) continue;
+                icon.sprite = sprite;
+                icon.color = i == category ? Color.white : Theme.TextDim;
+            }
+        }
+
+        private static void Collect(CatalogNode node, string path, string[] words, List<(string, CatalogNode)> results) {
             if (node.IsGroup) {
                 foreach (var child in node.children)
-                    Collect(child, child.IsGroup ? path + " " + child.name : path, words, results);
+                    Collect(child, child.IsGroup ? (path.Length > 0 ? path + " › " : "") + child.name : path, words, results);
                 return;
             }
-            var haystack = (path + " " + node.name).ToLowerInvariant();
-            if (words.All(w => haystack.Contains(w))) results.Add(node);
+            var haystack = (path + " " + node.name).ToLowerInvariant().Replace("\"", " ").Replace("›", " ");
+            if (words.All(w => haystack.Contains(w.Replace("\"", "")))) results.Add((path, node));
         }
 
         private List<CatalogNode> RecentNodes(List<CatalogNode> nodes) {
             var leaves = nodes.SelectMany(n => n.Leaves()).ToList();
             var list = new List<CatalogNode>();
             foreach (var id in PartsRecent.All) {
-                if (list.Count >= 9) break;
+                if (list.Count >= 24) break;
                 var custom = leaves.FirstOrDefault(l => l.customId == id);
                 if (custom != null) {
                     list.Add(custom);
@@ -284,67 +329,242 @@ namespace Protobot.Interface {
             return list;
         }
 
-        private void Section(string name, List<CatalogNode> nodes) {
-            var heading = Ui.Text(content, "Section " + name, name.ToUpperInvariant(), 12f, Theme.TextFaint, Theme.Medium);
-            heading.characterSpacing = 6f;
-            heading.margin = new Vector4(4f, 8f, 0f, 0f);
-            heading.Size(-1, 28f);
-            var grid = Ui.Rect("Grid " + name, content);
+        private static string Key(CatalogNode node) => node.section + "/" + node.name;
+
+        // The family names, to jump to one.
+        private void JumpRow(List<CatalogNode> families, bool looseFirst) {
+            var grid = Ui.Rect("Jump", content);
             var layout = grid.gameObject.AddComponent<GridLayoutGroup>();
-            layout.cellSize = new Vector2(98f, 94f);
-            layout.spacing = new Vector2(6f, 6f);
+            var width = (PanelWidth - RailWidth - 40f - 8f) / 3f;
+            layout.cellSize = new Vector2(width, 24f);
+            layout.spacing = new Vector2(4f, 4f);
             layout.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
             layout.constraintCount = 3;
-            layout.childAlignment = TextAnchor.UpperLeft;
-            foreach (var node in nodes)
-                tiles.Add((node, Tile(grid, node)));
+            var rows = (families.Count + 2) / 3;
+            grid.Size(-1, rows * 24f + (rows - 1) * 4f);
+            foreach (var family in families) {
+                var chip = Ui.Button(grid, family.name, family.name, () => JumpTo(family), false, 5f, 11f);
+                chip.targetGraphic.color = Theme.Field;
+                var label = chip.GetComponentInChildren<TextMeshProUGUI>();
+                label.overflowMode = TextOverflowModes.Ellipsis;
+                label.textWrappingMode = TextWrappingModes.NoWrap;
+                Ui.Tip(chip, family.name, null, "Jump to " + family.name + " (" + family.Count + " parts)");
+            }
+            var gap = Ui.Rect("Gap", content);
+            gap.Size(-1, 4f);
         }
 
-        private Image Tile(RectTransform grid, CatalogNode node) {
-            var tile = Ui.Image(grid, node.name, Theme.Field, 8f, true);
-            var hover = tile.gameObject.AddComponent<HoverTint>();
-            hover.target = tile;
+        private void JumpTo(CatalogNode family) {
+            if (folded.Remove(Key(family))) {
+                SaveFolded();
+                Refresh();
+            }
+            if (!headings.TryGetValue(family, out var heading) || heading == null) return;
+            LayoutRebuilder.ForceRebuildLayoutImmediate(content);
+            var y = -heading.anchoredPosition.y - heading.rect.height * (1f - heading.pivot.y);
+            var most = Mathf.Max(0f, content.rect.height - scroll.viewport.rect.height);
+            content.anchoredPosition = new Vector2(0f, Mathf.Clamp(y, 0f, most));
+        }
+
+        private void SaveFolded() => PlayerPrefs.SetString(FoldedKey, string.Join("|", folded));
+
+        // A family: a row with its picture, name and count; click it to open it in place (open ones are remembered).
+        private void Family(CatalogNode family) {
+            var isOpen = folded.Contains(Key(family));
+            var row = Ui.Image(content, "Family " + family.name, isOpen ? Theme.Hover : Theme.PanelRaised, 8f, true);
+            var rect = row.rectTransform;
+            rect.Size(-1, 50f);
+            headings[family] = rect;
+            var inner = Ui.Rect("Inner", rect).Fill(8, 0, 12, 0);
+            Ui.Row(inner, 10f);
+            var picture = Ui.Rect("Picture", inner);
+            picture.Size(38f, 38f);
+            Icon(picture, family.Leaves().FirstOrDefault() ?? family, 38f);
+            var name = Ui.Text(inner, "Name", family.name, Theme.FontBody, Theme.Text, Theme.Medium);
+            name.overflowMode = TextOverflowModes.Ellipsis;
+            name.textWrappingMode = TextWrappingModes.NoWrap;
+            name.Size(-1, 50f, 1f);
+            Ui.Text(inner, "Count", family.Count.ToString(), Theme.FontSmall, Theme.TextFaint, null, TextAlignmentOptions.MidlineRight).Size(30f, 50f);
+            var chevron = Ui.Image(inner, "Chevron", Theme.TextDim);
+            chevron.sprite = Interface.Instance.chevronIcon;
+            chevron.preserveAspect = true;
+            chevron.Size(10f, 10f);
+            chevron.rectTransform.localEulerAngles = new Vector3(0f, 0f, isOpen ? 180f : 270f);   // closed: points right
+            if (!isOpen) row.gameObject.AddComponent<HoverTint>().target = row;
+            var button = row.gameObject.AddComponent<Button>();
+            button.transition = Selectable.Transition.None;
+            var nav = button.navigation;
+            nav.mode = Navigation.Mode.None;
+            button.navigation = nav;
+            button.onClick.AddListener(() => {
+                var key = Key(family);
+                if (!folded.Remove(key)) folded.Add(key);
+                SaveFolded();
+                var y = content.anchoredPosition.y;
+                Refresh();
+                content.anchoredPosition = new Vector2(0f, y);
+                Audio.Sounds.Play(Audio.Sounds.Tick);
+            });
+            Ui.Tip(row, family.name, null, family.Count + " parts: click to " + (isOpen ? "close" : "open") + " the family");
+            if (!isOpen) return;
+            var loose = family.children.Where(c => !c.IsGroup).ToList();
+            if (loose.Count > 0) Tiles(loose);
+            foreach (var kind in family.children.Where(c => c.IsGroup)) Kind(kind, kind.name);
+            var gap = Ui.Rect("Gap", content);
+            gap.Size(-1, 4f);
+        }
+
+        private void Kind(CatalogNode kind, string label) {
+            var leaves = kind.children.Where(c => !c.IsGroup).ToList();
+            if (leaves.Count > 0) {
+                var sub = Ui.Text(content, "Kind " + label, label, 11.5f, Theme.TextDim, Theme.Medium);
+                sub.margin = new Vector4(4f, 2f, 0f, 0f);
+                sub.Size(-1, 20f);
+                Tiles(leaves);
+            }
+            foreach (var deeper in kind.children.Where(c => c.IsGroup)) Kind(deeper, label + " › " + deeper.name);
+        }
+
+        private RectTransform Heading(CatalogNode family, string name, int count, bool foldable, bool isFolded = false) {
+            var row = Ui.Image(content, "Heading " + name, foldable ? Theme.Field : new Color(1f, 1f, 1f, 0f), 6f, foldable);
+            var rect = row.rectTransform;
+            rect.Size(-1, 30f);
+            var top = Ui.Rect("Inner", rect).Fill(8, 0, 8, 0);
+            Ui.Row(top, 6f);
+            if (foldable) {
+                var chevron = Ui.Image(top, "Chevron", Theme.TextDim);
+                chevron.sprite = Interface.Instance.chevronIcon;
+                chevron.preserveAspect = true;
+                chevron.Size(10f, 10f);
+                chevron.rectTransform.localEulerAngles = new Vector3(0f, 0f, isFolded ? 90f : 180f);
+            }
+            var title = Ui.Text(top, "Name", name, Theme.FontSmall + 0.5f, Theme.Text, Theme.Medium);
+            title.overflowMode = TextOverflowModes.Ellipsis;
+            title.textWrappingMode = TextWrappingModes.NoWrap;
+            title.Size(-1, 30f, 1f);
+            var number = Ui.Text(top, "Count", count.ToString(), 11f, Theme.TextFaint);
+            number.Size(-1, 30f);
+            if (foldable && family != null) {
+                row.gameObject.AddComponent<HoverTint>().target = row;
+                var button = row.gameObject.AddComponent<Button>();
+                button.transition = Selectable.Transition.None;
+                var nav = button.navigation;
+                nav.mode = Navigation.Mode.None;
+                button.navigation = nav;
+                button.onClick.AddListener(() => {
+                    var key = Key(family);
+                    if (!folded.Remove(key)) folded.Add(key);
+                    SaveFolded();
+                    var y = content.anchoredPosition.y;
+                    Refresh();
+                    content.anchoredPosition = new Vector2(0f, y);
+                    Audio.Sounds.Play(Audio.Sounds.Tick);
+                });
+                Ui.Tip(row, family.name, null, count + " parts: click to " + (isFolded ? "show" : "fold") + " them");
+            }
+            return rect;
+        }
+
+        private void Note(string text) {
+            var note = Ui.Text(content, "Note", text, Theme.FontSmall, Theme.TextFaint);
+            note.textWrappingMode = TextWrappingModes.Normal;
+            note.margin = new Vector4(6f, 4f, 6f, 0f);
+            note.Size(-1, 40f);
+        }
+
+        // Tiles, three to a row, named without the words they all share (1/8" for "1/8" nylon spacer").
+        private void Tiles(List<CatalogNode> leaves) {
+            var names = Short(leaves.Select(l => l.name).ToList());
+            var grid = Ui.Rect("Tiles", content);
+            var layout = grid.gameObject.AddComponent<GridLayoutGroup>();
+            var width = Mathf.Floor((PanelWidth - 28f - 10f - 8f - (Columns - 1) * 6f) / Columns);
+            layout.cellSize = new Vector2(width, TileHeight);
+            layout.spacing = new Vector2(6f, 6f);
+            layout.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
+            layout.constraintCount = Columns;
+            layout.childAlignment = TextAnchor.UpperLeft;
+            var rows = (leaves.Count + Columns - 1) / Columns;
+            grid.Size(-1, rows * TileHeight + (rows - 1) * 6f + 2f);
+            for (var i = 0; i < leaves.Count; i++) tiles.Add((leaves[i], Tile(grid, leaves[i], names[i])));
+        }
+
+        // A part's picture (its rendered model, a custom part's thumbnail, or its type's icon), filling `parent`.
+        private void Icon(RectTransform parent, CatalogNode node, float size) {
+            if (node.customId != null) {
+                var part = CustomParts.Find(node.customId);
+                var raw = Ui.Rect("Thumbnail", parent).Fill().gameObject.AddComponent<RawImage>();
+                raw.raycastTarget = false;
+                if (part != null) raw.texture = Thumbnails.Get(part);
+                return;
+            }
+            if (node.action != null && Motion.StrandIcons.For(node.action) is Texture2D drawn) {   // V2: bands, tubing
+                var picture = Ui.Rect("Thumbnail", parent).Fill().gameObject.AddComponent<RawImage>();
+                picture.raycastTarget = false;
+                picture.texture = drawn;
+                return;
+            }
+            var icon = Ui.Image(parent, "Icon", Theme.TextDim);
+            icon.rectTransform.Fill(size * 0.12f, size * 0.12f, size * 0.12f, size * 0.12f);
+            // V2: the family's Protobot icon; a family without one (VEX-CAD's) gets one made the same way (a flat
+            // outline of its first part, square on).
+            var sprite = node.typeId != null && !PartsCatalog.IsVex(node.IconType) ? PartsCatalog.Type(node.IconType)?.icon : null;
+            if (sprite == null && node.typeId != null) sprite = Thumbnails.IconFor(node.typeId, node.p1, node.p2);
+            if (sprite != null) {
+                icon.sprite = sprite;
+                icon.preserveAspect = true;
+            }
+            else {
+                icon.color = new Color(1f, 1f, 1f, 0f);
+                var letter = Ui.Text(icon.transform, "Letter", node.name.Length > 0 ? node.name.Substring(0, 1) : "?", size * 0.5f, Theme.TextDim, Theme.Bold, TextAlignmentOptions.Center);
+                letter.rectTransform.Fill();
+            }
+        }
+
+        private Image Tile(RectTransform grid, CatalogNode node, string shortName) {
+            var tile = Ui.Image(grid, node.name, Theme.PanelRaised, 7f, true);
+            tile.gameObject.AddComponent<HoverTint>().target = tile;
             var button = tile.gameObject.AddComponent<Button>();
             button.transition = Selectable.Transition.None;
             var nav = button.navigation;
             nav.mode = Navigation.Mode.None;
             button.navigation = nav;
             var rect = tile.rectTransform;
-            button.onClick.AddListener(() => {
-                if (node.IsGroup) PartsFlyout.Toggle(node, rect, Choose, panel);
-                else Choose(node);
-            });
+            button.onClick.AddListener(() => Choose(node));
 
             if (node.action == "import") {
-                var plus = Ui.Text(tile.transform, "Plus", "+", 40f, Theme.Accent, Theme.Regular, TextAlignmentOptions.Center);
-                plus.rectTransform.Place(new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -6f), new Vector2(50f, 50f));
-                Dashed(tile.rectTransform);
+                var plus = Ui.Text(tile.transform, "Plus", "+", 44f, Theme.Accent, Theme.Regular, TextAlignmentOptions.Center);
+                plus.rectTransform.Place(new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -6f), new Vector2(60f, 56f));
             }
             else if (node.customId != null) {
                 var part = CustomParts.Find(node.customId);
-                var image = Ui.Rect("Thumbnail", tile.transform).Place(new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -6f), new Vector2(52f, 52f))
+                var image = Ui.Rect("Thumbnail", tile.transform).Place(new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -6f), new Vector2(58f, 58f))
                     .gameObject.AddComponent<RawImage>();
                 image.raycastTarget = false;
                 if (part != null) image.texture = Thumbnails.Get(part);
                 tile.gameObject.AddComponent<RightClick>().onRightClick = () => CustomMenu(node, rect);
             }
             else if (PartsCatalog.ModelIcon(node) is Texture2D model) {
-                // V2: VEX-CAD parts and families show a picture of the part.
-                var image = Ui.Rect("Thumbnail", tile.transform).Place(new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -6f), new Vector2(52f, 52f))
+                var image = Ui.Rect("Thumbnail", tile.transform).Place(new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -6f), new Vector2(58f, 58f))
                     .gameObject.AddComponent<RawImage>();
                 image.raycastTarget = false;
                 image.texture = model;
             }
+            else if (node.typeId != null && node.action == null && Thumbnails.ForPart(node.typeId, node.p1, node.p2) is Texture2D picture) {
+                // V2: every part's tile is a picture of the part itself.
+                var image = Ui.Rect("Thumbnail", tile.transform).Place(new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -6f), new Vector2(58f, 58f))
+                    .gameObject.AddComponent<RawImage>();
+                image.raycastTarget = false;
+                image.texture = picture;
+            }
             else {
-                var icon = Ui.Image(tile.transform, "Icon", Theme.Text);
-                icon.rectTransform.Place(new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -12f), new Vector2(40f, 40f));
+                var icon = Ui.Image(tile.transform, "Icon", Theme.TextDim);
+                icon.rectTransform.Place(new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -12f), new Vector2(44f, 44f));
                 var sprite = node.action == "polycarb" ? Interface.Instance.polycarbIcon : PartsCatalog.Type(node.IconType)?.icon;
                 if (node.action == "library") {
-                    // V2: three stacked cards (the library of your own parts).
                     icon.color = new Color(1f, 1f, 1f, 0f);
                     for (var i = 2; i >= 0; i--) {
-                        var card = Ui.Image(icon.transform, "Card", i == 0 ? Theme.Accent : Color.Lerp(Theme.TextDim, Theme.Field, i * 0.3f), 4f);
-                        card.rectTransform.Place(new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(i * 4f - 4f, 4f - i * 4f), new Vector2(26f, 30f));
+                        var card = Ui.Image(icon.transform, "Card", i == 0 ? Theme.Accent : Color.Lerp(Theme.TextDim, Theme.Field, i * 0.3f), 3f);
+                        card.rectTransform.Place(new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(i * 3f - 3f, 3f - i * 3f), new Vector2(18f, 22f));
                     }
                 }
                 else if (sprite != null) {
@@ -354,49 +574,34 @@ namespace Protobot.Interface {
                 }
                 else {
                     icon.color = new Color(1f, 1f, 1f, 0f);
-                    var letter = Ui.Text(icon.transform, "Letter", node.name.Substring(0, 1), 26f, Theme.TextDim, Theme.Bold, TextAlignmentOptions.Center);
+                    var letter = Ui.Text(icon.transform, "Letter", node.name.Substring(0, 1), 20f, Theme.TextDim, Theme.Bold, TextAlignmentOptions.Center);
                     letter.rectTransform.Fill();
                 }
             }
 
-            var label = Ui.Text(tile.transform, "Name", node.name, 12.5f, Theme.Text, Theme.Regular, TextAlignmentOptions.Top);
-            label.rectTransform.Fill(5, 58, 5, 2);
+            var label = Ui.Text(tile.transform, "Name", shortName, 12f, Theme.Text, Theme.Medium, TextAlignmentOptions.Top);
+            label.rectTransform.Fill(5, 68, 5, 2);
             label.textWrappingMode = TextWrappingModes.Normal;
             label.overflowMode = TextOverflowModes.Ellipsis;
-            label.lineSpacing = -12f;
-
-            if (node.IsGroup) {
-                // The family badge: a corner chevron and how many parts are in it.
-                var badge = Ui.Image(tile.transform, "Badge", Theme.Hover, 5f);
-                badge.rectTransform.Place(new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(-4f, -4f), new Vector2(22f, 18f));
-                var chevron = Ui.Image(badge.transform, "Chevron", Theme.Text);
-                chevron.sprite = Interface.Instance.chevronIcon;
-                chevron.preserveAspect = true;
-                chevron.rectTransform.Place(new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(9f, 9f));
-                chevron.rectTransform.localEulerAngles = new Vector3(0f, 0f, 180f);
-                var count = Ui.Text(tile.transform, "Count", node.Count.ToString(), 10.5f, Theme.TextFaint, Theme.Medium, TextAlignmentOptions.TopLeft);
-                count.rectTransform.Place(new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(6f, -4f), new Vector2(30f, 16f));
-                Ui.Tip(tile, node.name, null, node.Count + " parts: click to choose one");
-            }
-            else
-                Ui.Tip(tile, node.name, null, node.tip ?? node.section);
+            label.lineSpacing = -18f;
+            Ui.Tip(tile, node.name, null, node.tip ?? "Click to place it; it stays picked, so click in the build again for another");
             return tile;
         }
 
-        // A dashed outline (the "+" tile).
-        private static void Dashed(RectTransform tile) {
-            const float dash = 7f, gap = 5f, inset = 3f;
-            var size = new Vector2(98f, 94f);
-            for (var x = inset; x < size.x - inset; x += dash + gap) {
-                var w = Mathf.Min(dash, size.x - inset - x);
-                Ui.Image(tile, "Dash", Theme.TextFaint).rectTransform.Place(new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(x, -inset), new Vector2(w, 1.5f));
-                Ui.Image(tile, "Dash", Theme.TextFaint).rectTransform.Place(new Vector2(0f, 0f), new Vector2(0f, 0f), new Vector2(x, inset), new Vector2(w, 1.5f));
-            }
-            for (var y = inset; y < size.y - inset; y += dash + gap) {
-                var h = Mathf.Min(dash, size.y - inset - y);
-                Ui.Image(tile, "Dash", Theme.TextFaint).rectTransform.Place(new Vector2(0f, 0f), new Vector2(0f, 0f), new Vector2(inset, y), new Vector2(1.5f, h));
-                Ui.Image(tile, "Dash", Theme.TextFaint).rectTransform.Place(new Vector2(1f, 0f), new Vector2(1f, 0f), new Vector2(-inset, y), new Vector2(1.5f, h));
-            }
+        // Names without the words they all share at the start and the end (or most of them share at the end: one odd
+        // part among sizes keeps its full name, the sizes still lose "omni wheel").
+        private static List<string> Short(List<string> names) {
+            if (names.Count < 2) return names;
+            var words = names.Select(n => n.Split(' ')).ToList();
+            var ends = words.Where(w => w.Length >= 3).GroupBy(w => w[w.Length - 2] + " " + w[w.Length - 1]).OrderByDescending(g => g.Count()).FirstOrDefault();
+            if (ends != null && ends.Count() >= 3 && ends.Count() >= names.Count * 0.6f && ends.Count() < names.Count)
+                return words.Select(w => w.Length >= 3 && w[w.Length - 2] + " " + w[w.Length - 1] == ends.Key
+                    ? string.Join(" ", w.Take(w.Length - 2)) : string.Join(" ", w)).ToList();
+            var front = 0;
+            while (words.All(w => w.Length > front + 1) && words.All(w => w[front] == words[0][front])) front++;
+            var back = 0;
+            while (words.All(w => w.Length > front + back + 1) && words.All(w => w[w.Length - 1 - back] == words[0][words[0].Length - 1 - back])) back++;
+            return words.Select(w => string.Join(" ", w.Skip(front).Take(w.Length - front - back))).ToList();
         }
 
         private void CustomMenu(CatalogNode node, RectTransform anchor) {
@@ -414,7 +619,7 @@ namespace Protobot.Interface {
                     case "Edit holes": ImportDialog.Edit(part); break;
                     case "Manage library…": LibraryDialog.Open(); break;
                     default:
-                        // V2: the file moves to the library's Deleted folder (File > Custom parts library restores it).
+                        // The file moves to the library's Deleted folder (File > Custom parts library restores it).
                         var used = PartsManager.FindLoadedObjects().Any(o => o.GetComponent<SavedObject>().id == part.Id && !o.IsDeleted());
                         if (!CustomParts.Remove(part.key)) {
                             Interface.Say("Couldn't delete " + part.name + " (its file may be open somewhere else)", false);
@@ -430,10 +635,10 @@ namespace Protobot.Interface {
         private void Highlight() {
             foreach (var (node, tile) in tiles) {
                 if (tile == null) continue;
-                var on = selected != null && (node == selected || (node.IsGroup && node.Leaves().Contains(selected))
-                                              || (!node.IsGroup && node.typeId == selected.typeId && node.p1 == selected.p1 && node.p2 == selected.p2 && node.customId == selected.customId));
+                var on = selected != null && (node == selected
+                                              || (node.typeId == selected.typeId && node.p1 == selected.p1 && node.p2 == selected.p2 && node.customId == selected.customId && node.action == selected.action));
                 tile.GetComponent<HoverTint>().enabled = !on;
-                tile.color = on ? Theme.AccentSoft : Theme.Field;
+                tile.color = on ? Theme.AccentSoft : Theme.PanelRaised;
                 var outline = tile.GetComponent<Outline>();
                 if (on && outline == null) {
                     outline = tile.gameObject.AddComponent<Outline>();
@@ -456,12 +661,28 @@ namespace Protobot.Interface {
                 Polycarb.SheetEditor.Open();
                 return;
             }
-            if (node.action == "library") {  // V2: see, edit and delete custom parts
+            if (node.action == "library") {
                 LibraryDialog.Open();
                 return;
             }
-            if (node.action == "chain") {  // V2: the chain generator
+            if (node.action != null && node.action.StartsWith("group:")) {   // V2: a saved group
+                Builds.SavedGroups.Place(node.action.Substring("group:".Length));
+                return;
+            }
+            if (node.action == "chain") {
                 Motion.ChainTool.Begin();
+                return;
+            }
+            if (node.action != null && node.action.StartsWith("wire:")) {   // V2: a cable, routed port to port
+                Motion.TubeTool.BeginWire(node.action == "wire:3W" ? Motion.WireKind.ThreeWire : Motion.WireKind.Smart);
+                return;
+            }
+            if (node.action == "ptube") {   // V2: pneumatic tubing, routed
+                Motion.TubeTool.Begin();
+                return;
+            }
+            if (node.action != null && node.action.StartsWith("band:")) {   // V2: a band round its posts
+                Motion.ElasticTool.Begin(node.action.Substring("band:".Length));
                 return;
             }
             var type = PartsCatalog.Type(node.typeId);
@@ -475,7 +696,7 @@ namespace Protobot.Interface {
                     if (options != null && options.Count > 0 && !options.Contains(generator.param2.value)) generator.param2.value = options[0];
                 }
             }
-            // V2: metal starts as full-length stock (the saw cuts it to length); Ctrl+wheel or the field change it.
+            // Metal starts as full-length stock (the saw cuts it to length); Ctrl+wheel or the field change it.
             if (generator is AluminumPartGenerator) {
                 if (generator.UsesParams && generator.param1.custom && generator.param1.customUnit == "Holes")
                     generator.param1.value = ((int)generator.param1.customLimits.y).ToString();
@@ -492,7 +713,7 @@ namespace Protobot.Interface {
         public void PlaceCustom(CustomPartData part) {
             PartsCatalog.Invalidate();
             Refresh();
-            var node = PartsCatalog.Nodes.FirstOrDefault(n => n.customId == part.Id);
+            var node = PartsCatalog.Nodes.SelectMany(n => n.Leaves()).FirstOrDefault(n => n.customId == part.Id);
             if (node != null) Choose(node);
         }
 
@@ -503,7 +724,6 @@ namespace Protobot.Interface {
             var generator = Generator;
             if (generator == null || placement == null) return;
             placement.StartPlacing(new PartPlacementData(generator, SelectedType, placement.transform));
-            PartsRecent.Use(generator.GetId());
         }
 
         private static bool CtrlHeld() {
@@ -523,7 +743,7 @@ namespace Protobot.Interface {
             footer.gameObject.SetActive(true);
             var name = Ui.Text(footer, "Name", selected.name, Theme.FontTitle, Theme.Text, Theme.Medium);
             name.Size(-1, 22f);
-            // A VEX-CAD family's one parameter is which part it is: chosen in the menu already.
+            // A VEX-CAD family's one parameter is which part it is: chosen already.
             var vex = selected.typeId.StartsWith("VX") || generator is CustomPartGenerator;
             if (generator.UsesParams && !vex)
                 ParamRow(generator.param1, generator.GetParam1Options(), value => {
@@ -546,7 +766,7 @@ namespace Protobot.Interface {
             if (stepHoles != null)
                 Ui.Hint(footer, "Ctrl+Wheel", "more or fewer holes", "T", "reset turn").Size(-1, 20f);
             else
-                Ui.Hint(footer, "T", "reset turn").Size(-1, 20f);
+                Ui.Hint(footer, "Ctrl", "slide freely on a screw", "T", "reset turn").Size(-1, 20f);
         }
 
         private void ParamRow(Parameter parameter, List<string> options, System.Action<string> set) {
@@ -604,18 +824,19 @@ namespace Protobot.Interface {
 
         private void Update() {
             if (waitingForParts || dirty) Refresh();
-            // V2: Ctrl+wheel while placing a part with a hole count changes it (the camera doesn't zoom then).
+            // Ctrl+wheel while placing a part with a hole count changes it (the camera doesn't zoom then).
             if (MousePivotCameraInput.ScrollClaimed == null)
-                MousePivotCameraInput.ScrollClaimed = () => stepHoles != null && placement != null && placement.placing && CtrlHeld();
-            if (stepHoles != null && placement != null && placement.placing && CtrlHeld() && !MouseInput.overUI) {
+                MousePivotCameraInput.ScrollClaimed = () => (stepHoles != null && placement != null && placement.placing && CtrlHeld()) || Tools.QuickPlace.ClaimsWheel;
+            if (stepHoles != null && placement != null && placement.placing && CtrlHeld() && !MouseInput.overUI && !Tools.QuickPlace.ClaimsWheel) {
                 var wheel = MouseInput.scrollAxis;
                 if (wheel != 0f) stepHoles(wheel > 0f ? 1 : -1);
             }
             // The size panel sits under the list, not over its last rows.
             if (scrollArea != null) {
                 var bottom = footer.gameObject.activeSelf ? footer.rect.height + 18f : 10f;
-                if (!Mathf.Approximately(scrollArea.offsetMin.y, bottom))
-                    scrollArea.offsetMin = new Vector2(10f, bottom);
+                if (!Mathf.Approximately(scrollArea.offsetMin.y, bottom)) {
+                    scrollArea.offsetMin = new Vector2(scrollArea.offsetMin.x, bottom);
+                }
             }
             var top = Layout.TopBarBottom + 14f;
             if (!collapsed) {

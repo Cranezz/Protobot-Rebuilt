@@ -1,0 +1,14 @@
+Protobot.PartsManager.DestroyLoadedObjects();
+var tee = Protobot.PartsManager.GeneratePart("VXPNEUMATICS-Tee Fittings", new Vector3(0, 1, 0), Quaternion.identity);
+Protobot.HoleCollider sock = null;
+foreach (var h in tee.GetComponentsInChildren<Protobot.HoleCollider>()) if (h.transform.localPosition.x > 0.6f) sock = h;
+var face = sock.transform.position + sock.transform.forward * sock.transform.localScale.z / 2f;
+var plug = Protobot.PartsManager.GeneratePart("VXPNEUMATICS-Pneumatic Fitting Plug", face, Quaternion.LookRotation(sock.transform.forward));
+plug.name = "PLUG";
+var cyl = Protobot.PartsManager.GeneratePart("PNMT-50mm-Normal", new Vector3(0, 3, 0), Quaternion.identity);
+Protobot.HoleCollider port = null;
+foreach (var h in cyl.GetComponentsInChildren<Protobot.HoleCollider>()) if (h.holeType == Protobot.HoleCollider.HoleType.Threaded && h.transform.localPosition.x > 1f) port = h;
+var pface = port.transform.position - port.transform.forward * port.transform.localScale.z / 2f;
+var fit = Protobot.PartsManager.GeneratePart("VXPNEUMATICS-Elbow Fitting", pface, Quaternion.LookRotation(-port.transform.forward));
+fit.name = "ELBOW";
+return "plug at " + face.ToString("F2") + " fitting at " + pface.ToString("F2");

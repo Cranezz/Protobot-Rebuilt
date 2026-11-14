@@ -15,6 +15,7 @@ namespace Protobot.StateSystems {
         public static int curIndex;
 
         public static Action OnChangeState; //Runs when a state is added or loaded
+        public static Action<State> OnStateAdded, OnUndo, OnRedo;   // V2: the action log (Builds/ActionLog)
 
         public static StateSystem instance;
 
@@ -69,6 +70,7 @@ namespace Protobot.StateSystems {
 
             curIndex = lastStateIndex;
             InvokeOnChangeState();
+            OnStateAdded?.Invoke(newState);   // V2
         }
 
 
@@ -98,6 +100,7 @@ namespace Protobot.StateSystems {
                 curIndex--;
                 states[curIndex].Load();
                 InvokeOnChangeState();
+                OnUndo?.Invoke(states[curIndex]);   // V2
             }
         }
 
@@ -109,6 +112,7 @@ namespace Protobot.StateSystems {
                 curIndex++;
                 states[curIndex].Load();
                 InvokeOnChangeState();
+                OnRedo?.Invoke(states[curIndex]);   // V2
             }
         }
     }

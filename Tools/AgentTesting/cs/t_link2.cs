@@ -1,0 +1,11 @@
+var sb = new System.Text.StringBuilder();
+GameObject link = null;
+foreach (var o in Protobot.PartsManager.FindLoadedObjects()) if (o.GetComponent<Protobot.Motion.RubberLinkPart>() != null) link = o;
+var screw = link.GetComponent<Protobot.Screw>();
+sb.Append("detector holes " + screw.holeDetector.holes.Count + " neighbours " + string.Join(",", System.Linq.Enumerable.Select(Protobot.GroupManager.Neighbours(link), n => n.name)) + "\n");
+var bend = Protobot.Tools.PartBend.LinkBend(link, 45f, 0f);
+var note = Protobot.Tools.PartBend.ChangeBends(link, new System.Collections.Generic.List<Protobot.Tools.PartBend.Bend> { bend }, bend.start);
+sb.Append("bent: '" + note + "'\n");
+foreach (var o in Protobot.PartsManager.FindLoadedObjects()) sb.Append("  " + o.name + " pos " + o.transform.position.ToString("F3") + " fwd " + o.transform.forward.ToString("F2") + "\n");
+foreach (var cap in screw.holeDetector.GetComponentsInChildren<CapsuleCollider>(true)) sb.Append("  capsule " + cap.name + " en " + cap.enabled + " pos " + cap.transform.position.ToString("F3") + " up " + cap.transform.up.ToString("F2") + " h " + cap.height.ToString("F3") + "\n");
+return sb.ToString();

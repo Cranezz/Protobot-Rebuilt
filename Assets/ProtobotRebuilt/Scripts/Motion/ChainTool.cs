@@ -30,7 +30,6 @@ namespace Protobot.Motion {
         private string style = "chain";
         private ChainLoop editing;
         private RectTransform window, body;
-        private System.Func<bool> savedBlocked;
         private int shown = -1;
         private ChainPath preview;
         private Quaternion frame;
@@ -75,7 +74,7 @@ namespace Protobot.Motion {
         }
 
         private void OnDestroy() {
-            SelectionSystem.SelectionManager.Blocked = savedBlocked;
+            ToolBlock.Pop();   // V2: counted, so tools opening and closing together don't leave it on
             if (active == this) active = null;
         }
 
@@ -85,8 +84,7 @@ namespace Protobot.Motion {
         private Button make;
 
         private void Build() {
-            savedBlocked = SelectionSystem.SelectionManager.Blocked;
-            SelectionSystem.SelectionManager.Blocked = () => true;
+            ToolBlock.Push();
             window = Ui.Panel(transform, "Window", Theme.Panel, 10f).rectTransform;
             window.anchorMin = window.anchorMax = new Vector2(0f, 1f);
             window.pivot = new Vector2(0f, 1f);

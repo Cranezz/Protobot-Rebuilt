@@ -1,0 +1,1 @@
+var sb = new System.Text.StringBuilder(); foreach (var s0 in UnityEngine.Object.FindObjectsByType<Protobot.SavedObject>(FindObjectsSortMode.None)) { var r = s0.GetComponent<Renderer>(); sb.Append(s0.id + " " + (r != null ? r.bounds.center.ToString("F2") + " ext " + r.bounds.extents.ToString("F2") : "") + "\n"); } return sb.ToString();

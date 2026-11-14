@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Protobot.Interface;
 using Protobot.Rendering;
@@ -49,14 +49,59 @@ namespace Protobot.Motion {
         }
         public static Sandbox Instance => instance;
 
+        /// <summary>V2: where a point of a build part is now: carried by its body in the simulation (the build's own
+        /// parts stay where they were), else the point itself. Labels and markers use it to follow the robot.</summary>
+        public static Vector3 SimPoint(GameObject part, Vector3 world) {
+            if (instance == null || part == null || !instance.bodyOf.TryGetValue(part, out var body) || body.rb == null) return world;
+            var now = Matrix4x4.TRS(body.rb.position, body.rb.rotation, Vector3.one);
+            return now.MultiplyPoint3x4(body.startInverse.MultiplyPoint3x4(world));
+        }
+
+        public static Vector3 SimDirection(GameObject part, Vector3 direction) {
+            if (instance == null || part == null || !instance.bodyOf.TryGetValue(part, out var body) || body.rb == null) return direction;
+            return body.rb.rotation * (body.startInverse.rotation * direction);
+        }
+
         public bool Paused { get; private set; }
-        public bool Follow { get; set; } = true;
+        // V2: the camera: free, following the robot, or tracking a part or game piece clicked in the view.
+        public enum CameraMode { Free, Robot, Part }
+        public CameraMode View { get; private set; } = CameraMode.Robot;
+        private Rigidbody tracked;
+        private bool picking;
+        private Vector3? lastTarget;
+        public bool Follow { get => View == CameraMode.Robot; set => SetCamera(value ? CameraMode.Robot : CameraMode.Free); }
+
+        public void SetCamera(CameraMode mode) {
+            picking = mode == CameraMode.Part;
+            if (mode != CameraMode.Part) tracked = null;
+            View = mode == CameraMode.Part ? CameraMode.Free : mode;   // tracking starts once a part is clicked
+            lastTarget = null;
+            Interface.Interface.Say(mode == CameraMode.Free ? "The camera stays put: orbit, pan and zoom freely"
+                : mode == CameraMode.Robot ? "The camera follows the robot" : "Click a part or a game piece to keep the camera on it", true);
+        }
+
+        // Picking the part to track: a click on the robot (layer 16) or a game piece (18).
+        private void PickTracked() {
+            if (!picking || Mouse.current == null || !Mouse.current.leftButton.wasPressedThisFrame || MouseInput.overUI) return;
+            var view = UnityEngine.Camera.main;
+            if (view == null) return;
+            if (Physics.Raycast(view.ScreenPointToRay(MouseInput.Position), out var hit, 5000f, (1 << Layer) | (1 << 18), QueryTriggerInteraction.Ignore)
+                && hit.rigidbody != null) {
+                tracked = hit.rigidbody;
+                View = CameraMode.Part;
+                picking = false;
+                lastTarget = null;
+                Interface.Interface.Say("The camera tracks " + (hit.collider.gameObject.layer == 18 ? "that game piece" : "that part of the robot") + "; pick Free to let go", true);
+            }
+            else Interface.Interface.Say("Nothing to track there: click a part of the robot or a game piece", false);
+        }
 
         private class SimBody {
             public Rigidbody rb;
             public readonly List<GameObject> nodes = new();
             public float mass;
             public int colliders;
+            public Matrix4x4 startInverse = Matrix4x4.identity;   // V2: the body's pose when the run began, inverted
         }
 
         // A gear train: shafts (bodies, hinged to their frames) that turn together at their ratios k (of the train's
@@ -70,7 +115,10 @@ namespace Protobot.Motion {
             public PneumaticCylinder cylinder;
             public ConfigurableJoint joint;
             public bool extended;
+            public bool loose;   // V2: no air: the rod slides freely within its stroke
+            public PneumaticCylinder.AirPorts ports;
             public Rigidbody rod, barrel;
+            public float changedAt = -10f;   // V2: when its key last changed it (its state is shown on it for a moment)
         }
 
         private class Wheel {
@@ -269,19 +317,39 @@ namespace Protobot.Motion {
 
             root = new GameObject("Simulation").transform;
             var parts = FindObjectsByType<SavedObject>(FindObjectsSortMode.None)
-                        .Where(s => s.gameObject.activeInHierarchy && !s.gameObject.IsDeleted() && s.GetComponent<ChainLoop>() == null)
+                        .Where(s => s.gameObject.activeInHierarchy && !s.gameObject.IsDeleted() && s.GetComponent<ChainLoop>() == null && s.GetComponent<ElasticBand>() == null && s.GetComponent<PneumaticTube>() == null)
                         .Select(s => s.gameObject).ToList();
             if (parts.Count == 0) throw new System.Exception("there's nothing in the build");
             var cylinders = parts.Select(p => p.GetComponent<PneumaticCylinder>()).Where(c => c != null && c.enabled && c.Rod != null).ToList();
             var nodes = new List<GameObject>(parts);
             nodes.AddRange(cylinders.Select(c => c.Rod.gameObject));
+            // V2: a hinge's top leaf is a body of its own, turning on the pin.
+            var hingeParts = parts.Select(p => p.GetComponent<HingePart>()).Where(h => h != null && h.enabled && h.Leaf != null).ToList();
+            nodes.AddRange(hingeParts.Select(h => h.Leaf.gameObject));
+            // V2: a universal joint's far yoke too (joined at the cross: MakeUJoints).
+            ujoints = parts.Select(p => p.GetComponent<UniversalJoint>()).Where(u => u != null && u.enabled && u.Yoke != null).ToList();
+            nodes.AddRange(ujoints.Select(u => u.Yoke.gameObject));
             parent = nodes.ToDictionary(n => n, n => n);
             var rotors = GearTrain.Rotors();
 
             // Tight screws hold what they go through together; a joint screw only its nut.
             var hinges = new List<(GameObject a, GameObject b, Vector3 point, Vector3 axis, MotorDrive motor)>();
+            flexes.Clear();
             foreach (var part in parts) {
                 if (part.GetComponent<Screw>() == null || part.GetComponent<RodThread>() != null) continue;
+                if (RubberLink(part, out var farSide)) {   // V2: rigid with its first stud's side, bends to the other
+                    foreach (var next in GroupManager.Neighbours(part)) {
+                        if (!parent.ContainsKey(next)) continue;
+                        if (farSide.Contains(next)) {
+                            // V2: at the rubber's middle, along it there (bent or straight).
+                            var (rubberStart, rubberLength) = Tools.PartBend.LinkRubber(part);
+                            var (middle, turn) = Tools.PartBend.CenterAt(part, rubberStart + rubberLength / 2f, Tools.PartBend.SavedBends(part));
+                            flexes.Add((part, next, Tools.PartBend.ToWorld(part, middle), part.transform.rotation * (turn * -Tools.PartBend.AlongLocal(part))));
+                        }
+                        else Union(part, next);
+                    }
+                    continue;
+                }
                 var joint = Linkage.IsJoint(part);
                 var threaded = joint ? Linkage.Threaded(part) : null;
                 var head = joint ? Linkage.HeadPart(part) : null;
@@ -292,6 +360,7 @@ namespace Protobot.Motion {
                     else Union(part, next);
                 }
             }
+            foreach (var hingePart in hingeParts) hinges.Add((hingePart.gameObject, hingePart.Leaf.gameObject, hingePart.PinPoint, hingePart.PinAxis, null));
             // A cylinder's rod holds what its thread fastens.
             foreach (var cylinder in cylinders)
                 if (cylinder.Thread != null)
@@ -330,7 +399,12 @@ namespace Protobot.Motion {
                 bodyOf[node] = body;
             }
             var floor = 0f;
+            bogies.Clear();
+            bogieWheels.Clear();
             foreach (var body in bodies) MakeBody(body, cylinders, ref floor);
+            MakeBogieWheels();   // V2
+            foreach (var body in bodies)
+                if (body.rb != null) body.startInverse = Matrix4x4.TRS(body.rb.position, body.rb.rotation, Vector3.one).inverse;
             main = bodies.OrderByDescending(b => b.mass).First();
 
             // Ground: the grid, or the build's lowest point if it's below it.
@@ -359,6 +433,10 @@ namespace Protobot.Motion {
                 }
 
             MakeHinges(hinges);
+            MakeFlexes();   // V2
+            MakeUJoints();   // V2
+            MakeSlideTrucks();   // V2
+            MakeElastics();   // V2
             MakeTrains(rotors);
             StillChains();
             MakeSlides(cylinders);
@@ -472,6 +550,183 @@ namespace Protobot.Motion {
             return WheelKind.None;
         }
 
+        // ------------------------------------------------------------------ V2: bogie wheels
+        // A bogie wheel is one model: a bracket and green wheels on steel pins. In the simulation the bracket is part
+        // of the body it's screwed to, and each wheel (the halves on one pin) is a body of its own hinged to it on
+        // its pin, so a bogie rolls instead of sliding. The pieces are cut from the model once and shared.
+        private class BogieShape {
+            public Mesh frame;       // the model with its wheels' sub-mesh left empty (materials stay in order)
+            public Mesh frameHull;   // only the bracket's (and pins') points, for its collision shape
+            public int wheelSub;
+            public readonly List<(Mesh mesh, Vector3 axis)> wheels = new();
+        }
+
+        private static readonly Dictionary<Mesh, BogieShape> BogieShapes = new();
+        private readonly List<(GameObject node, Rigidbody frame)> bogies = new();
+
+        private static BogieShape BogieOf(GameObject node) {
+            if (!node.TryGetComponent(out SavedObject saved) || saved.id == null || !saved.id.Contains("Bogie Wheel")) return null;
+            var filter = node.GetComponent<MeshFilter>();
+            var renderer = node.GetComponent<MeshRenderer>();
+            var mesh = filter != null ? filter.sharedMesh : null;
+            if (mesh == null || renderer == null || !mesh.isReadable) return null;
+            if (BogieShapes.TryGetValue(mesh, out var known)) return known;
+            BogieShape shape = null;
+            var materials = renderer.sharedMaterials;
+            var wheelSub = -1;
+            for (var i = 0; i < mesh.subMeshCount && i < materials.Length; i++)
+                if (materials[i] != null && materials[i].name.Contains("Green")) wheelSub = i;
+            if (wheelSub >= 0) {
+                shape = new BogieShape { wheelSub = wheelSub };
+                var vertices = mesh.vertices;
+                shape.frame = Object.Instantiate(mesh);
+                shape.frame.name = mesh.name + " (bogie frame)";
+                shape.frame.SetTriangles(System.Array.Empty<int>(), wheelSub);
+                var rest = new List<int>();
+                for (var i = 0; i < mesh.subMeshCount; i++)
+                    if (i != wheelSub) rest.AddRange(mesh.GetTriangles(i));
+                shape.frameHull = Piece(vertices, rest, mesh.name + " (bogie bracket)");
+                // The wheels: the wheel sub-mesh's connected pieces, grouped by the line they turn about (each piece's
+                // thin way is its axle).
+                var triangles = mesh.GetTriangles(wheelSub);
+                var weld = new Dictionary<Vector3Int, int>();
+                var point = new int[vertices.Length];
+                for (var i = 0; i < vertices.Length; i++) {
+                    var k = Vector3Int.RoundToInt(vertices[i] * 2000f);
+                    if (!weld.TryGetValue(k, out var w)) weld[k] = w = weld.Count;
+                    point[i] = w;
+                }
+                var parent = new int[weld.Count];
+                for (var i = 0; i < parent.Length; i++) parent[i] = i;
+                int Find(int x) {
+                    while (parent[x] != x) x = parent[x] = parent[parent[x]];
+                    return x;
+                }
+                for (var i = 0; i < triangles.Length; i += 3) {
+                    var a = Find(point[triangles[i]]);
+                    parent[Find(point[triangles[i + 1]])] = a;
+                    parent[Find(point[triangles[i + 2]])] = a;
+                }
+                var pieces = new Dictionary<int, List<int>>();
+                for (var i = 0; i < triangles.Length; i += 3) {
+                    var r = Find(point[triangles[i]]);
+                    if (!pieces.TryGetValue(r, out var list)) pieces[r] = list = new List<int>();
+                    list.Add(triangles[i]);
+                    list.Add(triangles[i + 1]);
+                    list.Add(triangles[i + 2]);
+                }
+                var groups = new Dictionary<string, (Vector3 axis, List<int> triangles)>();
+                foreach (var piece in pieces.Values) {
+                    if (piece.Count < 60) continue;
+                    var b = new Bounds(vertices[piece[0]], Vector3.zero);
+                    foreach (var i in piece) b.Encapsulate(vertices[i]);
+                    var axis = b.size.x <= b.size.y && b.size.x <= b.size.z ? Vector3.right : b.size.y <= b.size.z ? Vector3.up : Vector3.forward;
+                    var line = b.center - axis * Vector3.Dot(b.center, axis);
+                    var key = axis + "|" + Mathf.Round(line.x * 20f) + "," + Mathf.Round(line.y * 20f) + "," + Mathf.Round(line.z * 20f);
+                    if (!groups.TryGetValue(key, out var group)) groups[key] = group = (axis, new List<int>());
+                    group.triangles.AddRange(piece);
+                }
+                foreach (var group in groups.Values) shape.wheels.Add((Piece(vertices, group.triangles, mesh.name + " (bogie wheel)", mesh), group.axis));
+                if (shape.wheels.Count == 0) shape = null;
+            }
+            BogieShapes[mesh] = shape;
+            return shape;
+        }
+
+        // A mesh of only some triangles of another (its own vertices); with source, normals and uv too.
+        private static Mesh Piece(Vector3[] vertices, List<int> triangles, string name, Mesh source = null) {
+            var map = new Dictionary<int, int>();
+            var points = new List<Vector3>();
+            var normals = source != null ? source.normals : null;
+            var uvs = source != null ? source.uv : null;
+            var newNormals = new List<Vector3>();
+            var newUvs = new List<Vector2>();
+            var indices = new List<int>(triangles.Count);
+            foreach (var i in triangles) {
+                if (!map.TryGetValue(i, out var j)) {
+                    map[i] = j = points.Count;
+                    points.Add(vertices[i]);
+                    if (normals != null && normals.Length == vertices.Length) newNormals.Add(normals[i]);
+                    if (uvs != null && uvs.Length == vertices.Length) newUvs.Add(uvs[i]);
+                }
+                indices.Add(j);
+            }
+            var mesh = new Mesh { name = name, indexFormat = points.Count > 65000 ? UnityEngine.Rendering.IndexFormat.UInt32 : UnityEngine.Rendering.IndexFormat.UInt16 };
+            mesh.SetVertices(points);
+            if (newNormals.Count == points.Count) mesh.SetNormals(newNormals);
+            if (newUvs.Count == points.Count) mesh.SetUVs(0, newUvs);
+            mesh.SetTriangles(indices, 0);
+            if (newNormals.Count != points.Count) mesh.RecalculateNormals();
+            mesh.RecalculateBounds();
+            return mesh;
+        }
+
+        private void MakeBogieWheels() {
+            foreach (var (node, frame) in bogies) {
+                var shape = BogieOf(node);
+                if (shape == null || frame == null) continue;
+                // The wheels' color as the part shows it now (painted or not).
+                var own = node.GetComponent<MeshRenderer>().sharedMaterials;
+                var material = shape.wheelSub < own.Length ? own[shape.wheelSub] : null;
+                foreach (var (mesh, axis) in shape.wheels) {
+                    var go = new GameObject("Bogie Wheel") { layer = Layer };
+                    go.transform.SetParent(root, false);
+                    go.transform.SetPositionAndRotation(node.transform.position, node.transform.rotation);
+                    var view = new GameObject("Wheel");
+                    view.transform.SetParent(go.transform, false);
+                    view.transform.localScale = node.transform.lossyScale;
+                    view.AddComponent<MeshFilter>().sharedMesh = mesh;
+                    view.AddComponent<MeshRenderer>().sharedMaterial = material;
+                    var shapeObject = new GameObject("Collider") { layer = Layer };
+                    shapeObject.transform.SetParent(go.transform, false);
+                    shapeObject.transform.localScale = node.transform.lossyScale;
+                    var collider = shapeObject.AddComponent<MeshCollider>();
+                    collider.sharedMesh = Hull(mesh, axis);
+                    collider.convex = true;
+                    collider.contactOffset = 0.02f;
+                    collider.sharedMaterial = Material(0.8f);
+                    foreach (var other in frame.GetComponentsInChildren<Collider>()) Physics.IgnoreCollision(collider, other, true);
+                    var rb = go.AddComponent<Rigidbody>();
+                    rb.mass = 0.012f;   // the two plastic halves, about 12 g
+                    rb.angularDamping = 0.5f;   // plastic on a steel pin
+                    rb.maxAngularVelocity = 400f;
+                    rb.solverIterations = 20;
+                    rb.interpolation = RigidbodyInterpolation.Interpolate;
+                    var joint = go.AddComponent<ConfigurableJoint>();
+                    joint.connectedBody = frame;
+                    joint.autoConfigureConnectedAnchor = true;
+                    joint.anchor = Vector3.Scale(mesh.bounds.center, node.transform.lossyScale);
+                    joint.axis = axis;
+                    joint.secondaryAxis = Perpendicular(axis);
+                    joint.xMotion = joint.yMotion = joint.zMotion = ConfigurableJointMotion.Locked;
+                    joint.angularXMotion = ConfigurableJointMotion.Free;
+                    joint.angularYMotion = joint.angularZMotion = ConfigurableJointMotion.Locked;
+                    joint.enableCollision = false;
+                    joint.enablePreprocessing = false;
+                    bogieWheels.Add((rb, frame, joint, axis));
+                }
+            }
+        }
+
+        private readonly List<(Rigidbody wheel, Rigidbody frame, ConfigurableJoint joint, Vector3 axisLocal)> bogieWheels = new();
+
+        // Plastic turning on a steel pin: friction about 0.25 at the pin's radius (0.08") against the load the pin
+        // carries, so a bogie rolls freely but doesn't roll on for ever (a lone one kept the speed its drop gave it).
+        private void BogieFriction() {
+            const float PinFriction = 0.25f, PinRadius = 0.08f;
+            foreach (var (wheel, frame, joint, axisLocal) in bogieWheels) {
+                if (wheel == null || frame == null) continue;
+                var axis = wheel.transform.TransformDirection(axisLocal);
+                var spin = Vector3.Dot(wheel.angularVelocity - frame.angularVelocity, axis);
+                if (Mathf.Abs(spin) < 1e-4f) continue;
+                var inertia = Inertia(wheel, axis, wheel.worldCenterOfMass);
+                var most = inertia * Mathf.Abs(spin) / Time.fixedDeltaTime;   // never more than stops it this step
+                var torque = Mathf.Min(PinFriction * joint.currentForce.magnitude * PinRadius, most) * Mathf.Sign(spin);
+                wheel.AddTorque(-axis * torque);
+                frame.AddTorque(axis * torque);
+            }
+        }
+
         private static bool Hardware(GameObject part) {
             if (!part.TryGetComponent(out SavedObject saved) || string.IsNullOrEmpty(saved.id)) return false;
             return saved.id.StartsWith("SCRW") || saved.id.StartsWith("NUT") || saved.id.StartsWith("RBMP");
@@ -493,11 +748,15 @@ namespace Protobot.Motion {
 
         private IEnumerable<MeshRenderer> RenderersOf(GameObject node, List<PneumaticCylinder> cylinders) {
             var rodOf = node.GetComponent<PneumaticCylinder>();
+            var hingeOf = node.GetComponent<HingePart>();   // V2: its top leaf is its own body
+            var ujOf = node.GetComponent<UniversalJoint>();
             foreach (var renderer in node.GetComponentsInChildren<MeshRenderer>()) {
                 if (!renderer.enabled || renderer.GetComponent<MeshFilter>() == null) continue;
                 if (renderer.gameObject.layer == HoleCollider.HOLE_COLLISIONS_LAYER || renderer.GetComponent<HoleFace>() != null) continue;
                 if (renderer.GetComponent<RodThread>() != null) continue;   // the thread's highlight
                 if (rodOf != null && rodOf.Rod != null && renderer.transform.IsChildOf(rodOf.Rod)) continue;
+                if (hingeOf != null && hingeOf.Leaf != null && renderer.transform.IsChildOf(hingeOf.Leaf)) continue;
+                if (ujOf != null && ujOf.Yoke != null && renderer.transform.IsChildOf(ujOf.Yoke)) continue;
                 var owner = renderer.GetComponentInParent<SavedObject>();
                 if (owner != null && owner.gameObject != node && node.GetComponent<SavedObject>() != null) continue;
                 yield return renderer;
@@ -525,7 +784,8 @@ namespace Protobot.Motion {
                     proxy.transform.SetParent(go.transform, true);
                     proxy.transform.SetPositionAndRotation(renderer.transform.position, renderer.transform.rotation);
                     proxy.transform.localScale = renderer.transform.lossyScale;
-                    proxy.AddComponent<MeshFilter>().sharedMesh = renderer.GetComponent<MeshFilter>().sharedMesh;
+                    var bogie = renderer.gameObject == node ? BogieOf(node) : null;   // V2: its wheels turn on their own
+                    proxy.AddComponent<MeshFilter>().sharedMesh = bogie != null ? bogie.frame : renderer.GetComponent<MeshFilter>().sharedMesh;
                     var copy = proxy.AddComponent<MeshRenderer>();
                     copy.sharedMaterials = renderer.sharedMaterials;
                     copy.shadowCastingMode = renderer.shadowCastingMode;
@@ -547,6 +807,11 @@ namespace Protobot.Motion {
                 var kind = KindOf(node);
                 var collider = shape.AddComponent<MeshCollider>();
                 collider.sharedMesh = Hull(filter.sharedMesh, kind != WheelKind.None ? WheelAxis(node) : (Vector3?)null);
+                if (BogieOf(node) is BogieShape bogieShape) {   // V2: the bracket's own shape; its wheels are bodies
+                    collider.sharedMesh = Hull(bogieShape.frameHull, null);
+                    kind = WheelKind.None;
+                    bogies.Add((node, rb));
+                }
                 collider.convex = true;
                 collider.contactOffset = 0.02f;
                 collider.sharedMaterial = kind == WheelKind.Omni ? Material(0f) : kind == WheelKind.Traction ? Material(1f)
@@ -575,6 +840,173 @@ namespace Protobot.Motion {
                 rb.inertiaTensor = new Vector3(Mathf.Max(tensor.x, floorInertia), Mathf.Max(tensor.y, floorInertia), Mathf.Max(tensor.z, floorInertia));
             }
             if (body.colliders > 0 && omnis.Any(w => w.rb == rb)) go.AddComponent<ContactCollector>().owner = this;
+        }
+
+        // V2: the rubber link (VEX's flexible link: a rubber body with a stud each end). What its far stud holds hangs
+        // on a sprung joint at the rubber's middle: it bends up to 45° (twists 20°) and springs back. About 700
+        // lbf-free units: 1 lb on a 1" lever bends it about 15°.
+        private readonly List<(GameObject link, GameObject other, Vector3 point, Vector3 axis)> flexes = new();
+
+        private static bool RubberLink(GameObject part, out HashSet<GameObject> farSide) {
+            farSide = null;
+            if (!part.TryGetComponent(out SavedObject saved) || saved.id != "VXHARDWARE-Rubber Link" || !part.TryGetComponent(out Screw screw) || screw.holeDetector == null) return false;
+            farSide = new HashSet<GameObject>();
+            var tip = part.transform.position;
+            var along = -part.transform.forward;
+            // V2: by which stud it's nearer (a bent link's far stud is turned).
+            part.TryGetComponent(out RubberLinkPart linkPart);
+            foreach (var hole in screw.holeDetector.GetOrderedHoles())
+                if (hole != null && hole.holeData != null && hole.holeData.part != null
+                    && (linkPart != null ? linkPart.OnFarStud(hole.holeData.position) : Vector3.Dot(hole.holeData.position - tip, along) > screw.ScrewLength / 2f))
+                    farSide.Add(hole.holeData.part);
+            return true;
+        }
+
+        private List<UniversalJoint> ujoints = new();
+
+        // V2: rubber bands and latex tubing: each span of the loop pulls the posts at its ends toward each other with
+        // the band's tension at its stretch now (the loop's length changes as its posts' middles move apart or
+        // together; the wraps round the posts stay). PhysX spring joints do the pulling (their springs are solved
+        // with the rest, so a light part on a strong band stays steady); their stiffness is set every step so the
+        // pull is the band's: spring = tension / span.
+        private class BandPull {
+            public ElasticBand band;
+            public readonly List<(Rigidbody rb, Vector3 local)> posts = new();
+            public readonly List<(SpringJoint joint, int a, int b)> spans = new();
+            public float startLength, startPolygon;
+        }
+
+        private readonly List<BandPull> bandPulls = new();
+
+        private void MakeElastics() {
+            bandPulls.Clear();
+            foreach (var band in ElasticBand.All) {
+                if (band == null || band.gameObject.IsDeleted() || band.Shape == null || !band.Shape.Valid || band.posts.Count < 2) continue;
+                var pull = new BandPull { band = band, startLength = band.Shape.length };
+                foreach (var post in band.posts) {
+                    Rigidbody rb = null;
+                    if (post.part != null && bodyOf.TryGetValue(post.part, out var body)) rb = body.rb;
+                    var center = post.Center;
+                    pull.posts.Add((rb, rb != null ? rb.transform.InverseTransformPoint(center) : center));
+                }
+                var n = pull.posts.Count;
+                for (var i = 0; i < n; i++) {
+                    var a = pull.posts[i];
+                    var b = pull.posts[(i + 1) % n];
+                    if (a.rb == null || b.rb == null || a.rb == b.rb) continue;
+                    var joint = a.rb.gameObject.AddComponent<SpringJoint>();
+                    joint.connectedBody = b.rb;
+                    joint.autoConfigureConnectedAnchor = false;
+                    joint.anchor = a.local;
+                    joint.connectedAnchor = b.local;
+                    joint.minDistance = 0f;
+                    joint.maxDistance = 0f;
+                    joint.tolerance = 0.001f;
+                    joint.spring = 0f;
+                    joint.damper = 0f;
+                    joint.enableCollision = true;
+                    pull.spans.Add((joint, i, (i + 1) % n));
+                }
+                if (pull.spans.Count == 0) continue;
+                pull.startPolygon = Polygon(pull);
+                bandPulls.Add(pull);
+            }
+            PullBands();
+        }
+
+        private static Vector3 PostAt((Rigidbody rb, Vector3 local) post) => post.rb != null ? post.rb.transform.TransformPoint(post.local) : post.local;
+
+        private static float Polygon(BandPull pull) {
+            var total = 0f;
+            for (var i = 0; i < pull.posts.Count; i++) total += Vector3.Distance(PostAt(pull.posts[i]), PostAt(pull.posts[(i + 1) % pull.posts.Count]));
+            return total;
+        }
+
+        private void PullBands() {
+            const float LbfToSim = 4.448f * Newton;
+            foreach (var pull in bandPulls) {
+                if (pull.band == null) continue;
+                var length = Mathf.Max(0.01f, pull.startLength + Polygon(pull) - pull.startPolygon);
+                var tension = pull.band.SpanPull(length) * LbfToSim;
+                // Its stiffness here, for a little damping along each span.
+                var stiff = (pull.band.SpanPull(length + 0.01f) * LbfToSim - tension) / 0.01f;
+                foreach (var (joint, a, b) in pull.spans) {
+                    if (joint == null) continue;
+                    var span = Mathf.Max(0.05f, Vector3.Distance(PostAt(pull.posts[a]), PostAt(pull.posts[b])));
+                    joint.spring = tension / span;
+                    joint.damper = Mathf.Max(0f, stiff) * 0.01f;
+                }
+            }
+        }
+
+        // V2: a slide truck slides along its member (free, with the acetal's light drag), between the member's ends.
+        private void MakeSlideTrucks() {
+            foreach (var truck in FindObjectsByType<SlideTruck>(FindObjectsSortMode.None)) {
+                if (truck.Member == null || !bodyOf.TryGetValue(truck.gameObject, out var a) || !bodyOf.TryGetValue(truck.Member, out var b) || a == b) continue;
+                var (point, along, low, high) = SlideTruck.Track(truck.Member);
+                var x = Vector3.Dot(truck.transform.position - point, along);
+                var middle = point + along * ((low + high) / 2f);
+                var joint = a.rb.gameObject.AddComponent<ConfigurableJoint>();
+                joint.connectedBody = b.rb;
+                joint.autoConfigureConnectedAnchor = false;
+                joint.anchor = a.rb.transform.InverseTransformPoint(truck.transform.position);
+                // The limit is symmetric round the joint's rest place: the middle of the track.
+                joint.connectedAnchor = b.rb.transform.InverseTransformPoint(truck.transform.position - along * (x - (low + high) / 2f));
+                joint.axis = a.rb.transform.InverseTransformDirection(along);
+                joint.secondaryAxis = a.rb.transform.InverseTransformDirection(Perpendicular(along));
+                joint.xMotion = ConfigurableJointMotion.Limited;
+                joint.yMotion = joint.zMotion = ConfigurableJointMotion.Locked;
+                joint.angularXMotion = joint.angularYMotion = joint.angularZMotion = ConfigurableJointMotion.Locked;
+                joint.linearLimit = new SoftJointLimit { limit = Mathf.Max(0.01f, (high - low) / 2f) };
+                joint.xDrive = new JointDrive { positionSpring = 0f, positionDamper = 0.3f * Newton, maximumForce = 0.5f * Newton };
+                joint.targetVelocity = Vector3.zero;
+                joint.enableCollision = false;
+                joint.enablePreprocessing = false;
+            }
+        }
+
+        // V2: a universal joint: its yokes free to bend about the cross's two pins (45° each way), never to twist.
+        private void MakeUJoints() {
+            foreach (var uj in ujoints) {
+                if (!bodyOf.TryGetValue(uj.gameObject, out var a) || !bodyOf.TryGetValue(uj.Yoke.gameObject, out var b) || a == b) continue;
+                var joint = a.rb.gameObject.AddComponent<ConfigurableJoint>();
+                joint.connectedBody = b.rb;
+                joint.autoConfigureConnectedAnchor = true;
+                joint.anchor = a.rb.transform.InverseTransformPoint(uj.Cross);
+                joint.axis = a.rb.transform.InverseTransformDirection(uj.PinA);
+                joint.secondaryAxis = a.rb.transform.InverseTransformDirection(uj.PinB);
+                joint.xMotion = joint.yMotion = joint.zMotion = ConfigurableJointMotion.Locked;
+                joint.angularXMotion = ConfigurableJointMotion.Limited;
+                joint.angularYMotion = ConfigurableJointMotion.Limited;
+                joint.angularZMotion = ConfigurableJointMotion.Locked;
+                joint.lowAngularXLimit = new SoftJointLimit { limit = -UniversalJoint.MaxBend };
+                joint.highAngularXLimit = new SoftJointLimit { limit = UniversalJoint.MaxBend };
+                joint.angularYLimit = new SoftJointLimit { limit = UniversalJoint.MaxBend };
+                joint.enableCollision = false;
+                joint.enablePreprocessing = false;
+            }
+        }
+
+        private void MakeFlexes() {
+            foreach (var (link, other, point, axis) in flexes) {
+                if (!bodyOf.TryGetValue(link, out var a) || !bodyOf.TryGetValue(other, out var b) || a == b) continue;
+                var joint = a.rb.gameObject.AddComponent<ConfigurableJoint>();
+                joint.connectedBody = b.rb;
+                joint.autoConfigureConnectedAnchor = true;
+                joint.anchor = a.rb.transform.InverseTransformPoint(point);
+                joint.axis = a.rb.transform.InverseTransformDirection(axis);
+                joint.secondaryAxis = a.rb.transform.InverseTransformDirection(Perpendicular(axis));
+                joint.xMotion = joint.yMotion = joint.zMotion = ConfigurableJointMotion.Locked;
+                joint.angularXMotion = joint.angularYMotion = joint.angularZMotion = ConfigurableJointMotion.Limited;
+                joint.lowAngularXLimit = new SoftJointLimit { limit = -20f };
+                joint.highAngularXLimit = new SoftJointLimit { limit = 20f };
+                joint.angularYLimit = new SoftJointLimit { limit = 45f };
+                joint.angularZLimit = new SoftJointLimit { limit = 45f };
+                joint.rotationDriveMode = RotationDriveMode.Slerp;
+                joint.slerpDrive = new JointDrive { positionSpring = 700f, positionDamper = 3f, maximumForce = float.MaxValue };
+                joint.enableCollision = false;
+                joint.enablePreprocessing = false;
+            }
         }
 
         private void MakeHinges(List<(GameObject a, GameObject b, Vector3 point, Vector3 axis, MotorDrive motor)> hinges) {
@@ -709,13 +1141,21 @@ namespace Protobot.Motion {
                 joint.linearLimit = new SoftJointLimit { limit = cylinder.Stroke / 2f };
                 joint.enableCollision = false;
                 joint.enablePreprocessing = false;
-                var slide = new Slide { cylinder = cylinder, joint = joint, rod = rod.rb, barrel = barrel.rb, extended = cylinder.Extended };
+                // V2: with air to one end only, the valve starts off: no air, the rod loose.
+                var slide = new Slide { cylinder = cylinder, joint = joint, rod = rod.rb, barrel = barrel.rb, extended = cylinder.Extended,
+                                        ports = cylinder.Ports, loose = cylinder.Ports != PneumaticCylinder.AirPorts.Both };
                 slides.Add(slide);
                 SetSlide(slide);
             }
         }
 
         private static void SetSlide(Slide slide) {
+            if (slide.loose) {
+                // Both ports open: only the seals' drag (about 1 N) holds the rod.
+                slide.joint.xDrive = new JointDrive { positionSpring = 0f, positionDamper = 0.5f * Newton / CylinderSpeed, maximumForce = 1f * Newton };
+                slide.joint.targetVelocity = Vector3.zero;
+                return;
+            }
             var force = (slide.extended ? PneumaticCylinder.ExtendForceNewtons : PneumaticCylinder.RetractForceNewtons) * Newton;
             slide.joint.xDrive = new JointDrive { positionSpring = 0f, positionDamper = force / CylinderSpeed, maximumForce = force };
             slide.joint.targetVelocity = new Vector3(SlideSign * (slide.extended ? CylinderSpeed : -CylinderSpeed), 0f, 0f);
@@ -733,8 +1173,10 @@ namespace Protobot.Motion {
             var typing = InputEvents.TextInput.IsTyping;
             var k = Keyboard.current;
             if (k != null && !typing) {
-                left = new Vector2((k.dKey.isPressed ? 1 : 0) - (k.aKey.isPressed ? 1 : 0), (k.wKey.isPressed ? 1 : 0) - (k.sKey.isPressed ? 1 : 0));
-                right = new Vector2((k.rightArrowKey.isPressed ? 1 : 0) - (k.leftArrowKey.isPressed ? 1 : 0), (k.upArrowKey.isPressed ? 1 : 0) - (k.downArrowKey.isPressed ? 1 : 0));
+                // Keys from Edit > Keyboard shortcuts.
+                static int H(string id) => Tools.Keybinds.Held(id) ? 1 : 0;
+                left = new Vector2(H("DriveRight") - H("DriveLeft"), H("DriveForward") - H("DriveBack"));
+                right = new Vector2(H("Drive2Right") - H("Drive2Left"), H("Drive2Forward") - H("Drive2Back"));
             }
             var pad = Gamepad.current;
             if (pad != null) {
@@ -788,22 +1230,42 @@ namespace Protobot.Motion {
                     }
                     motor.Command = direction * Controls.Speed(motor.gameObject) * (Controls.Reversed(motor.gameObject) ? -1f : 1f);
                 }
-            foreach (var slide in slides)
-                if (!typing && Controls.Pressed(Controls.CylinderKey(slide.cylinder.gameObject))) {
+            // V2: one key per cylinder. Air to both ends: out, in. Air to one end: that way (stiff), then loose.
+            foreach (var slide in slides) {
+                if (typing || !Controls.Pressed(Controls.CylinderKey(slide.cylinder.gameObject))) continue;
+                if (slide.ports == PneumaticCylinder.AirPorts.Both) {
                     slide.extended = !slide.extended;
-                    SetSlide(slide);
-                    Audio.Sounds.PlayAt(Audio.Sounds.Air, slide.rod.position, 0.7f);
+                    slide.loose = false;
                 }
+                else if (slide.loose) {
+                    slide.extended = slide.ports == PneumaticCylinder.AirPorts.Back;
+                    slide.loose = false;
+                }
+                else slide.loose = true;
+                SetSlide(slide);
+                slide.changedAt = Time.unscaledTime;
+                Audio.Sounds.PlayAt(Audio.Sounds.Air, slide.rod.position, slide.loose ? 0.4f : 0.7f);
+            }
             foreach (var train in trains)
                 foreach (var (motor, _) in train.motors) motor.Sound(Paused ? 0f : motor.Level);
-            if (Paused && Keyboard.current != null && Keyboard.current.periodKey.wasPressedThisFrame) Physics.Simulate(Time.fixedDeltaTime);
+            if (Paused && Keyboard.current != null && Tools.Keybinds.Pressed("StepFrame")) Physics.Simulate(Time.fixedDeltaTime);
         }
 
         private void LateUpdate() {
-            if (!Follow || main == null || main.rb == null || PivotCamera.Main == null) return;
-            var target = main.rb.worldCenterOfMass;
-            var focus = PivotCamera.Main.transform;
-            focus.position = Vector3.Lerp(focus.position, target, 1f - Mathf.Exp(-6f * Time.deltaTime));
+            DrawSlideStates();   // V2
+            PickTracked();
+            if (PivotCamera.Main == null) return;
+            Vector3? target = View == CameraMode.Robot && main != null && main.rb != null ? main.rb.worldCenterOfMass
+                        : View == CameraMode.Part && tracked != null ? tracked.worldCenterOfMass : (Vector3?)null;
+            if (target == null) {
+                lastTarget = null;
+                return;
+            }
+            // V2: the focus moves with the target (and the pan target with it), so the user's own orbit, pan and
+            // zoom keep working while it follows; the first frame glides onto the target.
+            if (lastTarget == null) PivotCamera.Main.MoveFocusPosition(target.Value);
+            else PivotCamera.Main.ShiftFocus(target.Value - lastTarget.Value);
+            lastTarget = target;
         }
 
         private void FixedUpdate() {
@@ -811,6 +1273,8 @@ namespace Protobot.Motion {
             RunChains(Time.fixedDeltaTime);
             foreach (var slide in slides) slide.rod.WakeUp();
             Omnis();
+            BogieFriction();   // V2
+            PullBands();   // V2
         }
 
         // A train turns as one: its speed (of its own turn) from its shafts' turning (what the last step did to them:
@@ -943,6 +1407,33 @@ namespace Protobot.Motion {
         public Transform Root => root;
         public bool Drives(MotorDrive motor) => trains.Any(t => t.motors.Any(m => m.motor == motor));
         public bool Slides(PneumaticCylinder cylinder) => slides.Any(s => s.cylinder == cylinder);
+
+        /// <summary>V2: the cylinder's air ports changed while running (the Controls window): its valve starts again
+        /// as the new ports start (both: holding where it was set; one end: loose).</summary>
+        public void SetPorts(PneumaticCylinder cylinder) {
+            foreach (var slide in slides) {
+                if (slide.cylinder != cylinder) continue;
+                slide.ports = cylinder.Ports;
+                slide.loose = slide.ports != PneumaticCylinder.AirPorts.Both;
+                slide.changedAt = Time.unscaledTime;
+                SetSlide(slide);
+            }
+        }
+
+        // V2: what a cylinder's air is doing, shown on it for 1.5 s after its key changes it (with one end of air
+        // a loose rod looks just like one held out, so pressing the key seemed to do nothing).
+        private void DrawSlideStates() {
+            var any = false;
+            foreach (var slide in slides) {
+                if (Time.unscaledTime - slide.changedAt > 1.5f || slide.rod == null) continue;
+                if (!any) Interface.Overlay.Begin();
+                any = true;
+                if (!Interface.Overlay.ToScreen(slide.rod.worldCenterOfMass, out var at)) continue;
+                var text = slide.loose ? "Loose (no air)" : slide.extended ? "Air: out" : "Air: in";
+                Interface.Overlay.Text(at + new Vector2(0f, 28f), text, slide.loose ? Interface.Theme.TextDim : Interface.Theme.Accent, null, true);
+            }
+        }
+        public bool IsLoose(PneumaticCylinder cylinder) => slides.FirstOrDefault(s => s.cylinder == cylinder)?.loose ?? cylinder.Ports != PneumaticCylinder.AirPorts.Both;
         public bool Extended(PneumaticCylinder cylinder) => slides.FirstOrDefault(s => s.cylinder == cylinder)?.extended ?? cylinder.Extended;
     }
 }

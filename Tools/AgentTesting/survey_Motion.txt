@@ -1,0 +1,135 @@
+0	Shaft	SHFT-Normal	
+1	High strength shaft	SHFT-High Strength	
+2	6" capped shaft	VXSHAFTPARTS-6" Capped Shaft	holes 0 size (0.20, 6.00, 0.20)
+3	Normal bearing flat	BRNG-Normal	
+4	High Strength bearing flat	BRNG-High Strength	
+5	Low Profile bearing flat	BRNG-Low Profile	
+6	Collar Retainer bearing flat	BRNG-Collar Retainer	
+7	Normal block bearing	BLCK-Normal	
+8	High Strength block bearing	BLCK-High Strength	
+9	Ball Bearing	VXBALLBEARINGS-Ball Bearing	holes 1 size (0.28, 0.97, 0.97)
+10	Ball Bearing Circle Insert	VXBALLBEARINGS-Ball Bearing Circle Insert	holes 1 size (0.50, 0.50, 0.36)
+11	Ball Bearing Housing	VXBALLBEARINGS-Ball Bearing Housing	holes 5 size (1.31, 1.31, 0.40)
+12	Ball Bearing Square Insert	VXBALLBEARINGS-Ball Bearing Square Insert	holes 1 size (0.50, 0.50, 0.36)
+13	1/8" HS Bushing	VXHIGHSTRENGTHSH-1/8" HS Bushing	holes 1 size (0.50, 0.13, 0.50)
+14	5/16" HS Bushing	VXHIGHSTRENGTHSH-5/16" HS Bushing	holes 1 size (0.50, 0.31, 0.50)
+15	2.00" omni wheel	OMNI-V2-2.00in	
+16	2.75" omni wheel	OMNI-V2-2.75in	
+17	3.25" omni wheel	OMNI-V2-3.25in	
+18	4.00" omni wheel	OMNI-V2-4.00in	
+19	2.75" traction wheel	TWHL-V2-2.75in	
+20	3.25" traction wheel	TWHL-V2-3.25in	
+21	4.00" traction wheel	TWHL-V2-4.00in	
+22	4" Traction Tire	VXWHEELS-4" Traction Tire	holes 1 size (4.00, 0.75, 4.00)
+23	2" Anti Static Omni Wheel	VXWHEELS-2" Anti Static Omni Wheel	holes 2 size (0.63, 1.99, 1.99)
+24	2.75" Anti Static Omni Wheel	VXWHEELS-2.75" Anti Static Omni Wheel	holes 17 size (2.75, 0.98, 2.75)
+25	3.25" Anti Static Omni Wheel	VXWHEELS-3.25" Anti Static Omni Wheel	holes 21 size (3.25, 0.98, 3.25)
+26	4" Anti Static Omni Wheel	VXWHEELS-4" Anti Static Omni Wheel	holes 29 size (4.00, 0.98, 4.00)
+27	2.75" Anti Static Traction Wheel	VXWHEELS-2.75" Anti Static Traction Wheel	holes 17 size (2.75, 2.75, 0.98)
+28	3.25" Anti Static Traction Wheel	VXWHEELS-3.25" Anti Static Traction Wheel	holes 29 size (3.25, 3.25, 0.98)
+29	4" Anti Static Traction Wheel	VXWHEELS-4" Anti Static Traction Wheel	holes 37 size (4.00, 4.00, 0.98)
+30	4" mecanum wheel	MECN-	
+31	2" Mecanum Wheel (left)	VXWHEELS-2" Mecanum Wheel (left)	holes 2 size (2.02, 1.50, 2.00)
+32	2" Mecanum Wheel (right)	VXWHEELS-2" Mecanum Wheel (right)	holes 2 size (2.02, 1.50, 2.00)
+33	2.75" omni wheel (V1)	OMNI-V1-2.75in	
+34	3.25" omni wheel (V1)	OMNI-V1-3.25in	
+35	4.00" omni wheel (V1)	OMNI-V1-4.00in	
+36	2.75" traction wheel (V1)	TWHL-V1-2.75in	
+37	3.25" traction wheel (V1)	TWHL-V1-3.25in	
+38	4.00" traction wheel (V1)	TWHL-V1-4.00in	
+39	5.00" traction wheel (V1)	TWHL-V1-5.00in	
+40	1.625" flex wheel	FWHL-With Adapters-1.625in	
+41	2.00" flex wheel	FWHL-With Adapters-2.00in	
+42	3.00" flex wheel	FWHL-With Adapters-3.00in	
+43	4.00" flex wheel	FWHL-With Adapters-4.00in	
+44	1.625" flex wheel	FWHL-No Adapters-1.625in	
+45	2.00" flex wheel	FWHL-No Adapters-2.00in	
+46	3.00" flex wheel	FWHL-No Adapters-3.00in	
+47	4.00" flex wheel	FWHL-No Adapters-4.00in	
+48	1.625" Flex Wheel, 30A (full width)	VXWHEELS-1.625" Flex Wheel, 30A, 1/2" wide	holes 1 size (1.63, 1.63, 0.50)
+49	1.625" Flex Wheel, 40A (full width)	VXWHEELS-1.625" Flex Wheel, 40A, 1/2" wide	holes 1 size (1.63, 1.63, 0.50)
+50	1.625" Flex Wheel, 60A (full width)	VXWHEELS-1.625" Flex Wheel, 60A, 1/2" wide	holes 1 size (1.63, 1.63, 0.50)
+51	2" Flex Wheel, 30A (full width)	VXWHEELS-2" Flex Wheel, 30A, 1/2" wide	holes 1 size (2.00, 2.00, 0.50)
+52	2" Flex Wheel, 40A (full width)	VXWHEELS-2" Flex Wheel, 40A, 1/2" wide	holes 1 size (2.00, 2.00, 0.50)
+53	2" Flex Wheel, 60A (full width)	VXWHEELS-2" Flex Wheel, 60A, 1/2" wide	holes 1 size (2.00, 2.00, 0.50)
+54	3" Flex Wheel, 30A (full width)	VXWHEELS-3" Flex Wheel, 30A, 1.00" wide	holes 6 size (3.00, 3.00, 1.00)
+55	3" Flex Wheel, 40A (full width)	VXWHEELS-3" Flex Wheel, 40A, 1.00" wide	holes 6 size (3.00, 3.00, 1.00)
+56	3" Flex Wheel, 60A (full width)	VXWHEELS-3" Flex Wheel, 60A, 1.00" wide	holes 6 size (3.00, 3.00, 1.00)
+57	4" Flex Wheel, 30A (full width)	VXWHEELS-4" Flex Wheel, 30A, 1.00" wide	holes 6 size (4.00, 4.00, 1.00)
+58	4" Flex Wheel, 40A (full width)	VXWHEELS-4" Flex Wheel, 40A, 1.00" wide	holes 6 size (4.00, 4.00, 1.00)
+59	4" Flex Wheel, 60A (full width)	VXWHEELS-4" Flex Wheel, 60A, 1.00" wide	holes 6 size (4.00, 4.00, 1.00)
+60	V5 Flywheel Weight	VXMOTIONPARTS-V5 Flywheel Weight	holes 24 size (3.35, 0.12, 3.35)
+61	6 Wheel Leg	VXWHEELS-6 Wheel Leg	holes 9 size (6.00, 6.00, 1.00)
+62	Bogie Wheel Double	VXWHEELS-Bogie Wheel Double	holes 4 size (1.95, 1.56, 2.32)
+63	Bogie Wheel Single	VXWHEELS-Bogie Wheel Single	holes 4 size (0.96, 1.56, 1.56)
+64	1/8" VersaHex Adapter	VXWHEELS-1/8" VersaHex Adapter	holes 1 size (0.70, 0.22, 0.70)
+65	1/4" VersaHex Adapter	VXWHEELS-1/4" VersaHex Adapter	holes 1 size (0.70, 0.34, 0.70)
+66	VersaHub	VXWHEELS-VersaHub	holes 13 size (2.15, 0.50, 2.20)
+67	Intake Roller	VXWHEELS-Intake Roller	holes 1 size (1.50, 0.50, 1.50)
+68	12T gear	GEAR-Normal-12T	
+69	36T gear	GEAR-Normal-36T	
+70	60T gear	GEAR-Normal-60T	
+71	84T gear	GEAR-Normal-84T	
+72	12T HS gear	GEAR-High Strength-12T	
+73	36T HS gear	GEAR-High Strength-36T	
+74	60T HS gear	GEAR-High Strength-60T	
+75	84T HS gear	GEAR-High Strength-84T	
+76	24T HS gear v2	GEAR-High Strength v2-24T	
+77	36T HS gear v2	GEAR-High Strength v2-36T	
+78	48T HS gear v2	GEAR-High Strength v2-48T	
+79	60T HS gear v2	GEAR-High Strength v2-60T	
+80	72T HS gear v2	GEAR-High Strength v2-72T	
+81	84T HS gear v2	GEAR-High Strength v2-84T	
+82	Normal 12T Steel Gear	VXGEARS-Normal 12T Steel Gear	holes 1 size (0.38, 0.57, 0.57)
+83	10T sprocket	SPKT-Normal-10T	
+84	15T sprocket	SPKT-Normal-15T	
+85	24T sprocket	SPKT-Normal-24T	
+86	40T sprocket	SPKT-Normal-40T	
+87	48T sprocket	SPKT-Normal-48T	
+88	6T HS sprocket	SPKT-High Strength-6T	
+89	12T HS sprocket	SPKT-High Strength-12T	
+90	18T HS sprocket	SPKT-High Strength-18T	
+91	24T HS sprocket	SPKT-High Strength-24T	
+92	30T HS sprocket	SPKT-High Strength-30T	
+93	6P 8T Sprocket	VXSPROCKETS-6P 8T Sprocket	holes 1 size (0.78, 0.50, 0.78)
+94	6P 16T Sprocket	VXSPROCKETS-6P 16T Sprocket	holes 1 size (1.40, 0.50, 1.40)
+95	6P 24T Sprocket	VXSPROCKETS-6P 24T Sprocket	holes 1 size (2.05, 0.50, 2.05)
+96	6P 32T Sprocket	VXSPROCKETS-6P 32T Sprocket	holes 9 size (2.69, 0.50, 2.69)
+97	6P 40T Sprocket	VXSPROCKETS-6P 40T Sprocket	holes 21 size (3.33, 0.50, 3.33)
+98	9P 15T Drive Wheel	VXSPROCKETS-9P 15T Drive Wheel	holes 1 size (2.00, 1.00, 2.00)
+99	Metal lock bar	LKBR-Metal	
+100	Plastic lock bar	LKBR-Plastic	
+101	HS Lock Bar (3 hole)	VXHIGHSTRENGTHSH-HS Lock Bar (3 hole)	holes 3 size (0.50, 1.50, 0.06)
+102	HS Lock Bar (5 hole)	VXHIGHSTRENGTHSH-HS Lock Bar (5 hole)	holes 5 size (0.50, 2.50, 0.06)
+103	HS Lock Bar (7 hole)	VXHIGHSTRENGTHSH-HS Lock Bar (7 hole)	holes 7 size (0.50, 3.50, 0.06)
+104	16T bevel gear	MCMS-Bevel Gear-16T	
+105	32T bevel gear	MCMS-Bevel Gear-32T	
+106	12T Bevel Gear	VXADVANCEDGEARS-12T Bevel Gear	holes 1 size (0.74, 0.56, 0.74)
+107	24T Bevel Gear	VXADVANCEDGEARS-24T Bevel Gear	holes 1 size (1.06, 0.43, 1.06)
+108	36T Bevel Gear	VXADVANCEDGEARS-36T Bevel Gear	holes 1 size (1.36, 0.29, 1.36)
+109	Worm gear	MCMS-Worm and Wheel-Gear	
+110	Worm worm	MCMS-Worm and Wheel-Worm	
+111	Lead screw bracket	MCMS-Screw Kit-Bracket	
+112	Lead screw worm nut	MCMS-Screw Kit-Worm Nut	
+113	Lead screw worm gear	MCMS-Screw Kit-Worm Gear	
+114	Lead Screw Segment	VXADVANCEDGEARS-Lead Screw Segment	holes 1 size (1.24, 0.58, 0.58)
+115	Cam follower	MCMS-Cam Follower	
+116	Drop off cam	MCMS-Drop Off Cam	
+117	Hand crank	MCMS-Hand Crank	
+118	Rack	MCMS-Rack	
+119	Ratchet Gear	VXADVANCEDGEARS-Ratchet Gear	holes 1 size (1.72, 0.32, 1.71)
+120	Winch Drum	VXADVANCEDGEARS-Winch Drum	holes 9 size (1.56, 1.39, 1.39)
+121	Winch Pawl	VXADVANCEDGEARS-Winch Pawl	holes 1 size (0.66, 0.39, 0.62)
+122	Differential	VXADVANCEDGEARS-Differential	holes 2 size (1.58, 1.85, 1.58)
+123	Universal Joint	VXADVANCEDGEARS-Universal Joint	holes 2 size (0.39, 1.09, 0.39)
+124	Pulley	VXMOTIONPARTS-Pulley	holes 2 size (1.13, 0.38, 1.13)
+125	Outer slide member	VXSLIDEASSEMBLYP-Outer Slide Member	holes 24 size (12.00, 0.85, 0.47)
+126	Inner slide member	VXSLIDEASSEMBLYP-Inner Slide Member	holes 24 size (12.00, 0.72, 0.41)
+127	Slide truck	VXSLIDEASSEMBLYP-Inner Acetal Slide Truck	holes 4 size (0.69, 2.00, 0.33)
+128	Inner slide truck (classic)	LMTK-Inner Slide Trunk	
+129	Outer slide truck (classic)	LMTK-Outer Slide Trunk	
+130	2 hole hinge	VXHINGES-2 Hole Hinge (bottom)	holes 6 size (0.87, 1.00, 0.24)
+131	3 hole hinge	VXHINGES-3 Hole Hinge (bottom)	holes 8 size (0.87, 1.50, 0.24)
+132	4 hole hinge	VXHINGES-4 Hole Hinge (bottom)	holes 10 size (0.87, 2.00, 0.24)
+133	5 hole hinge	VXHINGES-5 Hole Hinge (bottom)	holes 12 size (0.87, 2.50, 0.24)
+134	Rubber bumper	RBMP-	

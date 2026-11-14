@@ -1,0 +1,10 @@
+var close = GameObject.Find("Close Button"); if (close != null) close.GetComponent<UnityEngine.UI.Button>()?.onClick.Invoke();
+Protobot.PartsManager.DestroyLoadedObjects();
+var top = Protobot.PartsManager.GeneratePart("CCHL-1x2-15", new Vector3(0f, 8f, 0f), Quaternion.identity); top.name = "TOP";
+Protobot.Motion.Linkage.SetGrounded(top, true);
+var low = Protobot.PartsManager.GeneratePart("CCHL-1x2-15", new Vector3(0f, 0.6f, 0f), Quaternion.identity); low.name = "LOW";
+var gen = Protobot.PartsManager.GetPartType("BAND").GetComponent<Protobot.PartGenerator>(); gen.param1.value = "TUBE";
+var pa = top.GetComponent<Renderer>().bounds.center; var pb = low.GetComponent<Renderer>().bounds.center;
+var obj = gen.Generate(pa, Quaternion.identity); var band = obj.GetComponent<Protobot.Motion.ElasticBand>();
+band.Stretch(top, pa, low, pb, 1, 2f);
+return band.Describe() + " stiff " + band.Stiffness + " | low y " + low.transform.position.y.ToString("F2");

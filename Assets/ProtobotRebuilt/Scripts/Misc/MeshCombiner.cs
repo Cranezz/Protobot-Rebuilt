@@ -26,6 +26,11 @@ namespace Protobot {
             objs.ForEach(x => {
                 if (x.TryGetComponent(out MeshFilter meshFilter))
                     meshFilters.Add(meshFilter);
+                // V2: a wheel's or gear's inserts showing in its holes are part of it (the preview of a moved part too).
+                foreach (var insert in x.GetComponentsInChildren<HoleInsert>())
+                    foreach (var filter in insert.GetComponentsInChildren<MeshFilter>())
+                        if (filter.gameObject.activeInHierarchy && filter.sharedMesh != null && filter.GetComponent<HoleCollider>() == null)
+                            meshFilters.Add(filter);
             });
 
             CombineInstance[] combine = new CombineInstance[meshFilters.Count];

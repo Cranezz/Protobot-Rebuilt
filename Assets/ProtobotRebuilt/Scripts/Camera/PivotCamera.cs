@@ -81,6 +81,13 @@ namespace Protobot {
             panPos = transform.position;
         }
 
+        /// <summary>V2: moves the focus by `delta` at once, keeping the pan target with it (the simulation's camera
+        /// follows a moving robot this way, and panning and orbiting still work while it does).</summary>
+        public void ShiftFocus(Vector3 delta) {
+            panPos += delta;
+            transform.position += delta;
+        }
+
         public void MoveFocusPosition(Vector3 newFocusPos) {
             panPos = newFocusPos;
             transform.DOMove(newFocusPos, 0.4f);

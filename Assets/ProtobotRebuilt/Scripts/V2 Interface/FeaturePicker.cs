@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 namespace Protobot.Interface {
@@ -63,7 +63,8 @@ namespace Protobot.Interface {
         public static GameObject PartOf(GameObject hitObject) {
             if (hitObject.GetComponent<HoleCollider>() != null && hitObject.transform.parent != null)
                 return hitObject.transform.parent.gameObject;
-            return hitObject.GetComponent<SavedObject>() != null ? hitObject : null;
+            // (V2: or a PickablePart, e.g. a game's alignment tool)
+            return hitObject.GetComponent<SavedObject>() != null || hitObject.GetComponent<PickablePart>() != null ? hitObject : null;
         }
 
         /// <summary>The best feature near the mouse (on the part under it, or a part whose edge is just there).</summary>

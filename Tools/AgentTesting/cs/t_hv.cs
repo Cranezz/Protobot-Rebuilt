@@ -1,0 +1,1 @@
+var saw = UnityEngine.Object.FindFirstObjectByType<Protobot.Tools.PartSaw>(); return "hovered " + typeof(Protobot.Tools.PartSaw).GetField("hoveredTooth", System.Reflection.BindingFlags.NonPublic|System.Reflection.BindingFlags.Instance).GetValue(saw);

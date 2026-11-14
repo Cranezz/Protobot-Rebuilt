@@ -64,3 +64,7 @@ __pycache__/
 # Builds saved while running in the editor (the original Protobot saves to Application.dataPath/Builds)
 /[Aa]ssets/Builds/
 /[Aa]ssets/Builds.meta
+
+# The bug report webhook (Builds/BugReport.Webhook): built into the app, kept out of the repository
+/Assets/ProtobotRebuilt/Resources/Secrets/
+/Assets/ProtobotRebuilt/Resources/Secrets.meta

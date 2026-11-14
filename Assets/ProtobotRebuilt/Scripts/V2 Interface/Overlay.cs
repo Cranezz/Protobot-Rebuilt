@@ -207,9 +207,25 @@ namespace Protobot.Interface {
             var size = label.text.GetPreferredValues(value);
             var rect = (RectTransform)label.transform;
             rect.anchoredPosition = at;
-            rect.sizeDelta = new Vector2(size.x + 16f, 24f);
+            // V2: as tall as its lines (a second line was cut off with "...").
+            rect.sizeDelta = new Vector2(size.x + 16f, Mathf.Max(24f, size.y + 6f));
             label.onClick = onClick;
             label.background.raycastTarget = onClick != null;
+            return label;
+        }
+
+        /// <summary>V2: a tool's hint by the mouse: below and to the right of the pointer (never under it), kept on the
+        /// screen.</summary>
+        public static Label MouseText(string value, Color color, Action onClick = null, bool emphasize = false) {
+            if (Instance == null) return null;
+            var label = Text(Mouse, value, color, onClick, emphasize);
+            var rect = (RectTransform)label.transform;
+            var size = rect.sizeDelta;
+            var screen = Instance.rectTransform.rect.size;
+            var at = Mouse + new Vector2(20f + size.x / 2f, -16f - size.y / 2f);
+            at.x = Mathf.Min(at.x, screen.x - size.x / 2f - 4f);
+            if (at.y - size.y / 2f < 4f) at.y = Mouse.y + 24f + size.y / 2f;
+            rect.anchoredPosition = at;
             return label;
         }
 

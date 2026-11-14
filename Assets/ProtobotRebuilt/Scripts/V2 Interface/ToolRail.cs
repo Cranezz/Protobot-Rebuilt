@@ -26,7 +26,8 @@ namespace Protobot.Interface {
             ("Move", "Move Tool", "Enable Move Tool", 0, "Click a hole on a part, then a hole on another part to put them together."),
             ("Paint", "Color Tool", "Enable Color Tool", 0, "Click parts to paint them. Pick the color in the options above."),
             ("Saw", "Saw Tool", "Enable Saw Tool", 1, "Click a part to place a cut. Drag the plane or type its distance, then press Enter to cut."),
-            ("Drill", "Drill Tool", "Enable Drill Tool", 1, "Click a hole to drill it out round. Choose the bit size above."),
+            ("Drill", "Drill Tool", "Enable Drill Tool", 1, "Click a hole to drill it out round, or the side of a standoff or HS shaft to drill a hole across it. Choose the bit size above."),
+            ("Bend", "Bend Tool", "Enable Bend Tool", 1, "Bend HS shafts, standoffs and the rubber link: click where it bends, then drag the blue ring (angle) and the green ring (which way). Enter bends it."),
             ("Measure", "Measure Tool", "Enable Measure Tool", 2, "Click two points, edges or holes to measure the distance between them."),
         };
 
@@ -65,6 +66,7 @@ namespace Protobot.Interface {
 
         /// <summary>Switches to a tool by name (as its rail button does).</summary>
         public static void Select(string name) {
+            if (name == "Select") name = "Transform";   // V2: no cursor tool
             var tool = Instance?.tools.FirstOrDefault(t => t.name == name);
             if (tool?.sidebarToggle != null)
                 tool.sidebarToggle.isOn = true;
@@ -83,6 +85,7 @@ namespace Protobot.Interface {
 
             var group = -1;
             foreach (var def in Tools) {
+                if (def.name == "Select") continue;   // V2: the cursor tool is gone: right-click a part for its menu
                 var sidebarButton = oldSidebar != null ? oldSidebar.Find(def.sidebar) : null;
                 if (sidebarButton == null)
                     continue;
@@ -175,22 +178,24 @@ namespace Protobot.Interface {
             }
 
             currentName = active?.name;
-            // The app starts in the Select tool (and comes back to it when no tool is on).
-            if (active == null && Time.frameCount > 2 && tools.Any(t => t.name == "Select")) {
-                Select("Select");
+            // The app starts in the Transform tool (and comes back to it when no tool is on). V2: the Select tool
+            // (cursor) was removed: its key or anything that switches to it lands on Transform.
+            var selectOn = oldSidebar != null && oldSidebar.Find("Select Tool") is Transform selectButton && selectButton.GetComponent<Toggle>() is Toggle selectToggle && selectToggle.isOn;
+            if ((active == null || selectOn) && Time.frameCount > 2 && tools.Any(t => t.name == "Transform")) {
+                Select("Transform");
                 return;
             }
 
             // Esc with nothing under way in the tool (no part being placed, no cut or measurement started, no menu
-            // open) goes back to the Select tool.
+            // open) goes back to the Transform tool.
             var keyboard = UnityEngine.InputSystem.Keyboard.current;
-            if (keyboard != null && keyboard.escapeKey.wasPressedThisFrame && !busyLastFrame && currentName != "Select"
+            if (keyboard != null && keyboard.escapeKey.wasPressedThisFrame && !busyLastFrame && currentName != "Transform"
                 && !TextInput.IsTyping && !TextInput.ShortcutsPaused) {
-                Select("Select");
-                Interface.Say("Select tool");
+                Select("Transform");
+                Interface.Say("Transform tool");
             }
             if (active != shown) {
-                if (shown != null && active != null && placement != null && placement.placing && active.name != "Move")
+                if (shown != null && active != null && placement != null && placement.placing && active.name != "Move" && active.name != "Transform")
                     placement.StopPlacing();
                 shown = active;
                 if (active != null && optionBuilders.TryGetValue(active.name, out var build))

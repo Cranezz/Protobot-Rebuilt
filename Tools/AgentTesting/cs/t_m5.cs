@@ -1,0 +1,10 @@
+var g = Protobot.Game.SkillsGame.Current;
+var keys = new System.Collections.Generic.List<string>(g.matchLoads.Keys);
+foreach (var k in keys) g.DropMatchLoad(k);
+var sb = new System.Text.StringBuilder("state " + g.state + " after drop: ");
+foreach (var kv in g.matchLoads) sb.Append(kv.Key + "=" + kv.Value + " ");
+var at = g.field.LoaderDrop(0, false);
+var cam = Protobot.PivotCamera.Main;
+cam.SetTransform(at + UnityEngine.Vector3.down * 8f, new UnityEngine.Vector3(30f, cam.transform.eulerAngles.y, 0f), -60f);
+if (Protobot.Motion.Sandbox.Instance != null) Protobot.Motion.Sandbox.Instance.Follow = false;
+return sb.ToString();

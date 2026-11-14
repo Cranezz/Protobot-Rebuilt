@@ -34,8 +34,9 @@ namespace Protobot {
         public float GetInsertsOffset(PlacementData placementData, GameObject shaftObj) {
             if (!placementData.TryGetPartData(out var partData)) return 0;
             
+            // V2: the inserts sit flush in the hole now (HoleInsert): no gap for them.
             if (partData.allowCenterInserts && !shaftObj.name.Contains("HS"))
-                return 0.05f;
+                return 0f;
 
             return 0;
         }

@@ -102,7 +102,7 @@ namespace Protobot.Polycarb {
                 else dragging = false;
             }
             var keyboard = UnityEngine.InputSystem.Keyboard.current;
-            if (keyboard != null && keyboard.fKey.wasPressedThisFrame && !InputEvents.TextInput.IsTyping) {
+            if (keyboard != null && Tools.Keybinds.Pressed("SheetsFit") && !InputEvents.TextInput.IsTyping) {
                 viewZoom = 1f;
                 viewPan = Vector2.zero;
                 changed = true;

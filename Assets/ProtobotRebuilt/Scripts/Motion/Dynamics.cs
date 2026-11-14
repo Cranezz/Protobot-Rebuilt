@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using UnityEngine;
 
 namespace Protobot.Motion {
@@ -13,6 +14,51 @@ namespace Protobot.Motion {
                 part.AddComponent<PneumaticCylinder>();
             else if (id.StartsWith("MOTR-") && part.GetComponent<MotorDrive>() == null)
                 part.AddComponent<MotorDrive>();
+            else if (SlideTruck.IsTruck(id) && part.GetComponent<SlideTruck>() == null)
+                part.AddComponent<SlideTruck>();   // V2: rides in a slide member
+            else if (UniversalJoint.Is(id) && part.GetComponent<UniversalJoint>() == null)
+                part.AddComponent<UniversalJoint>();   // V2: bends at its cross
+            else if (HingePart.IsHinge(id) && part.GetComponent<HingePart>() == null)
+                part.AddComponent<HingePart>();   // V2: one part, both leaves and the pin
+            if (id.StartsWith("VX")) {
+                PartColors.Apply(part, id);   // V2: real colors (flex wheels by hardness, spacers, steel)
+                CleanVexHoles(part, id);
+                VexHoleFixes.Apply(part, id);   // V2: long slots, wrong holes
+                if (id.Contains("License Plate") && part.GetComponent<LicensePlate>() == null) part.AddComponent<LicensePlate>();   // V2: team number
+                if (RubberLinkPart.Is(id) && part.GetComponent<RubberLinkPart>() == null) part.AddComponent<RubberLinkPart>();   // V2: studs, bending
+            }
+            else if (VexHoleFixes.Handles(id)) VexHoleFixes.Apply(part, id);
+            if (id.StartsWith("FWHL-") || id.StartsWith("SPCR-") || id.StartsWith("PSPC-")) PartColors.Apply(part, id);   // V2: flex wheels by hardness, gray spacers
+        }
+
+        // V2: VEX-CAD parts' holes came from the hole scanner, which also found the openings in wheels (between
+        // spokes), gears and electronics as odd rectangular "holes". On anything that isn't structure (where slots are
+        // real) only round and square holes up to 0.3" stay. A wheel's, gear's or sprocket's middle hole always stays,
+        // and gets the original's inserts (brass on a screw, silver on a shaft).
+        private static void CleanVexHoles(GameObject part, string id) {
+            var type = PartsManager.GetPartType(id);
+            if (type == null || type.group == PartType.PartGroup.Structure) return;
+            var holes = part.GetComponentsInChildren<HoleCollider>(true).Where(h => h.transform.parent == part.transform).ToList();
+            if (holes.Count == 0) return;
+            HoleCollider middle = null;
+            if (part.TryGetComponent(out MeshFilter filter) && filter.sharedMesh != null) {
+                var center = filter.sharedMesh.bounds.center;
+                middle = holes.OrderBy(h => (h.transform.localPosition - center).sqrMagnitude).First();
+                if ((middle.transform.localPosition - center).magnitude > 0.2f) middle = null;
+            }
+            foreach (var hole in holes) {
+                if (hole == middle) continue;
+                var scale = hole.transform.localScale;
+                var wide = Mathf.Max(scale.x, scale.y);
+                var narrow = Mathf.Min(scale.x, scale.y);
+                var odd = hole.holeData != null && hole.holeData.outline != null;
+                if (wide > 0.3f || wide - narrow > 0.03f || odd) {
+                    hole.transform.SetParent(null);
+                    Object.DestroyImmediate(hole.gameObject);
+                }
+            }
+            if (middle != null && GearTrain.TurnsWithShaft(part) && middle.GetComponent<HoleInsert>() == null)
+                middle.gameObject.AddComponent<HoleInsert>();
         }
 
         /// <summary>

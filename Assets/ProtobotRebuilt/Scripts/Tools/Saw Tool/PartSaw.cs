@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using Parts_List;
@@ -33,11 +33,25 @@ namespace Protobot.Tools {
         private const float Step = 1f / 16f;
         private const float AngleStep = 5f;
 
-        private enum Mode { Pick, Move, Rotate, Reference, Target, Chamfer }
+        private enum Mode { Pick, Move, Rotate, Reference, Target, Chamfer, Bend }
+
+        // V2: bending (a high strength shaft or a standoff): placed like a cut, then the end past the line is
+        // pointed where it should go (drag) or the angle and direction typed.
+        private float bendAngle, bendToward, bendRadiusScale = 1.5f;
+        private bool bendDragging;
+        private static readonly float[] BendRadii = { 1f, 1.5f, 3f };
+        private static readonly string[] BendRadiusNames = { "Tight", "Normal", "Gentle" };
 
         // V2: chamfering a gear's teeth (GearChamfer): size and which face, remembered while the app runs.
         private static int chamferSize = 1;
         private static GearChamfer.Side chamferSide = GearChamfer.Side.Near;
+        private Vector3 chamferView;   // V2: where the chosen face is looked at from, in the part's space
+        // V2: taking teeth off (GearTeeth): the gear measured when the mode opened, and the teeth clicked.
+        private static bool teethMode;
+        private GearTeeth.Gear gearTeeth;
+        private bool gearMeasured;
+        private readonly HashSet<int> pickedTeeth = new();
+        private int hoveredTooth = -1;
 
         private Mode mode = Mode.Pick;
         private GameObject part;
@@ -83,7 +97,7 @@ namespace Protobot.Tools {
         private static void BuildOptions(RectTransform bar) {
             if (active == null || active.part == null) {
                 ToolOptions.Note(bar, "Click a part to place a cut");
-                Ui.Hint(bar, "Esc", "Select tool");
+                Ui.Hint(bar, "Esc", "Transform tool");
                 return;
             }
             active.BuildEditOptions(bar);
@@ -93,7 +107,10 @@ namespace Protobot.Tools {
             active = this;
             mode = Mode.Pick;
             ToolOptions.Rebuild();
+            startWith = SelectTool.SelectedPart;   // V2: a part already selected goes straight to its cut
         }
+
+        private GameObject startWith;
 
         private void OnDisable() {
             EndCut();
@@ -108,15 +125,33 @@ namespace Protobot.Tools {
             var typing = TextInput.IsTyping || TextInput.ShortcutsPaused;
             var keyboard = Keyboard.current;
 
+            if (startWith != null) {
+                var target = startWith;
+                startWith = null;
+                if (target.activeInHierarchy && PartCutting.IsCuttable(target) && !(target.transform.parent != null && target.transform.parent.GetComponent<Pivot>() != null)) {
+                    BeginCut(target);
+                    return;
+                }
+            }
             if (part == null || !part.activeInHierarchy) {
                 if (part != null) EndCut();
                 UpdatePick();
                 if (!typing && keyboard != null && keyboard.escapeKey.wasPressedThisFrame)
-                    ToolRail.Select("Select");
+                    ToolRail.Select("Transform");
                 return;
             }
 
             if (!typing && keyboard != null) {
+                if (keyboard.escapeKey.wasPressedThisFrame && mode == Mode.Bend) {
+                    PartBend.Show(part, PartBend.SavedBends(part));
+                    feedback.Show("Bend cancelled", FeedbackDisplay.DisplayType.alert);
+                    SetMode(Mode.Move);
+                    return;
+                }
+                if (mode == Mode.Bend && (keyboard.enterKey.wasPressedThisFrame || keyboard.numpadEnterKey.wasPressedThisFrame)) {
+                    ApplyBend();
+                    return;
+                }
                 if (keyboard.escapeKey.wasPressedThisFrame) {
                     if (mode == Mode.Reference || mode == Mode.Target || mode == Mode.Rotate || mode == Mode.Chamfer) {
                         if (mode == Mode.Chamfer) feedback.Show("Back to cutting", FeedbackDisplay.DisplayType.success);
@@ -125,7 +160,7 @@ namespace Protobot.Tools {
                     else {
                         EndCut();
                         feedback.Show("Cut cancelled", FeedbackDisplay.DisplayType.alert);
-                        ToolRail.Select("Select");
+                        ToolRail.Select("Transform");
                         return;
                     }
                 }
@@ -133,7 +168,7 @@ namespace Protobot.Tools {
                     ApplyChamfer();
                     return;
                 }
-                else if (keyboard.rKey.wasPressedThisFrame && mode != Mode.Reference && mode != Mode.Target && mode != Mode.Chamfer)
+                else if (Keybinds.Pressed("SawTilt") && mode != Mode.Reference && mode != Mode.Target && mode != Mode.Chamfer)
                     SetMode(mode == Mode.Rotate ? Mode.Move : Mode.Rotate);
                 else if (keyboard.enterKey.wasPressedThisFrame || keyboard.numpadEnterKey.wasPressedThisFrame) {
                     ApplyCut();
@@ -145,6 +180,12 @@ namespace Protobot.Tools {
                 KeepOutline();
                 if (planeObject != null) planeObject.SetActive(false);
                 DrawChamfer();
+                return;
+            }
+            if (mode == Mode.Bend) {
+                KeepOutline();
+                if (planeObject != null) planeObject.SetActive(false);
+                UpdateBend();
                 return;
             }
             if (mode == Mode.Reference) UpdateReferencePick();
@@ -735,10 +776,14 @@ namespace Protobot.Tools {
             drawCenter = center;
             drawHalfU = planeHalfU;
             drawHalfV = planeHalfV;
-            if (crossed.Count == 0) return;
+            if (!cutAll) return;
             float minU = -planeHalfU, maxU = planeHalfU, minV = -planeHalfV, maxV = planeHalfV;
-            foreach (var obj in crossed) {
+            foreach (var obj in crossed)
                 if (obj != part) OutlineFeature.SetOutline(obj.GetComponent<MeshRenderer>(), true, CrossedColor);
+            // V2: with All parts the plane is drawn across the whole build (every part's extent along it), so it's
+            // plain that it reaches everything; the parts it actually goes through are outlined.
+            foreach (var obj in PartsManager.FindLoadedObjects()) {
+                if (obj == null || obj.IsDeleted() || !obj.activeInHierarchy) continue;
                 foreach (var c in FeaturePicker.Corners(obj)) {
                     var d = c - center;
                     minU = Mathf.Min(minU, Vector3.Dot(d, u) - 0.25f);
@@ -778,6 +823,10 @@ namespace Protobot.Tools {
                 BuildChamferOptions(bar);
                 return;
             }
+            if (mode == Mode.Bend) {
+                BuildBendOptions(bar);
+                return;
+            }
             var (behind, ahead) = Pieces();
             var name = NameOf(part);
             ToolOptions.Note(bar, name.Length > 34 ? name.Substring(0, 33) + "…" : name);
@@ -812,18 +861,178 @@ namespace Protobot.Tools {
                 feedback.Show(on ? "The plane reaches every part it crosses: " + count + (count == 1 ? " part" : " parts") + " (outlined) will be cut" : "Only the picked part is cut", FeedbackDisplay.DisplayType.success);
             });
             if (GearChamfer.IsGear(part)) {
-                var chamfer = Ui.Button(bar, "Chamfer", "Chamfer teeth", () => {
+                var chamfer = Ui.Button(bar, "Chamfer", "Gear teeth", () => {
+                    // The face toward the camera now stays the chosen one however the view turns.
+                    chamferView = part.transform.InverseTransformPoint(Overlay.ViewCamera != null ? Overlay.ViewCamera.transform.position : Vector3.zero);
+                    pickedTeeth.Clear();
+                    gearMeasured = GearTeeth.Measure(part, out gearTeeth);
                     SetMode(Mode.Chamfer);
                     Dimension.Close();
                     CloseEditField();
                     feedback.Show("Chamfer: pick a size and face; the rings show where the bevel starts and ends", FeedbackDisplay.DisplayType.success);
                 }, false, 5f, Theme.FontSmall);
                 chamfer.Size(-1f, 30f);
-                Ui.Tip(chamfer, "Chamfer teeth", null, "Bevel the teeth round one face at 45°: a chamfered 48T fits inside a 2.75\" wheel, and chamfered teeth slide into mesh.");
+                Ui.Tip(chamfer, "Gear teeth", null, "Chamfer the teeth round one face at 45° (a chamfered 48T fits inside a 2.75\" wheel, and chamfered teeth slide into mesh), or take teeth off (a slip gear).");
+            }
+            if (false && PartBend.IsBendable(part) && Mathf.Abs(Tilt) < 0.01f) {   // V2: bending is the Bend tool's now
+                var bend = Ui.Button(bar, "Bend", "Bend here", () => {
+                    bendAngle = 0f;
+                    bendToward = 0f;
+                    SetMode(Mode.Bend);
+                    Dimension.Close();
+                    CloseEditField();
+                    feedback.Show("Bend: drag to point the end past the line where it should go, or type the angle", FeedbackDisplay.DisplayType.success);
+                }, false, 5f, Theme.FontSmall);
+                bend.Size(-1f, 30f);
+                Ui.Tip(bend, "Bend here", null, "Bend the part at this line instead of cutting it (a smooth bend, like a real one). Set where first, the same way as a cut.");
             }
             var cut = Ui.Button(bar, "Cut", "Cut", ApplyCut, true, 5f);
             cut.Size(64f, 30f);
             Ui.Tip(cut, "Cut", "Enter", "Cut the part in two along the plane.");
+        }
+
+        // ------------------------------------------------------------------ bending (V2)
+
+        // Where the bend starts along the straight part (inches from its low end), its length axis and that end.
+        private bool BendFrame(out float start, out int axis, out float length) {
+            var straight = PartBend.Straight(part);
+            var frame = PartBend.Frame(part, straight);
+            axis = frame.axis;
+            length = frame.length;
+            var local = Vector3.Scale(part.transform.InverseTransformPoint(center), part.transform.localScale);
+            start = Mathf.Clamp(local[axis] - frame.low, 0f, frame.length);
+            return frame.length > 0.1f;
+        }
+
+        private float BendRadius => Mathf.Max(0.1f, PartBend.Thickness(part, PartBend.Straight(part)) * bendRadiusScale);
+
+        private PartBend.Bend CurrentBend() {
+            BendFrame(out var start, out _, out _);
+            return new PartBend.Bend { start = start, angle = bendAngle, toward = bendToward, radius = BendRadius };
+        }
+
+        private void PreviewBend() {
+            var bends = PartBend.SavedBends(part);
+            if (Mathf.Abs(bendAngle) > 0.01f) bends.Add(CurrentBend());
+            PartBend.Show(part, bends);
+        }
+
+        private void UpdateBend() {
+            if (!BendFrame(out var start, out var axis, out var length)) return;
+            var t = part.transform;
+            var rotation = t.rotation;
+            var (along, _, _) = PartBend.Directions(axis, 0f);
+            var up = Vector3.zero;
+            up[(axis + 1) % 3] = 1f;
+            var side = Vector3.Cross(along, up);
+            var alongWorld = rotation * along;
+            var color = new Color(1f, 0.55f, 0.2f, 0.95f);
+            // The bend line: a ring round the part where it starts, and the way the far end now points.
+            var thickness = PartBend.Thickness(part, PartBend.Straight(part));
+            Overlay.WorldCircle(center, alongWorld, thickness * 1.4f, color, 2.5f);
+            var (_, towardLocal, _) = PartBend.Directions(axis, bendToward);
+            var pointing = rotation * (Quaternion.AngleAxis(bendAngle, Vector3.Cross(along, towardLocal)) * along);
+            Overlay.Line(center, center + pointing * Mathf.Max(1f, (length - start) * 0.6f), color, 2f);
+            if (Overlay.ToScreen(center, out var screen))
+                Overlay.Text(screen + new Vector2(0f, -44f), bendAngle.ToString("0.#", CultureInfo.InvariantCulture) + "° bend, toward " + bendToward.ToString("0", CultureInfo.InvariantCulture) + "°", Theme.Text);
+
+            // Drag: the end past the line points at the mouse (on a plane facing the camera through the bend).
+            var mouse = Mouse.current;
+            if (mouse == null) return;
+            if (MouseInput.LeftButton.wasPressedThisFrame && !MouseInput.overUI && MouseInput.withinScreen) bendDragging = true;
+            if (bendDragging && !mouse.leftButton.isPressed) {
+                bendDragging = false;
+                ToolOptions.Rebuild();
+                feedback.Show(bendAngle.ToString("0.#", CultureInfo.InvariantCulture) + "° bend: Enter (or Bend) to bend it", FeedbackDisplay.DisplayType.success);
+            }
+            if (!bendDragging) return;
+            var camera = Overlay.ViewCamera != null ? Overlay.ViewCamera : Camera.main;
+            if (camera == null) return;
+            var ray = camera.ScreenPointToRay(MouseInput.Position);
+            var plane = new Plane(-camera.transform.forward, center);
+            if (!plane.Raycast(ray, out var distance)) return;
+            var w = Quaternion.Inverse(rotation) * (ray.GetPoint(distance) - center);
+            if (w.magnitude < 0.05f) return;
+            var free = Keyboard.current != null && Keyboard.current.shiftKey.isPressed;
+            var angle = Vector3.Angle(along, w);
+            angle = free ? Mathf.Round(angle) : Mathf.Round(angle / 5f) * 5f;
+            var across = w - along * Vector3.Dot(w, along);
+            if (across.magnitude > 0.02f) {
+                var toward = Mathf.Atan2(Vector3.Dot(across, side), Vector3.Dot(across, up)) * Mathf.Rad2Deg;
+                if (toward < 0f) toward += 360f;
+                toward = free ? Mathf.Round(toward) : Mathf.Round(toward / 15f) * 15f % 360f;
+                bendToward = toward;
+            }
+            angle = Mathf.Clamp(angle, 0f, 170f);
+            bendAngle = angle;
+            PreviewBend();
+        }
+
+        private void BuildBendOptions(RectTransform bar) {
+            var name = NameOf(part);
+            ToolOptions.Note(bar, name.Length > 30 ? name.Substring(0, 29) + "…" : name);
+            Ui.Divider(bar, true).Size(1f, 22f);
+            BendFrame(out var start, out _, out _);
+            ToolOptions.Note(bar, "At " + Inch.Format(start));
+            ToolOptions.Note(bar, "Angle");
+            var angle = Ui.Field(bar, "Bend Angle", bendAngle.ToString("0.#", CultureInfo.InvariantCulture) + "°", text => {
+                if (float.TryParse(text.Replace("°", "").Trim(), NumberStyles.Float, CultureInfo.InvariantCulture, out var degrees)) {
+                    bendAngle = Mathf.Clamp(degrees, -170f, 170f);
+                    PreviewBend();
+                    ToolOptions.Rebuild();
+                }
+                else feedback.Show("Type an angle in degrees, like 45", FeedbackDisplay.DisplayType.alert);
+            }, Theme.FontBody, TextAlignmentOptions.Center);
+            angle.Size(60f, 30f);
+            angle.gameObject.AddComponent<WheelStep>().step = d => {
+                bendAngle = Mathf.Clamp(bendAngle + d * 5f, 0f, 170f);
+                PreviewBend();
+                ToolOptions.Rebuild();
+            };
+            Ui.Tip(angle, "Bend angle", "Wheel", "How far the end past the line turns (5° steps with the wheel).");
+            ToolOptions.Note(bar, "Toward");
+            var toward = Ui.Field(bar, "Bend Toward", bendToward.ToString("0", CultureInfo.InvariantCulture) + "°", text => {
+                if (float.TryParse(text.Replace("°", "").Trim(), NumberStyles.Float, CultureInfo.InvariantCulture, out var degrees)) {
+                    bendToward = ((degrees % 360f) + 360f) % 360f;
+                    PreviewBend();
+                    ToolOptions.Rebuild();
+                }
+            }, Theme.FontBody, TextAlignmentOptions.Center);
+            toward.Size(56f, 30f);
+            toward.gameObject.AddComponent<WheelStep>().step = d => {
+                bendToward = ((bendToward + d * 15f) % 360f + 360f) % 360f;
+                PreviewBend();
+                ToolOptions.Rebuild();
+            };
+            Ui.Tip(toward, "Bend direction", "Wheel", "Which way round the part it bends, in degrees (15° steps with the wheel).");
+            var index = System.Array.IndexOf(BendRadii, bendRadiusScale);
+            ToolOptions.Segmented(bar, BendRadiusNames, index < 0 ? 1 : index, i => {
+                bendRadiusScale = BendRadii[i];
+                PreviewBend();
+                feedback.Show(BendRadiusNames[i] + " bend: " + Inch.Format(BendRadius) + " radius", FeedbackDisplay.DisplayType.success);
+            });
+            Ui.Divider(bar, true).Size(1f, 22f);
+            Ui.Hint(bar, "Drag", "point the end", "Shift", "free", "Esc", "back");
+            var apply = Ui.Button(bar, "Apply Bend", "Bend", ApplyBend, true, 5f);
+            apply.Size(64f, 30f);
+            Ui.Tip(apply, "Bend", "Enter", "Bend the part (one undo step; saved with the build).");
+        }
+
+        private void ApplyBend() {
+            if (part == null || mode != Mode.Bend) return;
+            if (Mathf.Abs(bendAngle) < 0.5f) {
+                feedback.Show("Drag to bend it first (or type an angle)", FeedbackDisplay.DisplayType.alert);
+                return;
+            }
+            var bend = CurrentBend();
+            if (bend.start + bend.radius * Mathf.Abs(bend.angle) * Mathf.Deg2Rad > PartBend.Frame(part, PartBend.Straight(part)).length - 0.05f) {
+                feedback.Show("The bend runs off the end of the part: move it back or make it tighter", FeedbackDisplay.DisplayType.alert);
+                return;
+            }
+            PartBend.Show(part, PartBend.SavedBends(part));
+            PartBend.Add(part, bend);
+            feedback.Show("Bent " + NameOf(part) + " " + bend.angle.ToString("0.#", CultureInfo.InvariantCulture) + "° at " + Inch.Format(bend.start) + " (" + Inch.Format(bend.radius) + " radius)", FeedbackDisplay.DisplayType.success);
+            EndCut();
         }
 
         // ------------------------------------------------------------------ chamfering gear teeth (V2)
@@ -832,6 +1041,16 @@ namespace Protobot.Tools {
             var name = NameOf(part);
             ToolOptions.Note(bar, name.Length > 30 ? name.Substring(0, 29) + "…" : name);
             Ui.Divider(bar, true).Size(1f, 22f);
+            // V2: chamfer the teeth, or take some off.
+            ToolOptions.Segmented(bar, new[] { "Chamfer", "Take off teeth" }, teethMode ? 1 : 0, i => {
+                teethMode = i == 1;
+                feedback.Show(teethMode ? "Click the teeth to take off (again to put one back), then Take off" : "Chamfer: pick a size and face", FeedbackDisplay.DisplayType.success);
+                ToolOptions.Rebuild();
+            });
+            if (teethMode) {
+                BuildTeethOptions(bar);
+                return;
+            }
             ToolOptions.Note(bar, "Chamfer");
             var labels = GearChamfer.Sizes.Select(s => Inch.Format(s)).ToArray();
             var size = Popup.Choice(bar, labels, chamferSize, i => {
@@ -844,10 +1063,20 @@ namespace Protobot.Tools {
                 ToolOptions.Rebuild();
             };
             Ui.Tip(size, "Chamfer size", null, "How far the bevel cuts into the rim and the face (45°). The wheel over it steps sizes.");
-            ToolOptions.Segmented(bar, new[] { "Near face", "Far face", "Both" }, (int)chamferSide, i => {
-                chamferSide = (GearChamfer.Side)i;
-                feedback.Show(i == 2 ? "Both faces" : i == 0 ? "The face toward you" : "The face away from you", FeedbackDisplay.DisplayType.success);
+            // V2: one face (kept as the part turns: orbit round it freely) or both; Switch side flips which.
+            ToolOptions.Segmented(bar, new[] { "One face", "Both faces" }, chamferSide == GearChamfer.Side.Both ? 1 : 0, i => {
+                chamferSide = i == 1 ? GearChamfer.Side.Both : GearChamfer.Side.Near;
+                feedback.Show(i == 1 ? "Both faces" : "One face (the outlined rings)", FeedbackDisplay.DisplayType.success);
+                ToolOptions.Rebuild();
             });
+            if (chamferSide != GearChamfer.Side.Both) {
+                var flip = Ui.Button(bar, "Switch", "Switch side", () => {
+                    chamferView = part.transform.InverseTransformPoint(2f * part.transform.TransformPoint(part.GetComponent<MeshFilter>().sharedMesh.bounds.center) - part.transform.TransformPoint(chamferView));
+                    feedback.Show("The other face", FeedbackDisplay.DisplayType.success);
+                }, false, 5f, Theme.FontSmall);
+                flip.Size(-1f, 30f);
+                Ui.Tip(flip, "Switch side", null, "Chamfer the gear's other face instead.");
+            }
             Ui.Divider(bar, true).Size(1f, 22f);
             Ui.Hint(bar, "Enter", "chamfer", "Esc", "back");
             var back = Ui.Button(bar, "Back", "Back to cut", () => SetMode(Mode.Move), false, 5f, Theme.FontSmall);
@@ -857,12 +1086,107 @@ namespace Protobot.Tools {
             Ui.Tip(apply, "Chamfer", "Enter", "Cut the bevel into the gear (one undo step; saved with the build).");
         }
 
+        private void BuildTeethOptions(RectTransform bar) {
+            if (!gearMeasured) {
+                ToolOptions.Note(bar, "Couldn't find this gear's teeth");
+                return;
+            }
+            ToolOptions.Note(bar, pickedTeeth.Count == 0 ? "Click teeth to pick them" : pickedTeeth.Count + " of " + gearTeeth.teeth + (pickedTeeth.Count == 1 ? " tooth" : " teeth") + " picked");
+            if (pickedTeeth.Count > 0) {
+                var clear = Ui.Button(bar, "Clear", "Clear", () => {
+                    pickedTeeth.Clear();
+                    ToolOptions.Rebuild();
+                }, false, 5f, Theme.FontSmall);
+                clear.Size(-1f, 30f);
+            }
+            Ui.Divider(bar, true).Size(1f, 22f);
+            Ui.Hint(bar, "Click", "a tooth", "Enter", "take off", "Esc", "back");
+            var back = Ui.Button(bar, "Back", "Back to cut", () => SetMode(Mode.Move), false, 5f, Theme.FontSmall);
+            back.Size(-1f, 30f);
+            var apply = Ui.Button(bar, "Apply", "Take off", ApplyChamfer, true, 5f);
+            apply.Size(-1f, 30f);
+            Ui.Tip(apply, "Take off teeth", "Enter", "Cut the picked teeth down to the bottom of the gaps beside them (the teeth next to them stay whole). One undo step; saved with the build.");
+        }
+
+        // The teeth as dots on the face toward the camera: hover one, click to pick it (red).
+        // V2: picking teeth to take off: the mouse anywhere on a tooth (or the gap round it, out to the tip) picks it,
+        // and the whole tooth lights up (white under the mouse, red when picked).
+        private void DrawTeeth() {
+            if (!gearMeasured) return;
+            var t = part.transform;
+            var camera = Overlay.ViewCamera;
+            if (camera == null) return;
+            var toward = Vector3.Dot(t.TransformDirection(gearTeeth.axis), camera.transform.position - t.TransformPoint(gearTeeth.center)) > 0f ? 1f : -1f;
+            var mouse = Overlay.Mouse;
+            var face = gearTeeth.center + gearTeeth.axis * (toward * gearTeeth.thickness / 2f);
+            hoveredTooth = -1;
+            if (!MouseInput.overUI && MouseInput.withinScreen) {
+                // Where the mouse is on the gear: on the part itself, else on its near face's plane.
+                var ray = camera.ScreenPointToRay(MouseInput.Position);
+                Vector3? local = null;
+                foreach (var hit in Physics.RaycastAll(ray, Mathf.Infinity, LayerMask.GetMask("Default")).OrderBy(h => h.distance))
+                    if (FeaturePicker.PartOf(hit.collider.gameObject) == part) {
+                        local = t.InverseTransformPoint(hit.point);
+                        break;
+                    }
+                if (!local.HasValue) {
+                    var plane = new Plane(t.TransformDirection(gearTeeth.axis), t.TransformPoint(face));
+                    if (plane.Raycast(ray, out var distance)) local = t.InverseTransformPoint(ray.GetPoint(distance));
+                }
+                if (local.HasValue) {
+                    var offset = local.Value - gearTeeth.center;
+                    offset -= gearTeeth.axis * Vector3.Dot(offset, gearTeeth.axis);
+                    var radius = offset.magnitude;
+                    if (radius > gearTeeth.root * 0.8f && radius < gearTeeth.tip * 1.12f) {
+                        var polar = Mathf.Atan2(Vector3.Dot(offset, gearTeeth.b), Vector3.Dot(offset, gearTeeth.a));
+                        var k = Mathf.RoundToInt((polar - gearTeeth.phase) / (2f * gearTeeth.HalfPitch));
+                        hoveredTooth = ((k % gearTeeth.teeth) + gearTeeth.teeth) % gearTeeth.teeth;
+                    }
+                }
+            }
+            void Tooth(int k, Color line, Color fill) {
+                var center = gearTeeth.AngleOf(k);
+                var half = gearTeeth.HalfPitch * 0.92f;
+                var outline = new List<Vector2>();
+                void Add(float angle, float radius) {
+                    if (Overlay.ToScreen(t.TransformPoint(face + gearTeeth.Radial(angle) * radius), out var at)) outline.Add(at);
+                }
+                for (var i = 0; i <= 6; i++) Add(center - half + 2f * half * i / 6f, gearTeeth.root);
+                for (var i = 6; i >= 0; i--) Add(center - half * 0.55f + 2f * half * 0.55f * i / 6f, gearTeeth.tip);
+                if (outline.Count < 3) return;
+                var middle = Vector2.zero;
+                foreach (var p in outline) middle += p;
+                middle /= outline.Count;
+                var fan = new List<Vector2> { middle };
+                fan.AddRange(outline);
+                fan.Add(outline[0]);
+                Overlay.Fan(fan, fill);
+                for (var i = 0; i < outline.Count; i++) Overlay.Line(outline[i], outline[(i + 1) % outline.Count], line, 2f);
+            }
+            var red = new Color(1f, 0.3f, 0.25f);
+            foreach (var k in pickedTeeth) Tooth(k, red, new Color(red.r, red.g, red.b, 0.35f));
+            if (hoveredTooth >= 0) Tooth(hoveredTooth, Color.white, new Color(1f, 1f, 1f, pickedTeeth.Contains(hoveredTooth) ? 0.15f : 0.25f));
+            Overlay.WorldCircle(t.TransformPoint(face), t.TransformDirection(gearTeeth.axis), gearTeeth.root * t.lossyScale.x, new Color(1f, 0.35f, 0.3f, 0.6f), 1.5f);
+            if (hoveredTooth >= 0) {
+                Overlay.MouseText(pickedTeeth.Contains(hoveredTooth) ? "Keep this tooth" : "Take off this tooth (down to the red circle)", Color.white);
+                if (MouseInput.LeftButton.wasPressedThisFrame) {
+                    if (!pickedTeeth.Remove(hoveredTooth)) pickedTeeth.Add(hoveredTooth);
+                    Audio.Sounds.Play(Audio.Sounds.Tick);
+                    ToolOptions.Rebuild();
+                }
+            }
+        }
+
         private void DrawChamfer() {
             if (part == null) return;
+            if (teethMode) {
+                DrawTeeth();
+                return;
+            }
             var t = part.transform;
             var size = GearChamfer.Sizes[chamferSize];
             var color = new Color(1f, 0.35f, 0.3f, 0.95f);
-            foreach (var face in GearChamfer.Picked(part, chamferSide, Overlay.ViewCamera != null ? Overlay.ViewCamera.transform.position : Vector3.zero)) {
+            foreach (var face in GearChamfer.Picked(part, chamferSide, part.transform.TransformPoint(chamferView))) {
                 var axis = t.TransformDirection(face.inward);
                 // Where the bevel starts on the face, and where it meets the tooth tips.
                 Overlay.WorldCircle(t.TransformPoint(face.center), axis, (face.radius - size) * t.lossyScale.x, color, 2f);
@@ -872,8 +1196,16 @@ namespace Protobot.Tools {
 
         private void ApplyChamfer() {
             if (part == null || mode != Mode.Chamfer) return;
-            var camera = Overlay.ViewCamera != null ? Overlay.ViewCamera.transform.position : Vector3.zero;
-            var (message, ok) = GearChamfer.Apply(part, chamferSide, GearChamfer.Sizes[chamferSize], camera);
+            if (teethMode) {
+                var (said, worked) = gearMeasured ? GearTeeth.Apply(part, gearTeeth, pickedTeeth) : ("Couldn't find this gear's teeth", false);
+                feedback.Show(NameOf(part) + ": " + said, worked ? FeedbackDisplay.DisplayType.success : FeedbackDisplay.DisplayType.alert);
+                if (worked) {
+                    pickedTeeth.Clear();
+                    EndCut();
+                }
+                return;
+            }
+            var (message, ok) = GearChamfer.Apply(part, chamferSide, GearChamfer.Sizes[chamferSize], part.transform.TransformPoint(chamferView));
             feedback.Show(NameOf(part) + ": " + message, ok ? FeedbackDisplay.DisplayType.success : FeedbackDisplay.DisplayType.alert);
             if (ok) EndCut();
         }

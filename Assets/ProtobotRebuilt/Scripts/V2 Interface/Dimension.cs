@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using TMPro;
 using UnityEngine;
 
@@ -23,7 +23,9 @@ namespace Protobot.Interface {
         /// its own leg). With <paramref name="onEdit"/>, clicking a leg's value opens a box to type it; the new
         /// length (inches, positive) goes to onEdit with the axis.
         /// </summary>
-        public static void Legs(string key, Vector3 a, Vector3 b, Quaternion frame, Action<int, float> onEdit = null, float alpha = 0.9f) {
+        public static void Legs(string key, Vector3 a, Vector3 b, Quaternion frame, Action<int, float> onEdit = null, float alpha = 0.9f,
+                                Func<int, string> names = null) {
+            names ??= AxisName;   // V2: a game names the field's axes X, Y (along the field) and Up
             var c = Components(a, b, frame);
             var apart = 0;
             for (var i = 0; i < 3; i++) if (Mathf.Abs(c[i]) > 0.001f) apart++;
@@ -47,7 +49,7 @@ namespace Protobot.Interface {
                         fieldFrame = Time.frameCount;
                     }
                     else {
-                        var text = AxisName(i) + " " + Inch.Format(Mathf.Abs(c[i]));
+                        var text = names(i) + " " + Inch.Format(Mathf.Abs(c[i]));
                         var label = Overlay.Text(at, text, Theme.Axis(i), onEdit != null ? () => Open(legKey, at, Mathf.Abs(c[axis]), value => onEdit(axis, value)) : null);
                         if (onEdit != null)
                             Ui.Tip(label, AxisName(i) + " distance", null, "Click to type how far apart along " + AxisName(i) + ".");

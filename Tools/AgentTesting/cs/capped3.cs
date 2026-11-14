@@ -1,0 +1,23 @@
+var chan = Protobot.PartsManager.GeneratePart("CCHL-1x2-5", new Vector3(0f, 2f, 0f), Quaternion.identity);
+Protobot.HoleCollider hole = null; foreach (var h in chan.GetComponentsInChildren<Protobot.HoleCollider>()) { if (Mathf.Abs(h.transform.forward.y) > 0.9f) { hole = h; break; } }
+var pl = Protobot.Placement.Instance;
+Protobot.CappedShaftPlaceDisplacement cd = pl.GetComponent<Protobot.CappedShaftPlaceDisplacement>();
+var bf = System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance;
+var face = (Protobot.HoleFace)typeof(Protobot.CappedShaftPlaceDisplacement).GetField("hoverHoleFace", bf).GetValue(cd);
+face.gameObject.SetActive(true);
+var up = hole.transform.forward.y > 0 ? hole.transform.forward : -hole.transform.forward;
+face.hole = hole.holeData; face.direction = up;
+var type = Protobot.PartsManager.GetPartType("VXSHAFTPARTS"); var gen = type.GetComponent<Protobot.PartGenerator>(); gen.param1.value = "6\" Capped Shaft";
+var data = new Protobot.PartPlacementData(gen, type, pl.transform);
+Protobot.Transformations.Displacement d;
+var ok = cd.TryGetDisplacement(data, out d);
+if (!ok) return "refused";
+var shaft = Protobot.PartsManager.GeneratePart(gen.GetId(), d.translation.Position, d.rotation.Orientation);
+var tip = shaft.transform.TransformPoint(new Vector3(0, 0, 0)); var capEnd = shaft.transform.TransformPoint(new Vector3(0, -6f, 0));
+var holeTop = hole.holeData.position + up * hole.holeData.depth / 2f;
+var axisErr = Vector3.Angle(shaft.transform.up, -up);
+var line = Vector3.ProjectOnPlane(shaft.transform.position - hole.holeData.position, up).magnitude;
+var capFace = shaft.transform.TransformPoint(new Vector3(0, -5.98f, 0));
+var s = "axis off " + axisErr.ToString("F1") + "° centre off " + line.ToString("F4") + " cap underside vs hole face " + Vector3.Dot(capFace - holeTop, up).ToString("F4") + " tip below face " + Vector3.Dot(holeTop - tip, up).ToString("F2");
+UnityEngine.Object.Destroy(shaft); UnityEngine.Object.Destroy(chan); face.gameObject.SetActive(false);
+return s;

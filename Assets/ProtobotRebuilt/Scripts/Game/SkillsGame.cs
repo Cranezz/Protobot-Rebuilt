@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -16,7 +16,7 @@ namespace Protobot.Game {
     // simulation (Sandbox, hosted: its own Esc and messages) with the field's pins, cups and toggles as pieces, Match
     // Loads dropped into the red Loaders from the HUD, the score counted live (OverrideScoring); at 0:00 the robot stops,
     // the score is taken once everything is still (or after 5 s, SC1) and the results show.
-    public class SkillsGame : MonoBehaviour {
+    public partial class SkillsGame : MonoBehaviour {
         public enum State { Setup, Countdown, Running, Ending, Results }
 
         public static SkillsGame Current { get; private set; }
@@ -36,6 +36,26 @@ namespace Protobot.Game {
         // Where it starts, in the field frame.
         public float x, y, heading = 90f;
         public bool preload = true;
+
+        // V2: Robot Skills, or a match (practice on your own for now; online matches later): each has its own start
+        // (Skills: the Left Quadrant by the red Alliance Station, RSC; a match: one Quadrant on your Alliance's side of
+        // the Autonomous Line, SG1), preload (SG5: one Pin of your Alliance's color touching the robot) and timing
+        // (a match: 0:15 autonomous, then 1:45 driver control).
+        public enum Mode { Skills, Match }
+        public enum PreloadSpot { Front, Back, Left, Right, Top }
+        public Mode mode = Mode.Skills;
+        public bool redAlliance = true;
+        public Quadrant startQuadrant = Quadrant.Left;
+        public PreloadSpot preloadSpot = PreloadSpot.Front;
+        public bool skipAutonomous = true;
+        public const float AutonomousSeconds = 15f, DriverSeconds = 105f;
+        public bool InAutonomous => mode == Mode.Match && !skipAutonomous && timeLeft > DriverSeconds && (state == State.Running || state == State.Countdown);
+        public float RunSeconds => mode == Mode.Skills ? definition.skillsSeconds : DriverSeconds + (skipAutonomous ? 0f : AutonomousSeconds);
+        public string ModeName => mode == Mode.Skills ? "Driving Skills" : "Match practice";
+        public Quadrant StartQuadrant => mode == Mode.Skills ? Quadrant.Left : startQuadrant;
+        public bool Red => mode == Mode.Skills || redAlliance;
+        public string PreloadColors => Red ? "Red-Neutral" : "Blue-Neutral";
+        private string ghostColors;
 
         // The alignment tool (a build file's parts, fixed to the field until the run starts).
         public Transform tool;
@@ -61,7 +81,7 @@ namespace Protobot.Game {
 
         // ------------------------------------------------------------------ opening and closing
 
-        public static void Open(GameDefinition definition, bool lightField) {
+        public static void Open(GameDefinition definition, bool lightField, Mode mode = Mode.Skills) {
             if (Active) return;
             if (definition == null) {
                 Interface.Interface.Say("No game is installed", false);
@@ -85,9 +105,10 @@ namespace Protobot.Game {
             var game = go.AddComponent<SkillsGame>();
             Current = game;
             game.definition = definition;
+            game.mode = mode;
             try {
                 game.MeasureRobot(parts);
-                game.field = GameField.Create(definition, lightField);
+                game.field = GameField.Create(definition, lightField, mode == Mode.Skills);
             }
             catch (Exception e) {
                 Debug.LogException(e);
@@ -107,11 +128,12 @@ namespace Protobot.Game {
             }
             game.HideGrid();
             game.best = PlayerPrefs.GetInt(game.BestKey, 0);
+            game.setupTools = new SetupTools(game);   // V2: drag, Line up, Measure
             game.DefaultStart();
             game.state = State.Setup;
             GameUi.ShowSetup(game);
             game.FrameCamera();
-            Interface.Interface.Say($"{definition.Name}: Driving Skills. Set your start, then Start run", true);
+            Interface.Interface.Say($"{definition.Name}: {game.ModeName}. Set your start, then Start run", true);
         }
 
         public void Exit() {
@@ -144,7 +166,7 @@ namespace Protobot.Game {
             }
         }
 
-        private string BestKey => $"V2.Game.Best.{definition.title}.{buildName}";
+        private string BestKey => $"V2.Game.Best.{definition.title}.{buildName}" + (mode == Mode.Match ? ".Match" : "");
         private string FrontKey => $"V2.Game.Front.{buildName}";
 
         // ------------------------------------------------------------------ the robot
@@ -216,13 +238,67 @@ namespace Protobot.Game {
 
         /// <summary>Back against the red wall in the middle of the red Alliance Station's Quadrant, facing the field.</summary>
         public void DefaultStart() {
-            heading = 90f;
-            x = -GameField.Half + depth / 2f + 0.02f;
-            y = 0f;
-            toolX = x - depth / 2f;
-            toolY = 0f;
-            toolHeading = 90f;
+            // Worked out in the Left Quadrant, then turned round the field's middle into the one used.
+            var q = StartQuadrant;
+            // Beside the Toggle in the middle of the wall (SG1 must not touch it; the manual's Figure SG-1 shows each robot
+            // just to its side), turned round the field like the other Quadrants.
+            var beside = ToggleHalf + width / 2f + 0.5f;
+            var at = FromLeft(q, new Vector2(-GameField.Half + depth / 2f + 0.02f, beside));
+            var facing = FromLeft(q, Vector2.right);
+            heading = Mathf.Repeat(Mathf.Atan2(facing.x, facing.y) * Mathf.Rad2Deg, 360f);
+            x = at.x;
+            y = at.y;
+            var toolAt = FromLeft(q, new Vector2(-GameField.Half + 0.02f, beside));
+            toolX = toolAt.x;
+            toolY = toolAt.y;
+            toolHeading = heading;
+            SnapToWall();
             Apply();
+        }
+
+        // V2: the four Quadrants are the Left one turned round the field's middle (Left: x < -|y|, by the red Alliance
+        // Station; Bottom: y < -|x|, by the audience; Right; Top).
+        public static Vector2 ToLeft(Quadrant q, Vector2 p) => q switch {
+            Quadrant.Bottom => new Vector2(p.y, -p.x),
+            Quadrant.Right => -p,
+            Quadrant.Top => new Vector2(-p.y, p.x),
+            _ => p,
+        };
+
+        public static Vector2 FromLeft(Quadrant q, Vector2 p) => q switch {
+            Quadrant.Bottom => new Vector2(-p.y, p.x),
+            Quadrant.Right => -p,
+            Quadrant.Top => new Vector2(p.y, -p.x),
+            _ => p,
+        };
+
+        public static string QuadrantName(Quadrant q) => q.ToString();
+
+        /// <summary>Half the Toggle's length along the wall (it sits in the wall's middle), with a little room.</summary>
+        public const float ToggleHalf = 14f;
+
+        /// <summary>A match: the Alliance (its first Quadrant: Left for red, Right for blue).</summary>
+        public void SetAlliance(bool red) {
+            redAlliance = red;
+            startQuadrant = red ? Quadrant.Left : Quadrant.Right;
+            DefaultStart();
+        }
+
+        public void SetQuadrant(Quadrant q) {
+            startQuadrant = q;
+            DefaultStart();
+        }
+
+        public void SetPreloadSpot(PreloadSpot spot) {
+            preloadSpot = spot;
+            preload = true;
+            PlacePreloadGhost();
+            Changed?.Invoke();
+        }
+
+        public void SetSkipAutonomous(bool skip) {
+            skipAutonomous = skip;
+            Changed?.Invoke();
         }
 
         /// <summary>Places the field so the robot stands at (x, y) facing `heading`.</summary>
@@ -281,6 +357,7 @@ namespace Protobot.Game {
             x = newX;
             y = newY;
             heading = Mathf.Repeat(newHeading, 360f);
+            SnapToWall();   // V2: always against its wall (SG1)
             Apply();
         }
 
@@ -301,11 +378,15 @@ namespace Protobot.Game {
             list.Add(($"Fits in 18\" × 18\" × 18\" ({Number(depth)} × {Number(width)} × {Number(height)})", depth <= 18f + Slack && width <= 18f + Slack && height <= 18f + Slack));
             var corners = Corners();
             var edges = corners.Concat(Enumerable.Range(0, 4).Select(i => (corners[i] + corners[(i + 1) % 4]) / 2f)).ToList();
-            list.Add(("In the Quadrant by the red Alliance Station", edges.All(p => p.x <= -Mathf.Abs(p.y) + Slack && p.x >= -GameField.Half - Slack)));
-            list.Add(("Touching the Field Perimeter", edges.Any(p => p.x <= -GameField.Half + 0.1f)));
+            // V2: the Quadrant and wall checks in the start Quadrant's own frame (turned to look like the Left one).
+            var q = StartQuadrant;
+            var local = edges.Select(p => ToLeft(q, p)).ToList();
+            list.Add((mode == Mode.Skills ? "In the Quadrant by the red Alliance Station" : $"In the {QuadrantName(q)} Quadrant ({(Red ? "red" : "blue")} side of the Autonomous Line)",
+                local.All(p => p.x <= -Mathf.Abs(p.y) + Slack && p.x >= -GameField.Half - Slack)));
+            list.Add(("Touching the Field Perimeter", local.Any(p => p.x <= -GameField.Half + 0.1f)));
             list.Add(("Not in a Load Zone", !edges.Any(GameField.InLoadZone)));
             list.Add(("Not touching a Goal", !field.goals.Any(g => Overlaps(corners, g.position, 5.95f))));
-            list.Add(("Clear of the Toggle", height < 11.5f || !edges.Any(p => p.x <= -GameField.Half + 1.5f && Mathf.Abs(p.y) < 14f)));
+            list.Add(("Clear of the Toggle", height < 11.5f || !local.Any(p => p.x <= -GameField.Half + 1.5f && Mathf.Abs(p.y) < ToggleHalf)));
             return list;
         }
 
@@ -359,8 +440,13 @@ namespace Protobot.Game {
         }
 
         private void PlacePreloadGhost() {
+            if (preloadGhost != null && ghostColors != PreloadColors) {
+                Destroy(preloadGhost.gameObject);
+                preloadGhost = null;
+            }
             if (preloadGhost == null && field != null) {
-                var stock = field.StockPin("Red-Neutral");
+                ghostColors = PreloadColors;
+                var stock = field.StockPin(PreloadColors);
                 if (stock != null) {
                     preloadGhost = Instantiate(stock, field.transform).transform;
                     preloadGhost.gameObject.SetActive(true);
@@ -373,17 +459,27 @@ namespace Protobot.Game {
             preloadGhost.SetPositionAndRotation(position, rotation);
         }
 
-        // The Preload: standing on the tiles against the robot's front, alliance-colored half up.
+        // The Preload: standing on the tiles against the robot's front (or back or a side), alliance-colored half up;
+        // or lying on top of the robot. SG5: it touches the robot.
         private (Vector3, Quaternion) PreloadPose() {
             var f = field.Direction(heading);
-            var p = new Vector3(robotCenter.x, robotFloor, robotCenter.z) + f * (depth / 2f + 1.65f) + Vector3.up * 3.3f;
-            return (p, Quaternion.LookRotation(Vector3.up, f));
+            var side = Vector3.Cross(Vector3.up, f).normalized;
+            var center = new Vector3(robotCenter.x, robotFloor, robotCenter.z);
+            var standing = Quaternion.LookRotation(Vector3.up, f);
+            return preloadSpot switch {
+                PreloadSpot.Back => (center - f * (depth / 2f + 1.65f) + Vector3.up * 3.3f, standing),
+                PreloadSpot.Left => (center - side * (width / 2f + 1.65f) + Vector3.up * 3.3f, standing),
+                PreloadSpot.Right => (center + side * (width / 2f + 1.65f) + Vector3.up * 3.3f, standing),
+                PreloadSpot.Top => (center + Vector3.up * (height + 1.7f), Quaternion.LookRotation(side, Vector3.up)),
+                _ => (center + f * (depth / 2f + 1.65f) + Vector3.up * 3.3f, standing),
+            };
         }
 
         public void SetPreload(bool on) {
             preload = on;
             PlacePreloadGhost();
-            Interface.Interface.Say(on ? "Preload: a red/yellow pin in front of the robot" : "No preload on the robot", true);
+            Interface.Interface.Say(on ? "Preload: a " + LoadName(PreloadColors) + " touching the robot" : "No preload on the robot", true);
+            Changed?.Invoke();
         }
 
         // ------------------------------------------------------------------ alignment tool
@@ -397,10 +493,9 @@ namespace Protobot.Game {
 
         /// <summary>Loads a build file as the alignment tool.</summary>
         public void LoadTool(string path) {
-            var paths = new[] { path };
             Builds.BuildData data;
             try {
-                data = Builds.BuildFile.Read(paths[0]);
+                data = Builds.BuildFile.Read(path);
             }
             catch (Exception e) {
                 Interface.Interface.Say("That file couldn't be read: " + e.Message, false);
@@ -410,6 +505,11 @@ namespace Protobot.Game {
                 Interface.Interface.Say("That build has no parts", false);
                 return;
             }
+            LoadToolParts(data.parts, System.IO.Path.GetFileNameWithoutExtension(path));
+        }
+
+        /// <summary>V2: the alignment tool from parts (a build file's or a saved group's).</summary>
+        public void LoadToolParts(Builds.ObjectData[] parts, string name) {
             RemoveTool(false);
             tool = new GameObject("Alignment Tool").transform;
             tool.SetParent(field.transform, false);
@@ -417,7 +517,7 @@ namespace Protobot.Game {
             // into the tool: the tool's own axes are its build's (heading 0 = the build's +Z along the field's +Y).
             var holder = new GameObject("Parts").transform;
             var made = 0;
-            foreach (var part in data.parts) {
+            foreach (var part in parts) {
                 if (part.partId == "Error") continue;
                 GameObject generated = null;
                 try {
@@ -436,6 +536,9 @@ namespace Protobot.Game {
                     copy.AddComponent<MeshFilter>().sharedMesh = mesh;
                     copy.AddComponent<MeshRenderer>().sharedMaterials = r.sharedMaterials;
                     if (mesh != null && mesh.isReadable) {
+                        // V2: its exact shape on the Default layer, so Line up and Measure can pick its faces and corners.
+                        copy.AddComponent<MeshCollider>().sharedMesh = mesh;
+                        copy.AddComponent<PickablePart>();
                         var shape = new GameObject("Collider") { layer = Sandbox.FieldLayer };
                         shape.transform.SetParent(copy.transform, false);
                         var mc = shape.AddComponent<MeshCollider>();
@@ -457,15 +560,12 @@ namespace Protobot.Game {
             var offset = new Vector3(bounds.center.x, bounds.min.y, bounds.center.z);
             foreach (Transform child in holder) child.position -= offset;
             holder.SetParent(tool, false);
-            toolName = System.IO.Path.GetFileNameWithoutExtension(paths[0]);
-            // Behind the robot, against the wall.
-            var toolDepth = bounds.size.z;
-            toolHeading = heading;
-            var back = new Vector2(Mathf.Sin(heading * Mathf.Deg2Rad), Mathf.Cos(heading * Mathf.Deg2Rad));
-            toolX = x - back.x * (depth / 2f + toolDepth / 2f);
-            toolY = y - back.y * (depth / 2f + toolDepth / 2f);
-            Apply();
-            Interface.Interface.Say($"Alignment tool \"{toolName}\": place it, then Back up to push the robot against it. It's taken away when the run starts", true);
+            toolName = name;
+            // V2: beside the robot against its wall, turned the same way (behind it would be outside the field).
+            toolSize = new Vector2(bounds.size.x, bounds.size.z);
+            setupTools.toolSelected = true;
+            ToolBesideRobot();
+            Interface.Interface.Say($"Alignment tool \"{toolName}\" is beside your robot: drag it where you want it, then Line up the robot against it. It's taken away when the run starts", true);
         }
 
         public void RemoveTool(bool say = true) {
@@ -476,12 +576,7 @@ namespace Protobot.Game {
             if (say) Interface.Interface.Say("Alignment tool removed", true);
         }
 
-        public void SetTool(float newX, float newY, float newHeading) {
-            toolX = newX;
-            toolY = newY;
-            toolHeading = Mathf.Repeat(newHeading, 360f);
-            Apply();
-        }
+        public void SetTool(float newX, float newY, float newHeading) => PlaceTool(newX, newY, newHeading, 0f);
 
         // ------------------------------------------------------------------ saved starts
 
@@ -530,16 +625,25 @@ namespace Protobot.Game {
             if (tool != null) tool.gameObject.SetActive(false);
             if (preloadGhost != null) preloadGhost.gameObject.SetActive(false);
             matchLoads.Clear();
-            matchLoads["Red-Neutral"] = 3;   // RSC4: 3 red/yellow and 4 blue/yellow Pins, 7 Cups
-            matchLoads["Blue-Neutral"] = 4;
-            matchLoads["Cup"] = 7;
+            if (mode == Mode.Skills) {
+                matchLoads["Red-Neutral"] = 3;   // RSC4: 3 red/yellow and 4 blue/yellow Pins, 7 Cups
+                matchLoads["Blue-Neutral"] = 4;
+                matchLoads["Cup"] = 7;
+            }
+            else {
+                // V2: a match (Figure FO-2): each Alliance Station has 12 alliance/yellow Pins, 1 yellow/yellow Pin and
+                // 10 Cups, through its own Loaders.
+                matchLoads[PreloadColors] = 12;
+                if (field.StockPin("Neutral-Neutral") != null) matchLoads["Neutral-Neutral"] = 1;
+                matchLoads["Cup"] = 10;
+            }
             Sandbox.Hosted = true;
             Sandbox.FloorHeight = robotFloor;
             Sandbox.DriveEnabled = false;
             Sandbox.BuildEnvironment = root => {
                 (pins, cups, toggles) = field.MakePieces(root);
                 if (preload) {
-                    var stock = field.StockPin("Red-Neutral");
+                    var stock = field.StockPin(PreloadColors);
                     if (stock != null) {
                         var (p, r) = PreloadPose();
                         pins.Add(field.MakePin(stock.transform, root, p, r, false));
@@ -557,7 +661,7 @@ namespace Protobot.Game {
             Sandbox.Instance.Follow = true;
             state = State.Countdown;
             countdown = 3f;
-            timeLeft = definition.skillsSeconds;
+            timeLeft = RunSeconds;
             score = new SkillsScore();
             GameUi.ShowHud(this);
             Audio.Sounds.Play(Audio.Sounds.Tick);
@@ -615,7 +719,7 @@ namespace Protobot.Game {
             }
             var root = Sandbox.Instance.Root;
             // Into the Loader, on top of whatever is already in it (a drive team feeds it from above).
-            var at = field.LoaderDrop(loader);
+            var at = field.LoaderDrop(loader, Red);
             var floor = field.HeightOf(at) - 15.5f;
             var stack = 0f;
             foreach (var body in root.GetComponentsInChildren<Rigidbody>())
@@ -644,12 +748,12 @@ namespace Protobot.Game {
             }
             matchLoads[kind] = left - 1;
             Audio.Sounds.Play(Audio.Sounds.Tick);
-            Interface.Interface.Say($"Match Load: {LoadName(kind)} into the {(loader == 0 ? "first" : "second")} red Loader ({left - 1} left)", true);
+            Interface.Interface.Say($"Match Load: {LoadName(kind)} into the {(loader == 0 ? "first" : "second")} {(Red ? "red" : "blue")} Loader ({left - 1} left)", true);
             Changed?.Invoke();
         }
 
         public static string LoadName(string kind) => kind switch {
-            "Red-Neutral" => "red/yellow pin", "Blue-Neutral" => "blue/yellow pin", _ => "cup",
+            "Red-Neutral" => "red/yellow pin", "Blue-Neutral" => "blue/yellow pin", "Neutral-Neutral" => "yellow/yellow pin", _ => "cup",
         };
 
         private void Update() {
@@ -664,14 +768,22 @@ namespace Protobot.Game {
                     countdown -= Time.deltaTime;
                     if (countdown <= 0f) {
                         state = State.Running;
-                        Sandbox.DriveEnabled = true;
+                        // V2: a match's autonomous period: no driving (the robot's own code will run here).
+                        Sandbox.DriveEnabled = !InAutonomous;
                         Audio.Sounds.Play(Audio.Sounds.Tick);
-                        Interface.Interface.Say("Go!", true);
+                        Interface.Interface.Say(InAutonomous ? "Autonomous: 0:15 (robot code comes later: your robot waits)" : "Go!", true);
                     }
                     if (keyboard != null && keyboard.escapeKey.wasPressedThisFrame && !typing) BackToSetup();
                     break;
                 case State.Running:
+                    var wasAutonomous = InAutonomous;
                     timeLeft -= Time.deltaTime;
+                    if (wasAutonomous && !InAutonomous && timeLeft > 0f) {
+                        Sandbox.DriveEnabled = true;
+                        Audio.Sounds.Play(Audio.Sounds.Tick);
+                        Interface.Interface.Say("Driver control: 1:45", true);
+                        Changed?.Invoke();
+                    }
                     if (timeLeft <= 0f) {
                         timeLeft = 0f;
                         EndRun();
@@ -705,14 +817,25 @@ namespace Protobot.Game {
                 best = score.total;
                 PlayerPrefs.SetInt(BestKey, best);
             }
-            GameUi.ShowResults(this, newBest);
-            Audio.Sounds.Play(Audio.Sounds.Tick);
-            Interface.Interface.Say($"Score: {score.total}" + (newBest ? " (new best)" : ""), true);
+            // V2: the score reveal (camera round the field, the points flying into the total, then the breakdown).
+            if (score.robotInMidfield) score.items.Add(new ScoredItem { point = RobotPoint(), points = OverrideScoring.Midfield, kind = "Robot in the Midfield", where = "Midfield" });
+            ScoreReveal.Play(this, newBest);
+            Builds.ActionLog.Write("game", $"score {score.total}" + (newBest ? " (new best)" : ""));
             Changed?.Invoke();
         }
 
         public SkillsScore Evaluate() => OverrideScoring.Evaluate(field, pins.Where(p => p != null).ToList(), cups.Where(c => c != null).ToList(),
             toggles.Where(t => t != null).ToList(), RobotInMidfield());
+
+        // V2: the middle of the robot's bodies in the simulation (where the Midfield points rise from).
+        private Vector3 RobotPoint() {
+            var hits = Physics.OverlapBox(field.ToWorld(Vector2.zero, 30f), new Vector3(17.025f, 30f, 17.025f), field.transform.rotation * Quaternion.Euler(0f, 45f, 0f),
+                1 << Sandbox.Layer, QueryTriggerInteraction.Ignore);
+            if (hits.Length == 0) return field.ToWorld(Vector2.zero, 6f);
+            var b = hits[0].bounds;
+            foreach (var h in hits) b.Encapsulate(h.bounds);
+            return b.center + Vector3.up * b.extents.y;
+        }
 
         // SC6: any part of the Robot in the Midfield's volume (the 34.05" diamond, as high as anything goes).
         private bool RobotInMidfield() {
@@ -725,19 +848,39 @@ namespace Protobot.Game {
         // ------------------------------------------------------------------ setup view
 
         private void SetupKeys(Keyboard k) {
-            if (k.escapeKey.wasPressedThisFrame && !Popup.IsOpen && Dialog.OpenCount == 0) {
+            if (k.escapeKey.wasPressedThisFrame && !Popup.IsOpen && Dialog.OpenCount == 0 && !setupTools.UsedEscape) {
                 Exit();
                 return;
             }
             var step = k.shiftKey.isPressed ? 1f / 16f : 0.25f;
             float dx = 0f, dy = 0f, dh = 0f;
-            if (k.leftArrowKey.wasPressedThisFrame) dx -= step;
-            if (k.rightArrowKey.wasPressedThisFrame) dx += step;
-            if (k.downArrowKey.wasPressedThisFrame) dy -= step;
-            if (k.upArrowKey.wasPressedThisFrame) dy += step;
-            if (k.qKey.wasPressedThisFrame) dh -= k.shiftKey.isPressed ? 0.5f : 5f;
-            if (k.eKey.wasPressedThisFrame) dh += k.shiftKey.isPressed ? 0.5f : 5f;
-            if (dx != 0f || dy != 0f || dh != 0f) Nudge(dx, dy, dh);
+            // V2: keys from Edit > Keyboard shortcuts. Arrows go the way they point on screen.
+            if (Tools.Keybinds.Pressed("NudgeLeft")) dx -= 1f;
+            if (Tools.Keybinds.Pressed("NudgeRight")) dx += 1f;
+            if (Tools.Keybinds.Pressed("NudgeBack")) dy -= 1f;
+            if (Tools.Keybinds.Pressed("NudgeAway")) dy += 1f;
+            if (Tools.Keybinds.Pressed("TurnLeft")) dh -= k.shiftKey.isPressed ? 0.5f : 5f;
+            if (Tools.Keybinds.Pressed("TurnRight")) dh += k.shiftKey.isPressed ? 0.5f : 5f;
+            if (dx == 0f && dy == 0f && dh == 0f) return;
+            var move = Vector2.zero;
+            var camera = PivotCamera.Main != null ? PivotCamera.Main.camera.transform : null;
+            if (camera != null) {
+                var right = field.transform.InverseTransformDirection(camera.right);
+                var ahead = field.transform.InverseTransformDirection(Vector3.ProjectOnPlane(camera.forward, field.transform.up));
+                move = new Vector2(right.x, right.z).normalized * dx + new Vector2(ahead.x, ahead.z).normalized * dy;
+            }
+            PushUndo();
+            if (setupTools.toolSelected && tool != null) {
+                // The tool along the field's axis nearest the arrow's way.
+                var snapped = move == Vector2.zero ? Vector2.zero
+                    : Mathf.Abs(move.x) >= Mathf.Abs(move.y) ? new Vector2(Mathf.Sign(move.x), 0f) : new Vector2(0f, Mathf.Sign(move.y));
+                PlaceTool(toolX + snapped.x * step, toolY + snapped.y * step, toolHeading + dh, 0f);
+                return;
+            }
+            // The robot only slides along its wall: the arrow that points most along it moves it.
+            var along = Vector2.Dot(move, WallTangent);
+            if (Mathf.Abs(along) > 0.3f) SlideBy(Mathf.Sign(along) * step);
+            if (dh != 0f) TurnBy(dh);
         }
 
         private void DrawSetup() {
@@ -754,13 +897,53 @@ namespace Protobot.Game {
             var tip = field.ToWorld(c + f * (depth / 2f + 4f), height + 1f);
             Overlay.Line(tail, tip, Theme.Dimension, 3f);
             if (Overlay.ToScreen(tip, out var t2) && Overlay.ToScreen(tail, out var t1)) Overlay.Arrowhead(t2, t1, Theme.Dimension, 16f, 12f);
-            // The starting Quadrant (red) and the Midfield.
-            var red = new Color(Theme.Danger.r, Theme.Danger.g, Theme.Danger.b, 0.85f);
-            var a = new Vector2(-GameField.Half, -GameField.Half);
-            var b = new Vector2(-GameField.Half, GameField.Half);
-            var m = new Vector2(-GameField.MidfieldHalfDiagonal, 0f);
-            Overlay.Line(field.ToWorld(a, 0.1f), field.ToWorld(m, 0.1f), red, 2f);
-            Overlay.Line(field.ToWorld(b, 0.1f), field.ToWorld(m, 0.1f), red, 2f);
+            // V2: where the robot may start: its Quadrant (in its Alliance's color, lightly filled), labelled.
+            var q = StartQuadrant;
+            var zone = Red ? new Color(0.95f, 0.3f, 0.3f, 1f) : new Color(0.3f, 0.58f, 1f, 1f);
+            var triangle = new[] {
+                FromLeft(q, new Vector2(-GameField.Half, -GameField.Half)), FromLeft(q, new Vector2(-GameField.Half, GameField.Half)),
+                Vector2.zero,   // the Quadrant runs along the tape diagonals, corner to the field's middle
+            };
+            var screen = new List<Vector2>();
+            foreach (var p in triangle)
+                if (Overlay.ToScreen(field.ToWorld(p, 0.1f), out var s)) screen.Add(s);
+            if (screen.Count == 3) Overlay.Fan(screen, new Color(zone.r, zone.g, zone.b, 0.12f));
+            for (var i = 0; i < 3; i++) Overlay.Line(field.ToWorld(triangle[i], 0.1f), field.ToWorld(triangle[(i + 1) % 3], 0.1f), new Color(zone.r, zone.g, zone.b, 0.9f), 2.5f);
+            var middle = Vector2.Lerp((triangle[0] + triangle[1]) / 2f, triangle[2], 0.45f);   // toward the tip, clear of the robot
+            if (Overlay.ToScreen(field.ToWorld(middle, 0.1f), out var label))
+                Overlay.Text(label, mode == Mode.Skills ? "Start zone (Robot Skills)" : $"Start zone ({QuadrantName(q)} Quadrant)", zone);
+            // A match: the Autonomous Line (corner to corner), dashed.
+            if (mode == Mode.Match) Dashed(new Vector2(-GameField.Half, GameField.Half), new Vector2(GameField.Half, -GameField.Half), new Color(1f, 1f, 1f, 0.75f), 0.12f, 2f);
+            // Where the Preload may be: touching the robot (a band a Pin wide round its footprint), dashed yellow.
+            if (preload) {
+                var band = 3.3f;
+                var grown = Grown(corners, band);
+                for (var i = 0; i < 4; i++) Dashed(grown[i], grown[(i + 1) % 4], new Color(Theme.Warning.r, Theme.Warning.g, Theme.Warning.b, 0.9f), 0.14f, 2f);
+                var at = (grown[0] + grown[1]) / 2f;
+                if (Overlay.ToScreen(field.ToWorld(at, 0.14f), out var preloadLabel))
+                    Overlay.Text(preloadLabel + new Vector2(0f, 18f), "Preload: touching the robot", Theme.Warning);
+            }
+            setupTools?.Update();   // V2: drag, Line up, Measure
+        }
+
+        // The footprint grown outward by `by` inches on every side.
+        private Vector2[] Grown(Vector2[] corners, float by) {
+            var c = (corners[0] + corners[2]) / 2f;
+            var f = new Vector2(Mathf.Sin(heading * Mathf.Deg2Rad), Mathf.Cos(heading * Mathf.Deg2Rad));
+            var r = new Vector2(f.y, -f.x);
+            var d = depth / 2f + by;
+            var w = width / 2f + by;
+            return new[] { c + f * d + r * w, c + f * d - r * w, c - f * d - r * w, c - f * d + r * w };
+        }
+
+        private void Dashed(Vector2 a, Vector2 b, Color color, float height, float width) {
+            var length = Vector2.Distance(a, b);
+            const float Dash = 3f, Gap = 2f;
+            for (var t = 0f; t < length; t += Dash + Gap) {
+                var p = Vector2.Lerp(a, b, t / length);
+                var q = Vector2.Lerp(a, b, Mathf.Min(length, t + Dash) / length);
+                Overlay.Line(field.ToWorld(p, height), field.ToWorld(q, height), color, width);
+            }
         }
 
         public void FrameCamera() {

@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Protobot.Motion;
 using UnityEngine;
@@ -34,6 +34,7 @@ namespace Protobot.Game {
         public GameDefinition definition;
         public readonly List<Goal> goals = new();
         public readonly List<Vector2> loaders = new();       // the two red Loaders (skills uses only those)
+        public readonly List<Vector2> blueLoaders = new();   // V2: the blue ones (a blue alliance's Match Loads)
         private Transform display, collision;
         private Transform colliders;
         private readonly List<Renderer> hiddenDuringRun = new();
@@ -65,7 +66,7 @@ namespace Protobot.Game {
 
         // ------------------------------------------------------------------ making it
 
-        public static GameField Create(GameDefinition definition, bool light) {
+        public static GameField Create(GameDefinition definition, bool light, bool skills = true) {
             var root = new GameObject("Game Field");
             var field = root.AddComponent<GameField>();
             field.definition = definition;
@@ -81,7 +82,8 @@ namespace Protobot.Game {
             }
             field.Read();
             field.MakeColliders();
-            field.HideForSkills();
+            if (skills) field.HideForSkills();
+            else field.HideOffField();   // V2: a match starts with its Goals set up as the model shows
             return field;
         }
 
@@ -128,6 +130,7 @@ namespace Protobot.Game {
                     goals.Add(goal);
                 }
                 else if (t.name.StartsWith("276-9250-031") && t.name.Contains("Red Loader")) loaders.Add(ToField(MeshBounds(t.parent).center));
+                else if (t.name.StartsWith("276-9250-031") && t.name.Contains("Blue Loader")) blueLoaders.Add(ToField(MeshBounds(t.parent).center));
                 // One shape each for every pin half, cup half and Toggle bar (they're all alike), from the light model.
                 if (pinHalf == null && t.name.StartsWith("276-9250-001")) pinHalf = Readable(t);
                 if (cupHalf == null && t.name.StartsWith("276-9250-002")) cupHalf = Readable(t);
@@ -186,6 +189,19 @@ namespace Protobot.Game {
                 var inGoal = pin && goals.Any(g => (g.position - p).magnitude < 2f);
                 if (outside) stock.Add(t.gameObject);
                 if (outside || inGoal) t.gameObject.SetActive(false);
+            }
+        }
+
+        // V2: a match: only the pieces outside the field (Match Loads, Preloads) go; the Goals keep their pins.
+        private void HideOffField() {
+            foreach (var t in display.GetComponentsInChildren<Transform>(true)) {
+                var pin = t.name.StartsWith("276-9250-80x");
+                var cup = t.name.StartsWith("276-9250-81x");
+                if (!pin && !cup) continue;
+                var p = ToField(BoundsOf(t).center);
+                if (Mathf.Abs(p.x) <= Half + 0.3f && Mathf.Abs(p.y) <= Half + 0.3f) continue;
+                stock.Add(t.gameObject);
+                t.gameObject.SetActive(false);
             }
         }
 
@@ -364,8 +380,9 @@ namespace Protobot.Game {
         }
 
         /// <summary>Where a red Match Load enters: above the Loader (it falls in).</summary>
-        public Vector3 LoaderDrop(int loader) {
-            var p = loaders.Count > loader ? loaders[loader] : new Vector2(-Half + 2f, -58.8f);
+        public Vector3 LoaderDrop(int loader, bool red = true) {
+            var list = red ? loaders : blueLoaders;
+            var p = list.Count > loader ? list[loader] : red ? new Vector2(-Half + 2f, -58.8f) : new Vector2(Half - 2f, 58.8f);
             return ToWorld(p, 15.5f);
         }
     }

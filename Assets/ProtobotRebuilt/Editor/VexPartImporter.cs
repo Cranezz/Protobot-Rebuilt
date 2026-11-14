@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -244,8 +244,11 @@ public static class VexPartImporter {
             var store = new Mesh { name = family.name + " (meshes)" };
             AssetDatabase.DeleteAsset(meshAssetPath);
             AssetDatabase.CreateAsset(store, meshAssetPath);
-            foreach (var mesh in meshes)
+            foreach (var mesh in meshes) {
+                // V2: without the pieces nobody can see from outside (holes and weights were measured on the full model).
+                Protobot.EditorTools.HiddenGeometry.Strip(mesh);
                 AssetDatabase.AddObjectToAsset(mesh, store);
+            }
             AssetDatabase.SaveAssets();
 
             var prefabPath = PrefabFolder + Regex.Replace(family.name, @"[\\/:*?""<>|]", "") + ".prefab";

@@ -25,6 +25,8 @@ namespace Protobot.Tools {
         private Vector3 initPos, initOffset; // V2: where the part and the gizmo were when the drag started
 
         private Quaternion finalRotation = Quaternion.identity;
+        private Vector2 initMouseScreen;   // V2: where the drag began, for the dial
+        private float lastAngle;
         public override Quaternion FinalRotation => finalRotation;
 
         private static float Increment => TransformGizmo.TurnStep; // V2: set in the tool options (was 5°)
@@ -34,8 +36,14 @@ namespace Protobot.Tools {
             Vector3 curMouseVector = MouseVector;
             float angle = Vector2.SignedAngle(curMouseVector, initMouseVector);
             
-            if (snapping)
-                angle = Mathf.Round(angle * 1/Increment) * Increment; //force values to round at specific increment
+            // V2: Ctrl turns in big steps (45°, Ctrl+Shift 15°) whether snapping is on or not.
+            var keyboard = UnityEngine.InputSystem.Keyboard.current;
+            var ctrl = keyboard != null && (keyboard.ctrlKey.isPressed || keyboard.leftCommandKey.isPressed);
+            var step = ctrl ? (keyboard.shiftKey.isPressed ? 15f : 45f) : Increment;
+            lastStep = step;
+            if (snapping || ctrl)
+                angle = Mathf.Round(angle / step) * step; //force values to round at specific increment
+            lastAngle = angle;  // V2: shown on the dial
 
             float camDot = Vector3.Dot(refCamera.transform.forward, initRotVector); //finds the dot product between the camera direction vs. the look direction of this rotate ring
             Quaternion newRot = Quaternion.AngleAxis(angle, -initRotVector * Mathf.Sign(camDot)) * initRot;
@@ -52,6 +60,8 @@ namespace Protobot.Tools {
         public override void Initialize() {
             dragging = false;
             initScreen = refCamera.WorldToScreenPoint(transform.position);
+            initMouseScreen = MouseInput.Position;  // V2
+            lastAngle = 0f;
             initMouseVector = MouseVector;
             dragging = true;
 
@@ -60,7 +70,12 @@ namespace Protobot.Tools {
             var canvas = GetComponentInParent<MatchObjectLinkTransform>();
             initOffset = canvas != null && canvas.centerOnGroup ? TransformGizmo.Offset : Vector3.zero;
             initRotVector = rotVectorLink.Vector;
+            initCenter = initPos + initOffset;  // V2: the dial lies round the turn's axis
+            dialAxis = -initRotVector * Mathf.Sign(Vector3.Dot(refCamera.transform.forward, initRotVector));
         }
+
+        private Vector3 initCenter, dialAxis;
+        private float lastStep = 5f;
 
         //Input Events
         public override void OnDrag() {
@@ -70,6 +85,17 @@ namespace Protobot.Tools {
 
         public override void OnEndDrag() {
             dragging = false;  // V2
+            Interface.RingDial.Clear();
+        }
+
+        // V2: while dragging, a dial of tick marks (one per snap step) and the angle turned so far.
+        private void Update() {
+            if (dragging && MouseInput.LeftButton.isPressed)
+                Interface.RingDial.Draw(initCenter, dialAxis, initMouseScreen, MouseInput.Position, lastAngle, snapping || lastStep > Increment ? lastStep : 5f);
+            else if (dragging) {
+                dragging = false;
+                Interface.RingDial.Clear();
+            }
         }
     }
 }

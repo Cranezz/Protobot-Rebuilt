@@ -1,0 +1,15 @@
+var sb = new System.Text.StringBuilder();
+Protobot.PartsManager.DestroyLoadedObjects();
+var h1 = Protobot.PartsManager.GeneratePart("VXHINGES-3 Hole Hinge (bottom)", new Vector3(0f, 0.5f, 0f), Quaternion.Euler(-90f, 0f, 0f));
+var h2 = Protobot.PartsManager.GeneratePart("VXHINGES-3 Hole Hinge (bottom)", new Vector3(3f, 0.5f, 0f), Quaternion.Euler(-90f, 0f, 0f));
+var hp = h2.GetComponent<Protobot.Motion.HingePart>();
+sb.Append("hinge " + (hp != null) + " enabled " + hp.enabled + " leaf " + (hp.Leaf != null) + " holes " + h2.GetComponentsInChildren<Protobot.HoleCollider>().Length + "\n");
+hp.BeginManual(); hp.ManualTo(90f); hp.EndManual();
+sb.Append("angle " + hp.Angle + " token " + Protobot.Motion.Dynamics.Token(h2, "hinge") + "\n");
+var camGo = new GameObject("RC"); var cam = camGo.AddComponent<Camera>(); cam.orthographic = true; cam.clearFlags = CameraClearFlags.SolidColor; cam.backgroundColor = new Color(0.85f, 0.85f, 0.85f); cam.enabled = false;
+var rt = new RenderTexture(900, 600, 24); cam.targetTexture = rt; var tex = new Texture2D(900, 600, TextureFormat.RGB24, false);
+camGo.transform.rotation = Quaternion.Euler(40f, -25f, 0f); camGo.transform.position = new Vector3(1.2f, 0.5f, 0.5f) - camGo.transform.forward * 30f; cam.orthographicSize = 2.2f; cam.farClipPlane = 100f;
+cam.Render(); RenderTexture.active = rt; tex.ReadPixels(new Rect(0, 0, 900, 600), 0, 0); tex.Apply(); RenderTexture.active = null;
+System.IO.File.WriteAllBytes(@"C:/Dev/ProtobotRebuiltV2/ProtobotRebuiltV2/Assets/Screenshots/hinge2.png", tex.EncodeToPNG());
+UnityEngine.Object.DestroyImmediate(camGo); rt.Release();
+return sb.ToString();

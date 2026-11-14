@@ -1,0 +1,12 @@
+var close = GameObject.Find("Close Button"); if (close != null) close.GetComponent<UnityEngine.UI.Button>()?.onClick.Invoke();
+Protobot.PartsManager.DestroyLoadedObjects();
+var g = Protobot.PartsManager.GetPartType("GEAR").GetComponent<Protobot.PartGenerator>();
+var p1 = g.GetParam1Options(); var sb = new System.Text.StringBuilder("gear options " + string.Join("|", p1) + "\n");
+string gid = null; foreach (var n in Protobot.Interface.PartsCatalog.Nodes) foreach (var l in n.Leaves()) if (l.typeId == "GEAR" && gid == null && l.p2 == "60T" && l.p1 == "High Strength v2") gid = "GEAR-" + l.p1 + (l.p2 != null ? "-" + l.p2 : "");
+sb.Append("id " + gid + " | ");
+var gear = Protobot.PartsManager.GeneratePart(gid, new Vector3(0, 1, 0), Quaternion.Euler(90, 0, 0));
+if (!Protobot.Tools.GearTeeth.Measure(gear, out var m)) return sb + "measure failed";
+sb.Append("teeth " + m.teeth + " tip " + m.tip.ToString("F3") + " root " + m.root.ToString("F3") + " phase " + (m.phase * Mathf.Rad2Deg).ToString("F1") + " thick " + m.thickness.ToString("F3") + "\n");
+var r = Protobot.Tools.GearTeeth.Apply(gear, m, new System.Collections.Generic.List<int> { 0, 1, 2, 3, 4, 5 });
+sb.Append(r.message + " ok " + r.ok + " state " + gear.GetComponent<Protobot.SavedObject>().state.Length + "\n");
+return sb.ToString();

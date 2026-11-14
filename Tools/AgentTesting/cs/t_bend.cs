@@ -1,0 +1,33 @@
+var sb = new System.Text.StringBuilder();
+GameObject sndf = null;
+foreach (var o in Protobot.PartsManager.FindLoadedObjects()) { var so = o.GetComponent<Protobot.SavedObject>(); if (so != null && so.id == "SNDF-3/4in" && o.transform.position.x > 0.5f) sndf = o; }
+Protobot.Interface.ToolRail.Select("Bend");
+var tool = UnityEngine.Object.FindFirstObjectByType<Protobot.Tools.BendTool>();
+var T = typeof(Protobot.Tools.BendTool);
+var bf = System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance;
+T.GetMethod("Begin", bf).Invoke(tool, new object[] { sndf, null });
+var plan = (Protobot.Tools.PartBend.Plan)T.GetField("plan", bf).GetValue(tool);
+sb.Append("neighbours " + string.Join(",", System.Linq.Enumerable.Select(Protobot.GroupManager.Neighbours(sndf), n => n.name)) + "\n");
+sb.Append("plan moveHigh " + plan.moveHigh + " partMoves " + plan.partMoves + " tied " + plan.tied + " movers " + string.Join(",", plan.movers.ConvertAll(m => m.name)) + "\n");
+var before = new System.Collections.Generic.Dictionary<GameObject, Vector3>();
+foreach (var m in plan.movers) before[m] = m.transform.position;
+var partBefore = sndf.transform.position;
+T.GetField("angle", bf).SetValue(tool, 60f);
+T.GetMethod("Preview", bf).Invoke(tool, null);
+foreach (var m in plan.movers) sb.Append("  preview moved " + m.name + " by " + (m.transform.position - before[m]).magnitude.ToString("F3") + "\n");
+sb.Append("  part moved by " + (sndf.transform.position - partBefore).magnitude.ToString("F3") + "\n");
+// Aim at a point 3" away to the side.
+var target = sndf.transform.position + new Vector3(2.5f, 1.5f, 1.5f);
+var miss = (float)T.GetMethod("AimAt", bf).Invoke(tool, new object[] { target });
+T.GetMethod("Preview", bf).Invoke(tool, null);
+sb.Append("aim: angle " + T.GetField("angle", bf).GetValue(tool) + " toward " + T.GetField("toward", bf).GetValue(tool) + " miss " + miss.ToString("F4") + "\n");
+var saved = Protobot.Tools.PartBend.SavedBends(sndf);
+var bends = new System.Collections.Generic.List<Protobot.Tools.PartBend.Bend>(saved);
+var cur = (Protobot.Tools.PartBend.Bend)T.GetProperty("Current", bf).GetValue(tool);
+bends.Add(cur);
+var ray = Protobot.Tools.PartBend.EndRay(plan, saved, bends);
+sb.Append("end ray " + ray.point.ToString("F3") + " dir " + ray.direction.ToString("F3") + " to target dir " + (target - ray.point).normalized.ToString("F3") + "\n");
+T.GetMethod("Apply", bf).Invoke(tool, null);
+sb.Append("state " + sndf.GetComponent<Protobot.SavedObject>().state + "\n");
+foreach (var m in plan.movers) sb.Append("  after apply " + m.name + " moved " + (m.transform.position - before[m]).magnitude.ToString("F3") + "\n");
+return sb.ToString();

@@ -46,6 +46,15 @@ namespace Protobot.Polycarb {
 
         private static (Tool tool, string name, string key, string icon, string help) Def(Tool t) => Tools.First(x => x.tool == t);
 
+        // V2: every tool can have a key (Edit > Keyboard shortcuts); the table's keys are the defaults.
+        private static string ToolKeyId(Tool t) => "Sketch." + t;
+
+        [RuntimeInitializeOnLoadMethod]
+        private static void RegisterKeys() {
+            foreach (var def in Tools)
+                global::Protobot.Tools.Keybinds.Add(ToolKeyId(def.tool), "Sketch editor tools", def.name, def.key ?? "");
+        }
+
         private static string FamilyName(Tool t) => t switch {
             Tool.Rectangle => "Rectangle",
             Tool.Arc => "Arc",
@@ -91,7 +100,7 @@ namespace Protobot.Polycarb {
                 var (group, tools) = ToolGroups[i];
                 if (group != last) {
                     if (last == "Modify") {
-                        ToolbarButton("Construction", "Construction", "Q", "Turns what's selected into construction geometry (dashed): it helps you draw but isn't cut.", ToggleConstruction);
+                        ToolbarButton("Construction", "Construction", global::Protobot.Tools.Keybinds.Label("SketchConstruction"), "Turns what's selected into construction geometry (dashed): it helps you draw but isn't cut.", ToggleConstruction);
                         ToolbarButton("Delete", "Delete", "Del", "Deletes what's selected.", DeleteSelected);
                     }
                     if (last != null) Separator();
@@ -102,7 +111,7 @@ namespace Protobot.Polycarb {
                 var def = Def(tools[0]);
                 // Named by its family (the icon shows which variant), as SolidWorks' toolbar.
                 var family = FamilyName(tools[0]);
-                var (bg, icon) = ToolbarButton(def.icon, family, def.key, def.help, () => SetTool(groupChoice.TryGetValue(index, out var t) ? t : ToolGroups[index].tools[0]));
+                var (bg, icon) = ToolbarButton(def.icon, family, global::Protobot.Tools.Keybinds.Label(ToolKeyId(def.tool)), def.help, () => SetTool(groupChoice.TryGetValue(index, out var t) ? t : ToolGroups[index].tools[0]));
                 var nameText = bg.transform.Find("Name").GetComponent<TextMeshProUGUI>();
                 if (tools.Length > 1) {
                     var arrow = Ui.Image(bg.transform, "More", new Color(1f, 1f, 1f, 0f), 4f, true);

@@ -82,6 +82,9 @@ namespace Protobot.Builds {
             }
         }
 
+        /// <summary>V2: one saved part into the build (saved groups place theirs this way).</summary>
+        public static GameObject GeneratePart(ObjectData objectData, BuildData buildData) => GenerateObject(objectData, buildData);
+
         private static GameObject GenerateObject(ObjectData objectData, BuildData buildData)
         {
             GameObject generatedObject = PartsManager.GeneratePart(objectData.partId, objectData.GetPos(), objectData.GetRot());

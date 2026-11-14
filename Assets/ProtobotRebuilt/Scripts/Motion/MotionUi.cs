@@ -96,7 +96,7 @@ namespace Protobot.Motion {
             }
 
             private void Apply(float t) {
-                t = Mathf.Max(min, Mathf.Round(t / step) * step);
+                t = Mathf.Max(min, step > 0f ? Mathf.Round(t / step) * step : t);   // V2: step 0 = smooth
                 if (Mathf.Approximately(t, value)) return;
                 value = t;
                 Show();
@@ -108,7 +108,7 @@ namespace Protobot.Motion {
             public void OnPointerUp(PointerEventData e) => done?.Invoke(value);
 
             public void OnScroll(PointerEventData e) {
-                Apply(Mathf.Clamp01(value + Mathf.Sign(e.scrollDelta.y) * step));
+                Apply(Mathf.Clamp01(value + Mathf.Sign(e.scrollDelta.y) * (step > 0f ? step : 0.05f)));
                 done?.Invoke(value);
             }
         }
@@ -154,10 +154,12 @@ namespace Protobot.Motion {
             foreach (var motor in motors) {
                 if (motor == null || motor.gameObject.IsDeleted()) continue;
                 var color = motor.Color;
-                var axis = motor.Forward * (Controls.Reversed(motor.gameObject) ? -1f : 1f);
-                var center = motor.ShaftPoint + motor.Forward * 0.6f;
+                // V2: in the simulation the motors are where their bodies have carried them.
+                var go = motor.gameObject;
+                var axis = Sandbox.SimDirection(go, motor.Forward) * (Controls.Reversed(go) ? -1f : 1f);
+                var center = Sandbox.SimPoint(go, motor.ShaftPoint + motor.Forward * 0.6f);
                 Arc(center, axis, 0.9f, color);
-                if (!motor.TryGetComponent(out Renderer renderer) || !Overlay.ToScreen(renderer.bounds.center, out var point)) continue;
+                if (!motor.TryGetComponent(out Renderer renderer) || !Overlay.ToScreen(Sandbox.SimPoint(go, renderer.bounds.center), out var point)) continue;
                 var text = motor.Label;
                 var side = Controls.Side(motor.gameObject);
                 if (Sandbox.Running && side != "") text += side == "L" ? " · drive left" : " · drive right";
@@ -167,12 +169,12 @@ namespace Protobot.Motion {
             foreach (var cylinder in cylinders) {
                 if (cylinder == null || cylinder.gameObject.IsDeleted()) continue;
                 var color = Theme.Warning;
-                var tip = cylinder.RodTip;
-                var dir = cylinder.ExtendDirection;
+                var tip = Sandbox.SimPoint(cylinder.gameObject, cylinder.RodTip);
+                var dir = Sandbox.SimDirection(cylinder.gameObject, cylinder.ExtendDirection);
                 Overlay.Line(tip, tip + dir * 1.2f, color, 2.5f);
                 if (Overlay.ToScreen(tip + dir * 1.2f, out var head) && Overlay.ToScreen(tip + dir * 0.8f, out var from))
                     Overlay.Arrowhead(head, from, color);
-                if (!cylinder.TryGetComponent(out Renderer renderer) || !Overlay.ToScreen(renderer.bounds.center, out var point)) continue;
+                if (!cylinder.TryGetComponent(out Renderer renderer) || !Overlay.ToScreen(Sandbox.SimPoint(cylinder.gameObject, renderer.bounds.center), out var point)) continue;
                 var text = cylinder.Label + (keys ? " · " + Controls.KeyName(Controls.CylinderKey(cylinder.gameObject)) : "");
                 Overlay.Text(point + new Vector2(0f, 30f), text, color, null, true);
             }

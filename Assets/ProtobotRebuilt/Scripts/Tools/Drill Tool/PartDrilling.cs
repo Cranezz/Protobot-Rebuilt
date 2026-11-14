@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using Protobot.Geometry;
@@ -13,8 +13,121 @@ namespace Protobot.Tools {
         public const float BitDiameter = 0.25f; // inches
         private const string Prefix = "drill:";
 
+        // V2: a hole drilled across the part and then undone is kept switched off: it isn't counted.
         public static List<HoleCollider> Holes(GameObject part) =>
-            part.GetComponentsInChildren<HoleCollider>(true).Where(h => h.transform.parent == part.transform).ToList();
+            part.GetComponentsInChildren<HoleCollider>(true).Where(h => h.transform.parent == part.transform
+                && (h.gameObject.activeSelf || h.GetComponent<DrilledHole>() == null)).ToList();
+
+        // ------------------------------------------------------------------ V2: holes across a standoff or HS shaft
+
+        private const string CrossPrefix = "xdrill:";
+
+        /// <summary>Parts a hole can be drilled across (through the side), for a screw: standoffs and HS shafts.</summary>
+        public static bool CanCrossDrill(GameObject part) => PartBend.IsBendable(part) && !PartBend.IsLink(part);
+
+        /// <summary>Where a hole across the part goes for a click on its side: on its middle line (1/16" steps from
+        /// its end unless free), straight through along the face's normal. In the straight part's frame (its own
+        /// space with its scale), with how wide the part is that way.</summary>
+        public static bool CrossSpot(GameObject part, Vector3 point, Vector3 normal, float diameter, bool free,
+                                     out Vector3 center, out Vector3 axis, out float width, out float along) {
+            var bends = PartBend.SavedBends(part);
+            var (axisIndex, low, length, middle) = PartBend.Frame(part, PartBend.Straight(part));
+            along = PartBend.Along(part, point, bends);
+            if (!free) along = Mathf.Round(along * 16f) / 16f;
+            along = Mathf.Clamp(along, diameter / 2f + 0.03f, length - diameter / 2f - 0.03f);
+            var (_, turn) = PartBend.CenterAt(part, along, bends);
+            var local = Quaternion.Inverse(turn) * (Quaternion.Inverse(part.transform.rotation) * normal);
+            local[axisIndex] = 0f;
+            center = middle;
+            center[axisIndex] = low + along;
+            axis = local.sqrMagnitude > 1e-6f ? local.normalized : Vector3.zero;
+            width = axis == Vector3.zero ? 0f : 2f * HalfWidth(part, center, axis, axisIndex);
+            return axis != Vector3.zero && width > 0.02f && length > diameter + 0.06f;
+        }
+
+        // How far the part's material goes from its middle line along a way across it: a ray from outside onto the
+        // straight mesh (a shaft's box has no points along its middle to measure by).
+        private static GameObject probe;
+
+        private static float HalfWidth(GameObject part, Vector3 center, Vector3 axis, int axisIndex) {
+            var scale = part.transform.localScale;
+            var mesh = PartBend.Straight(part);
+            if (probe == null) probe = new GameObject("Drill Probe") { hideFlags = HideFlags.HideAndDontSave, layer = 2 };
+            var collider = probe.TryGetComponent(out MeshCollider found) ? found : probe.AddComponent<MeshCollider>();
+            collider.enabled = true;   // only while measuring (it sits at the origin)
+            if (collider.sharedMesh != mesh) collider.sharedMesh = mesh;
+            probe.transform.localScale = scale;
+            var reach = mesh.bounds.extents.magnitude * Mathf.Max(Mathf.Abs(scale.x), Mathf.Abs(scale.y), Mathf.Abs(scale.z)) + 1f;
+            var half = 0f;
+            foreach (var way in new[] { axis, -axis })
+                if (collider.Raycast(new Ray(center + way * reach, -way), out var hit, reach * 2f))
+                    half = Mathf.Max(half, Mathf.Abs(Vector3.Dot(hit.point - center, axis)));
+            collider.enabled = false;
+            return half;
+        }
+
+        /// <summary>Drills a round hole straight through the part across its length (made in the straight part, so
+        /// bends carry it), with a hole a screw goes through. False if nothing was cut.</summary>
+        public static bool CrossDrill(GameObject part, Vector3 center, Vector3 axis, float diameter) {
+            var (axisIndex, _, _, _) = PartBend.Frame(part, PartBend.Straight(part));
+            var half = HalfWidth(part, center, axis, axisIndex);
+            if (half < 0.01f) return false;
+            var scale = part.transform.localScale;
+            Vector3 Unscale(Vector3 v) => new(v.x / (scale.x == 0f ? 1f : scale.x), v.y / (scale.y == 0f ? 1f : scale.y), v.z / (scale.z == 0f ? 1f : scale.z));
+            const float margin = 0.003f;
+            var info = new HoleInfo {
+                found = true,
+                center = Unscale(center + axis * (half + margin)),
+                normal = axis,
+                thickness = 2f * (half + margin),
+                holeRadius = diameter / 2f,
+                round = true,
+            };
+            var straight = PartBend.Straight(part);
+            var drilled = HoleDrilling.Drill(straight, info, diameter / 2f, null, HoleDrilling.DrillSegments, null);
+            if (drilled == null) return false;
+            var bent = PartBend.HasStraight(part);
+            if (bent) PartBend.SetStraight(part, drilled);
+            else {
+                part.GetComponent<MeshFilter>().sharedMesh = drilled;
+                if (part.TryGetComponent(out MeshCollider meshCollider)) meshCollider.sharedMesh = drilled;
+            }
+            var round = HoleShapes.instance.GetShapeMesh("circle");
+            var hole = new GameObject("Drilled Hole", typeof(MeshCollider)) { tag = "HoleCollider", layer = HoleCollider.HOLE_COLLISIONS_LAYER };
+            hole.GetComponent<MeshCollider>().sharedMesh = round;
+            hole.transform.SetParent(part.transform, false);
+            hole.transform.localPosition = Unscale(center);
+            hole.transform.localRotation = Quaternion.LookRotation(axis);
+            hole.transform.localScale = new Vector3(diameter, diameter, 2f * half);
+            var marker = hole.AddComponent<DrilledHole>();
+            marker.straightPosition = hole.transform.localPosition;
+            marker.straightRotation = hole.transform.localRotation;
+            var collider = hole.AddComponent<HoleCollider>();
+            collider.holeType = HoleCollider.HoleType.Normal;
+            collider.Refresh();
+            if (bent) PartBend.Show(part, PartBend.SavedBends(part));
+            return true;
+        }
+
+        public static void RecordCross(SavedObject saved, Vector3 center, Vector3 axis, float diameter) {
+            string F(float f) => f.ToString("0.#####", CultureInfo.InvariantCulture);
+            saved.state += CrossPrefix + string.Join(",", F(center.x), F(center.y), F(center.z), F(axis.x), F(axis.y), F(axis.z), F(diameter)) + ";";
+        }
+
+        private static bool TryParseCross(string entry, out Vector3 center, out Vector3 axis, out float diameter) {
+            center = axis = Vector3.zero;
+            diameter = 0f;
+            if (entry == null || !entry.StartsWith(CrossPrefix)) return false;
+            var v = entry.Substring(CrossPrefix.Length).Split(',');
+            if (v.Length != 7) return false;
+            var f = new float[7];
+            for (var i = 0; i < 7; i++)
+                if (!float.TryParse(v[i], NumberStyles.Float, CultureInfo.InvariantCulture, out f[i])) return false;
+            center = new Vector3(f[0], f[1], f[2]);
+            axis = new Vector3(f[3], f[4], f[5]);
+            diameter = f[6];
+            return true;
+        }
 
         public static bool IsRound(HoleCollider hole) {
             var round = HoleShapes.instance.GetShapeMesh("circle");
@@ -199,6 +312,12 @@ namespace Protobot.Tools {
                 return;
             foreach (var entry in saved.state.Split(';')) {
                 if (GearChamfer.ApplyEntry(part, entry)) continue;   // chamfered gear teeth
+                if (GearTeeth.ApplyEntry(part, entry)) continue;     // V2: teeth taken off
+                if (PartBend.TryParse(entry, out _)) continue;        // V2: bends, all at once below
+                if (TryParseCross(entry, out var crossCenter, out var crossAxis, out var crossDiameter)) {   // V2: holes across
+                    CrossDrill(part, crossCenter, crossAxis, crossDiameter);
+                    continue;
+                }
                 if (PartCutting.TryParse(entry, out var point, out var normal)) {
                     if (PartCutting.Cut(part, point, normal) && part.TryGetComponent(out Parts_List.PartName partName)
                         && !partName.name.EndsWith("(cut)"))
@@ -213,7 +332,14 @@ namespace Protobot.Tools {
                     && float.TryParse(values[1], NumberStyles.Float, CultureInfo.InvariantCulture, out var diameter))
                     Drill(part, index, diameter);
             }
+            PartBend.ApplySaved(part);   // V2
         }
+    }
+
+    /// <summary>V2: a hole drilled across a part: where it is on the straight part (bends carry it).</summary>
+    public class DrilledHole : MonoBehaviour {
+        public Vector3 straightPosition;
+        public Quaternion straightRotation = Quaternion.identity;
     }
 
     // Undo/redo of a drilled hole: puts back the part's mesh, its holes' shapes and its saved state.
@@ -222,11 +348,15 @@ namespace Protobot.Tools {
         private readonly Mesh mesh;
         private readonly string state;
         private readonly List<(MeshCollider collider, Mesh shape, Vector3 scale)> holes = new();
+        private readonly Mesh straight;   // V2: a bent part's mesh before its bends
+        private readonly List<GameObject> drilled;   // V2: holes drilled across it
 
         public DrillElement(GameObject part) {
             this.part = part;
             mesh = part.GetComponent<MeshFilter>().sharedMesh;
             state = part.GetComponent<SavedObject>().state;
+            if (PartBend.HasStraight(part)) straight = PartBend.Straight(part);
+            drilled = part.GetComponentsInChildren<DrilledHole>(true).Where(h => h.gameObject.activeSelf).Select(h => h.gameObject).ToList();
             foreach (var hole in PartDrilling.Holes(part)) {
                 var collider = hole.GetComponent<MeshCollider>();
                 holes.Add((collider, collider.sharedMesh, hole.transform.localScale));
@@ -240,6 +370,9 @@ namespace Protobot.Tools {
             if (part.TryGetComponent(out MeshCollider collider))
                 collider.sharedMesh = mesh;
             part.GetComponent<SavedObject>().state = state;
+            if (straight != null) PartBend.SetStraight(part, straight);
+            foreach (var hole in part.GetComponentsInChildren<DrilledHole>(true))
+                hole.gameObject.SetActive(drilled.Contains(hole.gameObject));
             foreach (var (holeCollider, shape, scale) in holes) {
                 if (holeCollider == null)
                     continue;

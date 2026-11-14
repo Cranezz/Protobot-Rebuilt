@@ -1,0 +1,32 @@
+var close = GameObject.Find("Close Button"); if (close != null) close.GetComponent<UnityEngine.UI.Button>()?.onClick.Invoke();
+Protobot.PartsManager.DestroyLoadedObjects();
+var sb = new System.Text.StringBuilder();
+var brain = Protobot.PartsManager.GetPartType("BRAN").GetComponent<Protobot.PartGenerator>().Generate(new Vector3(0f, 1f, 0f), Quaternion.identity);
+var mg = Protobot.PartsManager.GetPartType("MOTR").GetComponent<Protobot.PartGenerator>(); mg.param1.value = "11W";
+var motor = mg.Generate(new Vector3(-1f, 1f, -6f), Quaternion.Euler(0f, 90f, 0f));
+var sg = Protobot.PartsManager.GetPartType("SWCH").GetComponent<Protobot.PartGenerator>(); sg.param1.value = "Limit"; sg.param2.value = "Cortex";
+var sw = sg.Generate(new Vector3(6f, 1f, 1f), Quaternion.identity);
+Physics.SyncTransforms();
+var bp = Protobot.Motion.WirePorts.Of(brain);
+var mp = Protobot.Motion.WirePorts.Of(motor);
+sb.Append("brain ports " + bp.Count + " motor ports " + mp.Count + (mp.Count > 0 ? " at " + mp[0].Position.ToString("F2") + " out " + mp[0].Out.ToString("F2") : "") + "\n");
+var flags = System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance;
+var place = typeof(Protobot.Motion.TubeTool).GetMethod("Place", flags);
+System.Func<Protobot.Motion.WirePort, Protobot.Motion.WireKind, Protobot.Motion.TubeTarget> T = (p, k) => new Protobot.Motion.TubeTarget { valid = true, kind = Protobot.Motion.TubeNode.Port, part = p.part, point = p.Position, dir = p.Out, depth = Protobot.Motion.Wire.PortDepth(k), what = p.label };
+// Smart cable: brain port 11 -> a point -> the motor
+var p11 = bp.Find(p => p.number == 11 && p.kind == Protobot.Motion.WireKind.Smart);
+Protobot.Motion.TubeTool.BeginWire(Protobot.Motion.WireKind.Smart, p11);
+var tool = UnityEngine.Object.FindFirstObjectByType<Protobot.Motion.TubeTool>();
+place.Invoke(tool, new object[] { new Protobot.Motion.TubeTarget { valid = true, kind = Protobot.Motion.TubeNode.Point, point = new Vector3(-0.5f, 1.2f, -3.5f), what = "air" } });
+if (mp.Count > 0) place.Invoke(tool, new object[] { T(mp[0], Protobot.Motion.WireKind.Smart) });
+// 3-wire: brain port A -> the switch (a spot on it)
+var pa = bp.Find(p => p.number == 1 && p.kind == Protobot.Motion.WireKind.ThreeWire);
+Protobot.Motion.TubeTool.BeginWire(Protobot.Motion.WireKind.ThreeWire, pa);
+tool = UnityEngine.Object.FindFirstObjectByType<Protobot.Motion.TubeTool>();
+var spot = new Protobot.Motion.WirePort { part = sw, local = sw.transform.InverseTransformPoint(sw.GetComponent<Renderer>().bounds.center + Vector3.up * 0.25f), outLocal = Vector3.up, upLocal = Vector3.forward, kind = Protobot.Motion.WireKind.ThreeWire, label = "" };
+place.Invoke(tool, new object[] { T(spot, Protobot.Motion.WireKind.ThreeWire) });
+foreach (var w in Protobot.Motion.Wire.Wires) sb.Append(w.Title + " nodes " + w.nodes.Count + " | " + w.Describe(w.Length).Replace("\n", " / ") + "\n");
+var md = motor.GetComponent<Protobot.Motion.MotorDrive>();
+sb.Append("motor number " + (md != null ? md.Number + " label " + md.Label : "no MotorDrive"));
+Protobot.PivotCamera.Main.SetTransform(new Vector3(0f, 1f, -2.5f), new Vector3(40f, 210f, 0f), -12f);
+return sb.ToString();

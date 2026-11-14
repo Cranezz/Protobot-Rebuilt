@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Rendering;
 using Object = UnityEngine.Object;
@@ -18,6 +19,10 @@ namespace Protobot {
         // put together from segments: every length gets a clean, capped end (the original only had the end
         // segment on full-length parts). Cut meshes are kept per length.
         [NonSerialized] private Mesh stock;
+        // V2: the original's hole colliders sit where its own model's holes were; on the VEX model some faces' holes
+        // are a little off them (a C-channel's flange holes 0.008"). Per face (hole axis + which side): the shift onto
+        // the VEX model's real opening and the wall's real thickness, measured once from the stock.
+        [NonSerialized] private System.Collections.Generic.Dictionary<string, (Vector3 shift, float depth)> holeFixes;
         [NonSerialized] private readonly System.Collections.Generic.Dictionary<int, Mesh> cutMeshes = new();
 
         public Mesh GetMesh(int holeCount) {
@@ -143,7 +148,67 @@ namespace Protobot {
             mesh.SetTriangles(triangles, 0);
             if (normals.Length != vertices.Length) mesh.RecalculateNormals();
             mesh.RecalculateBounds();
+            holeFixes = MeasureHoles(mesh, ours);
             return mesh;
+        }
+
+        private static string FaceKey(Vector3 position, Vector3 axis) {
+            var a = new Vector3Int(Mathf.RoundToInt(axis.x), Mathf.RoundToInt(axis.y), Mathf.RoundToInt(axis.z));
+            if (a.x < 0 || (a.x == 0 && a.y < 0) || (a.x == 0 && a.y == 0 && a.z < 0)) a = -a;
+            var side = Vector3.Dot(position, (Vector3)a) >= 0f ? "+" : "-";
+            return a.x + "," + a.y + "," + a.z + side;
+        }
+
+        // For one hole per face: the centre of the real opening (rays along the axis that pass through the mesh) and
+        // the wall's two surfaces just beside the hole.
+        private static System.Collections.Generic.Dictionary<string, (Vector3, float)> MeasureHoles(Mesh mesh, System.Collections.Generic.List<(Vector3 p, Vector3 a)> holes) {
+            var fixes = new System.Collections.Generic.Dictionary<string, (Vector3, float)>();
+            var probe = new GameObject("Hole Probe") { hideFlags = HideFlags.HideAndDontSave };
+            var collider = probe.AddComponent<MeshCollider>();
+            collider.sharedMesh = mesh;
+            try {
+                // A hole from the middle of the stock for each face (the ends are shaped differently).
+                var middle = holes.OrderBy(h => Mathf.Abs(h.p.x)).ToList();
+                foreach (var (p, axisRaw) in middle) {
+                    var key = FaceKey(p, axisRaw);
+                    if (fixes.ContainsKey(key)) continue;
+                    var axis = axisRaw.normalized;
+                    var u = Vector3.Cross(axis, Mathf.Abs(axis.x) < 0.9f ? Vector3.right : Vector3.up).normalized;
+                    var v = Vector3.Cross(axis, u);
+                    Vector3 sum = Vector3.zero;
+                    var count = 0;
+                    const float Half = 0.15f, Step = 0.003f;
+                    for (var a = -Half; a <= Half; a += Step)
+                        for (var b = -Half; b <= Half; b += Step) {
+                            var offset = u * a + v * b;
+                            if (collider.Raycast(new Ray(p + offset - axis * 0.5f, axis), out _, 1f)) continue;
+                            sum += offset;
+                            count++;
+                        }
+                    if (count < 20) continue;
+                    var shift = sum / count;
+                    if (shift.magnitude > 0.05f) continue;   // not a plain hole: leave it
+                    // The wall beside the hole: its two surfaces along the axis.
+                    var depth = -1f;
+                    var mid = 0f;
+                    foreach (var side in new[] { u, -u, v, -v }) {
+                        var rim = p + shift + side * 0.135f;
+                        if (!collider.Raycast(new Ray(rim + axis * 0.5f, -axis), out var front, 1f)) continue;
+                        if (!collider.Raycast(new Ray(rim - axis * 0.5f, axis), out var back, 1f)) continue;
+                        var f = Vector3.Dot(front.point - p, axis);
+                        var k = Vector3.Dot(back.point - p, axis);
+                        if (f - k < 0.01f || f - k > 0.3f) continue;
+                        depth = f - k;
+                        mid = (f + k) / 2f;
+                        break;
+                    }
+                    fixes[key] = (shift + (depth > 0f ? axis * mid : Vector3.zero), depth);
+                }
+            }
+            finally {
+                UnityEngine.Object.DestroyImmediate(probe);
+            }
+            return fixes;
         }
 
         // The original's way: one segment per hole. V2: plain makes every middle segment the plain one (the
@@ -259,8 +324,17 @@ namespace Protobot {
                     pos.x += GetXPos(i - 1, holeCount); // correctly positions hole
 
                     var rot = holeCollider.transform.rotation;
+                    // V2: onto the VEX model's real hole, as deep as its wall.
+                    (Vector3 shift, float depth) fix = default;
+                    var fixedHole = holeFixes != null && holeFixes.TryGetValue(FaceKey(pos, rot * Vector3.forward), out fix);
+                    if (fixedHole) pos += fix.shift;
                     
-                    Instantiate(holeCollider.gameObject, pos, rot, obj.transform);
+                    var made = Instantiate(holeCollider.gameObject, pos, rot, obj.transform);
+                    if (fixedHole && fix.depth > 0f) {
+                        var scale = made.transform.localScale;
+                        made.transform.localScale = new Vector3(scale.x, scale.y, fix.depth);
+                        if (made.TryGetComponent(out HoleCollider madeHole)) madeHole.Refresh();
+                    }
                 }
             }
         }

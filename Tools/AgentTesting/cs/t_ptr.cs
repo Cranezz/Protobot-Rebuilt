@@ -1,0 +1,1 @@
+var t = UnityEngine.InputSystem.Touchscreen.current; var m = UnityEngine.InputSystem.Mouse.current; var p = UnityEngine.InputSystem.Pointer.current; return "mouse " + m.position.ReadValue() + " touch " + (t != null ? t.position.ReadValue().ToString() : "none") + " pointer " + (p != null ? p.name + " " + p.position.ReadValue() : "none");

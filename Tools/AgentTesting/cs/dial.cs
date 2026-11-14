@@ -1,0 +1,16 @@
+var pt = System.Type.GetType("Protobot.Editor.Playtest, Protobot.Editor");
+var type = Protobot.PartsManager.GetPartType("GEAR");
+var gen = type.GetComponent<Protobot.PartGenerator>();
+var pl = Protobot.Placement.Instance;
+Protobot.PivotCamera.Main.SetTransform(new Vector3(0f, 0f, 0f), new Vector3(30f, 40f, 0f), -14f);
+pl.StartPlacing(new Protobot.PartPlacementData(gen, type, pl.transform));
+pl.transform.position = new Vector3(2f, 2f, 0f);
+var c = (Vector2)Camera.main.WorldToScreenPoint(pl.transform.position);
+pt.GetMethod("PointAt", new[] { typeof(Vector2) }).Invoke(null, new object[] { c + new Vector2(140f, 0f) });
+pt.GetMethod("Frames").Invoke(null, new object[] { 1 });
+pl.InitRotation(); pl.rotating = true;
+var a = 70f * Mathf.Deg2Rad;
+pt.GetMethod("PointAt", new[] { typeof(Vector2) }).Invoke(null, new object[] { c + new Vector2(Mathf.Cos(a), Mathf.Sin(a)) * 140f });
+pt.GetMethod("Frames").Invoke(null, new object[] { 2 });
+pt.GetMethod("Screenshot").Invoke(null, new object[] { "dial" });
+return "center " + c;

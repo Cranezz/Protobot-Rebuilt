@@ -672,19 +672,19 @@ namespace Protobot.Polycarb {
                 else if (tool != Tool.Select) SetTool(Tool.Select);
                 return;
             }
-            if (ctrl && (keyboard.yKey.wasPressedThisFrame || keyboard.shiftKey.isPressed && keyboard.zKey.wasPressedThisFrame)) {
+            // V2: keys from Edit > Keyboard shortcuts (Tools.Keybinds).
+            if (global::Protobot.Tools.Keybinds.Pressed("SketchRedo") || ctrl && keyboard.shiftKey.isPressed && keyboard.zKey.wasPressedThisFrame) {
                 Redo();
                 return;
             }
-            if (ctrl && keyboard.zKey.wasPressedThisFrame) {
+            if (global::Protobot.Tools.Keybinds.Pressed("SketchUndo")) {
                 Undo();
                 return;
             }
-            if (stage == Stage.Sketch && ctrl) {
-                if (keyboard.aKey.wasPressedThisFrame) SelectAll();
-                else if (keyboard.cKey.wasPressedThisFrame) CopySelection();
-                else if (keyboard.vKey.wasPressedThisFrame) Paste();
-                return;
+            if (stage == Stage.Sketch) {
+                if (global::Protobot.Tools.Keybinds.Pressed("SketchSelectAll")) { SelectAll(); return; }
+                if (global::Protobot.Tools.Keybinds.Pressed("SketchCopy")) { CopySelection(); return; }
+                if (global::Protobot.Tools.Keybinds.Pressed("SketchPaste")) { Paste(); return; }
             }
             if (keyboard.enterKey.wasPressedThisFrame || keyboard.numpadEnterKey.wasPressedThisFrame) {
                 // The tool's Apply, else Make piece.
@@ -693,12 +693,12 @@ namespace Protobot.Polycarb {
                 else MakeOrCreate();
                 return;
             }
-            if (keyboard.fKey.wasPressedThisFrame) Fit();
-            if (stage != Stage.Sketch || ctrl) return;
-            if (keyboard.deleteKey.wasPressedThisFrame || keyboard.backspaceKey.wasPressedThisFrame) DeleteSelected();
-            if (keyboard.qKey.wasPressedThisFrame) ToggleConstruction();
+            if (global::Protobot.Tools.Keybinds.Pressed("SketchFit")) Fit();
+            if (stage != Stage.Sketch) return;
+            if (!ctrl && (keyboard.deleteKey.wasPressedThisFrame || keyboard.backspaceKey.wasPressedThisFrame)) DeleteSelected();
+            if (global::Protobot.Tools.Keybinds.Pressed("SketchConstruction")) ToggleConstruction();
             foreach (var def in Tools)
-                if (def.key != null && keyboard[(Key)System.Enum.Parse(typeof(Key), def.key)].wasPressedThisFrame) SetTool(def.tool);
+                if (global::Protobot.Tools.Keybinds.Pressed(ToolKeyId(def.tool))) SetTool(def.tool);
         }
 
         private bool trimming;

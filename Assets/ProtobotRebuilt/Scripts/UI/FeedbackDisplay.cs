@@ -54,7 +54,13 @@ namespace Protobot.UI {
             }
         }
 
+        // V2: the user wants few notifications: confirmations of ordinary actions ("Cut 2\"", "Painted…") aren't shown;
+        // refusals and problems (alerts) are, and the few successes worth telling (a file saved or exported, a score)
+        // go through Interface.Announce, which sets this for its message.
+        public static bool important;
+
         public void Show(string stringToDisplay, DisplayType type) {
+            if (type == DisplayType.success && !important) return;
             curDisplayType = type;
             curDisplayString = stringToDisplay;
             showing = true;

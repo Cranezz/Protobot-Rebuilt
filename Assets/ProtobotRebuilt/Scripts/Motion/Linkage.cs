@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Protobot.StateSystems;
 using UnityEngine;
@@ -211,6 +211,27 @@ namespace Protobot.Motion {
                     else Union(obj, next);
                 }
             }
+            // V2: what a cylinder's rod thread holds (a nut, a collar, a bracket) is fastened to the cylinder: the thread
+            // itself isn't in the list (it stands for its cylinder), so this was missed and the parts on the rod were
+            // left behind when the cylinder moved (outlined with it, but not moved).
+            // V2: a hinge's top leaf (a child of the hinge, not a part): what's screwed to it is on the hinge.
+            foreach (var obj in set.ToList())
+                if (obj.TryGetComponent(out HingePart hingePart) && hingePart.Leaf != null) {
+                    foreach (var next in GroupManager.Neighbours(hingePart.Leaf.gameObject))
+                        if (set.Contains(next) && next != obj) Union(obj, next);
+                }
+                else if (obj.TryGetComponent(out UniversalJoint uj) && uj.Yoke != null) {
+                    foreach (var next in GroupManager.Neighbours(uj.Yoke.gameObject))
+                        if (set.Contains(next) && next != obj) Union(obj, next);
+                }
+            // V2: a slide truck is held by the slide member it's in.
+            foreach (var obj in set.ToList())
+                if (obj.TryGetComponent(out SlideTruck truck) && truck.Member != null && set.Contains(truck.Member)) Union(obj, truck.Member);
+            foreach (var obj in set.ToList())
+                if (obj.TryGetComponent(out PneumaticCylinder cylinder) && cylinder.Thread != null) {
+                    foreach (var next in GroupManager.Neighbours(cylinder.Thread.gameObject))
+                        if (set.Contains(next) && next != obj) Union(obj, next);
+                }
             // A child of something moved (a cylinder's rod thread) goes with it.
             foreach (var obj in set)
                 for (var t = obj.transform.parent; t != null; t = t.parent)

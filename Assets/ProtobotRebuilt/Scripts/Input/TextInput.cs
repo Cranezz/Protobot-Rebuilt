@@ -19,7 +19,7 @@ namespace Protobot.InputEvents {
         }
 
         /// <summary>A window or full-screen editor of the new interface is open: the 3D view's shortcuts wait.</summary>
-        public static bool ShortcutsPaused => Interface.Dialog.OpenCount > 0 || Polycarb.SheetEditor.IsOpen;
+        public static bool ShortcutsPaused => Interface.Dialog.OpenCount > 0 || Polycarb.SheetEditor.IsOpen || Online.OnlineWindow.IsOpen;   // V2: and the Multiplayer screen
 
         public static bool IsTyping {
             get {

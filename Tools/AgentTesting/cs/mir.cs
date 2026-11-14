@@ -1,0 +1,16 @@
+var pt = System.Type.GetType("Protobot.Editor.Playtest, Protobot.Editor");
+var pl = Protobot.Placement.Instance; pl.rotating = false;
+pt.GetMethod("Frames").Invoke(null, new object[] { 2 });
+var before = Protobot.PartsManager.FindLoadedObjects().Count;
+Protobot.Tools.MirrorTool.Open();
+pt.GetMethod("Frames").Invoke(null, new object[] { 1 });
+var t = typeof(Protobot.Tools.MirrorTool); var bf = System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static;
+var sb = new System.Text.StringBuilder("before " + before + " what " + t.GetField("what", bf).GetValue(null) + " plane at " + ((Vector3)t.GetMethod("PlanePoint", bf).Invoke(null, null)).ToString("F2"));
+Protobot.PivotCamera.Main.SetTransform(new Vector3(-4f, 3.5f, 6.3f), new Vector3(40f, 20f, 0f), -26f);
+pt.GetMethod("Frames").Invoke(null, new object[] { 2 });
+pt.GetMethod("Screenshot").Invoke(null, new object[] { "mirror_dialog" });
+pt.GetMethod("Frames").Invoke(null, new object[] { 1 });
+t.GetMethod("Apply", bf).Invoke(null, null);
+var msgs = ""; foreach (var tx in UnityEngine.Object.FindObjectsByType<TMPro.TMP_Text>(FindObjectsSortMode.None)) if (tx.text.StartsWith("Mirrored") || tx.text.StartsWith("Every") || tx.text.StartsWith("Nothing")) msgs += tx.text;
+sb.Append(" after " + Protobot.PartsManager.FindLoadedObjects().Count + " msg: " + msgs);
+return sb.ToString();

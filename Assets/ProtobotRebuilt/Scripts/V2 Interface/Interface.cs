@@ -1,4 +1,4 @@
-using Protobot.UI;
+﻿using Protobot.UI;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -67,6 +67,7 @@ namespace Protobot.Interface {
             ToolOptions.Create(Root);
             PartsBrowser.Create(Root);
             Tooltip.Create(Root);
+            KeyHint.Create(Root);   // V2: "E  Place tubing" by the mouse
             PartMenu.Create(Root);
             Builds.AutoSave.Create(Root);
             CameraButtons.Apply();
@@ -74,10 +75,21 @@ namespace Protobot.Interface {
             gameObject.AddComponent<Tools.PaintTool>();
         }
 
-        /// <summary>The original's feedback line at the top: success (green tick) or alert.</summary>
+        /// <summary>The original's feedback line at the top: success (green tick) or alert. V2: successes are only
+        /// shown through <see cref="Announce"/> (the user wants few notifications); alerts always are.</summary>
         public static void Say(string message, bool success = true) {
+            Builds.ActionLog.Write("say", (success ? "" : "(problem) ") + message);   // V2: in the action log, shown or not
             if (Instance != null && Instance.feedback != null)
                 Instance.feedback.Show(message, success ? FeedbackDisplay.DisplayType.success : FeedbackDisplay.DisplayType.alert);
+        }
+
+        /// <summary>V2: a success worth a notification: a file saved, exported or opened, a game's score.</summary>
+        public static void Announce(string message) {
+            Builds.ActionLog.Write("say", message);
+            if (Instance == null || Instance.feedback == null) return;
+            FeedbackDisplay.important = true;
+            try { Instance.feedback.Show(message, FeedbackDisplay.DisplayType.success); }
+            finally { FeedbackDisplay.important = false; }
         }
     }
 }

@@ -49,7 +49,7 @@ namespace Protobot.Interface {
             var bottomLeft = Layout.FromScreen(corners[0]);
             var panel = Ui.Panel(go.transform, "Panel", Theme.PanelRaised, 6f).rectTransform;
             panel.Place(Vector2.zero, new Vector2(0f, 1f), bottomLeft + new Vector2(0f, -4f),
-                new Vector2(Mathf.Max(anchor.rect.width, 120f), height));
+                new Vector2(Mathf.Max(anchor.rect.width, 150f), height));   // V2: wide enough for "Green · 200 rpm"
             open.list = panel;
 
             var viewport = Ui.Rect("Viewport", panel).Fill(4, 4, 4, 4);
