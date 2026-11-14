@@ -1,0 +1,11 @@
+var go = UnityEngine.Resources.Load<UnityEngine.GameObject>("Part Prefabs/VEX/Hardware");
+var c = go.transform.Find("2.00\" Shoulder Screw (0.04\" shoulder)");
+var sb = new System.Text.StringBuilder(c.name + ": ");
+foreach (var comp in c.GetComponents<UnityEngine.Component>()) sb.Append(comp.GetType().Name + " ");
+var pd = c.GetComponent<Protobot.PartData>();
+sb.Append("| p1 '" + pd.param1Value + "' p2 '" + pd.param2Value + "' children " + c.childCount);
+var pn = c.GetComponent<Parts_List.PartName>(); if (pn != null) sb.Append(" | name '" + pn.name + "' g " + pn.weightInGrams);
+var mf = c.GetComponent<UnityEngine.MeshFilter>(); sb.Append(" | mesh " + UnityEditor.AssetDatabase.GetAssetPath(mf.sharedMesh) + " :: " + mf.sharedMesh.name);
+var v = mf.sharedMesh.vertices; var zs = new System.Collections.Generic.SortedSet<float>(); foreach (var p in v) zs.Add((float)System.Math.Round(p.z, 3));
+sb.Append(" | z levels " + string.Join(",", zs));
+return sb.ToString();

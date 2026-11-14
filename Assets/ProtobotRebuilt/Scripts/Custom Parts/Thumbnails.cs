@@ -31,8 +31,9 @@ namespace Protobot.Custom {
                 foreach (var data in type.GetComponentsInChildren<PartData>(true)) {
                     if (data.param1Value != p1 || !data.TryGetComponent(out MeshFilter filter) || filter.sharedMesh == null) continue;
                     var materials = data.TryGetComponent(out MeshRenderer source) ? source.sharedMaterials : null;
-                    materials = Motion.PartColors.For(typeId + "-" + p1, materials) ?? materials;   // V2
-                    texture = Render(filter.sharedMesh, materials, p1, false);
+                    var (mesh, shownMaterials) = ChildPartGenerator.ShoulderShown(data.name, filter.sharedMesh, materials);   // V2: colored heads
+                    materials = Motion.PartColors.For(typeId + "-" + p1, shownMaterials) ?? shownMaterials;   // V2
+                    texture = Render(mesh, materials, p1, false);
                     break;
                 }
             }
@@ -87,8 +88,8 @@ namespace Protobot.Custom {
                     if (data.param1Value != p1 || !data.TryGetComponent(out MeshFilter filter) || filter.sharedMesh == null) continue;
                     var go = new GameObject("Thumbnail Part") { layer = Layer };
                     go.transform.position = new Vector3(0f, -6000f, 0f);
-                    go.AddComponent<MeshFilter>().sharedMesh = filter.sharedMesh;
-                    var shown = data.GetComponent<MeshRenderer>().sharedMaterials;
+                    var (mesh, shown) = ChildPartGenerator.ShoulderShown(data.name, filter.sharedMesh, data.GetComponent<MeshRenderer>().sharedMaterials);   // V2
+                    go.AddComponent<MeshFilter>().sharedMesh = mesh;
                     go.AddComponent<MeshRenderer>().sharedMaterials = Motion.PartColors.For(typeId + "-" + p1, shown) ?? shown;
                     return go;
                 }

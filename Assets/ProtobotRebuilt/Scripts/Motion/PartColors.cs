@@ -28,11 +28,33 @@ namespace Protobot.Motion {
                 var m = Tinted("Spacer Gray", current[0], new Color(0.30f, 0.30f, 0.31f), 0.25f);
                 return Enumerable.Repeat(m, current.Length).ToArray();
             }
+            // V2: RoboSource's color-coded shoulder screws: steel, the head colored by length (their store's code).
+            if (id.StartsWith("VXHARDWARE") && name.Contains("Shoulder Screw") && current.Length >= 2 && ShoulderHead(name) is (string label, Color head)) {
+                var steel = Like("SCRW", null, 1);
+                if (steel == null) return null;
+                var result = Enumerable.Repeat(steel[0], current.Length).ToArray();
+                result[current.Length - 1] = Tinted("Shoulder Head " + label, steel[0], head, 0.45f);
+                return result;
+            }
             if (id.StartsWith("VXHARDWARE") && (name.Contains("Coupler") || name.Contains("Shoulder Screw")))
                 return Like("SCRW", null, current.Length);
             if (id.StartsWith("VXSLIDEASSEMBLYP") && name.Contains("Slide Member"))
                 return Like("SCRW", null, current.Length);
             if (id.StartsWith("VXPNEUMATICS")) return Pneumatic(name, current);
+            return null;
+        }
+
+        /// <summary>V2: RoboSource's head color for a shoulder screw's length (robosource.net, color coded shoulder
+        /// screws): 0.290" yellow, 0.375" orange, 0.500" red, 1.00" dark blue, 1.50" purple, 2.00" black, 2.50" brown.</summary>
+        public static (string, Color)? ShoulderHead(string name) {
+            if (name == null) return null;
+            if (name.StartsWith("0.29")) return ("Yellow", new Color(0.50f, 0.40f, 0.04f));
+            if (name.StartsWith("3/8")) return ("Orange", new Color(0.50f, 0.20f, 0.02f));
+            if (name.StartsWith("1/2")) return ("Red", new Color(0.42f, 0.04f, 0.04f));
+            if (name.StartsWith("1.00")) return ("Dark Blue", new Color(0.04f, 0.09f, 0.32f));
+            if (name.StartsWith("1.50")) return ("Purple", new Color(0.22f, 0.07f, 0.34f));
+            if (name.StartsWith("2.00")) return ("Black", new Color(0.04f, 0.04f, 0.045f));
+            if (name.StartsWith("2.50")) return ("Brown", new Color(0.26f, 0.14f, 0.06f));
             return null;
         }
 

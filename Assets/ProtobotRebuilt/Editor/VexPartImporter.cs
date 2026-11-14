@@ -253,6 +253,7 @@ public static class VexPartImporter {
 
             var prefabPath = PrefabFolder + Regex.Replace(family.name, @"[\\/:*?""<>|]", "") + ".prefab";
             PrefabUtility.SaveAsPrefabAsset(root, prefabPath);
+            Protobot.EditorTools.ShoulderScrewBuilder.Add(prefabPath);   // V2: RoboSource's 2.50" (no VEX-CAD model)
             return meshes.Count;
         }
         finally {

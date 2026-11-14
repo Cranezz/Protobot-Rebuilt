@@ -34,6 +34,10 @@ namespace Protobot {
                 newObj.tag = "Screw";
                 newObj.AddComponent<Screw>();
             }
+            // V2: a shoulder screw's head is its own material (RoboSource colors it by length: PartColors).
+            if (IsShoulderScrew(child.name) && newObj.TryGetComponent(out MeshRenderer headRenderer) && newObj.TryGetComponent(out MeshFilter headFilter)
+                && headFilter.sharedMesh != null && headFilter.sharedMesh.subMeshCount == 2 && headRenderer.sharedMaterials.Length == 1)
+                headRenderer.sharedMaterials = new[] { headRenderer.sharedMaterial, headRenderer.sharedMaterial };
             if ((IsShoulderScrew(child.name) || stud) && newObj.GetComponent<Screw>() == null) {
                 var mesh = newObj.GetComponent<MeshFilter>().sharedMesh;
                 if (stud) Screw.Studs.Add(mesh);
@@ -143,6 +147,21 @@ namespace Protobot {
             for (int i = 0; i < normals.Length; i++) normals[i] = turn * normals[i];
             copy.vertices = vertices;
             copy.normals = normals;
+            if (shoulder && copy.subMeshCount == 1) {
+                // V2: the head (above its underside, now z = 0) as a second sub-mesh, so it can be colored.
+                var triangles = copy.triangles;
+                var shank = new List<int>();
+                var head = new List<int>();
+                for (var t = 0; t + 2 < triangles.Length; t += 3) {
+                    var z = (vertices[triangles[t]].z + vertices[triangles[t + 1]].z + vertices[triangles[t + 2]].z) / 3f;
+                    (z > -0.0005f ? head : shank).AddRange(new[] { triangles[t], triangles[t + 1], triangles[t + 2] });
+                }
+                if (head.Count > 0 && shank.Count > 0) {
+                    copy.subMeshCount = 2;
+                    copy.SetTriangles(shank, 0);
+                    copy.SetTriangles(head, 1);
+                }
+            }
             copy.RecalculateTangents();
             copy.RecalculateBounds();
             fixedCopies[mesh] = copy;
@@ -152,6 +171,14 @@ namespace Protobot {
                 fittingDiameters[copy] = threadRadius * 2f;
             }
             return copy;
+        }
+
+        /// <summary>V2: a shoulder screw's model as parts use it (its head a second sub-mesh: the parts list's
+        /// pictures show the head's color too), with the materials it needs; anything else as it is.</summary>
+        public static (Mesh, Material[]) ShoulderShown(string name, Mesh mesh, Material[] materials) {
+            if (!IsShoulderScrew(name) || !(Fixed(name, mesh) is Mesh shown)) return (mesh, materials);
+            if (shown.subMeshCount == 2 && materials != null && materials.Length == 1) materials = new[] { materials[0], materials[0] };
+            return (shown, materials);
         }
 
         private GameObject GetChildObj() {
