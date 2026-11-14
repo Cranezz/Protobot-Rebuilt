@@ -60,11 +60,11 @@ public class ShaftPartGenerator : PartGenerator {
             temp = hsShaftInch;
         }
 
+        // V2: the copy is stretched, not the template (the template is a prefab: the editor saved its stretch).
+        GameObject newObj = Instantiate(temp, position, rotation);
         Vector3 scale = temp.transform.localScale;
         scale.z = float.Parse(param2.value);
-        temp.transform.localScale = scale;
-
-        GameObject newObj = Instantiate(temp, position, rotation);
+        newObj.transform.localScale = scale;
         string shaftType;
         var partList = newObj.AddComponent<PartName>();
 

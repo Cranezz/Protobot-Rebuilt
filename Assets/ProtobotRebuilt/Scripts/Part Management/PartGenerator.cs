@@ -9,7 +9,9 @@ namespace Protobot {
     [Serializable]
     public class Parameter {
         public string name;
-        public string value;
+        // V2: not saved: parts are made from the prefabs themselves, so the size asked for last was written into the
+        // prefab and the editor saved it (the 12" shaft template became 6"). InitParamValues sets it at every start.
+        [System.NonSerialized] public string value;
         
         [Header("Custom")]
         public bool custom;
