@@ -1,0 +1,11 @@
+var root = Protobot.Motion.Sandbox.Instance.Root;
+UnityEngine.Rigidbody arm = null;
+foreach (var rb in root.GetComponentsInChildren<UnityEngine.Rigidbody>()) if (rb.name == "Bogie Rocker") arm = rb;
+var j = arm.GetComponent<UnityEngine.ConfigurableJoint>();
+var frame = j.connectedBody;
+frame.isKinematic = true;
+var axis = arm.transform.TransformDirection(j.axis);
+var sign = System.AppDomain.CurrentDomain.GetData("twist") == null ? 1f : -1f;
+System.AppDomain.CurrentDomain.SetData("twist", "done");
+arm.AddTorque(axis * 2f * sign, UnityEngine.ForceMode.Impulse);
+return "twisted " + sign;

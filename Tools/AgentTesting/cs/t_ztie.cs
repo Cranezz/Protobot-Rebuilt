@@ -1,0 +1,14 @@
+Protobot.PartsManager.DestroyLoadedObjects();
+var ch = Protobot.PartsManager.GeneratePart("CCHL-1x2-10", new UnityEngine.Vector3(0f, 1f, 0f), UnityEngine.Quaternion.identity);
+var b = ch.GetComponent<UnityEngine.Renderer>().bounds;
+var tube = Protobot.PartsManager.GeneratePart("PTUB-4mm", new UnityEngine.Vector3(b.min.x, b.max.y + 0.1f, b.center.z), UnityEngine.Quaternion.identity);
+var y = b.max.y + 0.08f;
+System.Func<float, string> F = v => v.ToString("0.####", System.Globalization.CultureInfo.InvariantCulture);
+var o = tube.transform.position;
+var p0 = new UnityEngine.Vector3(b.min.x - 1f, y, b.center.z) - o;
+var p1 = new UnityEngine.Vector3(b.center.x, y, b.center.z) - o;
+var p2 = new UnityEngine.Vector3(b.max.x + 1f, y + 1f, b.center.z) - o;
+var token = F(p0.x)+","+F(p0.y)+","+F(p0.z)+",0,0,0,0,0/" + F(p1.x)+","+F(p1.y)+","+F(p1.z)+",0,0,0,0,0,1/" + F(p2.x)+","+F(p2.y)+","+F(p2.z)+",0,0,0,0,0";
+Protobot.Motion.Dynamics.SetToken(tube, "tube", token);
+Protobot.PivotCamera.Main.SetTransform(new UnityEngine.Vector3(b.center.x, y, b.center.z), new UnityEngine.Vector3(25f, 30f, 0f), -3.5f);
+return "made; channel bounds " + b.size.ToString("F2") + " parts on tie node: " ;

@@ -588,6 +588,111 @@ namespace Protobot.Motion {
             public Mesh frameHull;   // only the bracket's (and pins') points, for its collision shape
             public int wheelSub;
             public readonly List<(Mesh mesh, Vector3 axis)> wheels = new();
+            // V2: the Double's rocker: the arm its two wheels turn on, pivoting on the middle pin.
+            public Mesh rocker;
+            public int rockerSub;
+            public Vector3 pivot, pivotAxis;   // model space
+        }
+
+        // V2: groups of triangles joined by shared corners (corners at the same place count as one).
+        private static List<List<int>> Pieces(Vector3[] vertices, int[] triangles) {
+            var weld = new Dictionary<Vector3Int, int>();
+            var point = new int[vertices.Length];
+            for (var i = 0; i < vertices.Length; i++) {
+                var k = Vector3Int.RoundToInt(vertices[i] * 2000f);
+                if (!weld.TryGetValue(k, out var w)) weld[k] = w = weld.Count;
+                point[i] = w;
+            }
+            var parent = new int[weld.Count];
+            for (var i = 0; i < parent.Length; i++) parent[i] = i;
+            int Find(int x) {
+                while (parent[x] != x) x = parent[x] = parent[parent[x]];
+                return x;
+            }
+            for (var i = 0; i + 2 < triangles.Length; i += 3) {
+                var a = Find(point[triangles[i]]);
+                parent[Find(point[triangles[i + 1]])] = a;
+                parent[Find(point[triangles[i + 2]])] = a;
+            }
+            var pieces = new Dictionary<int, List<int>>();
+            for (var i = 0; i + 2 < triangles.Length; i += 3) {
+                var r = Find(point[triangles[i]]);
+                if (!pieces.TryGetValue(r, out var list)) pieces[r] = list = new List<int>();
+                list.Add(triangles[i]);
+                list.Add(triangles[i + 1]);
+                list.Add(triangles[i + 2]);
+            }
+            return pieces.Values.ToList();
+        }
+
+        private static Bounds BoundsOf(Vector3[] vertices, List<int> triangles) {
+            var b = new Bounds(vertices[triangles[0]], Vector3.zero);
+            foreach (var i in triangles) b.Encapsulate(vertices[i]);
+            return b;
+        }
+
+        private static int AxisIndex(Vector3 axis) => Mathf.Abs(axis.x) > 0.5f ? 0 : Mathf.Abs(axis.y) > 0.5f ? 1 : 2;
+
+        // V2: a bogie whose wheels sit on an arm that pivots on a middle pin (the Double): that arm is the plastic piece
+        // nearest the wheels' middle (with another plastic piece, the bracket, besides it), the pin the steel piece
+        // longest along their axle.
+        private static void FindRocker(Mesh mesh, Vector3[] vertices, BogieShape shape, List<int> rest) {
+            if (shape.wheels.Count < 2) return;
+            var axis = shape.wheels[0].axis;
+            var middle = shape.wheels.Aggregate(Vector3.zero, (a, w) => a + w.mesh.bounds.center) / shape.wheels.Count;
+            var found = false;
+            var bestSub = 0;
+            List<int> bestTris = null;
+            var bestDistance = float.MaxValue;
+            var plastic = 0;
+            for (var sub = 0; sub < mesh.subMeshCount; sub++) {
+                if (sub == shape.wheelSub) continue;
+                foreach (var piece in Pieces(vertices, mesh.GetTriangles(sub))) {
+                    if (piece.Count < 180) continue;
+                    var b = BoundsOf(vertices, piece);
+                    if (b.size[AxisIndex(axis)] < 0.3f || Vector3.ProjectOnPlane(b.size, axis).magnitude < 0.5f) continue;   // (washers, pins)
+                    plastic++;
+                    var d = Vector3.ProjectOnPlane(b.center - middle, axis).magnitude;
+                    if (d < bestDistance) {
+                        found = true;
+                        bestDistance = d;
+                        bestSub = sub;
+                        bestTris = piece;
+                    }
+                }
+            }
+            if (!found || plastic < 2) return;   // one piece: the wheels turn on the bracket itself
+            var pinFound = false;
+            var pinCenter = Vector3.zero;
+            var pinLength = 0f;
+            for (var sub = 0; sub < mesh.subMeshCount; sub++)
+                foreach (var piece in Pieces(vertices, mesh.GetTriangles(sub))) {
+                    var b = BoundsOf(vertices, piece);
+                    var along = b.size[AxisIndex(axis)];
+                    var across = Vector3.ProjectOnPlane(b.size, axis).magnitude;
+                    if (along > 0.3f && across < 0.3f && along > pinLength) {
+                        pinFound = true;
+                        pinCenter = b.center;
+                        pinLength = along;
+                    }
+                }
+            if (!pinFound) return;
+            shape.rocker = Piece(vertices, bestTris, mesh.name + " (bogie rocker)", mesh);
+            shape.rockerSub = bestSub;
+            shape.pivot = pinCenter;
+            shape.pivotAxis = axis;
+            // The bracket without the arm.
+            var arm = new HashSet<(int, int, int)>();
+            for (var i = 0; i + 2 < bestTris.Count; i += 3) arm.Add((bestTris[i], bestTris[i + 1], bestTris[i + 2]));
+            var keep = new List<int>();
+            var subTris = mesh.GetTriangles(bestSub);
+            for (var i = 0; i + 2 < subTris.Length; i += 3)
+                if (!arm.Contains((subTris[i], subTris[i + 1], subTris[i + 2]))) keep.AddRange(new[] { subTris[i], subTris[i + 1], subTris[i + 2] });
+            shape.frame.SetTriangles(keep, bestSub);
+            var restKeep = new List<int>();
+            for (var i = 0; i + 2 < rest.Count; i += 3)
+                if (!arm.Contains((rest[i], rest[i + 1], rest[i + 2]))) restKeep.AddRange(new[] { rest[i], rest[i + 1], rest[i + 2] });
+            shape.frameHull = Piece(vertices, restKeep, mesh.name + " (bogie bracket)");
         }
 
         private static readonly Dictionary<Mesh, BogieShape> BogieShapes = new();
@@ -657,6 +762,7 @@ namespace Protobot.Motion {
                 }
                 foreach (var group in groups.Values) shape.wheels.Add((Piece(vertices, group.triangles, mesh.name + " (bogie wheel)", mesh), group.axis));
                 if (shape.wheels.Count == 0) shape = null;
+                else FindRocker(mesh, vertices, shape, rest);   // V2
             }
             BogieShapes[mesh] = shape;
             return shape;
@@ -697,6 +803,49 @@ namespace Protobot.Motion {
                 // The wheels' color as the part shows it now (painted or not).
                 var own = node.GetComponent<MeshRenderer>().sharedMaterials;
                 var material = shape.wheelSub < own.Length ? own[shape.wheelSub] : null;
+                var holder = frame;
+                var holderColliders = new List<Collider>(frame.GetComponentsInChildren<Collider>());
+                if (shape.rocker != null) {
+                    // V2: the Double's arm, a body pivoting on its middle pin (about 25° each way before the bracket
+                    // stops it); the wheels turn on it, so the bogie keeps both wheels on uneven ground.
+                    var arm = new GameObject("Bogie Rocker") { layer = Layer };
+                    arm.transform.SetParent(root, false);
+                    arm.transform.SetPositionAndRotation(node.transform.position, node.transform.rotation);
+                    var armView = new GameObject("Rocker");
+                    armView.transform.SetParent(arm.transform, false);
+                    armView.transform.localScale = node.transform.lossyScale;
+                    armView.AddComponent<MeshFilter>().sharedMesh = shape.rocker;
+                    armView.AddComponent<MeshRenderer>().sharedMaterial = shape.rockerSub < own.Length ? own[shape.rockerSub] : null;
+                    var armShape = new GameObject("Collider") { layer = Layer };
+                    armShape.transform.SetParent(arm.transform, false);
+                    armShape.transform.localScale = node.transform.lossyScale;
+                    var armCollider = armShape.AddComponent<MeshCollider>();
+                    armCollider.sharedMesh = Hull(shape.rocker, null);
+                    armCollider.convex = true;
+                    armCollider.contactOffset = 0.02f;
+                    armCollider.sharedMaterial = Material(0.35f);
+                    foreach (var other in holderColliders) Physics.IgnoreCollision(armCollider, other, true);
+                    var armBody = arm.AddComponent<Rigidbody>();
+                    armBody.mass = 0.02f;
+                    armBody.angularDamping = 0.5f;
+                    armBody.solverIterations = 20;
+                    armBody.interpolation = RigidbodyInterpolation.Interpolate;
+                    var pivot = arm.AddComponent<ConfigurableJoint>();
+                    pivot.connectedBody = frame;
+                    pivot.autoConfigureConnectedAnchor = true;
+                    pivot.anchor = Vector3.Scale(shape.pivot, node.transform.lossyScale);
+                    pivot.axis = shape.pivotAxis;
+                    pivot.secondaryAxis = Perpendicular(shape.pivotAxis);
+                    pivot.xMotion = pivot.yMotion = pivot.zMotion = ConfigurableJointMotion.Locked;
+                    pivot.angularXMotion = ConfigurableJointMotion.Limited;
+                    pivot.lowAngularXLimit = new SoftJointLimit { limit = -25f };
+                    pivot.highAngularXLimit = new SoftJointLimit { limit = 25f };
+                    pivot.angularYMotion = pivot.angularZMotion = ConfigurableJointMotion.Locked;
+                    pivot.enableCollision = false;
+                    pivot.enablePreprocessing = false;
+                    holder = armBody;
+                    holderColliders.Add(armCollider);
+                }
                 foreach (var (mesh, axis) in shape.wheels) {
                     var go = new GameObject("Bogie Wheel") { layer = Layer };
                     go.transform.SetParent(root, false);
@@ -714,7 +863,7 @@ namespace Protobot.Motion {
                     collider.convex = true;
                     collider.contactOffset = 0.02f;
                     collider.sharedMaterial = Material(0.8f);
-                    foreach (var other in frame.GetComponentsInChildren<Collider>()) Physics.IgnoreCollision(collider, other, true);
+                    foreach (var other in holderColliders) Physics.IgnoreCollision(collider, other, true);
                     var rb = go.AddComponent<Rigidbody>();
                     rb.mass = 0.012f;   // the two plastic halves, about 12 g
                     rb.angularDamping = 0.5f;   // plastic on a steel pin
@@ -722,7 +871,7 @@ namespace Protobot.Motion {
                     rb.solverIterations = 20;
                     rb.interpolation = RigidbodyInterpolation.Interpolate;
                     var joint = go.AddComponent<ConfigurableJoint>();
-                    joint.connectedBody = frame;
+                    joint.connectedBody = holder;   // V2: the bracket, or the Double's rocker
                     joint.autoConfigureConnectedAnchor = true;
                     joint.anchor = Vector3.Scale(mesh.bounds.center, node.transform.lossyScale);
                     joint.axis = axis;
@@ -732,7 +881,7 @@ namespace Protobot.Motion {
                     joint.angularYMotion = joint.angularZMotion = ConfigurableJointMotion.Locked;
                     joint.enableCollision = false;
                     joint.enablePreprocessing = false;
-                    bogieWheels.Add((rb, frame, joint, axis));
+                    bogieWheels.Add((rb, holder, joint, axis));
                 }
             }
         }

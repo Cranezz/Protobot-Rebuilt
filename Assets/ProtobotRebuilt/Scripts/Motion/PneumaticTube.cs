@@ -16,6 +16,7 @@ namespace Protobot.Motion {
         public Vector3 dirLocal;    // port: out of it; hole: its axis
         public int kind;
         public float depth;         // the port's or hole's depth
+        public bool tie;            // V2: a zip tie holds it to the part there (saved as a ninth field "1")
 
         public Vector3 Position(Transform tube) => part != null ? part.transform.TransformPoint(local) : tube.TransformPoint(local);
         public Vector3 Direction(Transform tube) => dirLocal.sqrMagnitude < 1e-8f ? Vector3.zero
@@ -172,7 +173,7 @@ namespace Protobot.Motion {
 
         public string Token() {
             var origin = transform.position;
-            return string.Join("/", nodes.Select(n => V(n.Position(transform) - origin) + "," + V(n.Direction(transform)) + "," + n.kind + "," + F(n.depth)));
+            return string.Join("/", nodes.Select(n => V(n.Position(transform) - origin) + "," + V(n.Direction(transform)) + "," + n.kind + "," + F(n.depth) + (n.tie ? ",1" : "")));
         }
 
         public void Save() {
@@ -212,7 +213,9 @@ namespace Protobot.Motion {
                 if (f.Length < 8 || !Parse(f, 0, out var p) || !Parse(f, 3, out var d)) continue;
                 int.TryParse(f[6], out var kind);
                 float.TryParse(f[7], NumberStyles.Float, CultureInfo.InvariantCulture, out var depth);
-                nodes.Add(Attach(transform, origin + p, d, kind, depth, nodes.Count > 0 ? nodes[^1].part : null));
+                var node = Attach(transform, origin + p, d, kind, depth, nodes.Count > 0 ? nodes[^1].part : null);
+                node.tie = f.Length >= 9 && f[8] == "1";   // V2
+                nodes.Add(node);
             }
         }
 
@@ -260,8 +263,11 @@ namespace Protobot.Motion {
             if (seenVersion != Dynamics.Version) {
                 seenVersion = Dynamics.Version;
                 for (var i = 0; i < nodes.Count; i++)
-                    if (nodes[i].part != null && nodes[i].part.IsDeleted())
+                    if (nodes[i].part != null && nodes[i].part.IsDeleted()) {
+                        var tie = nodes[i].tie;
                         nodes[i] = Attach(transform, nodes[i].Position(transform), nodes[i].Direction(transform), nodes[i].kind, nodes[i].depth, null);
+                        nodes[i].tie = tie;
+                    }
             }
             Refresh(false);
         }
@@ -269,7 +275,7 @@ namespace Protobot.Motion {
         public void Refresh(bool force) {
             if (nodes.Count == 0) return;
             var route = nodes.Select(World).ToList();
-            var key = bendRadius.ToString("F3") + "|" + string.Join(";", route.Select(r => r.p.ToString("F4") + r.d.ToString("F3")));
+            var key = bendRadius.ToString("F3") + "|" + string.Join(";", route.Select(r => r.p.ToString("F4") + r.d.ToString("F3"))) + "|" + string.Join("", nodes.Select(n => n.tie ? "1" : "0"));
             if (!force && key == shownKey) return;
             shownKey = key;
             // Moved with the build (not the simulation): its own place follows its first point.
@@ -313,6 +319,7 @@ namespace Protobot.Motion {
             var normals = new List<Vector3>();
             var triangles = new List<int>();
             Strands.Tube(local, false, Radius, 10, vertices, normals, triangles);
+            Ties(origin, vertices, normals, triangles);   // V2
             mesh.indexFormat = vertices.Count > 65000 ? UnityEngine.Rendering.IndexFormat.UInt32 : UnityEngine.Rendering.IndexFormat.UInt16;
             mesh.SetVertices(vertices);
             mesh.SetNormals(normals);
@@ -329,6 +336,69 @@ namespace Protobot.Motion {
             hitMesh.RecalculateBounds();
             hit.sharedMesh = null;
             hit.sharedMesh = hitMesh;
+        }
+
+        // ------------------------------------------------------------------ zip ties (V2)
+
+        /// <summary>A zip tie at each tied point: a thin band looped round the tube and the part beside it (from the
+        /// tube's middle toward the part's, through the part's surface), with its little square head.</summary>
+        private void Ties(Vector3 origin, List<Vector3> vertices, List<Vector3> normals, List<int> triangles) {
+            const float Band = 0.022f;
+            for (var i = 0; i < nodes.Count; i++) {
+                var node = nodes[i];
+                if (!node.tie || node.part == null || Line.Count < 2) continue;
+                var at = World(node).p;
+                var nearest = 0;
+                for (var k = 1; k < Line.Count; k++)
+                    if ((Line[k] - at).sqrMagnitude < (Line[nearest] - at).sqrMagnitude) nearest = k;
+                var c = Line[nearest];
+                var tangent = (Line[Mathf.Min(nearest + 1, Line.Count - 1)] - Line[Mathf.Max(nearest - 1, 0)]).normalized;
+                if (tangent.sqrMagnitude < 0.5f) continue;
+                // Toward the part: its middle, or (an edge point) into the corner it goes round.
+                var partCenter = node.part.TryGetComponent(out Renderer r) ? r.bounds.center : node.part.transform.position;
+                if (Sandbox.Running) partCenter = Sandbox.SimPoint(node.part, partCenter);
+                var toward = Vector3.ProjectOnPlane(node.kind == TubeNode.Edge ? at - c : partCenter - c, tangent);
+                if (toward.sqrMagnitude < 1e-6f) toward = Vector3.ProjectOnPlane(Vector3.down, tangent);
+                toward.Normalize();
+                var side = Vector3.Cross(tangent, toward);
+                var reach = Radius + 0.14f;   // round the tube and about an eighth of an inch of the part (a bar or a hole's edge)
+                var a = c + toward * reach;
+                var loop = new List<Vector3>();
+                const int Half = 10;
+                var r0 = Radius + Band;
+                for (var k = 0; k <= Half; k++) {   // round the tube, away from the part
+                    var t = Mathf.PI / 2f + Mathf.PI * k / Half;
+                    loop.Add(c - origin - (side * Mathf.Cos(t) + toward * Mathf.Sin(t)) * r0);
+                }
+                for (var k = 0; k <= Half; k++) {   // round the far side, in the part
+                    var t = -Mathf.PI / 2f + Mathf.PI * k / Half;
+                    loop.Add(a - origin - (side * Mathf.Cos(t) + toward * Mathf.Sin(t)) * (Band * 2f));
+                }
+                Strands.Tube(loop, true, Band, 6, vertices, normals, triangles);
+                // The head: a small block on the band beside the tube.
+                var head = c - origin + side * (r0 + Band) + toward * 0.03f;
+                var box = new List<Vector3> { head - tangent * 0.045f, head + tangent * 0.045f };
+                Strands.Tube(box, false, 0.04f, 4, vertices, normals, triangles, toward);
+            }
+        }
+
+        /// <summary>V2: the zip ties added to a mesh another way (a cable's: onto its cable sub-mesh, 0).</summary>
+        protected void AppendTies(Mesh target, Vector3 origin) {
+            if (!nodes.Any(n => n.tie)) return;
+            var vertices = new List<Vector3>();
+            var normals = new List<Vector3>();
+            target.GetVertices(vertices);
+            target.GetNormals(normals);
+            var subs = new List<int[]>();
+            for (var i = 0; i < target.subMeshCount; i++) subs.Add(target.GetTriangles(i));
+            var first = new List<int>(subs[0]);
+            Ties(origin, vertices, normals, first);
+            target.indexFormat = vertices.Count > 65000 ? UnityEngine.Rendering.IndexFormat.UInt32 : UnityEngine.Rendering.IndexFormat.UInt16;
+            target.SetVertices(vertices);
+            target.SetNormals(normals);
+            target.SetTriangles(first, 0);
+            for (var i = 1; i < subs.Count; i++) target.SetTriangles(subs[i], i);
+            target.RecalculateBounds();
         }
 
         // ------------------------------------------------------------------ how smoothly it bends

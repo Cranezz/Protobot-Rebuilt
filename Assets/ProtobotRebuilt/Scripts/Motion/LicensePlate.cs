@@ -1,4 +1,5 @@
 ﻿using Protobot.Interface;
+using Protobot.StateSystems;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -123,6 +124,21 @@ namespace Protobot.Motion {
             return text;
         }
 
+        /// <summary>V2: a plate's saved state (its text, size and font tokens), for undo.</summary>
+        private class PlateElement : IElement {
+            private readonly GameObject part;
+            public readonly string State;
+
+            public PlateElement(GameObject part) {
+                this.part = part;
+                State = part != null && part.TryGetComponent(out SavedObject saved) ? saved.state : null;
+            }
+
+            public void Load() {
+                if (part != null && part.TryGetComponent(out SavedObject saved)) saved.state = State;   // (LateUpdate redraws it)
+            }
+        }
+
         // ------------------------------------------------------------------ the window (right-click > Team number…)
 
         public static void Edit(GameObject part) {
@@ -157,6 +173,14 @@ namespace Protobot.Motion {
                 ToolOptions.Segmented(fontRow, FontNames, font, i => { font = i; Apply(); FontButtons(); });
             }
             FontButtons();
+            // V2: the window's changes are one undo step (the plate's saved state before and after).
+            var before = new PlateElement(part);
+            dialog.OnClose = () => {
+                var after = new PlateElement(part);
+                if (after.State == before.State) return;
+                StateSystem.AddElement(before);
+                StateSystem.AddState(after);
+            };
             var done = Ui.Button(dialog.Footer, "Done", "Done", () => {
                 Interface.Interface.Say(plate.Text.Length > 0 ? "License plate: " + plate.Text : "License plate left blank");
                 dialog.Close();

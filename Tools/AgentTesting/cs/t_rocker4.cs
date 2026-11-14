@@ -1,0 +1,10 @@
+var root = Protobot.Motion.Sandbox.Instance.Root;
+UnityEngine.Rigidbody arm = null;
+foreach (var rb in root.GetComponentsInChildren<UnityEngine.Rigidbody>()) if (rb.name == "Bogie Rocker") arm = rb;
+var j = arm.GetComponent<UnityEngine.ConfigurableJoint>();
+var frame = j.connectedBody;
+frame.isKinematic = true;
+var axis = arm.transform.TransformDirection(j.axis);
+System.AppDomain.CurrentDomain.SetData("rockerAxis", new float[] { axis.x, axis.y, axis.z });
+arm.AddTorque(axis * 50f, UnityEngine.ForceMode.Impulse);
+return "twisted; joint axis world " + axis.ToString("F2") + " limits " + j.lowAngularXLimit.limit + ".." + j.highAngularXLimit.limit + " motion " + j.angularXMotion;

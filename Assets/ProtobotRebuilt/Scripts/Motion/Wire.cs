@@ -64,6 +64,7 @@ namespace Protobot.Motion {
             Vector3 endOut = default, endUp = default;
             var end = nodes.Count > 1 ? End(nodes.Count - 1, out endOut, out endUp) : null;
             BuildMesh(mesh, Line, kind, origin, start, startOut, startUp, end, endOut, endUp);
+            AppendTies(mesh, origin);   // V2: zip ties
             if (!clicks) return;
             var hv = new List<Vector3>();
             var hn = new List<Vector3>();

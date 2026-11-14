@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Protobot.Interface;
 using TMPro;
 using UnityEngine;
@@ -151,6 +152,7 @@ namespace Protobot.Motion {
         /// cylinder's name with an arrow the way it extends.</summary>
         public static void DrawLabels(IEnumerable<MotorDrive> motors, IEnumerable<PneumaticCylinder> cylinders, bool keys = true) {
             Overlay.Begin();
+            var labels = new List<(Vector2 at, string text, Color color)>();
             foreach (var motor in motors) {
                 if (motor == null || motor.gameObject.IsDeleted()) continue;
                 var color = motor.Color;
@@ -164,7 +166,7 @@ namespace Protobot.Motion {
                 var side = Controls.Side(motor.gameObject);
                 if (Sandbox.Running && side != "") text += side == "L" ? " · drive left" : " · drive right";
                 else if (keys) text += " · " + Controls.KeyName(Controls.ForwardKey(motor.gameObject)) + " / " + Controls.KeyName(Controls.ReverseKey(motor.gameObject));
-                Overlay.Text(point + new Vector2(0f, 30f), text, color, null, true);
+                labels.Add((point + new Vector2(0f, 30f), text, color));
             }
             foreach (var cylinder in cylinders) {
                 if (cylinder == null || cylinder.gameObject.IsDeleted()) continue;
@@ -176,7 +178,28 @@ namespace Protobot.Motion {
                     Overlay.Arrowhead(head, from, color);
                 if (!cylinder.TryGetComponent(out Renderer renderer) || !Overlay.ToScreen(Sandbox.SimPoint(cylinder.gameObject, renderer.bounds.center), out var point)) continue;
                 var text = cylinder.Label + (keys ? " · " + Controls.KeyName(Controls.CylinderKey(cylinder.gameObject)) : "");
-                Overlay.Text(point + new Vector2(0f, 30f), text, color, null, true);
+                labels.Add((point + new Vector2(0f, 30f), text, color));
+            }
+            PlaceLabels(labels);
+        }
+
+        // V2: labels that would sit on each other (a 6-motor drive's motors side by side) are moved apart: each goes
+        // down past the ones already placed that it would touch, with a thin line back to where it belongs.
+        private static void PlaceLabels(List<(Vector2 at, string text, Color color)> labels) {
+            const float Height = 26f, Gap = 4f;
+            var placed = new List<Rect>();
+            foreach (var (at, text, color) in labels.OrderByDescending(l => l.at.y).ThenBy(l => l.at.x)) {
+                var width = 18f + text.Length * 7.2f;   // about the label's width at its size
+                var rect = new Rect(at.x - width / 2f, at.y - Height / 2f, width, Height);
+                for (var tries = 0; tries < 20; tries++) {
+                    var hit = placed.FirstOrDefault(r => r.Overlaps(rect));
+                    if (hit == default) break;
+                    rect.y = hit.yMin - Height - Gap;   // (screen y goes up: below the one it touched)
+                }
+                placed.Add(rect);
+                var where = rect.center;
+                if ((where - at).sqrMagnitude > 4f) Overlay.Line(at, new Vector2(where.x, rect.yMax), new Color(color.r, color.g, color.b, 0.5f), 1f);
+                Overlay.Text(where, text, color, null, true);
             }
         }
 

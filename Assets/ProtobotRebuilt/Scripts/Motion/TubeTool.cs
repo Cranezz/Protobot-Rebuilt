@@ -347,6 +347,7 @@ namespace Protobot.Motion {
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void Make() {
+            Tools.Keybinds.Add("TubeZipTie", "Tubing and wiring", "Zip tie the point under the mouse (a selected tube or cable)", "Z");   // V2
             if (instance != null) return;
             instance = new GameObject("Tube Editor").AddComponent<TubeEditor>();
         }
@@ -414,7 +415,19 @@ namespace Protobot.Motion {
             if (near >= 0) {
                 hovered = true;
                 var middle = near > 0 && near < tube.nodes.Count - 1;
-                Overlay.MouseText("Drag to move this point" + (middle ? " · right-click: take it out" : near == 0 || near == tube.nodes.Count - 1 ? (tube is Wire ? " (onto another port)" : " (onto another fitting's end)") : ""), Color.white);
+                var tieKey = Tools.Keybinds.Label("TubeZipTie");
+                var tieable = middle && tube.nodes[near].part != null && tube.nodes[near].kind != TubeNode.Hole;
+                Overlay.MouseText("Drag to move this point" + (middle ? " · right-click: take it out" : near == 0 || near == tube.nodes.Count - 1 ? (tube is Wire ? " (onto another port)" : " (onto another fitting's end)") : "")
+                                  + (tieable && tieKey != "" ? "\n" + tieKey + ": " + (tube.nodes[near].tie ? "take off the zip tie" : "zip tie it to the part") : ""), Color.white);
+                if (tieable && Tools.Keybinds.Pressed("TubeZipTie") && !InputEvents.TextInput.IsTyping) {   // V2: zip ties
+                    var undo = new PneumaticTube.TubeElement(tube);
+                    tube.nodes[near].tie = !tube.nodes[near].tie;
+                    tube.Refresh(true);
+                    tube.Save();
+                    StateSystem.AddElement(undo);
+                    StateSystem.AddState(new PneumaticTube.TubeElement(tube));
+                    Audio.Sounds.Play(Audio.Sounds.Tick);
+                }
                 if (MouseInput.LeftButton.wasPressedThisFrame) StartDrag(tube, near);
                 else if (MouseInput.RightButton.wasPressedThisFrame && middle) {
                     var undo = new PneumaticTube.TubeElement(tube);
