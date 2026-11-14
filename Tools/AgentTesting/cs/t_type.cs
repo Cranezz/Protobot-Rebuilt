@@ -1,1 +1,1 @@
-return "TestAllowIllegal " + (typeof(Protobot.Online.OnlineMatch).GetField("TestAllowIllegal") != null);
+return System.Type.GetType("Protobot.Devices.DevicesPanel, Assembly-CSharp") != null ? "found" : "missing";

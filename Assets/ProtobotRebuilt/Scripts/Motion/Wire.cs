@@ -97,12 +97,13 @@ namespace Protobot.Motion {
             var up0 = start != null ? startUp : Vector3.zero;
             if (kind == WireKind.Smart) Flat(line, up0, FlatWidth, FlatThick, vertices, normals, cable);
             else {
-                // Three round wires side by side (black, red, white).
+                // Three round wires bonded side by side in one ribbon (black, red, white), as VEX's 3-wire cable is:
+                // a little closer than touching so they read as one molded strip with grooves between the wires.
                 var sides = Sides(line, up0);
                 for (var w = 0; w < 3; w++) {
                     var shifted = new List<Vector3>();
-                    for (var i = 0; i < line.Count; i++) shifted.Add(line[i] + sides[i] * ((w - 1) * WireRadius * 2.05f));
-                    Strands.Tube(shifted, false, WireRadius, 6, vertices, normals, w == 0 ? cable : w == 1 ? extra : white);
+                    for (var i = 0; i < line.Count; i++) shifted.Add(line[i] + sides[i] * ((w - 1) * WireRadius * 1.86f));
+                    Strands.Tube(shifted, false, WireRadius, 10, vertices, normals, w == 0 ? cable : w == 1 ? extra : white);
                 }
             }
             if (start != null) Plug(kind, start.Value - origin, startOut, startUp, vertices, normals, plug, extra);
@@ -244,8 +245,18 @@ namespace Protobot.Motion {
                 Box(mouth - outward * (SmartIn - 0.02f) + side * (SmartShort * 0.3f), mouth - outward * 0.05f + side * (SmartShort * 0.3f), up, SmartLong * 0.6f, 0.02f, v, n, extra);
             }
             else {
-                // A black 3-pin housing against the port.
-                Box(mouth - outward * 0.02f, mouth + outward * ThreeOut, up, ThreeLong, ThreeShort, v, n, body);
+                // VEX's black 3-pin housing (0.1" pitch, like a servo plug): the body against the port, a narrower
+                // step at the back where the three wires go in, a raised polarizing key along one wide face, and the
+                // three crimp windows (small square recesses' edges) along the other.
+                var side = Vector3.Cross(up, outward).normalized;
+                var bodyEnd = ThreeOut - 0.08f;
+                Box(mouth - outward * 0.02f, mouth + outward * bodyEnd, up, ThreeLong, ThreeShort, v, n, body);
+                Box(mouth + outward * bodyEnd, mouth + outward * ThreeOut, up, ThreeLong - 0.04f, ThreeShort - 0.025f, v, n, body);
+                Box(mouth + outward * 0.06f + side * (ThreeShort / 2f + 0.012f), mouth + outward * (bodyEnd - 0.08f) + side * (ThreeShort / 2f + 0.012f),
+                    up, 0.07f, 0.024f, v, n, body);
+                for (var k = -1; k <= 1; k++)
+                    Box(mouth + outward * (bodyEnd - 0.17f) - side * (ThreeShort / 2f + 0.004f) + up * (k * 0.1f),
+                        mouth + outward * (bodyEnd - 0.07f) - side * (ThreeShort / 2f + 0.004f) + up * (k * 0.1f), up, 0.05f, 0.008f, v, n, body);
             }
         }
 
@@ -256,9 +267,12 @@ namespace Protobot.Motion {
                 var gold = ElasticPartGenerator.MaterialFor("Contacts gold", new Color(0.62f, 0.5f, 0.2f), 0.75f);
                 return new[] { new Material(black), clear, new Material(gold), new Material(black) };
             }
-            var red = ElasticPartGenerator.MaterialFor("Wire red", new Color(0.55f, 0.06f, 0.05f), 0.4f);
-            var white = ElasticPartGenerator.MaterialFor("Wire white", new Color(0.42f, 0.42f, 0.41f), 0.4f);
-            return new[] { new Material(black), new Material(black), new Material(red), new Material(white) };
+            // V2: the colors as the real wire shows them in the app's light (about half their value), the housing a
+            // little shinier than the wire's matte PVC.
+            var red = ElasticPartGenerator.MaterialFor("Wire red", new Color(0.36f, 0.04f, 0.035f), 0.35f);
+            var white = ElasticPartGenerator.MaterialFor("Wire white", new Color(0.41f, 0.41f, 0.4f), 0.35f);
+            var housing = ElasticPartGenerator.MaterialFor("Housing black", new Color(0.035f, 0.035f, 0.04f), 0.5f);
+            return new[] { new Material(black), new Material(housing), new Material(red), new Material(white) };
         }
 
         private static Material clearTemplate;

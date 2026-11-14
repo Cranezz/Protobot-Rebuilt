@@ -218,7 +218,7 @@ namespace Protobot.Motion {
             }
             SetBuildInterface(false);
             if (Hosted) return;
-            ControlsPanel.Open();
+            Devices.DevicesPanel.Open();   // V2: the Brain's devices (and the simulation's buttons)
             Audio.Sounds.Play(Audio.Sounds.Tick);
             var motors = instance.trains.Sum(t => t.motors.Count);
             Interface.Interface.Say("Simulating " + instance.bodies.Count + (instance.bodies.Count == 1 ? " body" : " bodies")
@@ -234,7 +234,8 @@ namespace Protobot.Motion {
             sandbox.Restore();
             Destroy(sandbox.gameObject);
             SetBuildInterface(true);
-            ControlsPanel.CloseSimulation();
+            Devices.DevicesPanel.SimulationEnded();
+            foreach (var motor in MotorDrive.Live()) motor.Manual = 0f;   // V2
             foreach (var motor in MotorDrive.Live()) motor.Sound(0f);
             FlexGrip.Clear();
             DriveEnabled = true;
@@ -1425,6 +1426,8 @@ namespace Protobot.Motion {
                         if (!typing && Controls.Held(Controls.ReverseKey(motor.gameObject))) direction -= 1f;
                     }
                     motor.Command = direction * Controls.Speed(motor.gameObject) * (Controls.Reversed(motor.gameObject) ? -1f : 1f);
+                    // V2: run by hand from the Devices panel (< and >, as on the Brain's motor screen).
+                    if (Mathf.Abs(motor.Manual) > 0.001f && remote == null) motor.Command = motor.Manual;
                 }
             // V2: one key per cylinder. Air to both ends: out, in. Air to one end: that way (stiff), then loose.
             foreach (var slide in slides) {
@@ -1633,6 +1636,31 @@ namespace Protobot.Motion {
                 Interface.Overlay.Text(at + new Vector2(0f, 28f), text, slide.loose ? Interface.Theme.TextDim : Interface.Theme.Accent, null, true);
             }
         }
+        /// <summary>V2: the rigid body a build part rides on in the simulation, or null.</summary>
+        public static Rigidbody BodyOf(GameObject part) => instance != null && part != null && instance.bodyOf.TryGetValue(part, out var body) ? body.rb : null;
+
+        /// <summary>V2: a solenoid switched (the Devices panel, robot code): air out (extend) or in.</summary>
+        public void SetAir(PneumaticCylinder cylinder, bool extend) {
+            foreach (var slide in slides) {
+                if (slide.cylinder != cylinder) continue;
+                if (slide.ports == PneumaticCylinder.AirPorts.Both) {
+                    if (slide.extended == extend && !slide.loose) continue;
+                    slide.extended = extend;
+                    slide.loose = false;
+                }
+                else {
+                    // Air to one end only: that end's way when switched on, loose when off.
+                    var way = slide.ports == PneumaticCylinder.AirPorts.Back;
+                    var on = extend == way;
+                    slide.extended = way;
+                    slide.loose = !on;
+                }
+                SetSlide(slide);
+                slide.changedAt = Time.unscaledTime;
+                Audio.Sounds.PlayAt(Audio.Sounds.Air, slide.rod.position, slide.loose ? 0.4f : 0.7f);
+            }
+        }
+
         public bool IsLoose(PneumaticCylinder cylinder) => slides.FirstOrDefault(s => s.cylinder == cylinder)?.loose ?? cylinder.Ports != PneumaticCylinder.AirPorts.Both;
         public bool Extended(PneumaticCylinder cylinder) => slides.FirstOrDefault(s => s.cylinder == cylinder)?.extended ?? cylinder.Extended;
     }

@@ -1,0 +1,26 @@
+var sb = new System.Text.StringBuilder();
+var motors = Protobot.Motion.MotorDrive.Live();
+Protobot.Motion.MotorDrive intake = null;
+foreach (var m in motors) if (Protobot.Motion.Controls.Side(m.gameObject) == "") intake = m;
+sb.AppendLine("motors " + motors.Count + " intake " + (intake != null ? intake.Label : "none"));
+var rotors = Protobot.Motion.GearTrain.Current();
+var system = Protobot.Motion.GearTrain.SystemOf(intake, rotors);
+var rotor = system.rotors[0];
+sb.AppendLine("shaft " + rotor.shaft.name + " start " + rotor.start + " axis " + rotor.axis + " len " + rotor.high);
+var rot = Protobot.PartsManager.GeneratePart("SNSR-Rotation-V5", rotor.start + rotor.axis * (rotor.high - 0.6f), UnityEngine.Quaternion.LookRotation(rotor.axis));
+var b = new UnityEngine.Bounds(rotor.start, UnityEngine.Vector3.zero);
+foreach (var r in UnityEngine.Object.FindObjectsByType<UnityEngine.MeshRenderer>(UnityEngine.FindObjectsSortMode.None)) if (r.gameObject.layer == 0 && r.GetComponentInParent<Protobot.SavedObject>() != null) b.Encapsulate(r.bounds);
+sb.AppendLine("robot bounds " + b.center + " size " + b.size);
+// A distance sensor above the robot looking down, an optical sensor 1" over its top, a bumper under a plate, a light sensor facing up.
+var dist = Protobot.PartsManager.GeneratePart("SNSR-Distance-V5", new UnityEngine.Vector3(b.center.x, b.max.y + 6f, b.center.z), UnityEngine.Quaternion.Euler(180f, 0f, 0f));
+var opt = Protobot.PartsManager.GeneratePart("SNSR-Optical-V5", new UnityEngine.Vector3(b.center.x + 3f, b.max.y + 1.2f, b.center.z), UnityEngine.Quaternion.Euler(180f, 0f, 0f));
+var light = Protobot.PartsManager.GeneratePart("VXSENSORS-Light Sensor", new UnityEngine.Vector3(b.max.x + 4f, 1f, b.center.z), UnityEngine.Quaternion.identity);
+var bump = Protobot.PartsManager.GeneratePart("SWCH-Bumper-V5", new UnityEngine.Vector3(b.max.x + 8f, 0.2f, b.center.z), UnityEngine.Quaternion.identity);
+var imu = Protobot.PartsManager.GeneratePart("SNSR-Inertial-V5", new UnityEngine.Vector3(b.center.x - 3f, b.max.y + 0.5f, b.center.z), UnityEngine.Quaternion.identity);
+var line = Protobot.PartsManager.GeneratePart("VXSENSORS-Line Tracker V2", new UnityEngine.Vector3(b.max.x + 12f, 1.0f, b.center.z), UnityEngine.Quaternion.Euler(-90f, 0f, 0f));
+UnityEngine.Physics.SyncTransforms();
+Protobot.Devices.V5Brain.Refresh(true);
+foreach (var d in Protobot.Devices.V5Brain.Devices) sb.AppendLine(d.PortLabel + " " + d.kind + " " + d.Name + " wired " + d.wired);
+Protobot.Devices.DevicesPanel.Open();
+foreach (var d in Protobot.Devices.V5Brain.Devices) if (!(d is Protobot.Devices.MotorDevice)) Protobot.Devices.DevicesPanel.Focus(d.part, true);
+return sb.ToString();

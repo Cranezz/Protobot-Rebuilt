@@ -185,6 +185,11 @@ namespace Protobot.Motion {
                 if (locked.Contains(part)) continue;
                 var hole = info.hole;
                 if (rotor.motors.Any(m => m.gameObject == part)) continue;   // driven, not locked
+                // V2: a rotation sensor, encoder or potentiometer measures the shaft turning in it.
+                if (Devices.V5Brain.MeasuresShaft(part)) {
+                    if (turnsIn.Add(part)) rotor.bearings.Add((part, info.position));
+                    continue;
+                }
                 var size = Mathf.Max(hole.transform.lossyScale.x, hole.transform.lossyScale.y);
                 var isSquare = hole.TryGetComponent(out MeshCollider mesh) && square != null && mesh.sharedMesh == square;
                 // Wheels, gears and sprockets with a bigger hole than the shaft are held on it by an insert.

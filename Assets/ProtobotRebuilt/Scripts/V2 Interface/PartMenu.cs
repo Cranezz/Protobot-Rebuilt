@@ -80,7 +80,7 @@ namespace Protobot.Interface {
                 options.Add(("Rod position and air…", () => Motion.CylinderDialog.Open(cylinder)));   // V2
             }
             if (saved.TryGetComponent(out Motion.MotorDrive motor)) {
-                options.Add(("Control this motor (keys, speed)", () => Motion.MotorControls.Control(new[] { motor })));
+                options.Add(("Device info (speed, torque, keys)", () => Motion.MotorControls.Control(new[] { motor })));
                 if (motor.Toggled != 0) options.Add(("Stop", () => motor.Run(0)));
                 else {
                     options.Add(("Run forward", () => motor.Run(1)));
@@ -90,6 +90,9 @@ namespace Protobot.Interface {
                     foreach (var rpm in Motion.MotorDrive.Cartridges)
                         if (rpm != motor.Rpm) options.Add((Motion.MotorDrive.CartridgeName(rpm) + " cartridge (" + rpm + " rpm)", () => motor.SetCartridge(rpm)));
             }
+            // V2: a sensor or solenoid: its Brain screen (readings, port).
+            else if (Devices.V5Brain.KindOf(saved.gameObject) is Devices.DeviceKind kind && kind != Devices.DeviceKind.Motor)
+                options.Add(("Device info (port, readings)", () => Devices.DevicesPanel.Focus(saved.gameObject)));
             // V2: chains: made round sprockets, and changed.
             if (saved.TryGetComponent(out Motion.ChainLoop chain))
                 options.Add(("Edit chain (sprockets, sides)", () => Motion.ChainTool.Begin(null, chain)));

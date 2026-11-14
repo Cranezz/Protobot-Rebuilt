@@ -28,6 +28,9 @@ namespace Protobot.Motion {
         /// <summary>Run from the part menu: 1 forward, -1 reverse, 0 not (keys run it while it's controlled).</summary>
         public int Toggled { get; private set; }
 
+        /// <summary>V2: run by hand from the Devices panel (the Brain's motor screen's &lt; and &gt;), -1..1; 0: not.</summary>
+        public float Manual { get; set; }
+
         /// <summary>This frame's command, -1..1 of full speed (set by the runner; the speed setting and reversed are in it).</summary>
         public float Command { get; set; }
 
@@ -41,22 +44,12 @@ namespace Protobot.Motion {
         public static string CartridgeName(int rpm) => rpm == 100 ? "red" : rpm == 600 ? "blue" : "green";
         public Color Color => CartridgeColor(Rpm);
 
-        /// <summary>V2: the brain port it's wired to (a smart cable from it to the brain), else 1, 2... in the order
-        /// they were added, skipping the numbers wired motors have.</summary>
+        /// <summary>V2: its smart port on the brain (Devices.V5Brain): the one it's wired to, else the next free one
+        /// (motors first, in the order they were added).</summary>
         public int Number {
             get {
-                var port = Port;
-                if (port != null) return port.number;
-                var live = Live();
-                var used = new HashSet<int>(live.Select(m => m.Port).Where(p => p != null).Select(p => p.number));
-                var n = 0;
-                foreach (var m in live) {
-                    if (m.Port != null) continue;
-                    do n++;
-                    while (used.Contains(n));
-                    if (m == this) return n;
-                }
-                return n + 1;
+                var port = Devices.V5Brain.SmartPortOf(gameObject);
+                return port > 0 ? port : Port?.number ?? 0;
             }
         }
 

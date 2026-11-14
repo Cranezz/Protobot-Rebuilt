@@ -19,7 +19,7 @@ namespace Protobot.Game {
         private static void ShowControls(bool editable) {
             if (controls != null) Object.Destroy(controls.gameObject);
             controls = (RectTransform)Motion.ControlsCard.Create(Interface.Interface.Root, Layout.TopBarBottom + 200f,
-                editable ? () => Motion.ControlsPanel.Open(true) : null).transform;
+                editable ? () => Devices.DevicesPanel.Open(true) : null).transform;
         }
 
         private static void ShowPerf() {
@@ -75,7 +75,7 @@ namespace Protobot.Game {
             }
             if (perf != null) Object.Destroy(perf.gameObject);
             if (controls != null) Object.Destroy(controls.gameObject);
-            Motion.ControlsPanel.Close();
+            Devices.DevicesPanel.Close();
             setup = hud = perf = controls = null;
             results = null;
         }

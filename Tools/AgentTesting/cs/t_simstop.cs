@@ -1,2 +1,1 @@
-Protobot.Motion.Sandbox.Stop(); System.AppDomain.CurrentDomain.SetData("rockerStart", null);
-return "stopped";
+Protobot.Motion.Sandbox.TestSticks = null; Protobot.Motion.Sandbox.Stop(); return "stopped";

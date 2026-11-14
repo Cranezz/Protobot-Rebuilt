@@ -214,7 +214,7 @@ namespace Protobot.Interface {
                 Application.OpenURL("file:///" + Builds.BuildFile.BackupFolder.Replace('\\', '/'));
                 Interface.Say("Backups are kept for every build you save (the last 10, one every 10 minutes)");
             } },
-            new Item { label = "Controls (motors, cylinders, drive)…", action = () => Motion.ControlsPanel.Open() },
+            new Item { label = "Devices (motors, sensors, pneumatics, drive)…", action = () => Devices.DevicesPanel.Open() },
             new Item { label = "Make a chain…", action = () => Motion.ChainTool.Begin() },
             new Item { label = "Mirror", shortcut = Tools.Keybinds.Label("Mirror"), action = Tools.MirrorTool.Open },
             new Item { divider = true },

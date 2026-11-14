@@ -91,6 +91,8 @@ namespace Protobot.Motion {
                     if (Controls.Held(Controls.ReverseKey(motor.gameObject))) direction -= 1f;
                 }
                 motor.Command = direction * Controls.Speed(motor.gameObject) * (Controls.Reversed(motor.gameObject) ? -1f : 1f);
+                // V2: run by hand from the Devices panel (< and >).
+                if (motor.Toggled == 0 && Mathf.Abs(motor.Manual) > 0.001f) motor.Command = motor.Manual;
                 if (Mathf.Abs(motor.Command) < 0.001f) {
                     refused.Remove(motor);
                     idle.Remove(motor);
