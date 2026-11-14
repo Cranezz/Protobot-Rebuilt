@@ -49,9 +49,43 @@ namespace Protobot.Online {
             UnityEngine.Object.DontDestroyOnLoad(go);
             var transport = go.AddComponent<UnityTransport>();
             var manager = go.AddComponent<NetworkManager>();
-            manager.NetworkConfig = new NetworkConfig { NetworkTransport = transport, ConnectionApproval = false, TickRate = 30 };
+            // Approval only to learn which session player each connection is (they send their player id).
+            manager.NetworkConfig = new NetworkConfig { NetworkTransport = transport, ConnectionApproval = true, TickRate = 30 };
+            manager.ConnectionApprovalCallback = (request, response) => {
+                var id = request.Payload == null ? "" : System.Text.Encoding.UTF8.GetString(request.Payload);
+                if (!string.IsNullOrEmpty(id)) players[request.ClientNetworkId] = id;
+                response.Approved = true;
+                response.CreatePlayerObject = false;
+            };
+            manager.OnClientDisconnectCallback += Disconnected;
             manager.RunInBackground = true;
             return manager;
+        }
+
+        /// <summary>Which session player each network connection is (filled on the host).</summary>
+        private static readonly Dictionary<ulong, string> players = new();
+
+        /// <summary>Tells the host who this is when connecting (the services' player id).</summary>
+        private static void SayWhoIAm() =>
+            Network().NetworkConfig.ConnectionData = System.Text.Encoding.UTF8.GetBytes(OnlineServices.PlayerId ?? "");
+
+        // A player whose connection dropped without leaving (the app closed or crashed) would stay in the lobby's list
+        // until the lobby service times them out: the host takes them off at once. (In a match the rule will be that
+        // their robot stays on the field switched off and Rejoin gives it back: that comes with the match flow.)
+        private static void Disconnected(ulong clientId) {
+            var net = NetworkManager.Singleton;
+            if (net == null || !net.IsServer || clientId == NetworkManager.ServerClientId) return;
+            if (!players.TryGetValue(clientId, out var playerId)) return;
+            players.Remove(clientId);
+            var session = Current;
+            if (session == null || !session.IsHost || session.Players.All(p => p.Id != playerId)) return;
+            ActionLog.Write("online", "connection lost: " + playerId);
+            _ = RemoveQuietly(session, playerId);
+        }
+
+        private static async Task RemoveQuietly(ISession session, string playerId) {
+            try { await session.AsHost().RemovePlayerAsync(playerId); }
+            catch (Exception e) { Debug.LogWarning("[Online] Removing a disconnected player: " + e.Message); }
         }
 
         // ------------------------------------------------------------------ hosting and joining
@@ -69,7 +103,7 @@ namespace Protobot.Online {
             if (!await OnlineServices.Start()) return OnlineServices.Problem;
             if (!string.IsNullOrEmpty(o.password) && (o.password.Length < 8 || o.password.Length > 64)) return "A password needs 8 to 64 characters (or leave it empty).";
             await Leave(null);
-            Network();
+            SayWhoIAm();
             try {
                 var options = new SessionOptions {
                     Type = SessionType,
@@ -101,7 +135,7 @@ namespace Protobot.Online {
         public static async Task<string> Join(string codeOrId, bool byId, string password) {
             if (!await OnlineServices.Start()) return OnlineServices.Problem;
             await Leave(null);
-            Network();
+            SayWhoIAm();
             try {
                 var options = new JoinSessionOptions { Type = SessionType, Password = string.IsNullOrEmpty(password) ? null : password, PlayerProperties = MyProperties(-1) };
                 var session = byId
