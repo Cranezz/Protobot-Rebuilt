@@ -1,3 +1,2 @@
-var a = System.IO.File.ReadAllText("Temp/cam.txt").Trim().Split(' ');
-Protobot.PivotCamera.Main.SetTransform(new Vector3(float.Parse(a[0]), float.Parse(a[1]), float.Parse(a[2])), new Vector3(float.Parse(a[3]), float.Parse(a[4]), 0f), float.Parse(a[5]));
-return "ok";
+Protobot.PivotCamera.Main.SetTransform(new UnityEngine.Vector3(12f, 3f, 2f), new UnityEngine.Vector3(25f, 200f, 0f), -26f);
+return "cam";

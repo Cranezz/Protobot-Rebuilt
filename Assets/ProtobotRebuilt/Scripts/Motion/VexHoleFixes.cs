@@ -55,6 +55,15 @@ namespace Protobot.Motion {
             var type = PartsManager.GetPartType(id);
             if (name.Contains("Bogie Wheel") && type != null) BogieMounts(type, name, fix);
             if (Through(id, name)) ThroughHoles(mesh, holes, fix, !id.StartsWith("VX"));
+            if (name == "Potentiometer") {   // V2: its shaft socket (blind, so not an opening) stays with its slots
+                var shaft = holes.Select((h, i) => (h, i)).Where(x => Size(x.h) > 0.2f).OrderBy(x => (x.h.transform.localPosition - mesh.bounds.center).sqrMagnitude).FirstOrDefault();
+                if (shaft.h != null) fix.remove.Remove(shaft.i);
+            }
+            // V2: the Vision Sensor mounts by two #8-32 threaded inserts in its back (VEX KB); its other "holes" were
+            // the case's screws, bosses and the lens.
+            if (name == "Vision Sensor")
+                for (var i = 0; i < holes.Count; i++)
+                    if (!(holes[i].holeType == HoleCollider.HoleType.Threaded && Size(holes[i]) > 0.158f && Size(holes[i]) < 0.172f) && !fix.remove.Contains(i)) fix.remove.Add(i);
             // Pneumatic ports: the cylinders' M5 ports (side, near each end), the reservoirs' 1/8" NPT ports; the
             // valves' small ports become threaded (their fittings thread in).
             if (id.StartsWith("PNMT-")) Ports(mesh, 0.15f, 0.25f, fix, false, 0.197f);   // V2: M5, as the fittings' studs
@@ -186,6 +195,12 @@ namespace Protobot.Motion {
         private static readonly string[] ThroughNames = {
             "Line Sensor Mounting Bar", "Ultrasonic Range Finder", "Optical Shaft Encoder", "V5 Bumper Switch", "Limit Switch",
             "Angle Gusset", "Pivot Gusset",
+            // V2 (2026-11-14): every sensor that mounts with screws through it: the Distance and Optical Sensors' tab
+            // slots, the Inertial and Rotation Sensors' through holes, the 3-wire sensors' and potentiometers'
+            // mounting holes and slots (the scanner had case screws as holes and dropped every slot on them).
+            "Distance Sensor", "Optical Sensor", "Inertial Sensor", "Rotation Sensor", "Light Sensor", "Line Tracker",
+            "Line Tracker V2", "Analog Accelerometer", "Yaw Rate Gyroscope Sensor", "Potentiometer", "Potentiometer V2",
+            "V5 3 Wire Expander",
         };
         private static readonly string[] ThroughIds = { "SWCH-Bumper-V5", "SWCH-Bumper-Cortex", "SWCH-Limit-Cortex", "GSET-Pack-Pivot", "GSET-Pack-Angle" };
 
