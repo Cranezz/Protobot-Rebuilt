@@ -82,6 +82,14 @@ namespace Protobot.Devices {
             }, reversed, 5f, Theme.FontSmall);
             rev.Size(80f, 26f);
             Ui.Tip(rev, "Direction", null, "Reversed: forward turns it the other way (the two sides of a drive face opposite ways).");
+            // V2: the brake mode when it isn't driven: Brake slows it, Hold keeps it where it is (arms and lifts).
+            var holding = Controls.Hold(motor.gameObject);
+            var hold = Ui.Button(nameRow, "Hold", holding ? "Hold" : "Brake", () => {
+                Controls.SetHold(motor.gameObject, !Controls.Hold(motor.gameObject));
+                Audio.Sounds.Play(Audio.Sounds.Tick);
+            }, holding, 5f, Theme.FontSmall);
+            hold.Size(64f, 26f);
+            Ui.Tip(hold, "When it stops", null, "Brake: it slows to a stop and can be pushed round. Hold: it stays where it stopped (as the V5 motor's hold mode: for arms and lifts).");
             var zero = Ui.Button(nameRow, "Zero", "Zero", () => {
                 m.Zero();
                 Audio.Sounds.Play(Audio.Sounds.Tick);

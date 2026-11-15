@@ -21,7 +21,7 @@ module.exports = async ({ params, context, logger }) => {
   };
 
   const size = Array.isArray(run.footprint) ? run.footprint.map(Number) : [];
-  if (size.length !== 3 || size.some((v) => !(v > 0))) return reject("no robot size was sent (got " + JSON.stringify(params).slice(0, 300) + ")");
+  if (size.length !== 3 || size.some((v) => !(v > 0))) return reject("no robot size was sent");
   if (size.some((v) => v > 18.05)) return reject("the robot was bigger than 18\" at the start");
 
   const seconds = Number(run.seconds);

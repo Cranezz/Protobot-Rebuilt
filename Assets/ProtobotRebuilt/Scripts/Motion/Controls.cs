@@ -118,6 +118,11 @@ namespace Protobot.Motion {
         public static bool Reversed(GameObject part) => Dynamics.Token(part, "rev") == "1";
         public static void SetReversed(GameObject part, bool value) => Dynamics.SetToken(part, "rev", value ? "1" : null);
 
+        /// <summary>V2: a motor that holds its position when it isn't driven (the V5 motor's "hold" brake mode: arms and
+        /// lifts stay up), instead of only braking. Token "hold:1".</summary>
+        public static bool Hold(GameObject part) => Dynamics.Token(part, "hold") == "1";
+        public static void SetHold(GameObject part, bool value) => Dynamics.SetToken(part, "hold", value ? "1" : null);
+
         /// <summary>Share of full speed, 0.05 to 1.</summary>
         public static float Speed(GameObject part) =>
             float.TryParse(Dynamics.Token(part, "speed"), NumberStyles.Float, CultureInfo.InvariantCulture, out var v) ? Mathf.Clamp(v, 0.05f, 1f) : 1f;

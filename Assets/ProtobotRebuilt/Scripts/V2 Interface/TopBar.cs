@@ -191,6 +191,7 @@ namespace Protobot.Interface {
             new Item { divider = true },
             new Item { label = "Play game…", action = Game.GameUi.OpenPlay },
             new Item { label = "Multiplayer…", action = Online.OnlineWindow.Open },   // V2
+            new Item { label = "Open replay…", action = Game.Replays.OpenFile },   // V2
             new Item { divider = true },
             new Item { label = "Import part…", action = Custom.ImportDialog.Choose },
             new Item { label = "Custom parts library…", action = Custom.LibraryDialog.Open },

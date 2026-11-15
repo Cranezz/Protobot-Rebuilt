@@ -17,8 +17,18 @@ namespace Protobot.Tools {
         public static bool IsCuttable(GameObject part) {
             if (!part.TryGetComponent(out SavedObject saved) || string.IsNullOrEmpty(saved.id))
                 return false;
+            if (IsElectronic(part)) return false;   // V2
             var filter = part.GetComponent<MeshFilter>();
             return filter != null && filter.sharedMesh != null && filter.sharedMesh.isReadable;
+        }
+
+        /// <summary>V2: motors, sensors, the brain, battery and radio: VEX's rules don't allow cutting them, and their
+        /// models (insides removed: Editor/HiddenGeometry) would show hollow and open where cut.</summary>
+        public static bool IsElectronic(GameObject part) {
+            if (!part.TryGetComponent(out SavedObject saved) || string.IsNullOrEmpty(saved.id)) return false;
+            var id = saved.id;
+            return Devices.V5Brain.KindOf(part) != null || id.StartsWith("BRAN") || id.StartsWith("BATT") || id.StartsWith("VXV5ELECTRONICS-")
+                   || id.StartsWith("VXSENSORS-") || id.StartsWith("CTRL");
         }
 
         /// <summary>

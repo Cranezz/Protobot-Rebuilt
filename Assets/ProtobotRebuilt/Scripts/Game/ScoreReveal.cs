@@ -316,6 +316,11 @@ namespace Protobot.Game {
             var change = Ui.Button(buttons, "Setup", "Change start", game.BackToSetup, false, 8f);
             change.targetGraphic.color = new Color(1f, 1f, 1f, 0.1f);
             change.Size(140f, 40f);
+            if (Replays.Last != null) {   // V2
+                var watch = Ui.Button(buttons, "Replay", "Watch replay", () => ReplayViewer.Open(Replays.Last), false, 8f);
+                watch.targetGraphic.color = new Color(1f, 1f, 1f, 0.1f);
+                watch.Size(150f, 40f);
+            }
             var again = Ui.Button(buttons, "Again", "Run again", game.StartRunNextFrame, true, 8f);
             again.Size(140f, 40f);
             Audio.Sounds.Play(Audio.Sounds.Pop, 0.5f);

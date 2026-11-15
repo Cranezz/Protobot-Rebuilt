@@ -276,7 +276,56 @@ namespace Protobot.Game {
             toolY = toolAt.y;
             toolHeading = heading;
             SnapToWall();
+            ClearOfPieces();
             Apply();
+        }
+
+        // V2: a deep, wide or tall robot beside the Toggle can start on top of the cups and pins standing by the wall, or
+        // touch a Goal or the Toggle: the default start looks along the wall (nearest first), then turned sideways, for
+        // the first spot that's legal and clear of the pieces (else one that's at least clear of them).
+        private void ClearOfPieces() {
+            if (field == null) return;
+            var spots = field.PieceSpots();
+            bool Clear() {
+                var corners = Corners();
+                foreach (var (at, reach) in spots)
+                    if (Inside(corners, at) || EdgeDistance(corners, at) < reach + 0.25f) return false;
+                return true;
+            }
+            if (Clear() && Legal) return;
+            var (keepX, keepY, keepHeading) = (x, y, heading);
+            var from = Slide;
+            (float x, float y, float h)? fallback = null;
+            foreach (var turn in new[] { 0f, 90f, -90f }) {
+                heading = HeadingOf(FromLeft(StartQuadrant, Dir(90f + turn)));
+                foreach (var step in new[] { 0f }.Concat(Enumerable.Range(1, 120).SelectMany(i => new[] { i * 0.5f, -i * 0.5f }))) {
+                    MoveAlong(from + step);
+                    if (Mathf.Abs(Slide - (from + step)) > 0.01f || !Clear()) continue;
+                    if (Legal) return;
+                    fallback ??= (x, y, heading);
+                }
+            }
+            (x, y, heading) = fallback ?? (keepX, keepY, keepHeading);
+            SnapToWall();
+        }
+
+        private static bool Inside(Vector2[] polygon, Vector2 p) {
+            var inside = false;
+            for (int i = 0, j = polygon.Length - 1; i < polygon.Length; j = i++)
+                if ((polygon[i].y > p.y) != (polygon[j].y > p.y) && p.x < (polygon[j].x - polygon[i].x) * (p.y - polygon[i].y) / (polygon[j].y - polygon[i].y) + polygon[i].x)
+                    inside = !inside;
+            return inside;
+        }
+
+        private static float EdgeDistance(Vector2[] polygon, Vector2 p) {
+            var best = float.MaxValue;
+            for (int i = 0, j = polygon.Length - 1; i < polygon.Length; j = i++) {
+                var a = polygon[j];
+                var ab = polygon[i] - a;
+                var t = Mathf.Clamp01(Vector2.Dot(p - a, ab) / Mathf.Max(ab.sqrMagnitude, 1e-6f));
+                best = Mathf.Min(best, Vector2.Distance(p, a + ab * t));
+            }
+            return best;
         }
 
         // V2: the four Quadrants are the Left one turned round the field's middle (Left: x < -|y|, by the red Alliance
@@ -683,6 +732,7 @@ namespace Protobot.Game {
                 return;
             }
             Sandbox.Instance.Follow = true;
+            if (!online) ReplayRecorder.Begin(this);   // V2: the replay
             state = State.Countdown;
             countdown = 3f;
             timeLeft = RunSeconds;
@@ -796,6 +846,7 @@ namespace Protobot.Game {
         };
 
         private void Update() {
+            if (ReplayViewer.Active) return;   // V2: a replay plays on this field
             var keyboard = Keyboard.current;
             var typing = InputEvents.TextInput.IsTyping || InputEvents.TextInput.ShortcutsPaused;
             switch (state) {
@@ -862,6 +913,14 @@ namespace Protobot.Game {
             }
             // V2: the score reveal (camera round the field, the points flying into the total, then the breakdown).
             if (score.robotInMidfield) score.items.Add(new ScoredItem { point = RobotPoint(), points = OverrideScoring.Midfield, kind = "Robot in the Midfield", where = "Midfield" });
+            // V2: the run's replay (kept for Watch replay and saved in Replays/).
+            var recorder = GetComponent<ReplayRecorder>();
+            if (recorder != null)
+                try {
+                    Replays.Last = recorder.Finish(score);
+                    Replays.Save(Replays.Last);
+                }
+                catch (Exception e) { Debug.LogWarning("V2: the replay couldn't be saved: " + e.Message); }
             ScoreReveal.Play(this, newBest);
             Builds.ActionLog.Write("game", $"score {score.total}" + (newBest ? " (new best)" : ""));
             Post();   // V2: the leaderboard and stats
@@ -878,8 +937,11 @@ namespace Protobot.Game {
                 }
                 if (mode != Mode.Skills || online || !Legal) return;
                 var items = score.items.Select(i => (i.kind, i.points)).ToList();
+                var replay = Replays.Last;
                 var message = await Online.Accounts.SubmitSkills(score.total, items, new Vector3(depth, width, height), RunSeconds, buildName);
                 if (message != null) Interface.Interface.Announce(message);
+                // V2: the replay of the player's best run goes with it (others can watch it from the leaderboard).
+                if (replay != null && replay.score == score.total) await Online.Accounts.SaveReplay(replay);
             }
             catch (Exception e) { Debug.LogWarning("V2: posting the result: " + e.Message); }
         }

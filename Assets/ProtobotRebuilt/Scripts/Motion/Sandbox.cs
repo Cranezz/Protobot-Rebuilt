@@ -156,6 +156,7 @@ namespace Protobot.Motion {
         private readonly List<Slide> slides = new();
         private readonly List<Wheel> omnis = new();
         private readonly List<Renderer> hidden = new();
+        private readonly Dictionary<Renderer, Renderer> sourceOf = new();   // V2: a copy -> the build renderer it draws (replays)
 
         // A chain runs on the frame its sprockets turn in (its links copied there), at the speed its rotor turns.
         private class SimChain {
@@ -233,7 +234,8 @@ namespace Protobot.Motion {
             instance = null;
             sandbox.Restore();
             Destroy(sandbox.gameObject);
-            SetBuildInterface(true);
+            // V2: a game (or a replay) keeps the build tools hidden: only plain simulating brings them back.
+            if (!Game.SkillsGame.Active && !Game.ReplayViewer.Active) SetBuildInterface(true);
             Devices.DevicesPanel.SimulationEnded();
             foreach (var motor in MotorDrive.Live()) motor.Manual = 0f;   // V2
             foreach (var motor in MotorDrive.Live()) motor.Sound(0f);
@@ -970,6 +972,7 @@ namespace Protobot.Motion {
                     copy.shadowCastingMode = renderer.shadowCastingMode;
                     copy.receiveShadows = renderer.receiveShadows;
                     copy.renderingLayerMask = renderer.renderingLayerMask & ~OutlineFeature.Layer;
+                    sourceOf[copy] = renderer;   // V2
                     renderer.enabled = false;
                     hidden.Add(renderer);
                     floor = Mathf.Min(floor, renderer.bounds.min.y);
@@ -1273,6 +1276,7 @@ namespace Protobot.Motion {
                 var proxy = copy.AddComponent<MeshRenderer>();
                 proxy.sharedMaterials = renderer.sharedMaterials;
                 proxy.renderingLayerMask = renderer.renderingLayerMask & ~OutlineFeature.Layer;
+                sourceOf[proxy] = renderer;   // V2
                 renderer.enabled = false;
                 hidden.Add(renderer);
                 sim.links.Add(copy.transform);
@@ -1507,6 +1511,8 @@ namespace Protobot.Motion {
                 most += Mathf.Abs(k) * stall;
             }
             var next = (inertia * speed + a * dt) / (inertia + b * dt);
+            // V2: hold mode (Controls.Hold): not driven, its motors stop the train where it is (up to their stall torque).
+            if (train.motors.All(m => Mathf.Abs(m.motor.Command) < 0.001f) && train.motors.Any(m => Controls.Hold(m.motor.gameObject))) next = 0f;
             // The V5 motor's current limit: no more than its stall torque.
             var torque = (next - speed) * inertia / dt;
             if (Mathf.Abs(torque) > most && most > 0f) next = speed + Mathf.Sign(torque) * most * dt / inertia;
@@ -1637,6 +1643,9 @@ namespace Protobot.Motion {
             }
         }
         /// <summary>V2: the rigid body a build part rides on in the simulation, or null.</summary>
+        /// <summary>V2: the build renderer a simulation copy draws (replays record which part it is), or null.</summary>
+        public static Renderer SourceOf(Renderer copy) => instance != null && copy != null && instance.sourceOf.TryGetValue(copy, out var source) ? source : null;
+
         public static Rigidbody BodyOf(GameObject part) => instance != null && part != null && instance.bodyOf.TryGetValue(part, out var body) ? body.rb : null;
 
         /// <summary>V2: a solenoid switched (the Devices panel, robot code): air out (extend) or in.</summary>

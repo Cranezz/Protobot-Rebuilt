@@ -1,3 +1,2 @@
-Protobot.Game.SkillsGame.Current.Exit();
-Protobot.Game.SkillsGame.Open(Protobot.Game.GameDefinition.All()[0], false, Protobot.Game.SkillsGame.Mode.Match);
+Protobot.Motion.Sandbox.TestSticks = () => (new Vector2(0f, 1f), Vector2.zero);
 return "full";

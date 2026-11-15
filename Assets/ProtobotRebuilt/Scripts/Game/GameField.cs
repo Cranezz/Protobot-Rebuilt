@@ -227,6 +227,43 @@ namespace Protobot.Game {
             return (pins, cups, toggles);
         }
 
+        /// <summary>V2: where the pins and cups on the field are before a run (field frame) and how far they reach
+        /// round their middle (a start that overlaps one is moved off it).</summary>
+        public List<(Vector2 at, float reach)> PieceSpots() {
+            var spots = new List<(Vector2, float)>();
+            foreach (var t in display.GetComponentsInChildren<Transform>(false)) {
+                if (!t.name.StartsWith("276-9250-80x") && !t.name.StartsWith("276-9250-81x")) continue;
+                if (t.GetComponentsInChildren<MeshRenderer>(false).Length == 0) continue;
+                var b = BoundsOf(t);
+                var a = ToField(b.center - b.extents);
+                var c = ToField(b.center + b.extents);
+                spots.Add((ToField(b.center), Mathf.Max(Mathf.Abs(c.x - a.x), Mathf.Abs(c.y - a.y)) / 2f));
+            }
+            return spots;
+        }
+
+        /// <summary>V2: hides the pins, cups and toggle bars on the field (a replay draws its own), until ShowOriginals.</summary>
+        public void HidePieces() {
+            foreach (var t in display.GetComponentsInChildren<Transform>(false)) {
+                var piece = t.name.StartsWith("276-9250-80x") || t.name.StartsWith("276-9250-81x");
+                foreach (var r in piece ? t.GetComponentsInChildren<MeshRenderer>(false) : t.name.StartsWith("276-9250-023") ? t.GetComponents<MeshRenderer>() : new MeshRenderer[0]) {
+                    if (!r.enabled) continue;
+                    r.enabled = false;
+                    hiddenDuringRun.Add(r);
+                }
+            }
+        }
+
+        /// <summary>V2: every mesh and material the field has by name (stock pieces too), for a replay's pieces.</summary>
+        public void Library(Dictionary<string, Mesh> meshes, Dictionary<string, Material> materials) {
+            foreach (var r in GetComponentsInChildren<MeshRenderer>(true)) {
+                var filter = r.GetComponent<MeshFilter>();
+                if (filter != null && filter.sharedMesh != null) meshes.TryAdd(filter.sharedMesh.name, filter.sharedMesh);
+                foreach (var m in r.sharedMaterials)
+                    if (m != null) materials.TryAdd(m.name.Replace(" (Instance)", ""), m);
+            }
+        }
+
         public void ShowOriginals() {
             foreach (var r in hiddenDuringRun) if (r != null) r.enabled = true;
             hiddenDuringRun.Clear();

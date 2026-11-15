@@ -8,8 +8,8 @@ var tokenTask = new Unity.Services.Core.Editor.AccessTokens().GetServicesGateway
 System.Threading.Tasks.Task.Run(async () => {
     try {
         var token = await tokenTask;
-        var url = "https://services.api.unity.com/access/v1/projects/" + project + "/environments/" + env + "/resource-policy";
-        var body = "{\"statements\":[{\"Sid\":\"deny-player-leaderboard-writes\",\"Action\":[\"Write\"],\"Effect\":\"Deny\",\"Principal\":\"Player\",\"Resource\":\"urn:ugs:leaderboards:/v1/projects/*/leaderboards/*/scores/players/*\",\"Version\":\"1.0.0\"}]}";
+        var url = "https://services.api.unity.com/access/resource-policy/v1/projects/" + project + "/environments/" + env + "/resource-policy";
+        var body = "{\"statements\":[{\"Sid\":\"deny-player-leaderboard-writes\",\"Action\":[\"Write\"],\"Effect\":\"Deny\",\"Principal\":\"Player\",\"Resource\":\"urn:ugs:leaderboards:/v1/projects/*/leaderboards/*/scores/players/*\",\"Version\":\"1.0.0\"},{\"Sid\":\"deny-player-leaderboard-any-write\",\"Action\":[\"Write\"],\"Effect\":\"Deny\",\"Principal\":\"Player\",\"Resource\":\"urn:ugs:leaderboards:/*\",\"Version\":\"1.0.0\"}]}";
         using (var http = new System.Net.Http.HttpClient()) {
             http.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
             var request = new System.Net.Http.HttpRequestMessage(new System.Net.Http.HttpMethod("PATCH"), url) { Content = new System.Net.Http.StringContent(body, System.Text.Encoding.UTF8, "application/json") };

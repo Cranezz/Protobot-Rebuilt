@@ -344,10 +344,17 @@ namespace Protobot.Tools {
                 Interface.Interface.Say("That hole already has a screw in it", false);
                 return;
             }
+            FastenAt(face, into, all, hole);
+        }
+
+        /// <summary>V2: C's screw and nut along a line (from the face of the first hole, going into the parts); for
+        /// builders and tests. False (with a message) when it couldn't.</summary>
+        public static bool FastenAt(Vector3 face, Vector3 into, bool all = false, HoleCollider hole = null) {
+            Physics.SyncTransforms();
             var stops = Along(face, into);
-            if (stops.Count == 0 || stops[0].hole != hole) {
+            if (stops.Count == 0 || (hole != null && stops[0].hole != hole)) {
                 Interface.Interface.Say("Couldn't follow the hole into its part", false);
-                return;
+                return false;
             }
             var through = new List<Stop> { stops[0] };
             Stop? threadedEnd = null;
@@ -359,11 +366,11 @@ namespace Protobot.Tools {
                 if (!all && gap > Touching) {
                     if (through.Count == 1) {
                         Interface.Interface.Say("The next hole isn't touching this one (" + Inch.Format(gap) + " gap): Shift+C screws through everything in line", false);
-                        return;
+                        return false;
                     }
                     if (!stop.threaded && gap < KepsLength) {
                         Interface.Interface.Say("No room for a nut after the last touching hole (" + Inch.Format(gap) + " to the next part): Shift+C screws through everything in line", false);
-                        return;
+                        return false;
                     }
                     break;
                 }
@@ -375,7 +382,7 @@ namespace Protobot.Tools {
             }
             if (through.Count < 2 && threadedEnd == null) {
                 Interface.Interface.Say("No other hole lined up behind this one to screw it to", false);
-                return;
+                return false;
             }
             var grip = through[through.Count - 1].to;
             var needed = threadedEnd.HasValue
@@ -384,9 +391,9 @@ namespace Protobot.Tools {
             var screw = FastenScrews.FirstOrDefault(s => s.length >= needed - 0.005f);
             if (screw.id == null) {
                 Interface.Interface.Say("Too far for the longest screw (2 1/2\"): " + Inch.Format(needed) + " of screw needed", false);
-                return;
+                return false;
             }
-            if (PartsManager.GetPartType(screw.id) == null) return;
+            if (PartsManager.GetPartType(screw.id) == null) return false;
 
             var made = new List<GameObject> { PartsManager.GeneratePart(screw.id, face, Quaternion.LookRotation(-into)) };
             if (!threadedEnd.HasValue)
@@ -400,6 +407,7 @@ namespace Protobot.Tools {
             var holes = through.Count + (threadedEnd.HasValue ? 1 : 0);
             var what = parts.Count == 2 ? parts[0] + " to " + parts[1] : parts.Count == 1 ? parts[0] + " (" + holes + " holes)" : parts.Count + " parts";
             Interface.Interface.Say("Screwed " + what + ": " + Inch.Format(screw.length) + " screw" + (threadedEnd.HasValue ? " into its thread" : " and keps nut"), true);
+            return true;
         }
 
         // Every hole on the line, in order, measured from the face.

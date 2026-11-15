@@ -156,6 +156,43 @@ namespace Protobot.Online {
             }
         }
 
+        // V2: the replay of a player's best skills run, in their public Cloud Save data (anyone signed in can read it).
+        private const string ReplayKey = "skills-replay";
+        private const int ReplayLimit = 1_500_000;   // characters of base64
+
+        /// <summary>Keeps this run's replay as the player's best (only when it's what the leaderboard has for them).</summary>
+        public static async Task SaveReplay(Game.ReplayFile replay) {
+            if (!OnlineServices.SignedIn || replay == null) return;
+            try {
+                var mine = await LeaderboardsService.Instance.GetPlayerScoreAsync(SkillsBoard);
+                if (mine == null || (int)Math.Round(mine.Score) != replay.score) return;   // not the best: the best's replay stays
+                var text = Convert.ToBase64String(Game.Replays.ToBytes(replay));
+                if (text.Length > ReplayLimit) {
+                    Debug.LogWarning("[Online] replay too big to share: " + text.Length);
+                    return;
+                }
+                await Unity.Services.CloudSave.CloudSaveService.Instance.Data.Player.SaveAsync(new Dictionary<string, object> { { ReplayKey, text } },
+                    new Unity.Services.CloudSave.Models.Data.Player.SaveOptions(new Unity.Services.CloudSave.Models.Data.Player.PublicWriteAccessClassOptions()));
+                Builds.ActionLog.Write("online", "replay shared (" + text.Length / 1024 + " KB)");
+            }
+            catch (Exception e) { Debug.LogWarning("[Online] replay: " + e.Message); }
+        }
+
+        /// <summary>A player's best run's replay, or null (none shared, or offline).</summary>
+        public static async Task<Game.ReplayFile> LoadReplay(string playerId) {
+            if (!await OnlineServices.Start() || string.IsNullOrEmpty(playerId)) return null;
+            try {
+                var items = await Unity.Services.CloudSave.CloudSaveService.Instance.Data.Player.LoadAsync(new HashSet<string> { ReplayKey },
+                    new Unity.Services.CloudSave.Models.Data.Player.LoadOptions(new Unity.Services.CloudSave.Models.Data.Player.PublicReadAccessClassOptions(playerId)));
+                if (!items.TryGetValue(ReplayKey, out var item)) return null;
+                return Game.Replays.FromBytes(Convert.FromBase64String(item.Value.GetAs<string>()));
+            }
+            catch (Exception e) {
+                Debug.LogWarning("[Online] replay: " + e.Message);
+                return null;
+            }
+        }
+
         public static async Task<(List<Entry> top, Entry mine, string problem)> Leaderboard(int count = 50) {
             if (!await OnlineServices.Start()) return (new List<Entry>(), null, OnlineServices.Problem);
             try {

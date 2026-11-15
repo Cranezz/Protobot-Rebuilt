@@ -221,7 +221,7 @@ namespace Protobot.Tools {
             if (clicked == null)
                 return;
             if (!PartCutting.IsCuttable(clicked)) {
-                feedback.Show("This part can't be cut", FeedbackDisplay.DisplayType.alert);
+                feedback.Show(PartCutting.IsElectronic(clicked) ? "Motors and electronics can't be cut (VEX's rules don't allow modifying them)" : "This part can't be cut", FeedbackDisplay.DisplayType.alert);   // V2
                 return;
             }
             if (clicked.transform.parent != null && clicked.transform.parent.GetComponent<Pivot>() != null) {

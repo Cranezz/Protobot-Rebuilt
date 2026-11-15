@@ -25,6 +25,12 @@ namespace Protobot.Online {
 
         public static void OpenLobby() => Open();
 
+        /// <summary>V2: straight to the skills leaderboard (back from a replay watched from it).</summary>
+        public static void OpenLeaderboard() {
+            if (screen == null) screen = OnlineScreen.Create();
+            screen.Show(OnlineScreen.Page.Leaderboard);
+        }
+
         public static void Close() {
             if (screen != null) screen.Close();
         }
@@ -581,7 +587,37 @@ namespace Protobot.Online {
                 Ui.Text(inner, "Name", e.name, Theme.FontBody, Color.white).Size(-1, 38f, 1f);
                 Ui.Text(inner, "Score", e.score + " pts", Theme.FontBody, Color.white, Theme.Medium, TextAlignmentOptions.MidlineRight).Size(90f, 38f);
                 Ui.Text(inner, "When", e.when == default ? "" : e.when.ToLocalTime().ToString("MMM d"), Theme.FontSmall, new Color(1f, 1f, 1f, 0.5f), null, TextAlignmentOptions.MidlineRight).Size(70f, 38f);
+                // V2: watch the run, report it (someone else's).
+                var entry = e;
+                var watch = Ui.Button(inner, "Watch", "Watch", () => WatchRun(entry), false, 6f, Theme.FontSmall);
+                watch.targetGraphic.color = new Color(1f, 1f, 1f, 0.1f);
+                watch.Size(74f, 28f);
+                Ui.Tip(watch, "Watch the run", null, "Plays the replay of this run on the field.");
+                if (!e.mine) {
+                    var report = Ui.Button(inner, "Report", "Report", () => PlayerReports.OpenRun(entry.playerId, entry.name, entry.score, watched.TryGetValue(entry.playerId, out var r) ? r : null), false, 6f, Theme.FontSmall);
+                    report.targetGraphic.color = new Color(1f, 1f, 1f, 0.1f);
+                    report.Size(74f, 28f);
+                    Ui.Tip(report, "Report the run", null, "Tell the moderators this run breaks the rules (the replay goes with your report).");
+                }
+                else Ui.Rect("Space", inner).Size(74f, 28f);
             }
+        }
+
+        private readonly Dictionary<string, Game.ReplayFile> watched = new();
+        private bool fetching;
+
+        private async void WatchRun(Accounts.Entry entry) {
+            if (fetching) return;
+            fetching = true;
+            var replay = await Accounts.LoadReplay(entry.playerId);
+            fetching = false;
+            if (this == null) return;
+            if (replay == null) {
+                Interface.Interface.Say("There's no replay of " + entry.name + "'s run (runs from before replays were added have none)", false);
+                return;
+            }
+            watched[entry.playerId] = replay;
+            Game.ReplayViewer.Open(replay);
         }
 
         // ---- account (V2: Online/Accounts)
@@ -677,6 +713,12 @@ namespace Protobot.Online {
                 problem.textWrappingMode = TextWrappingModes.Normal;
                 problem.Size(-1, 50f);
             }
+            // V2: appeals go to the moderators (a run taken off the leaderboard, a warning).
+            var appealRow = Row(40f);
+            var appeal = Ui.Button(appealRow, "Appeal", "Appeal a moderators' decision…", PlayerReports.OpenAppeal, false, 8f, Theme.FontSmall);
+            appeal.targetGraphic.color = new Color(1f, 1f, 1f, 0.08f);
+            appeal.Size(260f, 34f);
+            Ui.Tip(appeal, "Appeal", null, "If a run of yours was taken off the leaderboard or you were warned, and you think it was a mistake.");
         }
 
         // ---- hosting
