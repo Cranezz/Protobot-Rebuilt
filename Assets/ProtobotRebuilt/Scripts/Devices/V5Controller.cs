@@ -244,7 +244,7 @@ namespace Protobot.Devices {
             var name = path.Replace("<Gamepad>/", "");
             return name switch {
                 "leftShoulder" => "LB", "rightShoulder" => "RB", "leftTrigger" => "LT", "rightTrigger" => "RT",
-                "buttonNorth" => "Y / △", "buttonSouth" => "A / ✕", "buttonWest" => "X / □", "buttonEast" => "B / ○",
+                "buttonNorth" => "Pad Y", "buttonSouth" => "Pad A", "buttonWest" => "Pad X", "buttonEast" => "Pad B",
                 "start" => "Start", "select" => "Select", "leftStickPress" => "L3", "rightStickPress" => "R3",
                 _ => name.Replace("leftStick/", "L stick ").Replace("rightStick/", "R stick ").Replace("dpad/", "D-pad "),
             };

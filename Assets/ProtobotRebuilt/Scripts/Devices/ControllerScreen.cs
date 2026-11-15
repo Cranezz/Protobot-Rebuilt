@@ -10,9 +10,10 @@ using UnityEngine.UI;
 
 namespace Protobot.Devices {
     /// <summary>
-    /// V2 (Phase 7): the controller screen (Edit > Controller…, the Devices window's Controller tab). A V5 controller
-    /// drawn on screen, each control showing its key; click one and press a key or a gamepad control to bind it (like a
-    /// game's controller settings). Beside it, the chosen control: its key and gamepad control (change or clear each),
+    /// V2 (Phase 7): the controller screen (Edit > Controller…, the Devices window's Controller tab). VEX's picture of
+    /// the V5 Controller with a row for each of its controls down each side and a line from the row to the control, as
+    /// Steam's controller settings do; each row shows its key and gamepad control. Click one and press a key or a gamepad
+    /// control to bind it. Beside it, the chosen control: its key and gamepad control (change or clear each),
     /// what it runs on this robot (the drive, by the drive mode; the motors and cylinders on its key) and "Put on this
     /// button" for any motor or cylinder. Presets on top: Tank, Arcade, Split arcade. The bindings are this robot's
     /// (saved in its build: V5Controller); Use as my default makes them the default for robots without their own.
@@ -30,13 +31,12 @@ namespace Protobot.Devices {
         private TextMeshProUGUI captureNote;
         private float captureSince;
 
-        private static readonly Color Body = new(0.13f, 0.14f, 0.16f, 1f);
         private static readonly Color Control = new(0.22f, 0.235f, 0.27f, 1f);
         private static readonly Color Lit = new(0.157f, 0.522f, 0.957f, 1f);
 
         public static void Open() {
             if (open != null) return;
-            var dialog = Dialog.Open("Controller", new Vector2(1060f, 680f));
+            var dialog = Dialog.Open("Controller", new Vector2(1240f, 700f));
             var screen = dialog.gameObject.AddComponent<ControllerScreen>();
             open = screen;
             screen.dialog = dialog;
@@ -51,7 +51,7 @@ namespace Protobot.Devices {
         private void Build() {
             var body = dialog.Body;
             // Presets.
-            var top = Ui.Rect("Presets", body).Place(new Vector2(0f, 1f), new Vector2(0f, 1f), Vector2.zero, new Vector2(1020f, 34f));
+            var top = Ui.Rect("Presets", body).Place(new Vector2(0f, 1f), new Vector2(0f, 1f), Vector2.zero, new Vector2(1200f, 34f));
             Ui.Row(top, 10f);
             Ui.Text(top, "Label", "Drive", Theme.FontBody, Theme.TextDim, Theme.Medium).Size(52f, 32f);
             ToolOptions.Segmented(top, Controls.DriveModeNames, (int)Controls.Drive, i => {
@@ -65,18 +65,18 @@ namespace Protobot.Devices {
 
             // The controller.
             var stage = Ui.Image(body, "Stage", new Color(0f, 0f, 0f, 0.18f), 12f);
-            stage.rectTransform.Place(new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(0f, -46f), new Vector2(660f, 500f));
-            pad = Ui.Rect("Pad", stage.transform).Place(new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0f, -10f), new Vector2(620f, 440f));
+            stage.rectTransform.Place(new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(0f, -46f), new Vector2(836f, 520f));
+            pad = Ui.Rect("Pad", stage.transform).Place(new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(836f, 520f));
             DrawController();
 
             // The chosen control.
             var side = Ui.Image(body, "Details", Theme.PanelRaised, 10f);
-            side.rectTransform.Place(new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(0f, -46f), new Vector2(344f, 500f));
+            side.rectTransform.Place(new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(0f, -46f), new Vector2(350f, 520f));
             details = Ui.Rect("Content", side.transform).Fill(16, 14, 16, 14);
             Ui.Column(details, 8f);
 
             captureNote = Ui.Text(body, "Capture", "", Theme.FontSmall, Theme.Warning, Theme.Medium, TextAlignmentOptions.Center);
-            captureNote.rectTransform.Place(new Vector2(0f, 0f), new Vector2(0f, 0f), new Vector2(0f, 6f), new Vector2(660f, 24f));
+            captureNote.rectTransform.Place(new Vector2(0f, 0f), new Vector2(0f, 0f), new Vector2(0f, 0f), new Vector2(836f, 24f));
 
             var reset = Ui.Button(dialog.Footer, "Reset", "Reset to default", () => {
                 V5Controller.ResetToDefault();
@@ -95,60 +95,80 @@ namespace Protobot.Devices {
             Refresh();
         }
 
-        // ------------------------------------------------------------------ drawing
+        // ------------------------------------------------------------------ the controller (VEX's picture, Steam style)
 
-        private void DrawController() {
-            // Shoulder buttons, then the body with its grips.
-            Element("L1", new Vector2(-205f, 196f), new Vector2(130f, 30f), false);
-            Element("L2", new Vector2(-205f, 162f), new Vector2(130f, 30f), false);
-            Element("R1", new Vector2(205f, 196f), new Vector2(130f, 30f), false);
-            Element("R2", new Vector2(205f, 162f), new Vector2(130f, 30f), false);
-            var shell = Ui.Image(pad, "Body", Body, 40f);
-            shell.rectTransform.Place(new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0f, 10f), new Vector2(600f, 270f));
-            foreach (var x in new[] { -200f, 200f }) {
-                var grip = Ui.Image(pad, "Grip", Body);
-                grip.sprite = Theme.Circle;
-                grip.rectTransform.Place(new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(x, -110f), new Vector2(190f, 190f));
-                grip.transform.SetSiblingIndex(shell.transform.GetSiblingIndex());
-            }
-            var logo = Ui.Text(pad, "Logo", "V5", 22f, new Color(1f, 1f, 1f, 0.25f), Theme.Bold, TextAlignmentOptions.Center);
-            logo.rectTransform.Place(new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0f, 90f), new Vector2(80f, 30f));
-            // Sticks, each with its four directions.
-            leftDot = Stick(new Vector2(-150f, 58f), "Axis3+", "Axis3-", "Axis4-", "Axis4+", "3", "4");
-            rightDot = Stick(new Vector2(150f, 58f), "Axis2+", "Axis2-", "Axis1-", "Axis1+", "2", "1");
-            // D-pad (arrows) and the X/B/Y/A buttons.
-            var d = new Vector2(-195f, -122f);
-            Element("Up", d + new Vector2(0f, 36f), new Vector2(46f, 34f), false);
-            Element("Down", d + new Vector2(0f, -36f), new Vector2(46f, 34f), false);
-            Element("Left", d + new Vector2(-46f, 0f), new Vector2(46f, 34f), false);
-            Element("Right", d + new Vector2(46f, 0f), new Vector2(46f, 34f), false);
-            var f = new Vector2(195f, -122f);
-            Element("X", f + new Vector2(0f, 40f), new Vector2(46f, 46f), true);
-            Element("B", f + new Vector2(0f, -40f), new Vector2(46f, 46f), true);
-            Element("Y", f + new Vector2(-44f, 0f), new Vector2(46f, 46f), true);
-            Element("A", f + new Vector2(44f, 0f), new Vector2(46f, 46f), true);
+        // The picture (Resources/Controller/V5 Controller.png: VEX's catalog render of the V5 Controller, 276-4820, cut
+        // out) and where its controls are in it (pixels of the 1200 x 871 image, from the top left).
+        private const float PictureWidth = 430f, PictureAspect = 871f / 1200f, PictureY = 6f;
+        private static readonly Dictionary<string, Vector2> Spots = new() {
+            ["L1"] = new(262f, 40f), ["L2"] = new(305f, 56f), ["R1"] = new(938f, 40f), ["R2"] = new(895f, 56f),
+            ["LStick"] = new(225f, 260f), ["RStick"] = new(975f, 260f),
+            ["Up"] = new(365f, 345f), ["Left"] = new(293f, 418f), ["Right"] = new(437f, 418f), ["Down"] = new(365f, 490f),
+            ["X"] = new(835f, 345f), ["Y"] = new(762f, 418f), ["A"] = new(905f, 418f), ["B"] = new(835f, 490f),
+        };
+
+        // Each side's rows, top to bottom, in the order of what they point at (few lines cross).
+        private static readonly string[] LeftRows = { "L1", "L2", "Axis3+", "Axis4-", "Axis4+", "Axis3-", "Up", "Left", "Right", "Down" };
+        private static readonly string[] RightRows = { "R1", "R2", "Axis2+", "Axis1-", "Axis1+", "Axis2-", "X", "Y", "A", "B" };
+        private const float RowWidth = 178f, RowHeight = 32f, RowGap = 6f, ColumnX = 316f;
+
+        private ShapeGraphic lines;
+        private readonly Dictionary<string, (Vector2 from, Vector2 to)> callouts = new();
+        private readonly Dictionary<string, TextMeshProUGUI> padLabels = new();
+
+        private static Vector2 ToStage(Vector2 pixel) =>
+            new((pixel.x / 1200f - 0.5f) * PictureWidth, PictureY + (0.5f - pixel.y / 871f) * PictureWidth * PictureAspect);
+
+        // Where a control's line ends on the picture (a stick's directions just off its middle).
+        private static Vector2 Target(string id) {
+            const float off = 15f;
+            return id switch {
+                "Axis3+" => ToStage(Spots["LStick"]) + new Vector2(0f, off), "Axis3-" => ToStage(Spots["LStick"]) + new Vector2(0f, -off),
+                "Axis4+" => ToStage(Spots["LStick"]) + new Vector2(off, 0f), "Axis4-" => ToStage(Spots["LStick"]) + new Vector2(-off, 0f),
+                "Axis2+" => ToStage(Spots["RStick"]) + new Vector2(0f, off), "Axis2-" => ToStage(Spots["RStick"]) + new Vector2(0f, -off),
+                "Axis1+" => ToStage(Spots["RStick"]) + new Vector2(off, 0f), "Axis1-" => ToStage(Spots["RStick"]) + new Vector2(-off, 0f),
+                _ => ToStage(Spots[id]),
+            };
         }
 
-        private RectTransform Stick(Vector2 at, string up, string down, string left, string right, string vertical, string across) {
-            var ring = Ui.Image(pad, "Stick", new Color(0.08f, 0.085f, 0.1f, 1f));
-            ring.sprite = Theme.Circle;
-            ring.rectTransform.Place(new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), at, new Vector2(96f, 96f));
-            var dot = Ui.Image(ring.transform, "Dot", new Color(0.32f, 0.34f, 0.38f, 1f));
+        private void DrawController() {
+            var texture = Resources.Load<Texture2D>("Controller/V5 Controller");
+            var picture = Ui.Rect("Picture", pad).gameObject.AddComponent<RawImage>();
+            picture.texture = texture;
+            picture.raycastTarget = false;
+            picture.rectTransform.Place(new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0f, PictureY), new Vector2(PictureWidth, PictureWidth * PictureAspect));
+            lines = ShapeGraphic.Create(pad);
+            // Where the sticks are pushed: a dot over each.
+            leftDot = Dot(ToStage(Spots["LStick"]));
+            rightDot = Dot(ToStage(Spots["RStick"]));
+            Column(LeftRows, -1f);
+            Column(RightRows, 1f);
+            var note = Ui.Text(pad, "Credit", "Picture: VEX Robotics (V5 Controller, 276-4820)", 10f, new Color(1f, 1f, 1f, 0.3f), null, TextAlignmentOptions.Center);
+            note.rectTransform.Place(new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 4f), new Vector2(400f, 16f));
+        }
+
+        private RectTransform Dot(Vector2 at) {
+            var dot = Ui.Image(pad, "Stick Dot", new Color(0.157f, 0.522f, 0.957f, 0f));
             dot.sprite = Theme.Circle;
-            dot.rectTransform.Place(new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(44f, 44f));
-            var axes = Ui.Text(pad, "Axes", "Axis " + vertical + " up/down, " + across + " across", 10.5f, new Color(1f, 1f, 1f, 0.35f), null, TextAlignmentOptions.Center);
-            axes.rectTransform.Place(new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), at + new Vector2(0f, -106f), new Vector2(170f, 16f));
-            Element(up, at + new Vector2(0f, 72f), new Vector2(58f, 30f), false);
-            Element(down, at + new Vector2(0f, -78f), new Vector2(58f, 30f), false);
-            Element(left, at + new Vector2(-84f, 0f), new Vector2(58f, 30f), false);
-            Element(right, at + new Vector2(84f, 0f), new Vector2(58f, 30f), false);
+            dot.raycastTarget = false;
+            dot.rectTransform.Place(new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), at, new Vector2(14f, 14f));
             return dot.rectTransform;
         }
 
-        private void Element(string id, Vector2 at, Vector2 size, bool round) {
-            var image = Ui.Image(pad, id, Control, round ? 0f : 8f, true);
-            if (round) image.sprite = Theme.Circle;
-            image.rectTransform.Place(new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), at, size);
+        private void Column(string[] ids, float side) {
+            var total = ids.Length * RowHeight + (ids.Length - 1) * RowGap;
+            for (var i = 0; i < ids.Length; i++) {
+                var y = total / 2f - RowHeight / 2f - i * (RowHeight + RowGap);
+                var center = new Vector2(side * ColumnX, y);
+                Row(ids[i], center);
+                // The line leaves the row's inner side, runs level a little, then goes to the control.
+                callouts[ids[i]] = (center - new Vector2(side * RowWidth / 2f, 0f), Target(ids[i]));
+            }
+        }
+
+        private void Row(string id, Vector2 at) {
+            var image = Ui.Image(pad, id, Control, 7f, true);
+            image.rectTransform.Place(new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), at, new Vector2(RowWidth, RowHeight));
             var button = image.gameObject.AddComponent<Button>();
             button.transition = Selectable.Transition.None;
             var nav = button.navigation;
@@ -161,14 +181,36 @@ namespace Protobot.Devices {
                 Audio.Sounds.Play(Audio.Sounds.Tick);
                 Refresh();
             });
-            var label = id.StartsWith("Axis") ? "" : id;
-            var name = Ui.Text(image.transform, "Name", label, 10f, new Color(1f, 1f, 1f, 0.5f), Theme.Medium, TextAlignmentOptions.Top);
-            name.rectTransform.Fill(0, 2, 0, 0);
-            var key = Ui.Text(image.transform, "Key", "", 13f, Color.white, Theme.Bold, label.Length > 0 ? TextAlignmentOptions.Bottom : TextAlignmentOptions.Center);
-            key.rectTransform.Fill(2, 0, 2, label.Length > 0 ? 3 : 0);
-            key.overflowMode = TextOverflowModes.Ellipsis;
+            var name = Ui.Text(image.transform, "Name", Short(id), 11.5f, new Color(1f, 1f, 1f, 0.6f), Theme.Medium);
+            name.rectTransform.Fill(10, 0, RowWidth - 64f, 0);
+            var key = Ui.Text(image.transform, "Key", "", 14f, Color.white, Theme.Bold, TextAlignmentOptions.MidlineLeft);
+            key.rectTransform.Fill(62, 0, 58, 0);
+            var padLabel = Ui.Text(image.transform, "Pad", "", 10.5f, new Color(1f, 1f, 1f, 0.45f), null, TextAlignmentOptions.MidlineRight);
+            padLabel.rectTransform.Fill(RowWidth - 62f, 0, 8, 0);
             Ui.Tip(image, V5Controller.SlotName(id), null, "Click, then press a key or a gamepad control to bind it.");
             controls[id] = (image, key);
+            padLabels[id] = padLabel;
+        }
+
+        private static string Short(string id) => id switch {
+            "Axis3+" => "3 up", "Axis3-" => "3 down", "Axis4+" => "4 right", "Axis4-" => "4 left",
+            "Axis2+" => "2 up", "Axis2-" => "2 down", "Axis1+" => "1 right", "Axis1-" => "1 left",
+            _ => id,
+        };
+
+        private void DrawLines() {
+            if (lines == null) return;
+            lines.Clear();
+            foreach (var (id, (from, to)) in callouts) {
+                var held = V5Controller.Held(id);
+                var chosen = id == selected;
+                var color = held ? Lit : chosen ? new Color(1f, 1f, 1f, 0.85f) : new Color(1f, 1f, 1f, 0.3f);
+                var width = chosen || held ? 2f : 1.2f;
+                var bend = from + new Vector2(Mathf.Sign(to.x - from.x) * 18f, 0f);
+                lines.Line(from, bend, color, width);
+                lines.Line(bend, to, color, width);
+                lines.Disc(to, chosen || held ? 4.5f : 3f, color);
+            }
         }
 
         // ------------------------------------------------------------------ the chosen control
@@ -178,6 +220,7 @@ namespace Protobot.Devices {
             var help = dialog.Body.Find("Presets/DriveHelp")?.GetComponent<TextMeshProUGUI>();
             if (help != null) help.text = Controls.DriveHelp(Controls.Drive).Replace(" (W/S)", "").Replace(" (Up/Down)", "").Replace(" (W/A/S/D)", "").Replace(" (Left/Right)", "");
             foreach (var (id, (_, key)) in controls) key.text = V5Controller.KeyLabel(id);
+            foreach (var (id, label) in padLabels) label.text = V5Controller.PadLabel(id).Replace("L stick ", "").Replace("R stick ", "").Replace("D-pad ", "");
             foreach (Transform child in details) Destroy(child.gameObject);
             details.DetachChildren();
 
@@ -300,12 +343,19 @@ namespace Protobot.Devices {
 
         // ------------------------------------------------------------------ live
 
+        private static void StickDot(RectTransform dot, Vector2 center, Vector2 push) {
+            if (dot == null) return;
+            dot.anchoredPosition = center + push * 20f;
+            dot.GetComponent<Image>().color = new Color(0.157f, 0.522f, 0.957f, push.sqrMagnitude > 0.0001f ? 0.95f : 0f);
+        }
+
         private void Update() {
             // Held controls light up; the sticks show where they are.
             foreach (var (id, (image, _)) in controls)
                 image.color = id == selected ? (V5Controller.Held(id) ? Lit : new Color(0.3f, 0.33f, 0.4f, 1f)) : V5Controller.Held(id) ? Lit : Control;
-            if (leftDot != null) leftDot.anchoredPosition = new Vector2(V5Controller.Axis(V5Axis.Axis4), V5Controller.Axis(V5Axis.Axis3)) * 22f;
-            if (rightDot != null) rightDot.anchoredPosition = new Vector2(V5Controller.Axis(V5Axis.Axis1), V5Controller.Axis(V5Axis.Axis2)) * 22f;
+            StickDot(leftDot, ToStage(Spots["LStick"]), new Vector2(V5Controller.Axis(V5Axis.Axis4), V5Controller.Axis(V5Axis.Axis3)));
+            StickDot(rightDot, ToStage(Spots["RStick"]), new Vector2(V5Controller.Axis(V5Axis.Axis1), V5Controller.Axis(V5Axis.Axis2)));
+            DrawLines();
 
             if (capture == Capture.None || Time.unscaledTime - captureSince < 0.15f) return;
             var keyboard = Keyboard.current;
