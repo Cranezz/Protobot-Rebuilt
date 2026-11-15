@@ -231,6 +231,7 @@ namespace Protobot.Motion {
         public static void Stop() {
             if (!Running) return;
             var sandbox = instance;
+            RobotCode.RobotProgram.Stop(null);   // V2 (Phase 9)
             instance = null;
             sandbox.Restore();
             Destroy(sandbox.gameObject);
@@ -1381,6 +1382,7 @@ namespace Protobot.Motion {
         }
 
         private void Update() {
+            if (instance != this) return;   // V2: a stray copy saved in the scene (Main.unity) does nothing
             if (!Hosted && Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame && !InputEvents.TextInput.IsTyping && !MotionUi.Capturing && !Popup.IsOpen) {
                 Stop();
                 return;
@@ -1396,6 +1398,7 @@ namespace Protobot.Motion {
             DriveInput? InputFor(GameObject part) => InputOf?.Invoke(RobotOf?.Invoke(part) ?? 0);
             foreach (var train in trains)
                 foreach (var (motor, _) in train.motors) {
+                    if (RobotCode.RobotProgram.Owns(motor)) continue;   // V2: the robot's program drives it
                     var side = Controls.Side(motor.gameObject);
                     var remote = InputFor(motor.gameObject);
                     float direction;
@@ -1445,6 +1448,7 @@ namespace Protobot.Motion {
         }
 
         private void LateUpdate() {
+            if (instance != this) return;   // V2
             DrawSlideStates();   // V2
             PickTracked();
             if (PivotCamera.Main == null) return;
@@ -1462,6 +1466,8 @@ namespace Protobot.Motion {
         }
 
         private void FixedUpdate() {
+            if (instance != this) return;   // V2 (it ran the robot program a second time each step)
+            if (!Puppet) RobotCode.RobotProgram.Step(Time.fixedDeltaTime);   // V2 (Phase 9): robot code, before the trains turn
             foreach (var train in trains)
                 if (!train.rotors.Any(r => r.rb != null && r.rb.isKinematic)) Turn(train);   // V2: (another computer drives that robot)
             RunChains(Time.fixedDeltaTime);
@@ -1493,6 +1499,10 @@ namespace Protobot.Motion {
             float a = 0f, b = 0f, most = 0f;
             foreach (var (motor, k) in train.motors) {
                 var stall = motor.StallTorque * NewtonMeter;
+                if (motor.Coasting && Mathf.Abs(motor.Command) < 0.001f) {   // V2 (robot code): coast: no braking
+                    most += Mathf.Abs(k) * stall;
+                    continue;
+                }
                 a += k * stall * motor.Command;
                 b += k * k * stall / FreeSpeed(motor);
                 most += Mathf.Abs(k) * stall;

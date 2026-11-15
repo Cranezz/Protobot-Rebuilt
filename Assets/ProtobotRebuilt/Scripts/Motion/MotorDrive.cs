@@ -37,6 +37,9 @@ namespace Protobot.Motion {
         /// <summary>How fast the shaft turns now, share of full speed (for its sound and the labels).</summary>
         public float Level { get; set; }
 
+        /// <summary>V2 (robot code): stopped in coast mode: no braking from its windings while it isn't driven.</summary>
+        public bool Coasting { get; set; }
+
         private AudioSource sound;
         private Material cartridge;
 

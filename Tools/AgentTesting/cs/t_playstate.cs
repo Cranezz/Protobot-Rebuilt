@@ -1,0 +1,1 @@
+return "playing=" + UnityEditor.EditorApplication.isPlaying + " paused=" + UnityEditor.EditorApplication.isPaused + " frame=" + UnityEngine.Time.frameCount + " panel=" + (UnityEngine.GameObject.Find("V2 Interface") != null);

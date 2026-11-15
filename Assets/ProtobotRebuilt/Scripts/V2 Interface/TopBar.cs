@@ -164,6 +164,10 @@ namespace Protobot.Interface {
             }, false, 6f, Theme.FontSmall);
             play.Size(-1, 30f);
             Ui.Tip(play, "Play game", null, "Put your robot on this season's field and run Robot Skills: a timed minute, scored as you go.");
+            // V2 (Phase 9): the robot's program.
+            var code = Ui.Button(right, "Code", "Code", RobotCode.CodePanel.Toggle, false, 6f, Theme.FontSmall);
+            code.Size(-1, 30f);
+            Ui.Tip(code, "Robot code", null, "Program the robot in Python (VEXcode V5 style): autonomous routines, driver control, sensors. Runs on the simulated robot.");
             simulate = Ui.Button(right, "Simulate", "Simulate", Motion.Sandbox.Toggle, true, 6f, Theme.FontSmall);
             simulate.Size(-1, 30f);
             Ui.Tip(simulate, "Simulate", null, "Gravity and physics: the robot drives (W/A/S/D, arrows or a gamepad), motors turn, cylinders push; parts not fastened fall off. Stop puts the build back.");
@@ -222,6 +226,7 @@ namespace Protobot.Interface {
             new Item { label = "Graphics…", action = GraphicsWindow.Open },
             new Item { label = "Keyboard shortcuts…", action = Tools.KeybindsWindow.Open },
             new Item { label = "Controller…", action = Devices.ControllerScreen.Open },   // V2 (Phase 7)
+            new Item { label = "Robot code…", action = RobotCode.CodePanel.Open },   // V2 (Phase 9)
             new Item { label = "Preferences…", action = PreferencesWindow.Open },   // V2: its own window now
         };
 

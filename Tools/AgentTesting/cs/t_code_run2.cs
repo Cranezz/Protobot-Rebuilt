@@ -1,0 +1,12 @@
+var code = "from vex import *\nbrain = Brain()\nleft = MotorGroup(Motor(Ports.PORT4), Motor(Ports.PORT5), Motor(Ports.PORT6))\nright = MotorGroup(Motor(Ports.PORT1, True), Motor(Ports.PORT2, True), Motor(Ports.PORT3, True))\nleft.spin(FORWARD, 50, PERCENT)\nright.spin(FORWARD, 50, PERCENT)\nwait(3, SECONDS)\nleft.stop(BRAKE)\nright.stop(BRAKE)\nprint('vel', round(left.velocity(PERCENT)), 'pos', round(left.position(DEGREES)), round(right.position(DEGREES)), 't', brain.timer.time(SECONDS))\nwait(0.5, SECONDS)\nprint('after stop', round(left.velocity(PERCENT)))\n";
+Protobot.RobotCode.CodeStore.Set(code);
+Protobot.RobotCode.CodePanel.Open();
+var log = new System.Text.StringBuilder();
+Protobot.RobotCode.RobotProgram.Printed += s => log.Append(s);
+Protobot.Motion.Sandbox.Stop(); Protobot.Motion.Sandbox.Begin();
+var rb = Protobot.Motion.Sandbox.Instance.Bodies().OrderByDescending(b => b.rb.mass).First().rb;
+UnityEngine.PlayerPrefs.SetString("t_code_start", rb.position.x + "," + rb.position.z);
+string err; int line;
+var ok = Protobot.RobotCode.RobotProgram.Start(code, Protobot.RobotCode.RobotProgram.Period.Program, 0, out err, out line);
+typeof(Protobot.RobotCode.RobotProgram).GetField("testLog", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic);
+return "started " + ok + " " + err + " body " + rb.name + " mass " + rb.mass;

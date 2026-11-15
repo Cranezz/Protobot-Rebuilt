@@ -742,10 +742,22 @@ namespace Protobot.Game {
             Changed?.Invoke();
         }
 
+        /// <summary>V2 (Phase 9): runs the robot's program for a period; false when it has none (or can't start: the
+        /// mistake shows in the code window).</summary>
+        private bool StartCode(RobotCode.RobotProgram.Period period, float seconds) {
+            var source = RobotCode.CodeStore.Source;
+            if (string.IsNullOrWhiteSpace(source)) return false;
+            if (RobotCode.RobotProgram.Start(source, period, seconds, out var error, out _)) return true;
+            RobotCode.CodePanel.Open();
+            Interface.Interface.Say("The robot's program has a mistake: " + error, false);
+            return false;
+        }
+
         /// <summary>Ends the run now (the robot stops; the score is taken when everything is still).</summary>
         public void EndRun() {
             if (state != State.Running && state != State.Countdown) return;
             Sandbox.DriveEnabled = false;
+            RobotCode.RobotProgram.Stop(null);   // V2 (Phase 9): the robot's program stops with the match
             state = State.Ending;
             endingSince = Time.time;
             Interface.Interface.Say(timeLeft > 0.05f ? $"Run ended with {Mathf.CeilToInt(timeLeft)} s left" : "Time! The score counts once everything stops", true);
@@ -859,10 +871,11 @@ namespace Protobot.Game {
                     countdown -= Time.deltaTime;
                     if (countdown <= 0f) {
                         state = State.Running;
-                        // V2: a match's autonomous period: no driving (the robot's own code will run here).
+                        // V2: a match's autonomous period: no driving; the robot's own program runs (Phase 9).
                         Sandbox.DriveEnabled = !InAutonomous;
                         Audio.Sounds.Play(Audio.Sounds.Tick);
-                        Interface.Interface.Say(InAutonomous ? "Autonomous: 0:15 (robot code comes later: your robot waits)" : "Go!", true);
+                        var runsCode = InAutonomous && !online && StartCode(RobotCode.RobotProgram.Period.Autonomous, AutonomousSeconds);
+                        Interface.Interface.Say(!InAutonomous ? "Go!" : runsCode ? "Autonomous: 0:15 (the robot's program runs)" : "Autonomous: 0:15 (the robot has no program: it waits; Code in the top bar)", true);
                     }
                     if (keyboard != null && keyboard.escapeKey.wasPressedThisFrame && !typing && !online) BackToSetup();
                     break;
@@ -871,6 +884,9 @@ namespace Protobot.Game {
                     timeLeft -= Time.deltaTime;
                     if (wasAutonomous && !InAutonomous && timeLeft > 0f) {
                         Sandbox.DriveEnabled = true;
+                        // V2 (Phase 9): its program's driver control (a Competition's), else the keys drive.
+                        RobotCode.RobotProgram.Stop(null);
+                        if (!online && RobotCode.CodeStore.Source.Contains("Competition(")) StartCode(RobotCode.RobotProgram.Period.Driver, DriverSeconds);
                         Audio.Sounds.Play(Audio.Sounds.Tick);
                         Interface.Interface.Say("Driver control: 1:45", true);
                         Changed?.Invoke();
