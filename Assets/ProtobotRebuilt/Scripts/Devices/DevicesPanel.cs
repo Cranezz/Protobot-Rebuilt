@@ -20,10 +20,10 @@ namespace Protobot.Devices {
     // a switch. While the simulation runs it also has Pause, Reset and Stop. Replaces the old motor and Controls windows.
     public partial class DevicesPanel : MonoBehaviour {
         private const string PositionKey = "V2.DevicesPanelPosition", MinimizedKey = "V2.DevicesPanelMinimized", SizeKey = "V2.DevicesPanelSize";
-        private const float MinWidth = 380f, MinHeight = 300f, ColumnWidth = 310f;
+        private const float MinWidth = 640f, MinHeight = 300f, ColumnWidth = 300f;
         // V2: the window's size (drag its edges): cards flow into as many columns as fit.
         private float width = 720f, heightMax = 760f;
-        private int Columns => Mathf.Clamp(Mathf.FloorToInt((width - 30f) / ColumnWidth), 1, 4);
+        private int Columns => Mathf.Clamp(Mathf.FloorToInt((width - 30f) / ColumnWidth), 2, 4);   // at least two
         private static DevicesPanel open;
 
         private enum Page { Devices, ThreeWire, Controller }
@@ -507,8 +507,8 @@ namespace Protobot.Devices {
                 Ui.Tip(tile, "Port " + port, null, "Empty.");
                 return;
             }
-            var icon = Icon(tile.transform, device, 24f);
-            icon.Place(new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(3f, -3f), new Vector2(24f, 24f));
+            var icon = Icon(tile.transform, device, 34f);
+            icon.Place(new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(4f, -2f), new Vector2(34f, 34f));
             if (!device.wired) {
                 var dot = Ui.Text(tile.transform, "Unwired", "○", Theme.FontSmall - 3f, Theme.TextFaint, null, TextAlignmentOptions.TopRight);
                 dot.rectTransform.Place(new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(-4f, -1f), new Vector2(14f, 14f));
@@ -548,12 +548,14 @@ namespace Protobot.Devices {
                 shown = null;
             });
             Badge(row, d);
-            Icon(row, d, 18f).Size(18f, 18f);
-            var name = Ui.Text(row, "Name", d.Name, Theme.FontBody, Theme.Text);
+            Icon(row, d, 28f).Size(28f, 28f);
+            var given = d.part != null ? Motion.Controls.GivenName(d.part) : null;
+            if (d is SolenoidDevice valve && valve.part == null && valve.own != null) given = Motion.Controls.GivenName(valve.own.gameObject);
+            var name = Ui.Text(row, "Name", given ?? "", Theme.FontSmall, Theme.Text);
             name.Size(-1, 30f, 1f);
-            name.GetComponent<LayoutElement>().minWidth = 56f;
+            name.GetComponent<LayoutElement>().minWidth = 20f;
             if (d is MotorDevice mc && MotorControls.IsControlled(mc.motor) && !Sandbox.Running)
-                name.text = d.Name + "  <color=#5AA2FF><size=78%>keys</size></color>";
+                name.text = (given ?? "") + "  <color=#5AA2FF><size=78%>keys</size></color>";
             var reading = Ui.Text(row, "Reading", d.Reading, Theme.FontSmall, Theme.TextDim, Theme.Medium, TextAlignmentOptions.MidlineRight);
             reading.Size(d is MotorDevice ? 42f : d is SolenoidDevice ? 76f : 104f, 30f);
             live.Add(() => reading.text = d.Reading);
@@ -577,7 +579,7 @@ namespace Protobot.Devices {
 
         private void Badge(RectTransform row, V5Device d) {
             var badge = Ui.Image(row, "Port", d.threeWire ? new Color(0.98f, 0.73f, 0.23f, 0.16f) : Theme.Field, 5f);
-            badge.Size(d.ports > 1 ? 44f : 32f, 24f);
+            badge.Size(d.ports > 1 ? 40f : 28f, 24f);
             var text = Ui.Text(badge.transform, "Port", d.OnBrain ? d.PortLabel : "—", Theme.FontSmall, d.threeWire ? Theme.Warning : Theme.Text, Theme.Medium, TextAlignmentOptions.Center);
             text.rectTransform.Fill();
             if (!d.wired) text.color = Color.Lerp(text.color, Theme.TextFaint, 0.45f);
@@ -673,18 +675,35 @@ namespace Protobot.Devices {
         }
 
         // A device's little icon (drawn once it has its size).
+        // A device's picture: the parts list's own picture of the part (or, without one, a gray square-on outline;
+        // the drawn icon as a last resort). Hovering it names the device.
+        private static readonly Color Backdrop = new(0.74f, 0.77f, 0.81f, 1f);
+
         private RectTransform Icon(Transform parent, V5Device d, float size) {
-            var holder = Ui.Image(parent, "Icon", new Color(0f, 0f, 0f, 0f), 0f, true).rectTransform;
+            var part = d.part != null ? d.part : d is SolenoidDevice s && s.own != null ? s.own.gameObject : null;
+            var picture = part != null ? DevicePictures.For(part, out var gray) : null;
+            // A light backdrop behind the picture (black plastic parts would vanish on the dark panel).
+            var holder = Ui.Image(parent, "Icon", picture != null ? Backdrop : new Color(0f, 0f, 0f, 0f), picture != null ? 5f : 0f, true).rectTransform;
             holder.sizeDelta = new Vector2(size, size);
-            var shapes = ShapeGraphic.Create(holder);
-            var drawn = false;
-            live.Add(() => {
-                var r = shapes.rectTransform.rect;
-                if (drawn || r.width <= 0f) return;
-                drawn = true;
-                DeviceIcons.Draw(shapes, r, d.kind, d.Tint);
-            });
-            Ui.Tip(holder, V5Device.KindName(d.kind));
+            if (picture != null) {
+                var image = Ui.Rect("Picture", holder).Fill(1f, 1f, 1f, 1f).gameObject.AddComponent<RawImage>();
+                image.texture = picture;
+                image.raycastTarget = false;
+                if (DevicePictures.For(part, out gray) != null && gray) image.color = Theme.Field;
+            }
+            else {
+                var shapes = ShapeGraphic.Create(holder);
+                var drawn = false;
+                live.Add(() => {
+                    var r = shapes.rectTransform.rect;
+                    if (drawn || r.width <= 0f) return;
+                    drawn = true;
+                    DeviceIcons.Draw(shapes, r, d.kind, d.Tint);
+                });
+            }
+            var kind = d is MotorDevice m && m.motor != null ? m.motor.Kind + " motor" + (m.motor.HasCartridge ? ", " + m.Gearing + " cartridge" : "")
+                : d is SolenoidDevice sd ? (sd.part != null ? "Solenoid valve" : "Cylinder (its own valve)") : V5Device.KindName(d.kind);
+            Ui.Tip(holder, d.Name, null, kind + " · " + (d.threeWire ? "3-wire port " : "smart port ") + d.PortLabel + (d.wired ? "" : " (not wired)"));
             return holder;
         }
 
@@ -766,7 +785,7 @@ namespace Protobot.Devices {
         // A small arrow: down when folded, up when open.
         private void Chevron(RectTransform row, bool up) {
             var holder = Ui.Rect("Open", row);
-            holder.Size(16f, 30f);
+            holder.Size(12f, 30f);
             var shapes = ShapeGraphic.Create(holder);
             var drawn = false;
             live.Add(() => {
