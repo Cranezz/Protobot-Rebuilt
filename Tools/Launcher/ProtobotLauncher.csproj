@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- V2: the installed app's main exe (Velopack): runs Velopack's install/update/uninstall hooks itself (Unity's player
+       hung or left its crash handler holding files when it ran them), then starts Protobot. -->
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net48</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <AssemblyName>ProtobotLauncher</AssemblyName>
+    <ApplicationIcon>Protobot.ico</ApplicationIcon>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Velopack" Version="1.2.161" />
+  </ItemGroup>
+</Project>
