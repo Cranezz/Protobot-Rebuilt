@@ -72,3 +72,8 @@ __pycache__/
 # Notes for the AI agent working on this project: kept on this computer only
 /CLAUDE.md
 /AGENT_HANDOFF.md
+
+# The launcher's build output
+/Tools/Launcher/bin/
+/Tools/Launcher/obj/
+/Tools/Launcher/out/

@@ -879,13 +879,20 @@ namespace Protobot.Online {
     /// <summary>The Multiplayer screen's backgrounds: pictures in Resources/Online/Backgrounds, one picked at random and
     /// blurred once (made small, then a Gaussian blur on the CPU: drawn full screen it's soft).</summary>
     public static class Backgrounds {
-        private static Texture2D blurred, shade;
+        private static Texture2D blurred, shade, sharp;
+
+        /// <summary>V2: the picture the blurred background is made from, sharp (the intro starts on it).</summary>
+        public static Texture2D Sharp() {
+            if (sharp != null) return sharp;
+            var pictures = Resources.LoadAll<Texture2D>("Online/Backgrounds");
+            if (pictures.Length == 0) return null;
+            return sharp = pictures[UnityEngine.Random.Range(0, pictures.Length)];
+        }
 
         public static Texture2D Blurred() {
             if (blurred != null) return blurred;
-            var pictures = Resources.LoadAll<Texture2D>("Online/Backgrounds");
-            if (pictures.Length == 0) return null;
-            var source = pictures[UnityEngine.Random.Range(0, pictures.Length)];
+            var source = Sharp();
+            if (source == null) return null;
             const int width = 400;
             var height = Mathf.Max(1, Mathf.RoundToInt(width * (float)source.height / source.width));
             // Halve it a few times so the small copy keeps every pixel's colour (one big step would skip most).

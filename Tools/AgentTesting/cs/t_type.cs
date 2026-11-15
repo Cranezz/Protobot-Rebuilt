@@ -1,1 +1,1 @@
-return (System.Type.GetType("Protobot.Online.Voice, Assembly-CSharp") != null ? "voice " : "no voice ") + UnityEditor.EditorUtility.scriptCompilationFailed;
+return (System.Type.GetType("Protobot.Interface.Intro, Assembly-CSharp") != null) + " " + UnityEditor.EditorUtility.scriptCompilationFailed;
