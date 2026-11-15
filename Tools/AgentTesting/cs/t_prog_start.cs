@@ -1,0 +1,2 @@
+Protobot.Game.SkillsGame.Current.StartRun();
+return "started";

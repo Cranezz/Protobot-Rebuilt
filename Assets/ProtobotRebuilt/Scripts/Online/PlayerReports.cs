@@ -68,9 +68,10 @@ namespace Protobot.Online {
 
         /// <summary>Reports a skills leaderboard run: the moderators get the run's replay with the report (fetched
         /// here if it wasn't watched), and decide (warning, or the run taken off the leaderboard).</summary>
-        public static void OpenRun(string playerId, string name, int score, Game.ReplayFile replay) {
+        public static void OpenRun(string playerId, string name, int score, Game.ReplayFile replay, bool programming = false) {
             if (string.IsNullOrEmpty(playerId)) return;
-            if (reported.Contains("run:" + playerId)) {
+            var reportKey = (programming ? "prog:" : "run:") + playerId;
+            if (reported.Contains(reportKey)) {
                 Interface.Interface.Say("You've already reported " + name + "'s run this session", false);
                 return;
             }
@@ -97,10 +98,10 @@ namespace Protobot.Online {
                     return;
                 }
                 dialog.Close();
-                reported.Add("run:" + playerId);
-                replay ??= await Accounts.LoadReplay(playerId);
+                reported.Add(reportKey);
+                replay ??= await Accounts.LoadReplay(playerId, programming);
                 var md = new StringBuilder();
-                md.AppendLine("# Skills run report");
+                md.AppendLine(programming ? "# Programming skills run report" : "# Skills run report");
                 md.AppendLine();
                 md.AppendLine("- Run: " + name + " (" + playerId + "), " + score + " points");
                 md.AppendLine("- By: " + OnlineServices.Name + " (" + OnlineServices.PlayerId + ")");
@@ -108,13 +109,21 @@ namespace Protobot.Online {
                 md.AppendLine("- When: " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
                 md.AppendLine("- Version: " + BuildInfo.Full);
                 md.AppendLine("- Replay: " + (replay != null ? "run.pbr (File > Open replay… in Protobot)" : "none shared"));
+                if (programming && !string.IsNullOrEmpty(replay?.build?.code)) {   // V2 (Phase 9): the program that drove it
+                    md.AppendLine();
+                    md.AppendLine("## The robot's program");
+                    md.AppendLine();
+                    md.AppendLine("```python");
+                    md.AppendLine(replay.build.code);
+                    md.AppendLine("```");
+                }
                 md.AppendLine();
                 md.AppendLine("## What they wrote");
                 md.AppendLine();
                 md.AppendLine(details);
                 md.AppendLine();
                 md.AppendLine("To take the run off: Unity editor, Tools > Protobot > Skills Leaderboard Moderation (player id above).");
-                var content = "**Skills run report** · " + RunReasons[reason] + "\n> Run: " + name + " (`" + playerId + "`), " + score + " points\n> By: "
+                var content = (programming ? "**Programming skills run report** · " : "**Skills run report** · ") + RunReasons[reason] + "\n> Run: " + name + " (`" + playerId + "`), " + score + " points\n> By: "
                               + OnlineServices.Name + " (`" + OnlineServices.PlayerId + "`) · " + BuildInfo.Display;
                 Post(content, "Run report", md.ToString(), replay, "report " + name + "'s run (" + playerId + "): " + RunReasons[reason]);
             }, true, 6f);

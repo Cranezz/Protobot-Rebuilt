@@ -16,9 +16,12 @@ namespace Protobot.Online {
     /// run first, so neither can be edited by players.</summary>
     public static class Accounts {
         public const string SkillsBoard = "skills-override";
+        /// <summary>V2 (Phase 9): Programming Skills (runs driven only by the robot's program) have their own board.</summary>
+        public const string ProgrammingBoard = "programming-skills-override";
+        public static string Board(bool programming) => programming ? ProgrammingBoard : SkillsBoard;
 
         public class Stats {
-            public int matches, wins, losses, ties, points, skillsRuns, skillsBest;
+            public int matches, wins, losses, ties, points, skillsRuns, skillsBest, programmingRuns, programmingBest;
         }
 
         public class Entry {
@@ -131,7 +134,7 @@ namespace Protobot.Online {
 
         /// <summary>Sends a finished skills run; Cloud Code checks it and posts it to the leaderboard. Returns the
         /// message for the player (null: nothing to say).</summary>
-        public static async Task<string> SubmitSkills(int score, IEnumerable<(string kind, int points)> items, Vector3 footprint, float seconds, string robot) {
+        public static async Task<string> SubmitSkills(int score, IEnumerable<(string kind, int points)> items, Vector3 footprint, float seconds, string robot, bool programming = false) {
             if (!await OnlineServices.Start()) return null;
             var run = new Dictionary<string, object> {
                 { "score", score },
@@ -140,15 +143,16 @@ namespace Protobot.Online {
                 { "seconds", seconds },
                 { "build", Builds.BuildInfo.Build },
                 { "robot", robot },
+                { "kind", programming ? "programming" : "driving" },
             };
             try {
                 await SetDisplayName(OnlineServices.Name);
                 var json = await CloudCodeService.Instance.CallEndpointAsync("SubmitSkillsRun", new Dictionary<string, object> { { "run", run } });
                 var result = JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
                 var accepted = result.TryGetValue("accepted", out var a) && a is bool ok && ok;
-                Builds.ActionLog.Write("online", "skills run " + score + (accepted ? " posted" : " refused: " + (result.TryGetValue("reason", out var r) ? r : "")));
+                Builds.ActionLog.Write("online", (programming ? "programming " : "") + "skills run " + score + (accepted ? " posted" : " refused: " + (result.TryGetValue("reason", out var r) ? r : "")));
                 if (!accepted) return "The run wasn't posted to the leaderboard: " + (result.TryGetValue("reason", out var why) ? why : "it didn't pass the checks");
-                return result.TryGetValue("rank", out var rank) && rank != null ? "Posted to the skills leaderboard: #" + (Convert.ToInt32(rank) + 1) : null;
+                return result.TryGetValue("rank", out var rank) && rank != null ? "Posted to the " + (programming ? "programming " : "") + "skills leaderboard: #" + (Convert.ToInt32(rank) + 1) : null;
             }
             catch (Exception e) {
                 Debug.LogWarning("[Online] skills run: " + e.Message);
@@ -157,21 +161,21 @@ namespace Protobot.Online {
         }
 
         // V2: the replay of a player's best skills run, in their public Cloud Save data (anyone signed in can read it).
-        private const string ReplayKey = "skills-replay";
+        private const string ReplayKey = "skills-replay", ProgrammingReplayKey = "programming-replay";
         private const int ReplayLimit = 1_500_000;   // characters of base64
 
         /// <summary>Keeps this run's replay as the player's best (only when it's what the leaderboard has for them).</summary>
-        public static async Task SaveReplay(Game.ReplayFile replay) {
+        public static async Task SaveReplay(Game.ReplayFile replay, bool programming = false) {
             if (!OnlineServices.SignedIn || replay == null) return;
             try {
-                var mine = await LeaderboardsService.Instance.GetPlayerScoreAsync(SkillsBoard);
+                var mine = await LeaderboardsService.Instance.GetPlayerScoreAsync(Board(programming));
                 if (mine == null || (int)Math.Round(mine.Score) != replay.score) return;   // not the best: the best's replay stays
                 var text = Convert.ToBase64String(Game.Replays.ToBytes(replay));
                 if (text.Length > ReplayLimit) {
                     Debug.LogWarning("[Online] replay too big to share: " + text.Length);
                     return;
                 }
-                await Unity.Services.CloudSave.CloudSaveService.Instance.Data.Player.SaveAsync(new Dictionary<string, object> { { ReplayKey, text } },
+                await Unity.Services.CloudSave.CloudSaveService.Instance.Data.Player.SaveAsync(new Dictionary<string, object> { { programming ? ProgrammingReplayKey : ReplayKey, text } },
                     new Unity.Services.CloudSave.Models.Data.Player.SaveOptions(new Unity.Services.CloudSave.Models.Data.Player.PublicWriteAccessClassOptions()));
                 Builds.ActionLog.Write("online", "replay shared (" + text.Length / 1024 + " KB)");
             }
@@ -179,12 +183,13 @@ namespace Protobot.Online {
         }
 
         /// <summary>A player's best run's replay, or null (none shared, or offline).</summary>
-        public static async Task<Game.ReplayFile> LoadReplay(string playerId) {
+        public static async Task<Game.ReplayFile> LoadReplay(string playerId, bool programming = false) {
             if (!await OnlineServices.Start() || string.IsNullOrEmpty(playerId)) return null;
             try {
-                var items = await Unity.Services.CloudSave.CloudSaveService.Instance.Data.Player.LoadAsync(new HashSet<string> { ReplayKey },
+                var key = programming ? ProgrammingReplayKey : ReplayKey;
+                var items = await Unity.Services.CloudSave.CloudSaveService.Instance.Data.Player.LoadAsync(new HashSet<string> { key },
                     new Unity.Services.CloudSave.Models.Data.Player.LoadOptions(new Unity.Services.CloudSave.Models.Data.Player.PublicReadAccessClassOptions(playerId)));
-                if (!items.TryGetValue(ReplayKey, out var item)) return null;
+                if (!items.TryGetValue(key, out var item)) return null;
                 return Game.Replays.FromBytes(Convert.FromBase64String(item.Value.GetAs<string>()));
             }
             catch (Exception e) {
@@ -193,15 +198,15 @@ namespace Protobot.Online {
             }
         }
 
-        public static async Task<(List<Entry> top, Entry mine, string problem)> Leaderboard(int count = 50) {
+        public static async Task<(List<Entry> top, Entry mine, string problem)> Leaderboard(int count = 50, bool programming = false) {
             if (!await OnlineServices.Start()) return (new List<Entry>(), null, OnlineServices.Problem);
             try {
-                var page = await LeaderboardsService.Instance.GetScoresAsync(SkillsBoard, new GetScoresOptions { Limit = count });
+                var page = await LeaderboardsService.Instance.GetScoresAsync(Board(programming), new GetScoresOptions { Limit = count });
                 var me = OnlineServices.PlayerId;
                 var top = page.Results.Select(e => ToEntry(e, me)).ToList();
                 Entry mine = top.FirstOrDefault(e => e.mine);
                 if (mine == null)
-                    try { mine = ToEntry(await LeaderboardsService.Instance.GetPlayerScoreAsync(SkillsBoard), me); }
+                    try { mine = ToEntry(await LeaderboardsService.Instance.GetPlayerScoreAsync(Board(programming)), me); }
                     catch { }   // no score yet
                 return (top, mine, null);
             }

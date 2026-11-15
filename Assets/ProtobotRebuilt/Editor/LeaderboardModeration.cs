@@ -13,7 +13,11 @@ namespace Protobot.EditorTools {
     /// the player id). Removing takes the score off and deletes the run's shared replay.
     /// </summary>
     public class LeaderboardModeration : EditorWindow {
-        private const string Board = "skills-override";
+        // V2 (Phase 9): Driving Skills and Programming Skills boards, each with its own shared replay.
+        private static readonly string[] Boards = { "skills-override", "programming-skills-override" };
+        private static readonly string[] ReplayKeys = { "skills-replay", "programming-replay" };
+        private int board;
+        private string Board => Boards[board];
         private readonly List<(string id, string name, double score, string when)> rows = new();
         private string status = "", manualId = "";
         private bool busy;
@@ -74,12 +78,12 @@ namespace Protobot.EditorTools {
         }
 
         private async void Remove(string playerId) {
-            if (!EditorUtility.DisplayDialog("Remove the run", "Take player " + playerId + "'s run off the skills leaderboard and delete its replay? This can't be undone.", "Remove", "Cancel")) return;
+            if (!EditorUtility.DisplayDialog("Remove the run", "Take player " + playerId + "'s run off the " + (board == 1 ? "programming " : "") + "skills leaderboard and delete its replay? This can't be undone.", "Remove", "Cancel")) return;
             busy = true;
             try {
                 using var http = await Client();
                 var score = await http.DeleteAsync("https://services.api.unity.com/leaderboards/v1/projects/" + Project + "/environments/" + Environment + "/leaderboards/" + Board + "/scores/players/" + playerId);
-                var replay = await http.DeleteAsync("https://services.api.unity.com/cloud-save/v1/data/projects/" + Project + "/environments/" + Environment + "/players/" + playerId + "/public/items/skills-replay");
+                var replay = await http.DeleteAsync("https://services.api.unity.com/cloud-save/v1/data/projects/" + Project + "/environments/" + Environment + "/players/" + playerId + "/public/items/" + ReplayKeys[board]);
                 status = "Removed: score " + (int)score.StatusCode + ", replay " + (int)replay.StatusCode;
             }
             catch (Exception e) { status = e.Message; }
@@ -90,6 +94,11 @@ namespace Protobot.EditorTools {
         private void OnGUI() {
             EditorGUILayout.HelpBox("Runs on the Override skills leaderboard. Remove takes a run off (a major rule broken) and deletes its replay; "
                                     + "warnings and appeals are answered in the Discord channel.", MessageType.Info);
+            var chosen = GUILayout.Toolbar(board, new[] { "Driving Skills", "Programming Skills" });
+            if (chosen != board && !busy) {
+                board = chosen;
+                Load();
+            }
             using (new EditorGUILayout.HorizontalScope()) {
                 GUI.enabled = !busy;
                 if (GUILayout.Button("Refresh", GUILayout.Width(90f))) Load();

@@ -245,7 +245,9 @@ namespace Protobot.Game {
                         ? string.Join(",", renderer.sharedMaterials.Select(m => m != null ? ColorUtility.ToHtmlStringRGB(m.color) : "FFFFFF")) : null,
                 };
             }
-            build = new BuildData { version = Application.version, parts = data, drive = Controls.DriveToken };
+            build = new BuildData { version = Application.version, parts = data, drive = Controls.DriveToken,
+                // V2 (Phase 9): a Programming Skills run keeps the program that drove it (moderators can read it).
+                code = game.mode == SkillsGame.Mode.Programming ? RobotCode.CodeStore.Token : null };
             custom = data.Select(d => d.partId).Distinct().Select(CustomParts.Find).Where(c => c != null).ToArray();
         }
 

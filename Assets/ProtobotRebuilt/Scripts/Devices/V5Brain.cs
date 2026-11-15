@@ -123,7 +123,11 @@ namespace Protobot.Devices {
             seenWires = wires;
             seenParts = CountParts();
 
-            var old = devices.ToDictionary(d => d.Key, d => d);
+            // (Devices whose parts were destroyed all have key "0:<kind>", e.g. the replay viewer's temporary parts:
+            // keep the first; they never match a live part.)
+            var old = new Dictionary<string, V5Device>();
+            foreach (var d in devices)
+                if (!old.ContainsKey(d.Key)) old[d.Key] = d;
             devices.Clear();
             var found = new List<V5Device>();
             var parts = Object.FindObjectsByType<SavedObject>(FindObjectsSortMode.InstanceID)

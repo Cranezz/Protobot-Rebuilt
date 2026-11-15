@@ -2,11 +2,13 @@
 // the robot fit the 18" size limit at the start, the run took a skills run's time, every scored item is worth what
 // Override's rules give it and they add up to the score, and there aren't more of them than the field holds.
 // Then the score goes on the "skills-override" leaderboard (best kept) and into the player's stats (protected data:
-// only Cloud Code writes it).
+// only Cloud Code writes it). A Programming Skills run (run.kind "programming": driven only by the robot's program) goes
+// on "programming-skills-override" instead, with its own stats.
 const { DataApi } = require("@unity-services/cloud-save-1.4");
 const { LeaderboardsApi } = require("@unity-services/leaderboards-1.1");
 
 const LEADERBOARD = "skills-override";
+const PROGRAMMING_LEADERBOARD = "programming-skills-override";
 const VALUES = { "Red pin halves": 5, "Blue pin halves": 5, "Yellow pin halves": 10, "Robots in the Midfield": 8, "Robot in the Midfield": 8 };
 const MOST = { "Red pin halves": 60, "Blue pin halves": 60, "Yellow pin halves": 30, "Robots in the Midfield": 1, "Robot in the Midfield": 1 };
 
@@ -39,26 +41,32 @@ module.exports = async ({ params, context, logger }) => {
   const score = Math.round(Number(run.score));
   if (score !== total) return reject("the items don't add up to the score");
 
+  const programming = run.kind === "programming";
   const projectId = context.projectId;
   const playerId = context.playerId;
   const leaderboards = new LeaderboardsApi({ accessToken: context.serviceToken });
-  const posted = await leaderboards.addLeaderboardPlayerScore(projectId, LEADERBOARD, playerId, {
+  const posted = await leaderboards.addLeaderboardPlayerScore(projectId, programming ? PROGRAMMING_LEADERBOARD : LEADERBOARD, playerId, {
     score,
     metadata: { build: String(run.build || ""), robot: String(run.robot || "").slice(0, 40) },
   });
 
   const data = new DataApi({ accessToken: context.serviceToken });
   const stats = await readStats(data, projectId, playerId);
-  stats.skillsRuns += 1;
-  stats.skillsBest = Math.max(stats.skillsBest, score);
+  if (programming) {
+    stats.programmingRuns += 1;
+    stats.programmingBest = Math.max(stats.programmingBest, score);
+  } else {
+    stats.skillsRuns += 1;
+    stats.skillsBest = Math.max(stats.skillsBest, score);
+  }
   await data.setProtectedItem(projectId, playerId, { key: "stats", value: stats });
 
   const entry = posted && posted.data ? posted.data : {};
-  return { accepted: true, best: stats.skillsBest, rank: entry.rank, stats };
+  return { accepted: true, best: programming ? stats.programmingBest : stats.skillsBest, rank: entry.rank, stats };
 };
 
 async function readStats(data, projectId, playerId) {
-  const blank = { matches: 0, wins: 0, losses: 0, ties: 0, points: 0, skillsRuns: 0, skillsBest: 0, lastMatch: 0 };
+  const blank = { matches: 0, wins: 0, losses: 0, ties: 0, points: 0, skillsRuns: 0, skillsBest: 0, programmingRuns: 0, programmingBest: 0, lastMatch: 0 };
   try {
     const response = await data.getProtectedItems(projectId, playerId, ["stats"]);
     const found = response.data.results.find((r) => r.key === "stats");

@@ -1,4 +1,4 @@
-// Removes the cloud test player's leaderboard score, stats and shared replay (admin APIs, the editor's sign-in). Result in Temp/cleanup_result.txt.
+// Removes the cloud test player's leaderboard scores (driving and programming skills), stats and shared replays (admin APIs, the editor's sign-in). Result in Temp/cleanup_result.txt.
 var player = "XSqtBjWBSsGWrtdaq8uQ72wego99";
 var project = UnityEditor.CloudProjectSettings.projectId;
 var env = Unity.Services.Core.Editor.Environments.EnvironmentsApi.Instance.ActiveEnvironmentId;
@@ -17,6 +17,12 @@ System.Threading.Tasks.Task.Run(async () => {
             sb.AppendLine("stats: " + (int)cs.StatusCode + " " + await cs.Content.ReadAsStringAsync());
             var rp = await http.DeleteAsync("https://services.api.unity.com/cloud-save/v1/data/projects/" + project + "/environments/" + env + "/players/" + player + "/public/items/skills-replay");
             sb.AppendLine("replay: " + (int)rp.StatusCode + " " + await rp.Content.ReadAsStringAsync());
+            var plb = await http.DeleteAsync("https://services.api.unity.com/leaderboards/v1/projects/" + project + "/environments/" + env + "/leaderboards/programming-skills-override/scores/players/" + player);
+            sb.AppendLine("programming score: " + (int)plb.StatusCode + " " + await plb.Content.ReadAsStringAsync());
+            var prp = await http.DeleteAsync("https://services.api.unity.com/cloud-save/v1/data/projects/" + project + "/environments/" + env + "/players/" + player + "/public/items/programming-replay");
+            sb.AppendLine("programming replay: " + (int)prp.StatusCode + " " + await prp.Content.ReadAsStringAsync());
+            var pcheck = await http.GetAsync("https://services.api.unity.com/leaderboards/v1/projects/" + project + "/environments/" + env + "/leaderboards/programming-skills-override/scores");
+            sb.AppendLine("programming board now: " + (int)pcheck.StatusCode + " " + await pcheck.Content.ReadAsStringAsync());
             var check = await http.GetAsync("https://services.api.unity.com/leaderboards/v1/projects/" + project + "/environments/" + env + "/leaderboards/skills-override/scores");
             sb.AppendLine("board now: " + (int)check.StatusCode + " " + await check.Content.ReadAsStringAsync());
         }

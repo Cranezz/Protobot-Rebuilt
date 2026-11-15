@@ -18,6 +18,9 @@ namespace Protobot.Game {
         // The robot's control layout, top right under the performance readout (saved with the build).
         private static void ShowControls(bool editable) {
             if (controls != null) Object.Destroy(controls.gameObject);
+            controls = null;
+            // V2 (Phase 9): in Programming Skills the keys don't drive (the program does): no key layout.
+            if (SkillsGame.Current != null && SkillsGame.Current.mode == SkillsGame.Mode.Programming) return;
             controls = (RectTransform)Motion.ControlsCard.Create(Interface.Interface.Root, Layout.TopBarBottom + 200f,
                 editable ? () => Devices.DevicesPanel.Open(true) : null).transform;
         }
@@ -153,11 +156,12 @@ namespace Protobot.Game {
             // V2: Robot Skills or a match (practice on your own), each with its own start, preload and timing.
             var modeRow = Dialog.Row(body, "Mode", 40f, 130f);
             var modeChoice = 0;
-            Popup.Choice(modeRow, new[] { "Driving Skills · 1:00", "Match practice · 0:15 + 1:45" }, 0, i => modeChoice = i, 380f);
-            var later = Ui.Text(body, "Later", "Match practice starts like a match: one Quadrant on your Alliance's side, your Alliance's preload. Against other players: Multiplayer.", Theme.FontSmall, Theme.TextFaint);
+            // V2 (Phase 9): Programming Skills: the robot's program drives the whole minute.
+            Popup.Choice(modeRow, new[] { "Driving Skills · 1:00", "Programming Skills · 1:00", "Match practice · 0:15 + 1:45" }, 0, i => modeChoice = i, 380f);
+            var later = Ui.Text(body, "Later", "Programming Skills: the robot's program (Code in the top bar) drives the whole minute. Match practice starts like a match: one Quadrant on your Alliance's side, your Alliance's preload. Against other players: Multiplayer.", Theme.FontSmall, Theme.TextFaint);
             later.margin = new Vector4(138, 0, 0, 0);
             later.textWrappingMode = TextWrappingModes.Normal;
-            later.Size(-1, 34f);
+            later.Size(-1, 50f);
 
             var robotRow = Dialog.Row(body, "Robot", 40f, 130f);
             var manager = Object.FindAnyObjectByType<Builds.BuildsManager>();
@@ -189,7 +193,7 @@ namespace Protobot.Game {
             cancel.Size(-1f, 36f);
             var start = Ui.Button(dialog.Footer, "Start", "Set up the field", () => {
                 dialog.Close();
-                SkillsGame.Open(games[chosen], light, modeChoice == 1 ? SkillsGame.Mode.Match : SkillsGame.Mode.Skills);
+                SkillsGame.Open(games[chosen], light, modeChoice == 2 ? SkillsGame.Mode.Match : modeChoice == 1 ? SkillsGame.Mode.Programming : SkillsGame.Mode.Skills);
             }, true, 6f);
             start.Size(-1f, 36f);
             start.interactable = count > 0;
@@ -260,7 +264,7 @@ namespace Protobot.Game {
 
                 var title = Ui.Text(column, "Title", game.ModeName, Theme.FontTitle + 4f, Theme.Text, Theme.Medium);
                 title.Size(-1, 30f);
-                var sub = Ui.Text(column, "Sub", $"{game.definition.Name} · " + (game.mode == SkillsGame.Mode.Skills ? Clock(game.definition.skillsSeconds) : "0:15 autonomous + 1:45 driver"), Theme.FontSmall, Theme.TextDim);
+                var sub = Ui.Text(column, "Sub", $"{game.definition.Name} · " + (game.SkillsRun ? Clock(game.definition.skillsSeconds) + (game.mode == SkillsGame.Mode.Programming ? " of robot code" : "") : "0:15 autonomous + 1:45 driver"), Theme.FontSmall, Theme.TextDim);
                 sub.Size(-1, 20f);
 
                 // The robot.
@@ -422,7 +426,7 @@ namespace Protobot.Game {
                 }
 
                 // The checklist.
-                Dialog.Heading(column, game.mode == SkillsGame.Mode.Skills ? "Legal start (SG1, RSC2)" : "Legal start (SG1, SG5)");
+                Dialog.Heading(column, game.SkillsRun ? "Legal start (SG1, RSC2)" : "Legal start (SG1, SG5)");
                 foreach (var (rule, ok) in game.Checks()) {
                     var check = Row(column, "Check", 22f);
                     var dot = Ui.Image(check, "Dot", ok ? Theme.Success : Theme.Danger);
@@ -595,10 +599,10 @@ namespace Protobot.Game {
                 if (game == null || clock == null) return;
                 // V2: a match shows its period (autonomous counts its own 0:15).
                 clock.text = Clock(game.InAutonomous ? game.timeLeft - SkillsGame.DriverSeconds : game.timeLeft);
-                if (label != null) label.text = game.mode == SkillsGame.Mode.Skills ? "TIME            SCORE" : game.InAutonomous ? "AUTONOMOUS        SCORE" : "DRIVER            SCORE";
+                if (label != null) label.text = game.mode == SkillsGame.Mode.Programming ? "PROGRAM         SCORE" : game.mode == SkillsGame.Mode.Skills ? "TIME            SCORE" : game.InAutonomous ? "AUTONOMOUS        SCORE" : "DRIVER            SCORE";
                 clock.color = game.state == SkillsGame.State.Running && game.timeLeft < 10f ? Theme.Danger : Theme.Text;
                 if (game.state == SkillsGame.State.Countdown) countdown.text = Mathf.CeilToInt(game.countdown).ToString();
-                else if (game.state == SkillsGame.State.Running && game.RunSeconds - game.timeLeft < 0.8f) countdown.text = game.InAutonomous ? "AUTO" : "GO";
+                else if (game.state == SkillsGame.State.Running && game.RunSeconds - game.timeLeft < 0.8f) countdown.text = game.InAutonomous || game.mode == SkillsGame.Mode.Programming ? "AUTO" : "GO";
                 else if (game.state == SkillsGame.State.Ending) countdown.text = "";
                 else countdown.text = "";
             }

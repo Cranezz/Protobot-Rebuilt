@@ -41,7 +41,8 @@ namespace Protobot.Game {
         // (Skills: the Left Quadrant by the red Alliance Station, RSC; a match: one Quadrant on your Alliance's side of
         // the Autonomous Line, SG1), preload (SG5: one Pin of your Alliance's color touching the robot) and timing
         // (a match: 0:15 autonomous, then 1:45 driver control).
-        public enum Mode { Skills, Match }
+        // V2 (Phase 9): Programming Skills = a skills run (same start, Match Loads, 1:00) driven only by the robot's program.
+        public enum Mode { Skills, Match, Programming }
         public enum PreloadSpot { Front, Back, Left, Right, Top }
         public Mode mode = Mode.Skills;
         public bool redAlliance = true;
@@ -50,10 +51,12 @@ namespace Protobot.Game {
         public bool skipAutonomous = true;
         public const float AutonomousSeconds = 15f, DriverSeconds = 105f;
         public bool InAutonomous => mode == Mode.Match && !skipAutonomous && timeLeft > DriverSeconds && (state == State.Running || state == State.Countdown);
-        public float RunSeconds => mode == Mode.Skills ? definition.skillsSeconds : DriverSeconds + (skipAutonomous ? 0f : AutonomousSeconds);
-        public string ModeName => mode == Mode.Skills ? "Driving Skills" : "Match practice";
-        public Quadrant StartQuadrant => mode == Mode.Skills ? Quadrant.Left : startQuadrant;
-        public bool Red => mode == Mode.Skills || redAlliance;
+        /// <summary>Driving or Programming Skills (a Robot Skills run: the skills start, field and Match Loads).</summary>
+        public bool SkillsRun => mode != Mode.Match;
+        public float RunSeconds => SkillsRun ? definition.skillsSeconds : DriverSeconds + (skipAutonomous ? 0f : AutonomousSeconds);
+        public string ModeName => mode == Mode.Skills ? "Driving Skills" : mode == Mode.Programming ? "Programming Skills" : "Match practice";
+        public Quadrant StartQuadrant => SkillsRun ? Quadrant.Left : startQuadrant;
+        public bool Red => SkillsRun || redAlliance;
         public string PreloadColors => Red ? "Red-Neutral" : "Blue-Neutral";
         private string ghostColors;
 
@@ -64,6 +67,7 @@ namespace Protobot.Game {
 
         // The run.
         public float timeLeft, countdown;
+        private bool ranCode;   // V2 (Phase 9): the robot's program ran this run (a Programming Skills run only posts then)
         public SkillsScore score = new();
         public int best;
         public readonly Dictionary<string, int> matchLoads = new();
@@ -130,7 +134,7 @@ namespace Protobot.Game {
             game.mode = mode;
             try {
                 game.MeasureRobot(parts);
-                game.field = GameField.Create(definition, lightField, mode == Mode.Skills);
+                game.field = GameField.Create(definition, lightField, mode != Mode.Match);
             }
             catch (Exception e) {
                 Debug.LogException(e);
@@ -189,7 +193,7 @@ namespace Protobot.Game {
             }
         }
 
-        private string BestKey => $"V2.Game.Best.{definition.title}.{buildName}" + (mode == Mode.Match ? ".Match" : "");
+        private string BestKey => $"V2.Game.Best.{definition.title}.{buildName}" + (mode == Mode.Match ? ".Match" : mode == Mode.Programming ? ".Programming" : "");
         private string FrontKey => $"V2.Game.Front.{buildName}";
 
         // ------------------------------------------------------------------ the robot
@@ -453,7 +457,7 @@ namespace Protobot.Game {
             // V2: the Quadrant and wall checks in the start Quadrant's own frame (turned to look like the Left one).
             var q = StartQuadrant;
             var local = edges.Select(p => ToLeft(q, p)).ToList();
-            list.Add((mode == Mode.Skills ? "In the Quadrant by the red Alliance Station" : $"In the {QuadrantName(q)} Quadrant ({(Red ? "red" : "blue")} side of the Autonomous Line)",
+            list.Add((SkillsRun ? "In the Quadrant by the red Alliance Station" : $"In the {QuadrantName(q)} Quadrant ({(Red ? "red" : "blue")} side of the Autonomous Line)",
                 local.All(p => p.x <= -Mathf.Abs(p.y) + Slack && p.x >= -GameField.Half - Slack)));
             list.Add(("Touching the Field Perimeter", local.Any(p => p.x <= -GameField.Half + 0.1f)));
             list.Add(("Not in a Load Zone", !edges.Any(GameField.InLoadZone)));
@@ -698,7 +702,7 @@ namespace Protobot.Game {
             if (tool != null) tool.gameObject.SetActive(false);
             if (preloadGhost != null) preloadGhost.gameObject.SetActive(false);
             matchLoads.Clear();
-            if (mode == Mode.Skills) {
+            if (SkillsRun) {
                 matchLoads["Red-Neutral"] = 3;   // RSC4: 3 red/yellow and 4 blue/yellow Pins, 7 Cups
                 matchLoads["Blue-Neutral"] = 4;
                 matchLoads["Cup"] = 7;
@@ -735,6 +739,7 @@ namespace Protobot.Game {
             if (!online) ReplayRecorder.Begin(this);   // V2: the replay
             state = State.Countdown;
             countdown = 3f;
+            ranCode = false;
             timeLeft = RunSeconds;
             score = new SkillsScore();
             GameUi.ShowHud(this);
@@ -872,8 +877,17 @@ namespace Protobot.Game {
                     if (countdown <= 0f) {
                         state = State.Running;
                         // V2: a match's autonomous period: no driving; the robot's own program runs (Phase 9).
-                        Sandbox.DriveEnabled = !InAutonomous;
                         Audio.Sounds.Play(Audio.Sounds.Tick);
+                        if (mode == Mode.Programming) {
+                            // V2 (Phase 9): Programming Skills: the whole minute is the robot's program (its autonomous
+                            // when it's a competition program, as a field controller runs it); the keys don't drive.
+                            Sandbox.DriveEnabled = false;
+                            ranCode = StartCode(RobotCode.RobotProgram.Period.Autonomous, RunSeconds);
+                            if (ranCode) Interface.Interface.Say("Go! The robot's program runs", true);
+                            else if (string.IsNullOrWhiteSpace(RobotCode.CodeStore.Source)) Interface.Interface.Say("The robot has no program: it waits (Code in the top bar)", false);
+                            break;
+                        }
+                        Sandbox.DriveEnabled = !InAutonomous;
                         var runsCode = InAutonomous && !online && StartCode(RobotCode.RobotProgram.Period.Autonomous, AutonomousSeconds);
                         Interface.Interface.Say(!InAutonomous ? "Go!" : runsCode ? "Autonomous: 0:15 (the robot's program runs)" : "Autonomous: 0:15 (the robot has no program: it waits; Code in the top bar)", true);
                     }
@@ -951,13 +965,15 @@ namespace Protobot.Game {
                     Online.Accounts.RecordMatch(Red ? score.red : score.blue, Red ? score.blue : score.red);
                     return;
                 }
-                if (mode != Mode.Skills || online || !Legal) return;
+                if (!SkillsRun || online || !Legal) return;
+                if (mode == Mode.Programming && !ranCode) return;   // no program: nothing to post
                 var items = score.items.Select(i => (i.kind, i.points)).ToList();
                 var replay = Replays.Last;
-                var message = await Online.Accounts.SubmitSkills(score.total, items, new Vector3(depth, width, height), RunSeconds, buildName);
+                var programming = mode == Mode.Programming;
+                var message = await Online.Accounts.SubmitSkills(score.total, items, new Vector3(depth, width, height), RunSeconds, buildName, programming);
                 if (message != null) Interface.Interface.Announce(message);
                 // V2: the replay of the player's best run goes with it (others can watch it from the leaderboard).
-                if (replay != null && replay.score == score.total) await Online.Accounts.SaveReplay(replay);
+                if (replay != null && replay.score == score.total) await Online.Accounts.SaveReplay(replay, programming);
             }
             catch (Exception e) { Debug.LogWarning("V2: posting the result: " + e.Message); }
         }
@@ -1056,7 +1072,7 @@ namespace Protobot.Game {
             for (var i = 0; i < 3; i++) Overlay.Line(field.ToWorld(triangle[i], 0.1f), field.ToWorld(triangle[(i + 1) % 3], 0.1f), new Color(zone.r, zone.g, zone.b, 0.9f), 2.5f);
             var middle = Vector2.Lerp((triangle[0] + triangle[1]) / 2f, triangle[2], 0.45f);   // toward the tip, clear of the robot
             if (Overlay.ToScreen(field.ToWorld(middle, 0.1f), out var label))
-                Overlay.Text(label, mode == Mode.Skills ? "Start zone (Robot Skills)" : $"Start zone ({QuadrantName(q)} Quadrant)", zone);
+                Overlay.Text(label, SkillsRun ? "Start zone (Robot Skills)" : $"Start zone ({QuadrantName(q)} Quadrant)", zone);
             // A match: the Autonomous Line (corner to corner), dashed.
             if (mode == Mode.Match) Dashed(new Vector2(-GameField.Half, GameField.Half), new Vector2(GameField.Half, -GameField.Half), new Color(1f, 1f, 1f, 0.75f), 0.12f, 2f);
             // Where the Preload may be: touching the robot (a band a Pin wide round its footprint), dashed yellow.

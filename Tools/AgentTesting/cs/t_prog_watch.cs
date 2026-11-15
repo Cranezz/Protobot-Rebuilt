@@ -1,0 +1,10 @@
+var screen = UnityEngine.Object.FindAnyObjectByType<Protobot.Online.OnlineScreen>();
+if (screen == null) return "no screen";
+var t = screen.GetType();
+var bf = System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance;
+var board = (System.Collections.IList)t.GetField("board", bf).GetValue(screen);
+var fetching = t.GetField("fetching", bf).GetValue(screen);
+var prog = t.GetField("boardProgramming", bf).GetValue(screen);
+if (board == null || board.Count == 0) return "no board";
+t.GetMethod("WatchRun", bf).Invoke(screen, new object[] { board[0] });
+return "watch called; fetching was " + fetching + " programming " + prog;

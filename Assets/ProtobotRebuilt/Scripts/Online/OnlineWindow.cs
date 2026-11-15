@@ -542,13 +542,20 @@ namespace Protobot.Online {
         private Accounts.Entry boardMine;
         private string boardProblem;
         private bool boardLoading;
+        private bool boardProgramming;   // V2 (Phase 9): the Programming Skills board
 
         private async void LoadBoard() {
             if (boardLoading) return;
             boardLoading = true;
             dirty = true;
-            var (top, mine, problem) = await Accounts.Leaderboard();
+            var programming = boardProgramming;
+            var (top, mine, problem) = await Accounts.Leaderboard(50, programming);
             if (this == null) return;
+            if (programming != boardProgramming) {   // switched while it loaded
+                boardLoading = false;
+                LoadBoard();
+                return;
+            }
             board = top;
             boardMine = mine;
             boardProblem = problem;
@@ -557,7 +564,19 @@ namespace Protobot.Online {
         }
 
         private void Leaderboard() {
-            Heading("Skills leaderboard", "Override Robot Skills: your best run counts. A run is posted when it finishes, after it's checked against the rules (robot size, the scoring adds up).");
+            Heading("Skills leaderboard", (boardProgramming ? "Override Programming Skills: the robot's program drives the whole minute. " : "Override Driving Skills: ")
+                                          + "your best run counts. A run is posted when it finishes, after it's checked against the rules (robot size, the scoring adds up).");
+            // V2 (Phase 9): Driving Skills and Programming Skills each have their own board.
+            var kindRow = Row(44f);
+            ToolOptions.Segmented(kindRow, new[] { "Driving Skills", "Programming Skills" }, boardProgramming ? 1 : 0, i => {
+                if ((i == 1) == boardProgramming) return;
+                boardProgramming = i == 1;
+                board = null;
+                boardMine = null;
+                boardProblem = null;
+                Rebuild();
+            }, 170f);
+            Fixed(kindRow, 360f);
             if (board == null && !boardLoading) LoadBoard();
             if (board == null || boardLoading) {
                 Ui.Text(content, "Loading", "Loading…", Theme.FontBody, new Color(1f, 1f, 1f, 0.6f)).Size(-1, 30f);
@@ -575,7 +594,7 @@ namespace Protobot.Online {
             }
             var list = ScrollList(360f);
             if (board.Count == 0) {
-                Ui.Text(list, "Empty", "No runs yet: play Robot Skills (Play game) and finish a run.", Theme.FontBody, new Color(1f, 1f, 1f, 0.6f)).Size(-1, 34f);
+                Ui.Text(list, "Empty", boardProgramming ? "No runs yet: play Programming Skills (Play game) with a robot program and finish a run." : "No runs yet: play Robot Skills (Play game) and finish a run.", Theme.FontBody, new Color(1f, 1f, 1f, 0.6f)).Size(-1, 34f);
                 return;
             }
             foreach (var e in board) {
@@ -594,7 +613,7 @@ namespace Protobot.Online {
                 watch.Size(74f, 28f);
                 Ui.Tip(watch, "Watch the run", null, "Plays the replay of this run on the field.");
                 if (!e.mine) {
-                    var report = Ui.Button(inner, "Report", "Report", () => PlayerReports.OpenRun(entry.playerId, entry.name, entry.score, watched.TryGetValue(entry.playerId, out var r) ? r : null), false, 6f, Theme.FontSmall);
+                    var report = Ui.Button(inner, "Report", "Report", () => PlayerReports.OpenRun(entry.playerId, entry.name, entry.score, watched.TryGetValue(WatchKey(entry.playerId), out var r) ? r : null, boardProgramming), false, 6f, Theme.FontSmall);
                     report.targetGraphic.color = new Color(1f, 1f, 1f, 0.1f);
                     report.Size(74f, 28f);
                     Ui.Tip(report, "Report the run", null, "Tell the moderators this run breaks the rules (the replay goes with your report).");
@@ -606,17 +625,20 @@ namespace Protobot.Online {
         private readonly Dictionary<string, Game.ReplayFile> watched = new();
         private bool fetching;
 
+        private string WatchKey(string playerId) => (boardProgramming ? "prog:" : "") + playerId;
+
         private async void WatchRun(Accounts.Entry entry) {
             if (fetching) return;
             fetching = true;
-            var replay = await Accounts.LoadReplay(entry.playerId);
+            var key = WatchKey(entry.playerId);
+            var replay = await Accounts.LoadReplay(entry.playerId, boardProgramming);
             fetching = false;
             if (this == null) return;
             if (replay == null) {
                 Interface.Interface.Say("There's no replay of " + entry.name + "'s run (runs from before replays were added have none)", false);
                 return;
             }
-            watched[entry.playerId] = replay;
+            watched[key] = replay;
             Game.ReplayViewer.Open(replay);
         }
 
@@ -662,7 +684,7 @@ namespace Protobot.Online {
             var s = stats ?? new Accounts.Stats();
             var grid = Row(70f);
             foreach (var (label, value) in new[] { ("Matches", s.matches.ToString()), ("Won", s.wins.ToString()), ("Lost", s.losses.ToString()), ("Tied", s.ties.ToString()),
-                                                    ("Points", s.points.ToString()), ("Skills best", s.skillsBest.ToString()) }) {
+                                                    ("Points", s.points.ToString()), ("Skills best", s.skillsBest.ToString()), ("Programming best", s.programmingBest.ToString()) }) {
                 var tile = OnlineWindow.GlassPanel(grid, label, OnlineWindow.GlassDeep, 10f);
                 tile.Size(-1, 66f, 1f);
                 var column = Ui.Rect("Column", tile.transform).Fill(12, 8, 12, 8);
