@@ -98,13 +98,13 @@ namespace Protobot.Devices {
         // ------------------------------------------------------------------ the controller (VEX's picture, Steam style)
 
         // The picture (Resources/Controller/V5 Controller.png: VEX's catalog render of the V5 Controller, 276-4820, cut
-        // out) and where its controls are in it (pixels of the 1200 x 871 image, from the top left).
-        private const float PictureWidth = 430f, PictureAspect = 871f / 1200f, PictureY = 6f;
+        // out) and where its controls are in it (pixels of the 1200 x 864 image, from the top left).
+        private const float PictureWidth = 430f, PictureAspect = 864f / 1200f, PictureY = 6f;
         private static readonly Dictionary<string, Vector2> Spots = new() {
-            ["L1"] = new(262f, 40f), ["L2"] = new(305f, 56f), ["R1"] = new(938f, 40f), ["R2"] = new(895f, 56f),
-            ["LStick"] = new(225f, 260f), ["RStick"] = new(975f, 260f),
-            ["Up"] = new(365f, 345f), ["Left"] = new(293f, 418f), ["Right"] = new(437f, 418f), ["Down"] = new(365f, 490f),
-            ["X"] = new(835f, 345f), ["Y"] = new(762f, 418f), ["A"] = new(905f, 418f), ["B"] = new(835f, 490f),
+            ["L1"] = new(278f, 26f), ["L2"] = new(312f, 40f), ["R1"] = new(922f, 26f), ["R2"] = new(888f, 40f),
+            ["LStick"] = new(215f, 253f), ["RStick"] = new(985f, 253f),
+            ["Up"] = new(359f, 341f), ["Left"] = new(285f, 416f), ["Right"] = new(433f, 416f), ["Down"] = new(359f, 489f),
+            ["X"] = new(841f, 341f), ["Y"] = new(766f, 416f), ["A"] = new(913f, 416f), ["B"] = new(841f, 489f),
         };
 
         // Each side's rows, top to bottom, in the order of what they point at (few lines cross).
@@ -117,7 +117,7 @@ namespace Protobot.Devices {
         private readonly Dictionary<string, TextMeshProUGUI> padLabels = new();
 
         private static Vector2 ToStage(Vector2 pixel) =>
-            new((pixel.x / 1200f - 0.5f) * PictureWidth, PictureY + (0.5f - pixel.y / 871f) * PictureWidth * PictureAspect);
+            new((pixel.x / 1200f - 0.5f) * PictureWidth, PictureY + (0.5f - pixel.y / 864f) * PictureWidth * PictureAspect);
 
         // Where a control's line ends on the picture (a stick's directions just off its middle).
         private static Vector2 Target(string id) {
