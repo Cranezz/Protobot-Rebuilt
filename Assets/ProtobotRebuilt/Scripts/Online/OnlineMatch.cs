@@ -595,6 +595,7 @@ namespace Protobot.Online {
             Sandbox.InputOf = robot => robot == me ? null : Off;
             Sandbox.LocalRobot = me;
             Sandbox.Puppet = false;
+            _ = Voice.JoinAlliance(MatchSessions.Current != null ? MatchSessions.Current.Id : null, game.Red);   // V2: alliance voice chat
             game.onlineClient = true;   // every computer: the host takes the score once it has everyone's final positions
             game.onlineDrop = kind => {
                 var w = new StringBuilder().Append(kind).Append('|').Append(game.Red ? 1 : 0).Append('|').Append(game.loader);
@@ -1554,6 +1555,7 @@ namespace Protobot.Online {
 
         private void Cleanup() {
             Highlights.Clear("holding");
+            Voice.Leave(true);   // V2
             if (NetworkManager.Singleton != null) NetworkManager.Singleton.OnClientConnectedCallback -= OnClientConnected;
             if (ping != null) Destroy(ping.gameObject);
             if (TestDrive != 0f) Sandbox.TestSticks = null;

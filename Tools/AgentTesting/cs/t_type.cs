@@ -1,1 +1,1 @@
-return System.Type.GetType("Protobot.Builds.Updater, Assembly-CSharp") != null ? "found" : "missing";
+return (System.Type.GetType("Protobot.Online.Voice, Assembly-CSharp") != null ? "voice " : "no voice ") + UnityEditor.EditorUtility.scriptCompilationFailed;

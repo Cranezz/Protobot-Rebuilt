@@ -99,7 +99,7 @@ namespace Protobot.Online {
 
     /// <summary>The screen itself (see OnlineWindow).</summary>
     public class OnlineScreen : MonoBehaviour {
-        public enum Page { Servers, Leaderboard, Host, Lobby }
+        public enum Page { Servers, Leaderboard, Host, Lobby, Account }
 
         private Page page;
         private RectTransform root, nav, card, content;
@@ -247,7 +247,7 @@ namespace Protobot.Online {
             }
             if (page == Page.Servers && !loading && refreshAt > 0f && t > refreshAt && !InputEvents.TextInput.IsTyping) Refresh();
             if (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame && Dialog.OpenCount == 0 && !Popup.IsOpen && !InputEvents.TextInput.IsTyping) {
-                if (page == Page.Host || page == Page.Leaderboard) Show(Page.Servers);
+                if (page == Page.Host || page == Page.Leaderboard || page == Page.Account) Show(Page.Servers);
                 else if (page == Page.Servers) BackToMenu();
             }
         }
@@ -302,7 +302,14 @@ namespace Protobot.Online {
                 return;
             }
             NavButton("Server list", page == Page.Servers, () => Show(Page.Servers));
-            NavButton("Skills leaderboard", page == Page.Leaderboard, () => Show(Page.Leaderboard));
+            NavButton("Skills leaderboard", page == Page.Leaderboard, () => {
+                board = null;
+                Show(Page.Leaderboard);
+            });
+            NavButton("Account", page == Page.Account, () => {
+                stats = null;
+                Show(Page.Account);
+            });
             NavButton("Host a match", page == Page.Host, () => {
                 hostOptions = new MatchSessions.HostOptions { name = OnlineServices.Name + "'s match", mode = 0, maxPlayers = 4 };
                 Show(Page.Host);
@@ -312,6 +319,7 @@ namespace Protobot.Online {
             NavButton("Back to menu", false, BackToMenu);
             if (page == Page.Servers) Servers();
             else if (page == Page.Leaderboard) Leaderboard();
+            else if (page == Page.Account) Account();
             else Host();
         }
 
@@ -523,14 +531,152 @@ namespace Protobot.Online {
 
         // ---- leaderboard
 
+        // V2: the best Robot Skills runs (Online/Accounts: posted by Cloud Code after it checks each run).
+        private List<Accounts.Entry> board;
+        private Accounts.Entry boardMine;
+        private string boardProblem;
+        private bool boardLoading;
+
+        private async void LoadBoard() {
+            if (boardLoading) return;
+            boardLoading = true;
+            dirty = true;
+            var (top, mine, problem) = await Accounts.Leaderboard();
+            if (this == null) return;
+            board = top;
+            boardMine = mine;
+            boardProblem = problem;
+            boardLoading = false;
+            dirty = true;
+        }
+
         private void Leaderboard() {
-            Heading("Skills leaderboard", "The best Robot Skills runs, with a replay of each.");
-            var text = Ui.Text(content, "Soon", "Run Robot Skills online and your best score is posted here for everyone to see. Click a run to watch its replay. "
-                                                + "Robots are checked against the game's rules (size and the rest) before a run counts, and anyone can report a run that looks wrong.\n\n"
-                                                + "This is the next part being built.",
-                Theme.FontBody, new Color(1f, 1f, 1f, 0.75f));
-            text.textWrappingMode = TextWrappingModes.Normal;
-            text.Size(-1, 140f);
+            Heading("Skills leaderboard", "Override Robot Skills: your best run counts. A run is posted when it finishes, after it's checked against the rules (robot size, the scoring adds up).");
+            if (board == null && !boardLoading) LoadBoard();
+            if (board == null || boardLoading) {
+                Ui.Text(content, "Loading", "Loading…", Theme.FontBody, new Color(1f, 1f, 1f, 0.6f)).Size(-1, 30f);
+                return;
+            }
+            if (boardProblem != null) {
+                var p = Ui.Text(content, "Problem", boardProblem, Theme.FontBody, Theme.Warning);
+                p.textWrappingMode = TextWrappingModes.Normal;
+                p.Size(-1, 50f);
+                return;
+            }
+            if (boardMine != null) {
+                var me = Ui.Text(content, "Mine", "Your best: " + boardMine.score + " points, #" + boardMine.rank, Theme.FontBody, Color.white, Theme.Medium);
+                me.Size(-1, 30f);
+            }
+            var list = ScrollList(360f);
+            if (board.Count == 0) {
+                Ui.Text(list, "Empty", "No runs yet: play Robot Skills (Play game) and finish a run.", Theme.FontBody, new Color(1f, 1f, 1f, 0.6f)).Size(-1, 34f);
+                return;
+            }
+            foreach (var e in board) {
+                var row = Ui.Image(list, "Run " + e.rank, e.mine ? new Color(0.16f, 0.52f, 0.96f, 0.25f) : OnlineWindow.GlassRow, 8f);
+                var inner = row.rectTransform;
+                Ui.Row(inner, 12f, new RectOffset(14, 14, 0, 0));
+                inner.Size(-1, 40f);
+                Ui.Text(inner, "Rank", "#" + e.rank, Theme.FontBody, new Color(1f, 1f, 1f, 0.6f), Theme.Medium).Size(54f, 38f);
+                Ui.Text(inner, "Name", e.name, Theme.FontBody, Color.white).Size(-1, 38f, 1f);
+                Ui.Text(inner, "Score", e.score + " pts", Theme.FontBody, Color.white, Theme.Medium, TextAlignmentOptions.MidlineRight).Size(90f, 38f);
+                Ui.Text(inner, "When", e.when == default ? "" : e.when.ToLocalTime().ToString("MMM d"), Theme.FontSmall, new Color(1f, 1f, 1f, 0.5f), null, TextAlignmentOptions.MidlineRight).Size(70f, 38f);
+            }
+        }
+
+        // ---- account (V2: Online/Accounts)
+
+        private Accounts.Stats stats;
+        private bool statsLoading;
+        private string accountUser = "", accountPassword = "", accountProblem;
+        private bool accountBusy;
+
+        private async void LoadStats() {
+            if (statsLoading) return;
+            statsLoading = true;
+            var s = await Accounts.LoadStats();
+            if (this == null) return;
+            stats = s ?? new Accounts.Stats();
+            statsLoading = false;
+            dirty = true;
+        }
+
+        private async void AccountAction(Func<System.Threading.Tasks.Task<string>> action) {
+            if (accountBusy) return;
+            accountBusy = true;
+            accountProblem = null;
+            dirty = true;
+            var problem = await action();
+            if (this == null) return;
+            accountBusy = false;
+            accountProblem = problem;
+            if (problem == null) {
+                accountPassword = "";
+                stats = null;
+            }
+            dirty = true;
+        }
+
+        private void Account() {
+            var guest = Accounts.IsGuest;
+            Heading("Account", guest
+                ? "You're playing as a guest (kept on this computer). Make an account to keep your stats and scores and sign in anywhere."
+                : "Signed in as " + Accounts.Username + ". Your stats and skills scores go with your account.");
+            if (stats == null && !statsLoading) LoadStats();
+            var s = stats ?? new Accounts.Stats();
+            var grid = Row(70f);
+            foreach (var (label, value) in new[] { ("Matches", s.matches.ToString()), ("Won", s.wins.ToString()), ("Lost", s.losses.ToString()), ("Tied", s.ties.ToString()),
+                                                    ("Points", s.points.ToString()), ("Skills best", s.skillsBest.ToString()) }) {
+                var tile = OnlineWindow.GlassPanel(grid, label, OnlineWindow.GlassDeep, 10f);
+                tile.Size(-1, 66f, 1f);
+                var column = Ui.Rect("Column", tile.transform).Fill(12, 8, 12, 8);
+                Ui.Column(column, 0f);
+                Ui.Text(column, "Label", label, Theme.FontSmall, new Color(1f, 1f, 1f, 0.6f)).Size(-1, 20f);
+                Ui.Text(column, "Value", statsLoading ? "…" : value, 22f, Color.white, Theme.Medium).Size(-1, 30f);
+            }
+            if (guest) {
+                var userRow = Row(44f);
+                Ui.Text(userRow, "Label", "Username", Theme.FontBody, new Color(1f, 1f, 1f, 0.7f)).Size(140f, 40f);
+                var user = DarkField(userRow, "Username", accountUser, v => accountUser = v);
+                user.characterLimit = 20;
+                user.Size(320f, 40f);
+                var passRow = Row(44f);
+                Ui.Text(passRow, "Label", "Password", Theme.FontBody, new Color(1f, 1f, 1f, 0.7f)).Size(140f, 40f);
+                var pass = DarkField(passRow, "Password", accountPassword, v => accountPassword = v);
+                pass.contentType = TMP_InputField.ContentType.Password;
+                pass.ForceLabelUpdate();
+                pass.characterLimit = 30;
+                pass.Size(320f, 40f);
+                var buttons = Row(44f);
+                Ui.Rect("Indent", buttons).Size(140f, 40f);
+                var create = Ui.Button(buttons, "Create", accountBusy ? "Working…" : "Create account", () => AccountAction(() => Accounts.CreateAccount(accountUser.Trim(), accountPassword)), true, 8f);
+                create.Size(170f, 40f);
+                create.interactable = !accountBusy;
+                Ui.Tip(create, "Create account", null, "Makes this guest an account: your stats and scores so far stay.");
+                var signIn = Ui.Button(buttons, "Sign in", "Sign in", () => AccountAction(() => Accounts.SignIn(accountUser, accountPassword)), false, 8f);
+                signIn.targetGraphic.color = new Color(1f, 1f, 1f, 0.08f);
+                signIn.Size(140f, 40f);
+                signIn.interactable = !accountBusy;
+                Ui.Tip(signIn, "Sign in", null, "Signs in to an account you made before (on any computer).");
+                var rules = Ui.Text(content, "Rules", "Username: 3-20 letters, digits and . - @ _ . Password: 8-30 characters with an upper case letter, a lower case letter, a digit and a symbol.",
+                    Theme.FontSmall, new Color(1f, 1f, 1f, 0.5f));
+                rules.textWrappingMode = TextWrappingModes.Normal;
+                rules.Size(-1, 40f);
+            }
+            else {
+                var buttons = Row(44f);
+                var signOut = Ui.Button(buttons, "Sign out", "Sign out", () => AccountAction(async () => {
+                    await Accounts.SignOut();
+                    return null;
+                }), false, 8f);
+                signOut.targetGraphic.color = new Color(1f, 1f, 1f, 0.08f);
+                signOut.Size(140f, 40f);
+            }
+            if (accountProblem != null) {
+                var problem = Ui.Text(content, "Problem", accountProblem, Theme.FontBody, Theme.Warning);
+                problem.textWrappingMode = TextWrappingModes.Normal;
+                problem.Size(-1, 50f);
+            }
         }
 
         // ---- hosting

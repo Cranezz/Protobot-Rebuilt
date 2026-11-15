@@ -864,7 +864,24 @@ namespace Protobot.Game {
             if (score.robotInMidfield) score.items.Add(new ScoredItem { point = RobotPoint(), points = OverrideScoring.Midfield, kind = "Robot in the Midfield", where = "Midfield" });
             ScoreReveal.Play(this, newBest);
             Builds.ActionLog.Write("game", $"score {score.total}" + (newBest ? " (new best)" : ""));
+            Post();   // V2: the leaderboard and stats
             Changed?.Invoke();
+        }
+
+        // V2: a legal skills run goes to the skills leaderboard (checked by Cloud Code first); an online match's result
+        // into this player's stats.
+        private async void Post() {
+            try {
+                if (online && score.match) {
+                    Online.Accounts.RecordMatch(Red ? score.red : score.blue, Red ? score.blue : score.red);
+                    return;
+                }
+                if (mode != Mode.Skills || online || !Legal) return;
+                var items = score.items.Select(i => (i.kind, i.points)).ToList();
+                var message = await Online.Accounts.SubmitSkills(score.total, items, new Vector3(depth, width, height), RunSeconds, buildName);
+                if (message != null) Interface.Interface.Announce(message);
+            }
+            catch (Exception e) { Debug.LogWarning("V2: posting the result: " + e.Message); }
         }
 
         public SkillsScore Evaluate() {
