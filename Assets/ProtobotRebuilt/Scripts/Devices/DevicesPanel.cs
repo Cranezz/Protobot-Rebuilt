@@ -689,6 +689,7 @@ namespace Protobot.Devices {
                 var image = Ui.Rect("Picture", holder).Fill(1f, 1f, 1f, 1f).gameObject.AddComponent<RawImage>();
                 image.texture = picture;
                 image.raycastTarget = false;
+                if (d is MotorDevice) image.uvRect = new Rect(0.12f, 0.14f, 0.76f, 0.76f);   // its front fills the icon
                 if (DevicePictures.For(part, out gray) != null && gray) image.color = Theme.Field;
             }
             else {

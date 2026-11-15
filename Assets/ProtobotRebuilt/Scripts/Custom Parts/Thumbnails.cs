@@ -130,7 +130,12 @@ namespace Protobot.Custom {
 
         private static Material flat;
 
-        private static Texture2D RenderObject(GameObject stage, bool silhouette, string name) {
+        /// <summary>V2: a picture of an object on the picture layer seen from a given way (camera rotation).</summary>
+        public static Texture2D RenderView(GameObject stage, Quaternion view, string name) => RenderObject(stage, false, name, view);
+
+        public const int PictureLayer = Layer;
+
+        private static Texture2D RenderObject(GameObject stage, bool silhouette, string name, Quaternion? view = null) {
             var renderers = stage.GetComponentsInChildren<Renderer>(true).Where(r => r.gameObject.layer == Layer && r.enabled).ToList();
             if (renderers.Count == 0) return null;
             var bounds = renderers[0].bounds;
@@ -167,7 +172,7 @@ namespace Protobot.Custom {
                 camera.orthographicSize = half * 1.08f;
             }
             else {
-                rotation = Quaternion.Euler(28f, -35f, 0f);
+                rotation = view ?? Quaternion.Euler(28f, -35f, 0f);
                 camera.fieldOfView = 25f;
             }
             var distance = silhouette ? radius * 3f : radius / Mathf.Sin(12.5f * Mathf.Deg2Rad);
