@@ -69,7 +69,7 @@ Everything still open, in the order it'll be done. Each phase ends with a play-t
 3. **Match stats:** wins, points, matches played, kept per player.
    - **You:** switch on Cloud Code, Cloud Save and Leaderboards in the Unity dashboard (I'll give the exact clicks).
 
-## Phase 5: parts menu (1 session) - DONE (Build 35): two-panel layout; the user keeps the colored part pictures (no flat gray)
+## Phase 5: parts menu (1 session) - DONE: the two-panel layout (Build 35) was taken back out (Build 41): families and their kinds open in place as nested rows; the user keeps the colored part pictures (no flat gray)
 
 - **Layout:** the two-panel menu like the original Protobot: the main list, then a smaller panel beside it with the
   sub-categories and sizes.

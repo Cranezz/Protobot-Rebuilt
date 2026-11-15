@@ -12,10 +12,10 @@ namespace Protobot.Interface {
     // V2: the parts menu (replaces the original's add-parts list), laid out like the app's other windows:
     // - Search on top (covers every part), then the categories as pills (Recent, Hardware, Structure, Motion,
     //   Electronics, Pneumatics, Field, Custom).
-    // - The chosen category lists its families as rows (a picture, the name, how many parts); click one and a second,
-    //   narrower panel opens beside the list (like the original Protobot's two-panel menu) with the family's parts as
-    //   tiles, three to a row (kinds as sub-headings: Spacers > Nylon (3/8" OD) > 1/8"...). The open family is
-    //   remembered per category. Search and Recent show tiles straight away.
+    // - The chosen category lists its families as rows (a picture, the name, how many parts); click one and it opens
+    //   in place with its parts as tiles, three to a row, and its kinds as smaller rows that open in place too
+    //   (Spacers > Nylon (3/8" OD) > its sizes). Open families and kinds are remembered. Search and Recent show tiles
+    //   straight away. (V2: the two-panel version was tried and taken back out: the user wanted it nested in place.)
     // - Clicking a part starts placing it (click in the build to place, again for another; R turns it, Esc stops); its
     //   sizes show at the bottom. Right-click a custom part to edit or remove it.
     // Parts come from PartsCatalog (its sections and families in the order teams use them).
@@ -23,14 +23,7 @@ namespace Protobot.Interface {
         private static readonly string[] Categories = { "Recent", "Hardware", "Structure", "Motion", "Electronics", "Pneumatics", "Field", "Custom" };
         private static readonly string[] CategoryIcons = { null, "SCRW", "CCHL", "GEAR", "MOTR", "PNMT", "OVPN", null };
         private const string CategoryKey = "V2.PartsCategory3", FoldedKey = "V2.PartsOpen3";   // V2: open families now
-        private const float PanelWidth = 420f, RailWidth = 0f, TileHeight = 104f, PillsHeight = 66f, SideWidth = 380f, SideGap = 8f;
-        private const string SideKey = "V2.PartsSide.";   // + category: the family open beside the list
-        // V2: the second panel (a family's parts) and what Tiles/Kind/Note fill (the list or that panel).
-        private RectTransform side, sideContent;
-        private TextMeshProUGUI sideTitle, sideCount;
-        private ScrollRect sideScroll;
-        private CatalogNode openFamily;
-        private float tileArea = PanelWidth;
+        private const float PanelWidth = 420f, RailWidth = 0f, TileHeight = 104f, PillsHeight = 66f;
         private const int Columns = 3;
         private static readonly Color RailColor = new(0.075f, 0.082f, 0.098f, 1f);
 
@@ -161,8 +154,6 @@ namespace Protobot.Interface {
             footer.gameObject.AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
             footer.gameObject.SetActive(false);
 
-            BuildSide();
-
             // The folded tab.
             var tabButton = Ui.Button(transform, "Parts Tab", "Parts", () => SetCollapsed(false), true, 8f, Theme.FontBody);
             tab = (RectTransform)tabButton.transform;
@@ -175,78 +166,6 @@ namespace Protobot.Interface {
             CustomParts.Changed += OnCustomPartsChanged;
             SetCollapsed(PlayerPrefs.GetInt("V2.PartsFolded", 0) == 1);
             SetCategory(category);
-        }
-
-        // V2: the family panel beside the list: its name, how many parts, a close button, and its parts.
-        private void BuildSide() {
-            side = Ui.Panel(transform, "Family Panel", Theme.Panel, 10f).rectTransform;
-            side.anchorMin = new Vector2(1f, 0f);
-            side.anchorMax = new Vector2(1f, 1f);
-            side.pivot = new Vector2(1f, 1f);
-            var inner = SideWidth - 28f;
-            var header = Ui.Rect("Header", side).Place(new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(16f, -12f), new Vector2(inner + 2f, 30f));
-            sideTitle = Ui.Text(header, "Title", "", Theme.FontTitle, Theme.Text, Theme.Medium);
-            sideTitle.rectTransform.Fill(0, 0, 90, 0);
-            sideCount = Ui.Text(header, "Count", "", Theme.FontSmall, Theme.TextFaint, null, TextAlignmentOptions.MidlineRight);
-            sideCount.rectTransform.Fill(inner - 120f, 0, 36, 0);
-            var close = Ui.Button(header, "Close", "×", () => OpenFamily(null), false, 6f, Theme.FontTitle);
-            ((RectTransform)close.transform).Place(new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), Vector2.zero, new Vector2(30f, 30f));
-            close.targetGraphic.color = new Color(1f, 1f, 1f, 0f);
-            Ui.Tip(close, "Close", null, "Closes the family's panel (click the family again, too).");
-            var area = Ui.Rect("Scroll", side);
-            area.anchorMin = Vector2.zero;
-            area.anchorMax = Vector2.one;
-            area.offsetMin = new Vector2(10f, 10f);
-            area.offsetMax = new Vector2(-8f, -50f);
-            var viewport = Ui.Rect("Viewport", area).Fill();
-            viewport.gameObject.AddComponent<RectMask2D>();
-            viewport.gameObject.AddComponent<Image>().color = new Color(0f, 0f, 0f, 0f);
-            sideContent = Ui.Rect("Content", viewport);
-            sideContent.anchorMin = new Vector2(0f, 1f);
-            sideContent.anchorMax = new Vector2(1f, 1f);
-            sideContent.pivot = new Vector2(0.5f, 1f);
-            sideContent.sizeDelta = Vector2.zero;
-            Ui.Column(sideContent, 6f, new RectOffset(4, 6, 2, 12));
-            sideContent.gameObject.AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
-            sideScroll = area.gameObject.AddComponent<ScrollRect>();
-            sideScroll.viewport = viewport;
-            sideScroll.content = sideContent;
-            sideScroll.horizontal = false;
-            sideScroll.movementType = ScrollRect.MovementType.Clamped;
-            sideScroll.scrollSensitivity = 34f;
-            side.gameObject.SetActive(false);
-        }
-
-        private void OpenFamily(CatalogNode family) {
-            var changed = family != openFamily;
-            openFamily = family;
-            PlayerPrefs.SetString(SideKey + category, family != null ? family.name : "");
-            var y = content.anchoredPosition.y;
-            Refresh();
-            content.anchoredPosition = new Vector2(0f, y);
-            if (changed && sideContent != null) sideContent.anchoredPosition = Vector2.zero;
-            Audio.Sounds.Play(Audio.Sounds.Tick);
-        }
-
-        // The open family's parts in the side panel (filled by the same Tiles/Kind as the list).
-        private void FillSide() {
-            foreach (Transform child in sideContent) Destroy(child.gameObject);
-            sideContent.DetachChildren();
-            if (openFamily == null) return;
-            sideTitle.text = openFamily.name;
-            sideCount.text = openFamily.Count + (openFamily.Count == 1 ? " part" : " parts");
-            var main = content;
-            content = sideContent;
-            tileArea = SideWidth;
-            try {
-                var loose = openFamily.children.Where(c => !c.IsGroup).ToList();
-                if (loose.Count > 0) Tiles(loose);
-                foreach (var kind in openFamily.children.Where(c => c.IsGroup)) Kind(kind, kind.name);
-            }
-            finally {
-                content = main;
-                tileArea = PanelWidth;
-            }
         }
 
         private void OnDestroy() {
@@ -271,7 +190,6 @@ namespace Protobot.Interface {
             collapsed = value;
             PlayerPrefs.SetInt("V2.PartsFolded", value ? 1 : 0);
             panel.gameObject.SetActive(!value);
-            if (side != null) side.gameObject.SetActive(!value && openFamily != null);
             tab.gameObject.SetActive(value);
             PartsFlyout.Close();
         }
@@ -291,7 +209,6 @@ namespace Protobot.Interface {
                 if (letter != null) letter.color = on ? Color.white : Theme.TextDim;
             }
             if (search != null && search.text.Length > 0) search.SetTextWithoutNotify("");
-            openFamily = null;   // Refresh finds the one open in this category
             Refresh();
             if (content != null) content.anchoredPosition = Vector2.zero;
         }
@@ -354,16 +271,9 @@ namespace Protobot.Interface {
                     Heading(null, section, loose.Count, false);
                     Tiles(loose);
                 }
-                // The family open beside the list (remembered per category).
-                var remembered = PlayerPrefs.GetString(SideKey + category, "");
-                if (openFamily == null || !families.Contains(openFamily))
-                    openFamily = families.FirstOrDefault(f => f.name == (openFamily != null ? openFamily.name : remembered));
                 foreach (var family in families) Family(family);
                 shown = list.Sum(n => n.action != null ? 0 : n.Count);
             }
-            if (text.Length > 0 || category == 0 || category >= Categories.Length) openFamily = null;
-            FillSide();
-            if (side != null) side.gameObject.SetActive(!collapsed && openFamily != null);
             countLabel.text = shown + (shown == 1 ? " part" : " parts");
             Highlight();
             dirty = false;
@@ -459,9 +369,9 @@ namespace Protobot.Interface {
 
         private void SaveFolded() => PlayerPrefs.SetString(FoldedKey, string.Join("|", folded));
 
-        // A family: a row with its picture, name and count; click it to open its parts in the panel beside the list.
+        // A family: a row with its picture, name and count; click it to open it in place (open ones are remembered).
         private void Family(CatalogNode family) {
-            var isOpen = openFamily == family;
+            var isOpen = folded.Contains(Key(family));
             var row = Ui.Image(content, "Family " + family.name, isOpen ? Theme.Hover : Theme.PanelRaised, 8f, true);
             var rect = row.rectTransform;
             rect.Size(-1, 50f);
@@ -480,26 +390,77 @@ namespace Protobot.Interface {
             chevron.sprite = Interface.Instance.chevronIcon;
             chevron.preserveAspect = true;
             chevron.Size(10f, 10f);
-            chevron.rectTransform.localEulerAngles = new Vector3(0f, 0f, isOpen ? 90f : 270f);   // open: points to its panel
+            chevron.rectTransform.localEulerAngles = new Vector3(0f, 0f, isOpen ? 180f : 270f);   // closed: points right
             if (!isOpen) row.gameObject.AddComponent<HoverTint>().target = row;
             var button = row.gameObject.AddComponent<Button>();
             button.transition = Selectable.Transition.None;
             var nav = button.navigation;
             nav.mode = Navigation.Mode.None;
             button.navigation = nav;
-            button.onClick.AddListener(() => OpenFamily(openFamily == family ? null : family));
-            Ui.Tip(row, family.name, null, family.Count + " parts: click to " + (isOpen ? "close its panel" : "see them in the panel beside the list"));
+            button.onClick.AddListener(() => {
+                var key = Key(family);
+                if (!folded.Remove(key)) folded.Add(key);
+                SaveFolded();
+                var y = content.anchoredPosition.y;
+                Refresh();
+                content.anchoredPosition = new Vector2(0f, y);
+                Audio.Sounds.Play(Audio.Sounds.Tick);
+            });
+            Ui.Tip(row, family.name, null, family.Count + " parts: click to " + (isOpen ? "close" : "open") + " the family");
+            if (!isOpen) return;
+            Contents(family, Key(family), 1);
+            var gap = Ui.Rect("Gap", content);
+            gap.Size(-1, 4f);
         }
 
-        private void Kind(CatalogNode kind, string label) {
-            var leaves = kind.children.Where(c => !c.IsGroup).ToList();
-            if (leaves.Count > 0) {
-                var sub = Ui.Text(content, "Kind " + label, label, 11.5f, Theme.TextDim, Theme.Medium);
-                sub.margin = new Vector4(4f, 2f, 0f, 0f);
-                sub.Size(-1, 20f);
-                Tiles(leaves);
-            }
-            foreach (var deeper in kind.children.Where(c => c.IsGroup)) Kind(deeper, label + " › " + deeper.name);
+        // V2: what an open family or kind holds: its parts as tiles, then its kinds as rows that open in place
+        // (Spacers > Nylon (3/8" OD) > its sizes). A group holding only one kind shows that kind's contents at once.
+        private void Contents(CatalogNode group, string key, int depth) {
+            var children = group.children;
+            while (children.Count == 1 && children[0].IsGroup) children = children[0].children;
+            var loose = children.Where(c => !c.IsGroup).ToList();
+            if (loose.Count > 0) Tiles(loose);
+            foreach (var kind in children.Where(c => c.IsGroup)) Kind(kind, key + "/" + kind.name, depth);
+        }
+
+        // V2: a kind inside an open family (or inside another kind): a smaller row, indented by how deep it is, that
+        // opens in place like the family does (open ones are remembered with the families).
+        private void Kind(CatalogNode kind, string key, int depth) {
+            var isOpen = folded.Contains(key);
+            var row = Ui.Image(content, "Kind " + kind.name, isOpen ? Theme.Hover : Theme.Field, 6f, true);
+            var rect = row.rectTransform;
+            rect.Size(-1, 36f);
+            var inner = Ui.Rect("Inner", rect).Fill(10f + 16f * (depth - 1), 0, 12, 0);
+            Ui.Row(inner, 8f);
+            var chevron = Ui.Image(inner, "Chevron", Theme.TextDim);
+            chevron.sprite = Interface.Instance.chevronIcon;
+            chevron.preserveAspect = true;
+            chevron.Size(9f, 9f);
+            chevron.rectTransform.localEulerAngles = new Vector3(0f, 0f, isOpen ? 180f : 270f);   // closed: points right
+            var picture = Ui.Rect("Picture", inner);
+            picture.Size(28f, 28f);
+            Icon(picture, kind.Leaves().FirstOrDefault() ?? kind, 28f);
+            var name = Ui.Text(inner, "Name", kind.name, Theme.FontSmall + 0.5f, Theme.Text, Theme.Medium);
+            name.overflowMode = TextOverflowModes.Ellipsis;
+            name.textWrappingMode = TextWrappingModes.NoWrap;
+            name.Size(-1, 36f, 1f);
+            Ui.Text(inner, "Count", kind.Count.ToString(), 11f, Theme.TextFaint, null, TextAlignmentOptions.MidlineRight).Size(30f, 36f);
+            if (!isOpen) row.gameObject.AddComponent<HoverTint>().target = row;
+            var button = row.gameObject.AddComponent<Button>();
+            button.transition = Selectable.Transition.None;
+            var nav = button.navigation;
+            nav.mode = Navigation.Mode.None;
+            button.navigation = nav;
+            button.onClick.AddListener(() => {
+                if (!folded.Remove(key)) folded.Add(key);
+                SaveFolded();
+                var y = content.anchoredPosition.y;
+                Refresh();
+                content.anchoredPosition = new Vector2(0f, y);
+                Audio.Sounds.Play(Audio.Sounds.Tick);
+            });
+            Ui.Tip(row, kind.name, null, kind.Count + " parts: click to " + (isOpen ? "close" : "open") + " them");
+            if (isOpen) Contents(kind, key, depth + 1);
         }
 
         private RectTransform Heading(CatalogNode family, string name, int count, bool foldable, bool isFolded = false) {
@@ -554,7 +515,7 @@ namespace Protobot.Interface {
             var names = Short(leaves.Select(l => l.name).ToList());
             var grid = Ui.Rect("Tiles", content);
             var layout = grid.gameObject.AddComponent<GridLayoutGroup>();
-            var width = Mathf.Floor((tileArea - 28f - 10f - 8f - (Columns - 1) * 6f) / Columns);
+            var width = Mathf.Floor((PanelWidth - 28f - 10f - 8f - (Columns - 1) * 6f) / Columns);
             layout.cellSize = new Vector2(width, TileHeight);
             layout.spacing = new Vector2(6f, 6f);
             layout.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
@@ -919,16 +880,11 @@ namespace Protobot.Interface {
             if (!collapsed) {
                 panel.offsetMax = new Vector2(-14f, -top);
                 panel.offsetMin = new Vector2(-14f - PanelWidth, 14f);
-                if (side != null) {
-                    side.offsetMax = new Vector2(-14f - PanelWidth - SideGap, -top);
-                    side.offsetMin = new Vector2(-14f - PanelWidth - SideGap - SideWidth, 14f);
-                }
             }
             tab.anchoredPosition = new Vector2(-14f, -top);
             if (cameraOptions != null) {
                 // The panel's width in the original canvas's units.
-                var open = side != null && side.gameObject.activeSelf ? SideWidth + SideGap : 0f;
-                var shift = collapsed ? 0f : (PanelWidth + open + 14f) * Interface.Root.lossyScale.x / cameraOptions.lossyScale.x;
+                var shift = collapsed ? 0f : (PanelWidth + 14f) * Interface.Root.lossyScale.x / cameraOptions.lossyScale.x;
                 cameraOptions.anchoredPosition = cameraOptionsHome - new Vector2(shift, 0f);
             }
 
