@@ -232,6 +232,7 @@ namespace Protobot.Interface {
             new Item { label = "Report a bug…", action = () => Builds.CrashGuard.ReportDialog(false) },   // V2: with the bug log
             new Item { label = "Request a part…", action = () => Builds.CrashGuard.ReportDialog(true) },   // V2
             new Item { label = "Open bug log folder", action = () => Application.OpenURL("file:///" + Builds.CrashGuard.LogFolder.Replace('\\', '/')) },
+            new Item { label = "Check for updates…", action = () => _ = Builds.Updater.Check(true) },   // V2
             new Item { label = "Patch notes", action = () => Press(OldButton("Help Menu/Patch Notes Button")) },
             new Item { label = "Official website", action = () => Press(OldButton("Help Menu/Website Button")) },
         };

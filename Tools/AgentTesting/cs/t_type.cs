@@ -1,1 +1,1 @@
-return System.Type.GetType("Protobot.Devices.DevicesPanel, Assembly-CSharp") != null ? "found" : "missing";
+return System.Type.GetType("Protobot.Builds.Updater, Assembly-CSharp") != null ? "found" : "missing";
