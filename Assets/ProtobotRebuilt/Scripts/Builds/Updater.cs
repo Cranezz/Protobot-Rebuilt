@@ -23,10 +23,27 @@ namespace Protobot.Builds {
 
         // Velopack's install/update/uninstall hooks run the app with special arguments: it handles them and quits
         // before anything else starts.
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        // Velopack's own handler exits the process from inside the hook, which hung in Unity's player (Setup waited 30 s
+        // and killed it): a hook start only needs the app to quit straight away (it has nothing to set up), so it does.
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         private static void Hooks() {
             if (Application.isEditor) return;
-            try { VelopackApp.Build().Run(); }
+            var hook = false;
+            foreach (var arg in Environment.GetCommandLineArgs())
+                if (arg.StartsWith("--veloapp-", StringComparison.OrdinalIgnoreCase)) hook = true;
+            if (hook) {
+                Debug.Log("[Updater] Velopack hook start: quitting");
+                Application.Quit(0);
+                new System.Threading.Thread(() => {
+                    System.Threading.Thread.Sleep(4000);
+                    System.Diagnostics.Process.GetCurrentProcess().Kill();
+                }) { IsBackground = true }.Start();
+                return;
+            }
+            try {
+                VelopackApp.Build().Run();
+                Debug.Log("[Updater] Velopack ready");
+            }
             catch (Exception e) { Debug.LogWarning("V2: Velopack start-up: " + e.Message); }
         }
 
@@ -63,10 +80,12 @@ namespace Protobot.Builds {
                 }
                 var manager = Manager();
                 if (!manager.IsInstalled) {
+                    Debug.Log("[Updater] not an installed copy: no update check");
                     if (manual) NotInstalled();
                     return;
                 }
                 var info = await manager.CheckForUpdatesAsync();
+                Debug.Log("[Updater] installed " + manager.CurrentVersion + ", newest " + (info != null ? info.TargetFullRelease.Version.ToString() : "the same"));
                 if (info == null) {
                     if (manual) Interface.Interface.Announce("Protobot is up to date (" + BuildInfo.Display + ")");
                     return;

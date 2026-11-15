@@ -46,7 +46,7 @@ Everything still open, in the order it'll be done. Each phase ends with a play-t
    - **A real report:** one test report sent to Discord, labelled as a test.
    - **You:** join a match from your laptop on another network (a phone hotspot is enough) and tell me how driving feels.
 
-## Phase 3: putting the app out (1-2 sessions)
+## Phase 3: putting the app out (1-2 sessions) - DONE (2026-11-14): GitHub repo, links, Velopack installer and updates, releases 1.9.36 and 1.9.37
 
 1. **GitHub:** a repository with the part meshes and field in Git LFS (they're already marked); a README.
    - **You:** create the repository (or say which account and whether it's public) and run `gh auth login` once.
