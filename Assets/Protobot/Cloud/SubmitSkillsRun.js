@@ -11,14 +11,17 @@ const VALUES = { "Red pin halves": 5, "Blue pin halves": 5, "Yellow pin halves":
 const MOST = { "Red pin halves": 60, "Blue pin halves": 60, "Yellow pin halves": 30, "Robots in the Midfield": 1, "Robot in the Midfield": 1 };
 
 module.exports = async ({ params, context, logger }) => {
-  const run = params.run || {};
+  let run = params.run || {};
+  if (typeof run === "string") {
+    try { run = JSON.parse(run); } catch (e) { run = {}; }
+  }
   const reject = (reason) => {
     logger.warning("Skills run refused: " + reason, { "player": context.playerId });
     return { accepted: false, reason };
   };
 
   const size = Array.isArray(run.footprint) ? run.footprint.map(Number) : [];
-  if (size.length !== 3 || size.some((v) => !(v > 0))) return reject("no robot size was sent");
+  if (size.length !== 3 || size.some((v) => !(v > 0))) return reject("no robot size was sent (got " + JSON.stringify(params).slice(0, 300) + ")");
   if (size.some((v) => v > 18.05)) return reject("the robot was bigger than 18\" at the start");
 
   const seconds = Number(run.seconds);
@@ -38,13 +41,13 @@ module.exports = async ({ params, context, logger }) => {
 
   const projectId = context.projectId;
   const playerId = context.playerId;
-  const leaderboards = new LeaderboardsApi(context);
+  const leaderboards = new LeaderboardsApi({ accessToken: context.serviceToken });
   const posted = await leaderboards.addLeaderboardPlayerScore(projectId, LEADERBOARD, playerId, {
     score,
     metadata: { build: String(run.build || ""), robot: String(run.robot || "").slice(0, 40) },
   });
 
-  const data = new DataApi(context);
+  const data = new DataApi({ accessToken: context.serviceToken });
   const stats = await readStats(data, projectId, playerId);
   stats.skillsRuns += 1;
   stats.skillsBest = Math.max(stats.skillsBest, score);

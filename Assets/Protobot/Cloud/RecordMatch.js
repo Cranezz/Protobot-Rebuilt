@@ -9,7 +9,7 @@ module.exports = async ({ params, context, logger }) => {
 
   const projectId = context.projectId;
   const playerId = context.playerId;
-  const data = new DataApi(context);
+  const data = new DataApi({ accessToken: context.serviceToken });
   const stats = await readStats(data, projectId, playerId);
   const now = Date.now();
   if (now - stats.lastMatch < 60000) return { recorded: false, reason: "a match was recorded less than a minute ago", stats };

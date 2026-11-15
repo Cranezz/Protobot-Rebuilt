@@ -57,7 +57,7 @@ Everything still open, in the order it'll be done. Each phase ends with a play-t
 3. **Links:** the "download the latest version" link (version mismatch) and the bug-report page point at the GitHub
    page.
 
-## Phase 4: accounts, stats and the skills leaderboard (2-3 sessions)
+## Phase 4: accounts, stats and the skills leaderboard (2-3 sessions) - DONE (1.9.38) except: the access rule blocking direct leaderboard posts isn't enforced yet; replays and report/appeal flow not built
 
 1. **Accounts:**
    - Sign-in through Unity (anonymous accounts upgrade to a username).
@@ -88,7 +88,7 @@ Everything still open, in the order it'll be done. Each phase ends with a play-t
   Steam's controller screen).
 - **Where it's saved:** per robot, with presets for tank, arcade and split arcade.
 
-## Phase 8: voice chat (1 session)
+## Phase 8: voice chat (1 session) - DONE (1.9.38): alliance channels, push to talk / open mic / off, local mute
 
 - **Channels:** Vivox alliance channels (you hear only your partner): push-to-talk or open mic, a mute per player, and
   no microphone needed to play.
