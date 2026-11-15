@@ -1352,22 +1352,9 @@ namespace Protobot.Motion {
         /// <summary>The sticks: from a gamepad, else W/A/S/D (left) and the arrows (right).</summary>
         public static (Vector2 left, Vector2 right) Sticks() {
             if (TestSticks != null) return TestSticks();
-            Vector2 left = default, right = default;
-            var typing = InputEvents.TextInput.IsTyping;
-            var k = Keyboard.current;
-            if (k != null && !typing) {
-                // Keys from Edit > Keyboard shortcuts.
-                static int H(string id) => Tools.Keybinds.Held(id) ? 1 : 0;
-                left = new Vector2(H("DriveRight") - H("DriveLeft"), H("DriveForward") - H("DriveBack"));
-                right = new Vector2(H("Drive2Right") - H("Drive2Left"), H("Drive2Forward") - H("Drive2Back"));
-            }
-            var pad = Gamepad.current;
-            if (pad != null) {
-                var l = pad.leftStick.ReadValue();
-                var r = pad.rightStick.ReadValue();
-                if (l.sqrMagnitude > 0.01f) left = l;
-                if (r.sqrMagnitude > 0.01f) right = r;
-            }
+            // V2 (Phase 7): the robot's V5 controller (its keys and gamepad controls: Edit > Controller…).
+            var left = new Vector2(Devices.V5Controller.Axis(Devices.V5Axis.Axis4), Devices.V5Controller.Axis(Devices.V5Axis.Axis3));
+            var right = new Vector2(Devices.V5Controller.Axis(Devices.V5Axis.Axis1), Devices.V5Controller.Axis(Devices.V5Axis.Axis2));
             return (left, right);
         }
 

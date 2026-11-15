@@ -33,6 +33,7 @@ namespace Protobot.Builds {
 
             PartsManager.DestroyLoadedObjects();
             Motion.Controls.LoadDrive(buildData.drive);   // V2: the build's drive control
+            Devices.V5Controller.Load(buildData.controller);   // V2: its controller bindings (Phase 7)
 
             //Camera Data
             CameraData camData = buildData.camera;
@@ -195,6 +196,7 @@ namespace Protobot.Builds {
                 camera = newCameraData,
                 parts = newParts,
                 drive = Motion.Controls.DriveToken,   // V2
+                controller = Devices.V5Controller.Token,   // V2
             };
         }
     }

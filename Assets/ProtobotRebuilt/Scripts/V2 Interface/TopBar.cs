@@ -221,6 +221,7 @@ namespace Protobot.Interface {
             new Item { divider = true },
             new Item { label = "Graphics…", action = GraphicsWindow.Open },
             new Item { label = "Keyboard shortcuts…", action = Tools.KeybindsWindow.Open },
+            new Item { label = "Controller…", action = Devices.ControllerScreen.Open },   // V2 (Phase 7)
             new Item { label = "Preferences…", action = PreferencesWindow.Open },   // V2: its own window now
         };
 

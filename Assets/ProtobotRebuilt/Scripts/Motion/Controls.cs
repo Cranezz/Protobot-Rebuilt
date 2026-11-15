@@ -37,11 +37,15 @@ namespace Protobot.Motion {
             BuildDrive = !string.IsNullOrEmpty(token) && System.Enum.TryParse(token, out DriveMode mode) ? mode : null;
 
         /// <summary>The drivetrain's keys as (keys, what they do) lines, for the on-screen card.</summary>
-        public static (string keys, string action)[] DriveLayout(DriveMode mode) => mode switch {
-            DriveMode.Tank => new[] { ("W / S", "left side forward / back"), ("Up / Down", "right side forward / back") },
-            DriveMode.Arcade => new[] { ("W / S", "drive forward / back"), ("A / D", "turn left / right") },
-            _ => new[] { ("W / S", "drive forward / back"), ("Left / Right", "turn left / right") },
-        };
+        // V2 (Phase 7): the keys the robot's V5 controller has on those stick axes (Devices.V5Controller).
+        public static (string keys, string action)[] DriveLayout(DriveMode mode) {
+            static string K(string a, string b) => Devices.V5Controller.KeyLabel(a) + " / " + Devices.V5Controller.KeyLabel(b);
+            return mode switch {
+                DriveMode.Tank => new[] { (K("Axis3+", "Axis3-"), "left side forward / back"), (K("Axis2+", "Axis2-"), "right side forward / back") },
+                DriveMode.Arcade => new[] { (K("Axis3+", "Axis3-"), "drive forward / back"), (K("Axis4-", "Axis4+"), "turn left / right") },
+                _ => new[] { (K("Axis3+", "Axis3-"), "drive forward / back"), (K("Axis1-", "Axis1+"), "turn left / right") },
+            };
+        }
 
         public static string DriveHelp(DriveMode mode) => mode switch {
             DriveMode.Tank => "Left stick (W/S) drives the left side, right stick (Up/Down) the right side",
@@ -67,13 +71,14 @@ namespace Protobot.Motion {
         public static bool Held(Key key) {
             if (key == Key.None || Keyboard.current == null) return false;
             var control = Keyboard.current[key];
-            return control != null && control.isPressed;
+            // V2: or the gamepad control bound to the V5 controller button this key is on.
+            return (control != null && control.isPressed) || Devices.V5Controller.PadHeldForKey(key);
         }
 
         public static bool Pressed(Key key) {
             if (key == Key.None || Keyboard.current == null) return false;
             var control = Keyboard.current[key];
-            return control != null && control.wasPressedThisFrame;
+            return (control != null && control.wasPressedThisFrame) || Devices.V5Controller.PadPressedForKey(key);   // V2
         }
 
         /// <summary>The key pressed this frame (for setting a key), or None.</summary>

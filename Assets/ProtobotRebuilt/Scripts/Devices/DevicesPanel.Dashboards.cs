@@ -476,6 +476,13 @@ namespace Protobot.Devices {
                 Ui.Text(line, "Action", action, Theme.FontSmall, Theme.TextDim).Size(-1, 22f, 1f);
             }
             Note(content, Gamepad.current != null ? "A gamepad is connected: its sticks drive too." : "A gamepad's sticks drive too when one is connected.", Theme.TextFaint);
+            // V2 (Phase 7): every control's key and gamepad control, on a drawn V5 controller.
+            var screenRow = Ui.Rect("Screen", content);
+            Ui.Row(screenRow, 8f);
+            screenRow.Size(-1, 34f);
+            var openScreen = Ui.Button(screenRow, "Controller", "Controller screen…", ControllerScreen.Open, true, 6f, Theme.FontSmall);
+            openScreen.Size(170f, 30f);
+            Ui.Tip(openScreen, "Controller screen", null, "Bind each stick and button of the V5 controller to a key or a gamepad control, for this robot.");
             var motors = MotorDrive.Live();
             var left = motors.Where(m => Controls.Side(m.gameObject) == "L").Select(m => m.Label).ToList();
             var right = motors.Where(m => Controls.Side(m.gameObject) == "R").Select(m => m.Label).ToList();

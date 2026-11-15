@@ -32,7 +32,7 @@ Everything still open, in the order it'll be done. Each phase ends with a play-t
 4. **Small gaps:** zip ties for tubing, undo for license-plate text, motor labels not overlapping on a 6-motor drive.
 5. **Re-check:** the spacer-on-a-screw-inside-a-C-channel case (believed fixed).
 
-## Phase 2: online matches ready for real players (2-3 sessions) - DONE except the laptop test (you) and a real Discord report
+## Phase 2: online matches ready for real players (2-3 sessions) - DONE except the laptop test (you); a test report reached the Discord channel (2026-11-15)
 
 1. **Start setup online:** each player places their robot within the legal start (the same wall lock, slide, turn,
    Line up and Measure as Match practice) before the match; the host starts when everyone says ready.
@@ -57,7 +57,7 @@ Everything still open, in the order it'll be done. Each phase ends with a play-t
 3. **Links:** the "download the latest version" link (version mismatch) and the bug-report page point at the GitHub
    page.
 
-## Phase 4: accounts, stats and the skills leaderboard (2-3 sessions) - DONE (1.9.38) except: the access rule blocking direct leaderboard posts isn't enforced yet; replays and report/appeal flow not built
+## Phase 4: accounts, stats and the skills leaderboard (2-3 sessions) - DONE (2026-11-15): players can't post scores directly (access rule, through the current Resource Policy API); replays (recorded, watched, shared with the best run), run reports and appeals to the Discord channel, Tools > Protobot > Skills Leaderboard Moderation. Not done: Cloud Code recomputing the score from the replay
 
 1. **Accounts:**
    - Sign-in through Unity (anonymous accounts upgrade to a username).
@@ -76,13 +76,13 @@ Everything still open, in the order it'll be done. Each phase ends with a play-t
 - **Pictures:** flat gray orthographic part pictures (spacers #CCCCCC), with new ones for click-on spacers, couplers,
   the rubber link, shoulder screws, brackets, license plates, wheels, ball bearings, fittings, cylinder mounts and field parts.
 
-## Phase 6: demo robot (1 session)
+## Phase 6: demo robot (1 session) - DONE (2026-11-15): Sample Builds/Override Demo Robot.pbb (MotionTestRig.DemoRobot): intake picks up and holds a lying pin or cup, hopper, Brain; the arm reaches and presses the Toggles but doesn't flip them yet (needs a grippy tip or more torque)
 
 - **The robot:** one that plays Override in Play game: picks up pins and cups (raised intake and hopper) and flips the
   Toggles (an arm reaching about 13").
 - **Uses:** the sample build, the multiplayer test robot and the trailer picture.
 
-## Phase 7: controller screen (1 session)
+## Phase 7: controller screen (1 session) - DONE (2026-11-15): Edit > Controller… (Devices/ControllerScreen, V5Controller): keys and gamepad per control, saved in the build
 
 - **The screen:** an on-screen V5 controller: click a button or stick, press a key or a gamepad button to bind it (like
   Steam's controller screen).
@@ -104,7 +104,7 @@ Everything still open, in the order it'll be done. Each phase ends with a play-t
 4. **Autonomous:** the period in matches and skills runs the robot's code.
 5. **Tuning:** PID and other tuning carry over to the real robot (close, not identical).
 
-## Checks still owed (done when their phase comes round)
+## Checks still owed (done when their phase comes round) - DONE 2026-11-15: GPU time 2.9 -> 1.0 ms (Ultra) at more pixels; saw refuses electronics (their cut shows open); jig line-up exact, saved group loads as the tool
 
 - **Lighter models:** frame times before and after on the Benchmark tab, and memory in a built app (Phase 0 or 3).
 - **Saw on cleaned parts:** a saw cut on a part with its hidden insides removed shows it hollow; decide whether to fill
