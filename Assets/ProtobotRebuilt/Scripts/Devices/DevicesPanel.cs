@@ -19,8 +19,11 @@ namespace Protobot.Devices {
     // what the real ones read, live; solenoids their port, mode (Digital Out), value and the cylinders' position, with
     // a switch. While the simulation runs it also has Pause, Reset and Stop. Replaces the old motor and Controls windows.
     public partial class DevicesPanel : MonoBehaviour {
-        private const string PositionKey = "V2.DevicesPanelPosition", MinimizedKey = "V2.DevicesPanelMinimized";
-        private const float Width = 500f;
+        private const string PositionKey = "V2.DevicesPanelPosition", MinimizedKey = "V2.DevicesPanelMinimized", SizeKey = "V2.DevicesPanelSize";
+        private const float MinWidth = 380f, MinHeight = 300f, ColumnWidth = 310f;
+        // V2: the window's size (drag its edges): cards flow into as many columns as fit.
+        private float width = 720f, heightMax = 760f;
+        private int Columns => Mathf.Clamp(Mathf.FloorToInt((width - 30f) / ColumnWidth), 1, 4);
         private static DevicesPanel open;
 
         private enum Page { Devices, ThreeWire, Controller }
@@ -93,7 +96,13 @@ namespace Protobot.Devices {
         private void Build() {
             window = Ui.Panel(transform, "Window", Theme.Panel, 10f).rectTransform;
             window.anchorMin = window.anchorMax = window.pivot = new Vector2(1f, 1f);
-            window.sizeDelta = new Vector2(Width, 0f);
+            var size = PlayerPrefs.GetString(SizeKey, "").Split(',');
+            if (size.Length == 2 && float.TryParse(size[0], NumberStyles.Float, CultureInfo.InvariantCulture, out var sw)
+                && float.TryParse(size[1], NumberStyles.Float, CultureInfo.InvariantCulture, out var sh)) {
+                width = Mathf.Max(MinWidth, sw);
+                heightMax = Mathf.Max(MinHeight, sh);
+            }
+            window.sizeDelta = new Vector2(width, 0f);
             var parts = PlayerPrefs.GetString(PositionKey, "").Split(',');
             window.anchoredPosition = right ? new Vector2(-330f, -(Layout.TopBarBottom + 12f))
                 : parts.Length == 2 && float.TryParse(parts[0], NumberStyles.Float, CultureInfo.InvariantCulture, out var x)
@@ -173,6 +182,12 @@ namespace Protobot.Devices {
 
             minimized = PlayerPrefs.GetInt(MinimizedKey, 0) == 1 && !right;
             SetMinimized(minimized);
+            // Edges and corners to resize it by.
+            Grip("Left", new Vector2(0f, 0f), new Vector2(0f, 1f), -1, 0);
+            Grip("Right", new Vector2(1f, 0f), new Vector2(1f, 1f), 1, 0);
+            Grip("Bottom", new Vector2(0f, 0f), new Vector2(1f, 0f), 0, -1);
+            Grip("Bottom Left", Vector2.zero, Vector2.zero, -1, -1);
+            Grip("Bottom Right", new Vector2(1f, 0f), new Vector2(1f, 0f), 1, -1);
             KeepOnScreen();
         }
 
@@ -186,7 +201,7 @@ namespace Protobot.Devices {
             if (window == null || Interface.Interface.Root == null) return;
             var root = ((RectTransform)Interface.Interface.Root).rect;
             var p = window.anchoredPosition;
-            p.x = Mathf.Clamp(p.x, -root.width + Width * 0.3f, 0f);
+            p.x = Mathf.Clamp(p.x, -root.width + width * 0.3f, 0f);
             p.y = Mathf.Clamp(p.y, -root.height + 40f, 0f);
             window.anchoredPosition = p;
         }
@@ -216,7 +231,7 @@ namespace Protobot.Devices {
 
         private string Signature() {
             var sb = new System.Text.StringBuilder();
-            sb.Append(page).Append(Sandbox.Running).Append(Controls.Drive).Append('|');
+            sb.Append(page).Append(Sandbox.Running).Append(Controls.Drive).Append(Columns).Append(Mathf.RoundToInt(width / 24f)).Append('|');
             foreach (var d in V5Brain.Devices) {
                 sb.Append(d.Key).Append(d.port).Append(d.wired).Append(d.Name).Append(expanded.Contains(d.Key));
                 if (d.part != null) sb.Append(Dynamics.Token(d.part, "cartridge")).Append(Dynamics.Token(d.part, "side")).Append(Dynamics.Token(d.part, "rev"))
@@ -250,6 +265,7 @@ namespace Protobot.Devices {
                 Rebuild();
             }
             foreach (var update in live) update();
+            foreach (var draw in gripDraws) draw();
             UpdateTabs();
             FitHeight();
             HoverHighlight();
@@ -261,12 +277,15 @@ namespace Protobot.Devices {
             var rootHeight = ((RectTransform)Interface.Interface.Root).rect.height;
             var room = rootHeight + window.anchoredPosition.y - 160f;
             var wanted = LayoutUtility.GetPreferredHeight(content);
-            frameLayout.preferredHeight = Mathf.Clamp(wanted, 60f, Mathf.Max(160f, room));
+            // The window's height: what the cards need, up to the size it was given (header, tabs and status: ~145).
+            frameLayout.preferredHeight = Mathf.Clamp(wanted, 60f, Mathf.Max(120f, Mathf.Min(room, heightMax - 145f)));
             if (focusKey != null) {
                 var card = cards.FirstOrDefault(c => c.device.Key == focusKey).rect;
                 if (card != null) {
                     LayoutRebuilder.ForceRebuildLayoutImmediate(content);
-                    var top = -card.anchoredPosition.y - card.rect.height * (1f - card.pivot.y);
+                    var corners = new Vector3[4];
+                    card.GetWorldCorners(corners);
+                    var top = -content.InverseTransformPoint(corners[1]).y;
                     var max = Mathf.Max(0f, content.rect.height - frame.rect.height);
                     content.anchoredPosition = new Vector2(0f, Mathf.Clamp(top - 8f, 0f, max));
                 }
@@ -413,7 +432,7 @@ namespace Protobot.Devices {
             // The smart ports, 7 x 3, as the Brain shows them.
             var grid = Ui.Rect("Ports", content);
             var layout = grid.gameObject.AddComponent<GridLayoutGroup>();
-            layout.cellSize = new Vector2((Width - 24f - 6f - 6f * 4f) / 7f, 44f);
+            layout.cellSize = new Vector2((width - 24f - 6f - 4f * 6f) / 7f, 44f);
             layout.spacing = new Vector2(4f, 4f);
             layout.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
             layout.constraintCount = 7;
@@ -435,11 +454,49 @@ namespace Protobot.Devices {
                 Note(content, off.Count + (off.Count == 1 ? " device has" : " devices have") + " no free port on the brain (21 smart, 8 three-wire): a real robot couldn't plug " + (off.Count == 1 ? "it" : "them") + " in.", Theme.Warning, 36f);
         }
 
+        // A section's cards in columns (as many as fit the window), each card going into the shortest one.
         private void Section(string title, IEnumerable<V5Device> devices) {
             var list = devices.ToList();
             if (list.Count == 0) return;
             Heading(title);
-            foreach (var d in list) Card(d);
+            var n = Mathf.Min(Columns, list.Count);
+            if (n <= 1) {
+                foreach (var d in list) Card(content, d);
+                return;
+            }
+            var row = Ui.Rect(title + " Columns", content);
+            var layout = Ui.Row(row, 6f, null, TextAnchor.UpperLeft);
+            layout.childForceExpandWidth = true;
+            var columns = new RectTransform[n];
+            var heights = new float[n];
+            for (var i = 0; i < n; i++) {
+                columns[i] = Ui.Rect("Column " + (i + 1), row);
+                Ui.Column(columns[i], 6f);
+                var element = columns[i].gameObject.AddComponent<LayoutElement>();
+                element.flexibleWidth = 1f;
+                element.preferredWidth = 0f;
+                element.minWidth = 0f;
+            }
+            foreach (var d in list) {
+                var k = System.Array.IndexOf(heights, heights.Min());
+                Card(columns[k], d);
+                heights[k] += Estimate(d) + 6f;
+            }
+        }
+
+        // About how tall a card is (to balance the columns).
+        private float Estimate(V5Device d) {
+            if (!expanded.Contains(d.Key)) return 42f;
+            return d switch {
+                MotorDevice => 520f,
+                DistanceSensor => 210f,
+                OpticalSensor => 180f,
+                ShaftSensor => 190f,
+                InertialSensor => 250f,
+                SolenoidDevice s => 110f + 60f * s.cylinders.Count,
+                PlainDevice => 80f,
+                _ => 140f,
+            };
         }
 
         private void PortTile(RectTransform grid, int port, V5Device device) {
@@ -450,10 +507,8 @@ namespace Protobot.Devices {
                 Ui.Tip(tile, "Port " + port, null, "Empty.");
                 return;
             }
-            var label = Ui.Text(tile.transform, "Kind", V5Device.Short(device.kind), Theme.FontSmall, Theme.Text, Theme.Medium, TextAlignmentOptions.Center);
-            label.rectTransform.Place(new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0f, -3f), new Vector2(60f, 18f));
-            var strip = Ui.Image(tile.transform, "Strip", device.Tint, 2f);
-            strip.rectTransform.Place(new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 4f), new Vector2(30f, 4f));
+            var icon = Icon(tile.transform, device, 24f);
+            icon.Place(new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(3f, -3f), new Vector2(24f, 24f));
             if (!device.wired) {
                 var dot = Ui.Text(tile.transform, "Unwired", "○", Theme.FontSmall - 3f, Theme.TextFaint, null, TextAlignmentOptions.TopRight);
                 dot.rectTransform.Place(new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(-4f, -1f), new Vector2(14f, 14f));
@@ -471,8 +526,8 @@ namespace Protobot.Devices {
 
         // ------------------------------------------------------------------ cards
 
-        private void Card(V5Device d) {
-            var card = Box(content, d.Name, Theme.PanelRaised, 8f, true).rect;
+        private void Card(RectTransform parent, V5Device d) {
+            var card = Box(parent, d.Name, Theme.PanelRaised, 8f, true).rect;
             var column = Ui.Column(card, 6f, new RectOffset(8, 8, 6, 8));
             column.childForceExpandWidth = true;
             cards.Add((card, d));
@@ -480,7 +535,7 @@ namespace Protobot.Devices {
 
             // The folded row: port, color, name, reading (and a motor's < ■ >).
             var row = Ui.Image(card.transform, "Row", new Color(0f, 0f, 0f, 0f), 0f, true).rectTransform;
-            Ui.Row(row, 7f);
+            Ui.Row(row, 5f);
             row.Size(-1, 30f);
             var toggle = row.gameObject.AddComponent<Button>();
             toggle.transition = Selectable.Transition.None;
@@ -493,15 +548,14 @@ namespace Protobot.Devices {
                 shown = null;
             });
             Badge(row, d);
-            var dot = Ui.Image(row, "Color", d.Tint, 0f);
-            dot.sprite = Theme.Circle;
-            dot.Size(12f, 12f);
+            Icon(row, d, 18f).Size(18f, 18f);
             var name = Ui.Text(row, "Name", d.Name, Theme.FontBody, Theme.Text);
             name.Size(-1, 30f, 1f);
+            name.GetComponent<LayoutElement>().minWidth = 56f;
             if (d is MotorDevice mc && MotorControls.IsControlled(mc.motor) && !Sandbox.Running)
                 name.text = d.Name + "  <color=#5AA2FF><size=78%>keys</size></color>";
             var reading = Ui.Text(row, "Reading", d.Reading, Theme.FontSmall, Theme.TextDim, Theme.Medium, TextAlignmentOptions.MidlineRight);
-            reading.Size(d is MotorDevice ? 50f : 120f, 30f);
+            reading.Size(d is MotorDevice ? 42f : d is SolenoidDevice ? 76f : 104f, 30f);
             live.Add(() => reading.text = d.Reading);
             if (d is MotorDevice motor) ManualButtons(row, motor);
             if (d is SolenoidDevice solenoid) ValveSwitch(row, solenoid);
@@ -539,13 +593,13 @@ namespace Protobot.Devices {
                 Audio.Sounds.Play(Audio.Sounds.Tick);
             }
             var back = Ui.Button(row, "Reverse", "<", () => Step(-0.25f), false, 5f, Theme.FontBody);
-            back.Size(28f, 26f);
+            back.Size(24f, 26f);
             Ui.Tip(back, "Reverse", null, "Runs it backward by hand, 25% more each click (as the Brain's motor screen does).");
             var stop = Ui.Button(row, "Stop", "■", () => Step(0f), false, 5f, Theme.FontSmall);
-            stop.Size(28f, 26f);
+            stop.Size(24f, 26f);
             Ui.Tip(stop, "Stop", null, "Stops running it by hand.");
             var forward = Ui.Button(row, "Forward", ">", () => Step(0.25f), false, 5f, Theme.FontBody);
-            forward.Size(28f, 26f);
+            forward.Size(24f, 26f);
             Ui.Tip(forward, "Forward", null, "Runs it forward by hand, 25% more each click.");
             live.Add(() => {
                 var manual = m.motor != null ? m.motor.Manual : 0f;
@@ -556,7 +610,7 @@ namespace Protobot.Devices {
 
         private void ValveSwitch(RectTransform row, SolenoidDevice s) {
             var button = Ui.Button(row, "Value", "Low (0)", null, false, 5f, Theme.FontSmall);
-            button.Size(74f, 26f);
+            button.Size(64f, 26f);
             button.onClick.AddListener(() => {
                 s.Set(!s.High);
                 Audio.Sounds.Play(Audio.Sounds.Tick);
@@ -616,6 +670,97 @@ namespace Protobot.Devices {
             image.rectTransform.Fill();
             image.gameObject.AddComponent<LayoutElement>().ignoreLayout = true;
             return (rect, image);
+        }
+
+        // A device's little icon (drawn once it has its size).
+        private RectTransform Icon(Transform parent, V5Device d, float size) {
+            var holder = Ui.Image(parent, "Icon", new Color(0f, 0f, 0f, 0f), 0f, true).rectTransform;
+            holder.sizeDelta = new Vector2(size, size);
+            var shapes = ShapeGraphic.Create(holder);
+            var drawn = false;
+            live.Add(() => {
+                var r = shapes.rectTransform.rect;
+                if (drawn || r.width <= 0f) return;
+                drawn = true;
+                DeviceIcons.Draw(shapes, r, d.kind, d.Tint);
+            });
+            Ui.Tip(holder, V5Device.KindName(d.kind));
+            return holder;
+        }
+
+        // Resizing: an edge or corner dragged changes the width (the left edge: the window grows leftward) and the
+        // most height it takes.
+        private void Grip(string name, Vector2 min, Vector2 max, int dx, int dy) {
+            var grip = Ui.Image(window, name + " Grip", new Color(1f, 1f, 1f, 0f), 0f, true).rectTransform;
+            grip.gameObject.AddComponent<LayoutElement>().ignoreLayout = true;
+            grip.anchorMin = min;
+            grip.anchorMax = max;
+            grip.pivot = new Vector2(0.5f, 0.5f);
+            const float T = 10f;
+            grip.sizeDelta = new Vector2(dx != 0 && dy == 0 ? T : dx != 0 ? 18f : -24f, dy != 0 && dx == 0 ? T : dy != 0 ? 18f : -24f);
+            grip.anchoredPosition = Vector2.zero;
+            var resizer = grip.gameObject.AddComponent<Resizer>();
+            resizer.owner = this;
+            resizer.dx = dx;
+            resizer.dy = dy;
+            if (dx != 0 && dy != 0) {   // a corner shows a grip
+                var shapes = ShapeGraphic.Create(grip);
+                var drawn = false;
+                gripDraws.Add(() => {
+                    var r = shapes.rectTransform.rect;
+                    if (drawn || r.width <= 0f) return;
+                    drawn = true;
+                    var corner = new Vector2(dx < 0 ? r.center.x - 2f : r.center.x + 2f, r.center.y - 2f);
+                    for (var i = 1; i <= 2; i++)
+                        shapes.Line(corner + new Vector2(0f, 4.5f * i), corner + new Vector2(-dx * 4.5f * i, 0f), Theme.TextFaint, 1.2f);
+                });
+            }
+        }
+
+        private readonly List<Action> gripDraws = new();
+
+        private void Resize(Vector2 delta, int dx, int dy) {
+            var root = ((RectTransform)Interface.Interface.Root).rect;
+            if (dx < 0) width = Mathf.Clamp(width - delta.x, MinWidth, root.width - 20f);
+            if (dx > 0) {
+                var before = width;
+                width = Mathf.Clamp(width + delta.x, MinWidth, root.width - 20f);
+                window.anchoredPosition += new Vector2(width - before, 0f);
+            }
+            if (dy < 0) heightMax = Mathf.Clamp(heightMax - delta.y, MinHeight, root.height);
+            window.sizeDelta = new Vector2(width, window.sizeDelta.y);
+            KeepOnScreen();
+        }
+
+        private class Resizer : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler, IPointerEnterHandler, IPointerExitHandler {
+            public DevicesPanel owner;
+            public int dx, dy;
+            private Image image;
+
+            public void OnBeginDrag(PointerEventData e) {
+                if (dy != 0) owner.heightMax = Mathf.Max(MinHeight, owner.window.rect.height);
+            }
+
+            public void OnDrag(PointerEventData e) =>
+                owner.Resize(e.delta / Mathf.Max(Interface.Interface.Root.lossyScale.x, 0.0001f), dx, dy);
+
+            public void OnEndDrag(PointerEventData e) {
+                PlayerPrefs.SetString(SizeKey, owner.width.ToString(CultureInfo.InvariantCulture) + "," + owner.heightMax.ToString(CultureInfo.InvariantCulture));
+                if (!owner.right) {
+                    var p = owner.window.anchoredPosition;
+                    PlayerPrefs.SetString(PositionKey, p.x.ToString(CultureInfo.InvariantCulture) + "," + p.y.ToString(CultureInfo.InvariantCulture));
+                }
+            }
+
+            public void OnPointerEnter(PointerEventData e) {
+                if (image == null) image = GetComponent<Image>();
+                image.color = new Color(Theme.Accent.r, Theme.Accent.g, Theme.Accent.b, 0.35f);
+            }
+
+            public void OnPointerExit(PointerEventData e) {
+                if (image == null) image = GetComponent<Image>();
+                image.color = new Color(1f, 1f, 1f, 0f);
+            }
         }
 
         // A small arrow: down when folded, up when open.

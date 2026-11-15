@@ -247,7 +247,9 @@ namespace Protobot.Motion {
                 Vector3 startOut = default, startUp = default, endOut = default, endUp = default;
                 if (route.Count > 0 && route[0].kind == TubeNode.Port) start = PlugAt(route[0], world[0], out startOut, out startUp);
                 if (route.Count > 1 && route[^1].kind == TubeNode.Port) end = PlugAt(route[^1], world[^1], out endOut, out endUp);
-                Wire.BuildMesh(previewMesh, line, wire.Value, line[0], start, startOut, startUp, end, endOut, endUp);
+                Wire.BuildMesh(previewMesh, line, wire.Value, line[0], start, startOut, startUp, end, endOut, endUp,
+                               route.Count > 0 && route[0].kind == TubeNode.Port && WirePorts.IsBrain(route[0].part),
+                               route.Count > 1 && route[^1].kind == TubeNode.Port && WirePorts.IsBrain(route[^1].part));
             }
             else if (line.Count >= 2) {
                 var v = new List<Vector3>();

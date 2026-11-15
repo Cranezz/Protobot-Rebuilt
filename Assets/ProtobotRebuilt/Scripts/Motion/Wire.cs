@@ -17,6 +17,7 @@ namespace Protobot.Motion {
         // Plugs: how far each sits out of its socket (the cable leaves straight from there) and its size.
         public const float SmartOut = 0.32f, SmartIn = 0.36f, SmartLong = 0.33f, SmartShort = 0.25f;
         public const float ThreeOut = 0.5f, ThreeLong = 0.31f, ThreeShort = 0.12f;
+        public const float ThreeShows = 0.13f;   // V2: how much of a 3-wire plug shows out of a brain port
         // A V5 Smart Cable is flat 4-wire modular cable (its plug is a 4-contact RJ-style one): about 4.4 x 2.3 mm,
         // its edges round.
         public const float FlatWidth = 0.17f, FlatThick = 0.09f, WireRadius = 0.024f;
@@ -63,7 +64,7 @@ namespace Protobot.Motion {
             var start = End(0, out var startOut, out var startUp);
             Vector3 endOut = default, endUp = default;
             var end = nodes.Count > 1 ? End(nodes.Count - 1, out endOut, out endUp) : null;
-            BuildMesh(mesh, Line, kind, origin, start, startOut, startUp, end, endOut, endUp);
+            BuildMesh(mesh, Line, kind, origin, start, startOut, startUp, end, endOut, endUp, InBrain(0), InBrain(nodes.Count - 1));
             AppendTies(mesh, origin);   // V2: zip ties
             if (!clicks) return;
             var hv = new List<Vector3>();
@@ -81,7 +82,7 @@ namespace Protobot.Motion {
         /// <summary>The cable along a line (world points, the mesh relative to origin) with a plug in each socket given
         /// (its mouth, the way out of it, its long side): the cable itself and the routing tool's preview.</summary>
         public static void BuildMesh(Mesh mesh, List<Vector3> world, WireKind kind, Vector3 origin, Vector3? start, Vector3 startOut, Vector3 startUp,
-                                     Vector3? end, Vector3 endOut, Vector3 endUp) {
+                                     Vector3? end, Vector3 endOut, Vector3 endUp, bool startInBrain = false, bool endInBrain = false) {
             mesh.Clear();
             if (world.Count < 2) return;
             var vertices = new List<Vector3>();
@@ -92,8 +93,10 @@ namespace Protobot.Motion {
             var white = new List<int>();   // the white wire (3-wire)
             var line = world.Select(p => p - origin).ToList();
             var cut = kind == WireKind.Smart ? SmartOut - 0.08f : ThreeOut - 0.06f;
-            if (start != null) line = Trim(line, true, cut);
-            if (end != null) line = Trim(line, false, cut);
+            // V2: a 3-wire plug in a brain port goes in until only its back shows (the brain's ports are deep slots).
+            var seated = ThreeOut - ThreeShows;
+            if (start != null) line = Trim(line, true, kind == WireKind.ThreeWire && startInBrain ? cut - seated : cut);
+            if (end != null) line = Trim(line, false, kind == WireKind.ThreeWire && endInBrain ? cut - seated : cut);
             var up0 = start != null ? startUp : Vector3.zero;
             if (kind == WireKind.Smart) Flat(line, up0, FlatWidth, FlatThick, vertices, normals, cable);
             else {
@@ -106,8 +109,8 @@ namespace Protobot.Motion {
                     Strands.Tube(shifted, false, WireRadius, 10, vertices, normals, w == 0 ? cable : w == 1 ? extra : white);
                 }
             }
-            if (start != null) Plug(kind, start.Value - origin, startOut, startUp, vertices, normals, plug, extra);
-            if (end != null) Plug(kind, end.Value - origin, endOut, endUp, vertices, normals, plug, extra);
+            if (start != null) Plug(kind, start.Value - origin - (kind == WireKind.ThreeWire && startInBrain ? startOut * seated : Vector3.zero), startOut, startUp, vertices, normals, plug, extra);
+            if (end != null) Plug(kind, end.Value - origin - (kind == WireKind.ThreeWire && endInBrain ? endOut * seated : Vector3.zero), endOut, endUp, vertices, normals, plug, extra);
             mesh.indexFormat = vertices.Count > 65000 ? UnityEngine.Rendering.IndexFormat.UInt32 : UnityEngine.Rendering.IndexFormat.UInt16;
             mesh.SetVertices(vertices);
             mesh.SetNormals(normals);
@@ -118,6 +121,9 @@ namespace Protobot.Motion {
             mesh.SetTriangles(white, 3);
             mesh.RecalculateBounds();
         }
+
+        // V2: whether a node is plugged into the brain (its 3-wire plugs go in deep).
+        private bool InBrain(int index) => index >= 0 && index < nodes.Count && nodes[index].kind == TubeNode.Port && WirePorts.IsBrain(nodes[index].part);
 
         // A plugged end: its socket mouth (world), the way out and its long side.
         private Vector3? End(int index, out Vector3 outward, out Vector3 up) {

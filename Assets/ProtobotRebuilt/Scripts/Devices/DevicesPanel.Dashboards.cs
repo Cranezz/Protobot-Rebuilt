@@ -100,9 +100,14 @@ namespace Protobot.Devices {
                 Controls.SetSide(motor.gameObject, i == 1 ? "L" : i == 2 ? "R" : "");
                 Audio.Sounds.Play(Audio.Sounds.Tick);
             });
+            holder.Size(-1, 28f, 1f);
             if (side == "") {
-                MotionUi.KeyChip(runs, Controls.ForwardKey(motor.gameObject), key => SetKey(motor, key, true), "Forward key", "Hold it to run " + motor.Label + " forward.").Size(54f, 26f);
-                MotionUi.KeyChip(runs, Controls.ReverseKey(motor.gameObject), key => SetKey(motor, key, false), "Reverse key", "Hold it to run " + motor.Label + " in reverse.").Size(54f, 26f);
+                var keys = ButtonRow(card);
+                Ui.Text(keys, "Label", "Keys", Theme.FontSmall, Theme.TextDim).Size(70f, 28f);
+                Ui.Text(keys, "Forward", "Forward", Theme.FontSmall - 1f, Theme.TextFaint).Size(52f, 28f);
+                MotionUi.KeyChip(keys, Controls.ForwardKey(motor.gameObject), key => SetKey(motor, key, true), "Forward key", "Hold it to run " + motor.Label + " forward.").Size(54f, 26f);
+                Ui.Text(keys, "Reverse", "Reverse", Theme.FontSmall - 1f, Theme.TextFaint).Size(52f, 28f);
+                MotionUi.KeyChip(keys, Controls.ReverseKey(motor.gameObject), key => SetKey(motor, key, false), "Reverse key", "Hold it to run " + motor.Label + " in reverse.").Size(54f, 26f);
                 var speedRow = ButtonRow(card);
                 Ui.Text(speedRow, "Label", "Key speed", Theme.FontSmall, Theme.TextDim).Size(70f, 28f);
                 MotionUi.Slider(speedRow, Controls.Speed(motor.gameObject), 0.05f, 0.05f, v => Mathf.RoundToInt(v * 100f) + "%  ·  " + Mathf.RoundToInt(v * motor.Rpm) + " rpm",
@@ -380,7 +385,7 @@ namespace Protobot.Devices {
             var devices = V5Brain.Devices.Where(d => d.threeWire && d.OnBrain).ToList();
             var grid = Ui.Rect("Ports", content);
             var layout = grid.gameObject.AddComponent<GridLayoutGroup>();
-            layout.cellSize = new Vector2((Width - 24f - 6f - 6f) / 2f, 64f);
+            layout.cellSize = new Vector2((width - 24f - 6f - 6f) / 2f, 64f);
             layout.spacing = new Vector2(6f, 6f);
             layout.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
             layout.constraintCount = 2;
