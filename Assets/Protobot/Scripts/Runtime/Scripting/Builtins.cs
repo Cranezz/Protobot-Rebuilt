@@ -459,6 +459,8 @@ namespace Protobot.Scripting {
         };
 
         public static PyBuiltin Method(Interpreter vm, object o, string name) {
+            var cpp = CppMethod(o, name);   // V2: C++'s names (std::vector / std::string) for translated C++
+            if (cpp != null) return cpp;
             switch (o) {
                 case string s: return StrMethod(vm, s, name);
                 case PyList l: return ListMethod(vm, l, name);
@@ -551,6 +553,65 @@ namespace Protobot.Scripting {
                 _ => null,
             };
             return f == null ? null : new PyBuiltin(name, f);
+        }
+
+        // V2: std::vector's and std::string's methods on lists and strings (C++ robot code).
+        private static PyBuiltin CppMethod(object o, string name) {
+            switch (o) {
+                case PyList l:
+                    switch (name) {
+                        case "size": return new PyBuiltin(name, _ => (long)l.items.Count);
+                        case "empty": return new PyBuiltin(name, _ => l.items.Count == 0);
+                        case "push_back": case "emplace_back": return new PyBuiltin(name, a => { l.items.Add(a.Need(0, null)); return PyNone.Value; });
+                        case "pop_back": return new PyBuiltin(name, _ => {
+                            if (l.items.Count == 0) throw new PyError("IndexError", "pop_back on an empty vector");
+                            l.items.RemoveAt(l.items.Count - 1);
+                            return PyNone.Value;
+                        });
+                        case "back": return new PyBuiltin(name, _ => l.items.Count > 0 ? l.items[l.items.Count - 1] : throw new PyError("IndexError", "back() of an empty vector"));
+                        case "front": return new PyBuiltin(name, _ => l.items.Count > 0 ? l.items[0] : throw new PyError("IndexError", "front() of an empty vector"));
+                        case "at": return new PyBuiltin(name, a => {
+                            var i = (int)Ops.ToLong(a.Need(0, null));
+                            if (i < 0 || i >= l.items.Count) throw new PyError("IndexError", "at(" + i + ") is out of range (the vector has " + l.items.Count + ")");
+                            return l.items[i];
+                        });
+                        case "resize": return new PyBuiltin(name, a => {
+                            var n = (int)Ops.ToLong(a.Need(0, null));
+                            var fill = a.Count > 1 ? a.pos[1] : 0L;
+                            while (l.items.Count > n) l.items.RemoveAt(l.items.Count - 1);
+                            while (l.items.Count < n) l.items.Add(fill);
+                            return PyNone.Value;
+                        });
+                    }
+                    return null;
+                case string s:
+                    switch (name) {
+                        case "size": case "length": return new PyBuiltin(name, _ => (long)s.Length);
+                        case "empty": return new PyBuiltin(name, _ => s.Length == 0);
+                        case "c_str": case "data": return new PyBuiltin(name, _ => s);
+                        case "substr": return new PyBuiltin(name, a => {
+                            var start = (int)Math.Min(s.Length, Ops.ToLong(a.Get(0, null, 0L)));
+                            var len = a.Count > 1 ? (int)Math.Min(s.Length - start, Ops.ToLong(a.pos[1])) : s.Length - start;
+                            return s.Substring(start, Math.Max(0, len));
+                        });
+                        case "at": return new PyBuiltin(name, a => s[(int)Ops.ToLong(a.Need(0, null))].ToString());
+                        case "back": return new PyBuiltin(name, _ => s.Length > 0 ? s[s.Length - 1].ToString() : "");
+                        case "front": return new PyBuiltin(name, _ => s.Length > 0 ? s[0].ToString() : "");
+                    }
+                    return null;
+                case PyDict d:
+                    switch (name) {
+                        case "size": return new PyBuiltin(name, _ => (long)d.Keys.Count());
+                        case "empty": return new PyBuiltin(name, _ => !d.Keys.Any());
+                        case "contains": case "count": return new PyBuiltin(name, a => {
+                            var k = a.Need(0, null);
+                            var has = d.Keys.Any(x => Ops.Eq(x, k));
+                            return name == "count" ? (object)(has ? 1L : 0L) : has;
+                        });
+                    }
+                    return null;
+            }
+            return null;
         }
 
         private static PyBuiltin ListMethod(Interpreter vm, PyList l, string name) {

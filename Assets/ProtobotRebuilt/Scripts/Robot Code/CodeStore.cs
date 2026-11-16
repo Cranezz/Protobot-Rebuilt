@@ -16,7 +16,7 @@ namespace Protobot.RobotCode {
         public static string Token => Source ?? "";
 
         public static string Folder => Path.Combine(Application.persistentDataPath, "Robot Code");
-        public static string ExternalPath => Path.Combine(Folder, "main.py");
+        public static string ExternalPath => Path.Combine(Folder, Scripting.CppTranslator.LooksLikeCpp(Source) ? "main.cpp" : "main.py");   // V2: C++ too
         public static bool Watching { get; private set; }
         private static DateTime lastWrite;
         private static float nextPoll;

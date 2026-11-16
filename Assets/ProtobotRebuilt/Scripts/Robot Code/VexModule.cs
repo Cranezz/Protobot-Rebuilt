@@ -11,8 +11,16 @@ namespace Protobot.RobotCode {
 
         protected void Method(string name, Func<Args, object> fn) => members[name] = new PyBuiltin(name, fn);
         protected void Field(string name, object value) => members[name] = value;
+        internal void Add(string name, object value) => members[name] = value;   // V2 (C++ libraries' members)
 
-        public bool TryGetAttr(string name, out object value) => members.TryGetValue(name, out value);
+        public virtual bool TryGetAttr(string name, out object value) {   // V2: EZ-Template's chassis answers to more
+            if (members.TryGetValue(name, out value)) return true;
+            // V2 (C++): VEXcode C++'s names: Brain.Screen, Controller1.Axis3, ButtonA (capitalized) and spinFor,
+            // setVelocity, isCalibrating (camelCase) are the same members.
+            if (name.Length > 0 && char.IsUpper(name[0]) && members.TryGetValue(char.ToLowerInvariant(name[0]) + name.Substring(1), out value)) return true;
+            var snake = Scripting.CppTranslator.Snake(name);
+            return snake != name && members.TryGetValue(snake, out value);
+        }
 
         public bool TrySetAttr(string name, object value) {
             members[name] = value;   // programs may keep their own values on an object
@@ -172,6 +180,18 @@ namespace Protobot.RobotCode {
         };
 
         public static bool IsUnit(object o) => o is PyEnum;
+
+        /// <summary>V2 (C++): VEXcode C++ puts "wait for completion" right after the units (spinFor(fwd, 90, deg,
+        /// false)); Python has the velocity there. A true/false before the wait's own place is that wait.</summary>
+        public static Args WaitFlag(Args a, int waitIndex) {
+            for (var i = 0; i < Math.Min(a.Count, waitIndex); i++)
+                if (a.pos[i] is bool b) {
+                    var kw = a.kw != null ? new Dictionary<string, object>(a.kw) : new Dictionary<string, object>();
+                    kw["wait"] = b;
+                    return new Args(a.vm, a.name, a.pos.Take(i).ToArray(), kw);
+                }
+            return a;
+        }
 
         public static double Seconds(double value, string unit) => unit == "MSEC" ? value / 1000.0 : value;
 

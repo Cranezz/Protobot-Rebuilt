@@ -202,6 +202,8 @@ namespace Protobot.RobotCode {
         // ------------------------------------------------------------------ text
 
         private string Text(Args a) {
+            // VEXcode C++: Brain.Screen.print("Speed %d", speed) formats like printf.
+            if (program.Cpp && a.Count > 0 && a.pos[0] is string f && (a.Count > 1 || f.Contains("%"))) return CppRuntime.CFormat(a.vm, f, a.pos.Skip(1).ToArray());
             var sep = a.kw != null && a.kw.TryGetValue("sep", out var s) ? Ops.Str(s) : "";
             var precision = a.kw != null && a.kw.TryGetValue("precision", out var p) ? (int)Ops.ToLong(p) : 2;
             return string.Join(sep, a.pos.Select(o => o is double d ? d.ToString("F" + Math.Max(0, precision), Ops.Inv) : a.vm.StrOf(o)));

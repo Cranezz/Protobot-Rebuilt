@@ -34,6 +34,8 @@ namespace Protobot.RobotCode {
         private bool ended;
 
         internal readonly VexBrain Brain;
+        /// <summary>V2: a C++ program (screen prints take printf formats).</summary>
+        internal bool Cpp { get; private set; }
         private VexController primary, partner;
         private object driverFn, autonFn;
         private bool competitionStarted;
@@ -64,7 +66,16 @@ namespace Protobot.RobotCode {
             line = 0;
             var program = new RobotProgram(period, limit);
             try {
-                program.mainFiber = program.vm.Load(source ?? "");
+                // V2: C++ (PROS / LemLib / VEXcode C++) runs on the same interpreter, translated.
+                if (Scripting.CppTranslator.LooksLikeCpp(source)) {
+                    program.Cpp = true;
+                    var body = Scripting.CppTranslator.Translate(source, out var warnings);
+                    CppRuntime.Install(program.vm);
+                    CppApi.Install(program, program.vm.modules["vex"], program.vm.modules["motion"], source);
+                    program.mainFiber = program.vm.Load(Compiler.CompileModule(body));
+                    foreach (var w in warnings) program.Warn("cpp:" + w, w);
+                }
+                else program.mainFiber = program.vm.Load(source ?? "");
             }
             catch (SyntaxErr e) {
                 error = "Line " + e.line + ": " + e.Message;

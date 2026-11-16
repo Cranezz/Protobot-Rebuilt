@@ -139,6 +139,7 @@ namespace Protobot.RobotCode {
 
         // VEXcode prints floats to 2 places unless told (precision=).
         private string Text(Args a) {
+            if (program.Cpp && a.Count > 0 && a.pos[0] is string f && (a.Count > 1 || f.Contains("%"))) return CppRuntime.CFormat(a.vm, f, a.pos.Skip(1).ToArray());   // V2 (C++)
             var sep = a.kw != null && a.kw.TryGetValue("sep", out var s) ? Ops.Str(s) : "";
             var precision = a.kw != null && a.kw.TryGetValue("precision", out var p) ? (int)Ops.ToLong(p) : 2;
             return string.Join(sep, a.pos.Select(o => o is double d ? d.ToString("F" + Math.Max(0, precision), Ops.Inv) : a.vm.StrOf(o)));
@@ -288,7 +289,13 @@ namespace Protobot.RobotCode {
 
         private bool Live => !isPartner && Sandbox.DriveEnabled && !InputEvents.TextInput.IsTyping && !InputEvents.TextInput.ShortcutsPaused;
 
-        private float AxisValue(V5Axis axis) => Live ? Mathf.Clamp(V5Controller.Axis(axis), -1f, 1f) : 0f;
+        private float AxisValue(V5Axis axis) => !Live ? 0f : Motion.Sandbox.TestSticks != null ? TestAxis(axis) : Mathf.Clamp(V5Controller.Axis(axis), -1f, 1f);
+
+        // Scripts' test sticks (Sandbox.TestSticks), as the controller's axes.
+        private static float TestAxis(V5Axis axis) {
+            var (l, r) = Motion.Sandbox.TestSticks();
+            return Mathf.Clamp(axis switch { V5Axis.Axis1 => r.x, V5Axis.Axis2 => r.y, V5Axis.Axis4 => l.x, _ => l.y }, -1f, 1f);
+        }
         private bool Held(V5Button button) => Live && V5Controller.Held(button);
 
         private sealed class Axis : VexObject {
@@ -368,6 +375,7 @@ namespace Protobot.RobotCode {
                 return PyNone.Value;
             });
             Method("spin_for", a2 => {
+                a2 = WaitFlag(a2, 5);   // V2 (C++): spinFor(fwd, 90, deg, false)
                 var dir = Dir(a2.Need(0, "direction"));
                 var amount = a2.Number(1, "rotation", 0);
                 var unit = UnitName(a2.Get(2, "units"), "DEGREES");
@@ -382,6 +390,7 @@ namespace Protobot.RobotCode {
                 return MoveTo(Position() + dir * deg, speed, a2, 5);
             });
             Method("spin_to_position", a2 => {
+                a2 = WaitFlag(a2, 4);
                 var target = ToDegrees(a2.Number(0, "rotation", 0), UnitName(a2.Get(1, "units"), "DEGREES"));
                 var speed = a2.Has(2, "velocity") && !(a2.Get(2, "velocity") is PyNone) ? Share(a2.Number(2, "velocity", 0), UnitName(a2.Get(3, "units_v"), "RPM")) : velocity;
                 return MoveTo(target, speed, a2, 4);
@@ -543,8 +552,8 @@ namespace Protobot.RobotCode {
                 return PyNone.Value;
             });
             foreach (var n in new[] { "spin", "stop", "set_velocity", "set_stopping", "set_max_torque", "set_timeout", "set_position", "reset_position", "set_reversed" }) Each(n);
-            Method("spin_for", a => All(p, a, "spin_for", 5));
-            Method("spin_to_position", a => All(p, a, "spin_to_position", 4));
+            Method("spin_for", a => All(p, WaitFlag(a, 5), "spin_for", 5));
+            Method("spin_to_position", a => All(p, WaitFlag(a, 4), "spin_to_position", 4));
             Method("position", a => Ops.ToDouble(p.vm.CallSync(Get(motors[0], "position"), a.pos, a.kw)));
             Method("velocity", a => motors.Average(m => Ops.ToDouble(p.vm.CallSync(Get(m, "velocity"), a.pos, a.kw))));
             Method("current", a => motors.Sum(m => Ops.ToDouble(p.vm.CallSync(Get(m, "current"), a.pos, a.kw))));
@@ -611,6 +620,7 @@ namespace Protobot.RobotCode {
                 return PyNone.Value;
             });
             Method("drive_for", a2 => {
+                a2 = WaitFlag(a2, 5);
                 var dir = Dir(a2.Need(0, "direction"));
                 var mm = Mm(a2.Number(1, "distance", 0), UnitName(a2.Get(2, "units"), "MM"));
                 var v = a2.Has(3, "velocity") && !(a2.Get(3, "velocity") is PyNone) ? Share(a2.Number(3, "velocity", 0), UnitName(a2.Get(4, "units_v"), "RPM")) : driveVelocity;
@@ -627,6 +637,7 @@ namespace Protobot.RobotCode {
                 return PyNone.Value;
             });
             Method("turn_for", a2 => {
+                a2 = WaitFlag(a2, 5);
                 var dir = Turn(a2.Need(0, "direction"));
                 var angle = a2.Number(1, "angle", 0);
                 if (UnitName(a2.Get(2, "units"), "DEGREES") == "TURNS") angle *= 360;
@@ -638,6 +649,7 @@ namespace Protobot.RobotCode {
                 return Move(deg, -deg, v, wait);
             });
             Method("turn_to_heading", a2 => {
+                a2 = WaitFlag(a2, 4);
                 RequireSmart("turn_to_heading");
                 var target = a2.Number(0, "angle", 0);
                 var now = gyro.Heading();
@@ -646,6 +658,7 @@ namespace Protobot.RobotCode {
                 return GyroTurn(gyro.Rotation() + delta, v, a2.Bool(4, "wait", true));
             });
             Method("turn_to_rotation", a2 => {
+                a2 = WaitFlag(a2, 4);
                 RequireSmart("turn_to_rotation");
                 var v = a2.Has(2, "velocity") && !(a2.Get(2, "velocity") is PyNone) ? Share(a2.Number(2, "velocity", 0), UnitName(a2.Get(3, "units_v"), "RPM")) : turnVelocity;
                 return GyroTurn(a2.Number(0, "angle", 0), v, a2.Bool(4, "wait", true));
@@ -845,6 +858,7 @@ namespace Protobot.RobotCode {
         }
 
         private InertialSensor Device => program.Device<InertialSensor>(port, false, "Inertial");
+        internal bool Installed => V5Brain.Get<InertialSensor>(port) != null;   // (no warning)
         private bool Calibrating => program.Time < calibratingUntil;
 
         public double Rotation() => Calibrating || Device == null ? rotationOffset : Device.Rotation + rotationOffset;

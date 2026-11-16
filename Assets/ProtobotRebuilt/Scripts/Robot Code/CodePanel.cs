@@ -38,6 +38,7 @@ namespace Protobot.RobotCode {
         private bool outputDirty, screenDirty, highlightDirty = true;
         private int errorLine;
         private string pendingInsert;
+        private bool pendingCloseBrace;
         private int validateFrame = -1, validateCount;
         private bool pastedTabs;
         private bool syncing;
@@ -348,19 +349,44 @@ namespace Protobot.RobotCode {
                 pendingInsert = "    ";
                 return '\0';
             }
+            if (added == '}' && Scripting.CppTranslator.LooksLikeCpp(text)) {
+                // V2 (C++): a } typed where the line is only spaces goes back a level.
+                var ls = index == 0 ? 0 : text.LastIndexOf('\n', Math.Max(0, index - 1)) + 1;
+                if (index - ls >= 4 && text.Substring(ls, index - ls).Trim().Length == 0) pendingCloseBrace = true;
+                return added;
+            }
             if (added == '\n') {
                 // Keep the line's indentation; one more level after a ':'.
                 var lineStart = text.LastIndexOf('\n', Math.Max(0, index - 1)) + 1;
                 if (index == 0) lineStart = 0;
                 var line = text.Substring(lineStart, Math.Max(0, index - lineStart));
                 var indent = line.Length - line.TrimStart(' ').Length;
-                var code = StripComment(line).TrimEnd();
-                if (code.EndsWith(":")) indent += 4;
+                var cpp = Scripting.CppTranslator.LooksLikeCpp(text);
+                var code = cpp ? StripCppComment(line).TrimEnd() : StripComment(line).TrimEnd();
+                if (cpp) {
+                    if (code.EndsWith("{")) indent += 4;   // V2 (C++)
+                }
+                else if (code.EndsWith(":")) indent += 4;
                 else if (Regex(code)) indent = Math.Max(0, indent - 4);
                 if (indent > 0) pendingInsert = new string(' ', indent);
                 return '\n';
             }
             return added;
+        }
+
+        private static string StripCppComment(string line) {
+            var inString = '\0';
+            for (var i = 0; i < line.Length; i++) {
+                var c = line[i];
+                if (inString != '\0') {
+                    if (c == '\\') { i++; continue; }
+                    if (c == inString) inString = '\0';
+                    continue;
+                }
+                if (c == '"' || c == '\'') inString = c;
+                else if (c == '/' && i + 1 < line.Length && line[i + 1] == '/') return line.Substring(0, i);
+            }
+            return line;
         }
 
         private static bool Pasting() {
@@ -472,6 +498,16 @@ namespace Protobot.RobotCode {
                 SetText(field.text.Replace("\t", "    "), caret + tabsBefore * 3);
                 Changed(field.text);
             }
+            if (pendingCloseBrace) {
+                // The } went in after the spaces: take 4 of them out.
+                pendingCloseBrace = false;
+                var at = Mathf.Clamp(field.stringPosition, 0, field.text.Length);
+                var brace = at - 1;
+                if (brace >= 4 && field.text[brace] == '}' && field.text.Substring(brace - 4, 4) == "    ") {
+                    SetText(field.text.Remove(brace - 4, 4), at - 4);
+                    Changed(field.text);
+                }
+            }
             if (pendingInsert != null) {
                 var insert = pendingInsert;
                 pendingInsert = null;
@@ -518,15 +554,16 @@ namespace Protobot.RobotCode {
             var (start, end) = SelectedLines();
             var text = field.text;
             var lines = text.Substring(start, end - start).Split('\n');
-            var all = lines.Where(l => l.Trim().Length > 0).All(l => l.TrimStart().StartsWith("#"));
+            var mark = Scripting.CppTranslator.LooksLikeCpp(text) ? "//" : "#";   // V2: C++ comments
+            var all = lines.Where(l => l.Trim().Length > 0).All(l => l.TrimStart().StartsWith(mark));
             for (var i = 0; i < lines.Length; i++) {
                 if (lines[i].Trim().Length == 0) continue;
                 var indent = lines[i].Length - lines[i].TrimStart().Length;
                 if (all) {
-                    var rest = lines[i].Substring(indent + 1);
+                    var rest = lines[i].Substring(indent + mark.Length);
                     lines[i] = lines[i].Substring(0, indent) + (rest.StartsWith(" ") ? rest.Substring(1) : rest);
                 }
-                else lines[i] = lines[i].Substring(0, indent) + "# " + lines[i].Substring(indent);
+                else lines[i] = lines[i].Substring(0, indent) + mark + " " + lines[i].Substring(indent);
             }
             var joined = string.Join("\n", lines);
             SetText(text.Substring(0, start) + joined + text.Substring(end), start + joined.Length);
@@ -571,7 +608,8 @@ namespace Protobot.RobotCode {
             }
             // A mistake in how it's written shows before anything starts.
             try {
-                Scripting.Compiler.Compile(CodeStore.Source);
+                if (Scripting.CppTranslator.LooksLikeCpp(CodeStore.Source)) Scripting.Compiler.CompileModule(Scripting.CppTranslator.Translate(CodeStore.Source, out _));   // V2: C++
+                else Scripting.Compiler.Compile(CodeStore.Source);
             }
             catch (Scripting.SyntaxErr e) {
                 ShowError(e.line, "Line " + e.line + ": SyntaxError: " + e.Message);
@@ -647,7 +685,7 @@ namespace Protobot.RobotCode {
                 : p.Status;
             stopButton.interactable = RobotProgram.Active;
             var lines = 1 + field.text.Count(c => c == '\n');
-            subtitle.text = lines + (lines == 1 ? " line" : " lines") + (CodeStore.Watching ? " · synced with VS Code" : "");
+            subtitle.text = (Scripting.CppTranslator.LooksLikeCpp(field.text) ? "C++ · " : "Python · ") + lines + (lines == 1 ? " line" : " lines") + (CodeStore.Watching ? " · synced with VS Code" : "");
             if (highlightDirty) {
                 highlightDirty = false;
                 highlight.text = PythonColors.Highlight(field.text);
@@ -822,6 +860,85 @@ namespace Protobot.RobotCode {
     /// <summary>Python's colors as VS Code's dark theme shows them, as TextMeshPro rich text (the characters
     /// themselves unchanged, so it lines up with the text box).</summary>
     public static class PythonColors {
+        // V2: C++ (PROS / LemLib / VEXcode C++), the same colors as VS Code's dark theme.
+        private static readonly HashSet<string> CppControl = new() { "if", "else", "for", "while", "do", "switch", "case", "default", "break", "continue", "return", "goto", "try", "catch", "throw", "new", "delete", "using", "namespace", "template", "typename", "sizeof" };
+        private static readonly HashSet<string> CppStorage = new() { "void", "int", "double", "float", "bool", "char", "long", "short", "unsigned", "signed", "auto", "const", "constexpr", "static", "inline", "extern", "struct", "class", "enum", "public", "private", "protected", "virtual", "override", "true", "false", "nullptr", "NULL", "this", "uint8_t", "uint32_t", "int32_t", "size_t", "std" };
+
+        private static string HighlightCpp(string text) {
+            var sb = new StringBuilder(text.Length * 2);
+            var i = 0;
+            var lineStart = true;
+            while (i < text.Length) {
+                var c = text[i];
+                if (c == '\n') { lineStart = true; Plainly(sb, "\n"); i++; continue; }
+                if (lineStart && c == '#') {
+                    var end = text.IndexOf('\n', i);
+                    if (end < 0) end = text.Length;
+                    Span(sb, text, i, end, Keyword);
+                    i = end;
+                    continue;
+                }
+                if (c != ' ' && c != '\t') lineStart = false;
+                if (c == '/' && i + 1 < text.Length && text[i + 1] == '/') {
+                    var end = text.IndexOf('\n', i);
+                    if (end < 0) end = text.Length;
+                    Span(sb, text, i, end, Comment);
+                    i = end;
+                    continue;
+                }
+                if (c == '/' && i + 1 < text.Length && text[i + 1] == '*') {
+                    var end = text.IndexOf("*/", i + 2, StringComparison.Ordinal);
+                    end = end < 0 ? text.Length : end + 2;
+                    // (a block comment over several lines: colored line by line)
+                    var start = i;
+                    while (start < end) {
+                        var nl = text.IndexOf('\n', start);
+                        var stop = nl < 0 || nl > end ? end : nl;
+                        Span(sb, text, start, stop, Comment);
+                        if (stop < end) Plainly(sb, "\n");
+                        start = stop + 1;
+                    }
+                    i = end;
+                    continue;
+                }
+                if (c == '"' || c == '\'') {
+                    var start = i++;
+                    while (i < text.Length && text[i] != c && text[i] != '\n') i += text[i] == '\\' ? 2 : 1;
+                    if (i < text.Length && text[i] == c) i++;
+                    Span(sb, text, start, Math.Min(i, text.Length), Str);
+                    continue;
+                }
+                if (char.IsDigit(c)) {
+                    var start = i;
+                    while (i < text.Length && (char.IsLetterOrDigit(text[i]) || text[i] == '.' || text[i] == '\'')) i++;
+                    Span(sb, text, start, i, Number);
+                    continue;
+                }
+                if (char.IsLetter(c) || c == '_') {
+                    var start = i;
+                    while (i < text.Length && (char.IsLetterOrDigit(text[i]) || text[i] == '_')) i++;
+                    var word = text.Substring(start, i - start);
+                    var next = i;
+                    while (next < text.Length && text[next] == ' ') next++;
+                    string color;
+                    if (CppControl.Contains(word)) color = Keyword;
+                    else if (CppStorage.Contains(word)) color = Storage;
+                    else if (word is "pros" or "lemlib" or "vex" or "ez") color = Type;
+                    else if (next < text.Length && text[next] == ':' && next + 1 < text.Length && text[next + 1] == ':') color = Type;
+                    else if (word.Length > 1 && word.All(ch => char.IsUpper(ch) || char.IsDigit(ch) || ch == '_')) color = Constant;
+                    else if (next < text.Length && text[next] == '(') color = Function;
+                    else if (char.IsUpper(word[0]) && start > 1 && text[start - 1] == ':' && text[start - 2] == ':') color = Type;
+                    else color = null;
+                    if (color == null) Plainly(sb, word);
+                    else Span(sb, text, start, i, color);
+                    continue;
+                }
+                Plainly(sb, c.ToString());
+                i++;
+            }
+            return sb.ToString();
+        }
+
         private const string Keyword = "#C586C0", Storage = "#569CD6", Str = "#CE9178", Comment = "#6A9955", Number = "#B5CEA8",
             Function = "#DCDCAA", Type = "#4EC9B0", Constant = "#4FC1FF", Plain = "#D4D4D4";
 
@@ -831,6 +948,7 @@ namespace Protobot.RobotCode {
         private static readonly HashSet<string> VexTypes = new() { "Brain", "Controller", "Motor", "MotorGroup", "DriveTrain", "SmartDrive", "Inertial", "Distance", "Optical", "Rotation", "Bumper", "Limit", "DigitalIn", "DigitalOut", "Pneumatics", "Encoder", "Potentiometer", "PotentiometerV2", "Line", "Light", "Sonar", "Gyro", "Timer", "Thread", "Competition", "Event", "Ports", "GearSetting", "Color" };
 
         public static string Highlight(string text) {
+            if (Scripting.CppTranslator.LooksLikeCpp(text)) return HighlightCpp(text);   // V2
             var sb = new StringBuilder(text.Length * 2);
             var i = 0;
             var afterDef = false;

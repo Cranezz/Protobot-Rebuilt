@@ -76,8 +76,10 @@ namespace Protobot.Scripting {
         // ------------------------------------------------------------------ starting
 
         /// <summary>Compiles the program (SyntaxErr on a mistake) and starts its main thread.</summary>
-        public Fiber Load(string source, string name = "main") {
-            var code = Compiler.Compile(source);
+        public Fiber Load(string source, string name = "main") => Load(Compiler.Compile(source), name);
+
+        /// <summary>V2: a program already compiled (C++ translated to the same syntax tree).</summary>
+        public Fiber Load(CodeObject code, string name = "main") {
             main.globals["__name__"] = "__main__";
             var fiber = new Fiber { name = name };
             var frame = new Frame { code = code, scope = new Scope(0, null), module = main };

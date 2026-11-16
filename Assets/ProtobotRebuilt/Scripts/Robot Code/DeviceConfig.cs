@@ -18,6 +18,119 @@ namespace Protobot.RobotCode {
     public static class DeviceConfig {
         public const string Begin = "# ---- Robot configuration (code window: Insert devices) ----";
         public const string End = "# ---- End of robot configuration ----";
+        public const string CppBegin = "// ---- Robot configuration (code window: Insert devices) ----";
+        public const string CppEnd = "// ---- End of robot configuration ----";
+
+        public static bool UsesVexcode(string source) => source.Contains("vex.h") || source.Contains("using namespace vex") || source.Contains("vex::");
+
+        /// <summary>V2: the configuration in C++: PROS (signed ports, pros::MotorGroup, pros::Imu, adi) or VEXcode C++
+        /// (motor(PORT1, ratio18_1, false), motor_group, drivetrain/smartdrive), measured as the Python one.</summary>
+        public static string GenerateCpp(bool pros, bool ez = false) {
+            LastDrive = null;
+            V5Brain.Refresh(true);
+            var sb = new StringBuilder();
+            var used = new HashSet<string> { "controller", "brain", "Brain", "Controller1" };
+            sb.AppendLine(CppBegin);
+            if (pros) sb.AppendLine("#include \"main.h\"");
+            else {
+                sb.AppendLine("#include \"vex.h\"");
+                sb.AppendLine("using namespace vex;");
+            }
+            sb.AppendLine();
+            sb.AppendLine(pros ? "pros::Controller controller(pros::E_CONTROLLER_MASTER);" : "brain Brain;\ncontroller Controller1 = controller(primary);");
+            var devices = V5Brain.Devices.ToList();
+            var motors = devices.OfType<MotorDevice>().Where(m => m.motor != null).ToList();
+            var leftMotors = motors.Where(m => Controls.Side(m.part) == "L").ToList();
+            var rightMotors = motors.Where(m => Controls.Side(m.part) == "R").ToList();
+            string Gear(int rpm) => pros ? (rpm == 100 ? "pros::MotorGearset::red" : rpm == 600 ? "pros::MotorGearset::blue" : "pros::MotorGearset::green")
+                                         : (rpm == 100 ? "ratio36_1" : rpm == 600 ? "ratio6_1" : "ratio18_1");
+            long Signed(MotorDevice m) => Controls.Reversed(m.part) ? -m.port : m.port;
+            var names = new Dictionary<MotorDevice, string>();
+            var lefts = 0;
+            var rights = 0;
+            foreach (var m in motors) {
+                var side = Controls.Side(m.part);
+                var given = Controls.GivenName(m.part);
+                names[m] = Name(given ?? (side == "L" ? "left_motor_" + Letter(lefts++) : side == "R" ? "right_motor_" + Letter(rights++) : "motor_" + m.port), used);
+            }
+            if (motors.Any(m => !pros || !(leftMotors.Contains(m) || rightMotors.Contains(m)))) {
+                sb.AppendLine();
+                sb.AppendLine(pros ? "// Motors: port (negative: reversed), cartridge (red 100 rpm, green 200, blue 600)"
+                                   : "// Motors: port, cartridge (ratio36_1 red 100 rpm, ratio18_1 green 200, ratio6_1 blue 600), reversed");
+            }
+            foreach (var m in motors) {
+                if (pros && (leftMotors.Contains(m) || rightMotors.Contains(m))) continue;   // (in the drive's groups below)
+                sb.AppendLine(pros ? $"pros::Motor {names[m]}({Signed(m)}, {Gear(m.motor.Rpm)});"
+                                   : $"motor {names[m]} = motor(PORT{m.port}, {Gear(m.motor.Rpm)}, {(Controls.Reversed(m.part) ? "true" : "false")});");
+            }
+            string imuName = null;
+            var sensors = devices.Where(d => d.kind != DeviceKind.Motor && d.kind != DeviceKind.Solenoid && d.kind != DeviceKind.Radio && d.kind != DeviceKind.Expander).ToList();
+            if (sensors.Count > 0) {
+                sb.AppendLine();
+                sb.AppendLine("// Sensors");
+            }
+            foreach (var d in sensors) {
+                var port3 = "'" + (char)('A' + Mathf.Clamp(d.port - 1, 0, 7)) + "'";
+                string Line(string prosType, string vexType, string fallback, bool threeWire) {
+                    var n = Name(Controls.GivenName(d.part) ?? fallback, used);
+                    if (d.kind == DeviceKind.Inertial) imuName = n;
+                    if (pros) return threeWire ? $"pros::adi::{prosType} {n}({port3});" : $"pros::{prosType} {n}({d.port});";
+                    return threeWire ? $"{vexType} {n} = {vexType}(Brain.ThreeWirePort.{(char)('A' + Mathf.Clamp(d.port - 1, 0, 7))});" : $"{vexType} {n} = {vexType}(PORT{d.port});";
+                }
+                var line = d.kind switch {
+                    DeviceKind.Inertial => Line("Imu", "inertial", "imu", false),
+                    DeviceKind.Distance => Line("Distance", "distance", "distance_" + d.port, false),
+                    DeviceKind.Optical => Line("Optical", "optical", "optical_" + d.port, false),
+                    DeviceKind.Rotation => Line("Rotation", "rotation", "rotation_" + d.port, false),
+                    DeviceKind.Bumper => Line("DigitalIn", "bumper", "bumper_" + d.port, true),
+                    DeviceKind.Limit => Line("DigitalIn", "limit", "limit_" + d.port, true),
+                    DeviceKind.Encoder => Line("Encoder", "encoder", "encoder_" + d.port, true),
+                    _ => "// " + V5Device.KindName(d.kind) + " on port " + d.port + ": not in the C++ libraries here yet",
+                };
+                sb.AppendLine(line);
+            }
+            var solenoids = devices.OfType<SolenoidDevice>().ToList();
+            if (solenoids.Count > 0) {
+                sb.AppendLine();
+                sb.AppendLine(pros ? "// Pneumatics: .set_value(true) extends, .set_value(false) retracts" : "// Pneumatics: .set(true) extends, .set(false) retracts");
+            }
+            foreach (var sol in solenoids) {
+                var letter = (char)('A' + Mathf.Clamp(sol.port - 1, 0, 7));
+                var given = sol.part != null ? Controls.GivenName(sol.part) : sol.own != null ? Controls.GivenName(sol.own.gameObject) : null;
+                var n = Name(given ?? "piston_" + char.ToLowerInvariant(letter), used);
+                sb.AppendLine(pros ? $"pros::adi::DigitalOut {n}('{letter}');" : $"digital_out {n} = digital_out(Brain.ThreeWirePort.{letter});");
+            }
+            if (leftMotors.Count > 0 && rightMotors.Count > 0) {
+                var (diameter, track, ratio, measured) = MeasureDrive(leftMotors, rightMotors);
+                LastDrive = (diameter, track, ratio, leftMotors[0].motor.Rpm, imuName != null);
+                var wheelRpm = leftMotors[0].motor.Rpm / Math.Max(0.01f, ratio);
+                if (Mathf.Abs(wheelRpm - Mathf.Round(wheelRpm)) < 0.5f) wheelRpm = Mathf.Round(wheelRpm);   // (360, not 359.928)
+                sb.AppendLine();
+                sb.AppendLine("// Drivetrain" + (measured ? " (measured from the build: " + F(diameter) + "\" wheels, track width " + F(track) + "\", " + F(wheelRpm) + " rpm at the wheels)" : ""));
+                if (pros && ez) {
+                    // V2: EZ-Template makes the drive's motors itself.
+                    var imuPort = devices.FirstOrDefault(d => d.kind == DeviceKind.Inertial)?.port ?? 0;
+                    sb.AppendLine("// EZ-Template: left ports, right ports (negative: reversed), IMU port, wheel diameter, rpm at the wheels");
+                    if (imuPort == 0) sb.AppendLine("// (no Inertial sensor on the robot: EZ-Template needs one for turns; add one and Insert devices again)");
+                    sb.AppendLine($"ez::Drive chassis({{{string.Join(", ", leftMotors.Select(Signed))}}}, {{{string.Join(", ", rightMotors.Select(Signed))}}}, {imuPort}, {F(diameter)}, {F(wheelRpm)});");
+                }
+                else if (pros) {
+                    sb.AppendLine($"pros::MotorGroup left_drive({{{string.Join(", ", leftMotors.Select(Signed))}}}, {Gear(leftMotors[0].motor.Rpm)});");
+                    sb.AppendLine($"pros::MotorGroup right_drive({{{string.Join(", ", rightMotors.Select(Signed))}}}, {Gear(rightMotors[0].motor.Rpm)});");
+                    sb.AppendLine($"// LemLib: lemlib::Drivetrain drivetrain(&left_drive, &right_drive, {F(track)}, {F(diameter)}, {F(wheelRpm)}, 2);");
+                }
+                else {
+                    sb.AppendLine($"motor_group left_drive = motor_group({string.Join(", ", leftMotors.Select(m => names[m]))});");
+                    sb.AppendLine($"motor_group right_drive = motor_group({string.Join(", ", rightMotors.Select(m => names[m]))});");
+                    var travel = F(Mathf.PI * diameter);
+                    sb.AppendLine(imuName != null
+                        ? $"smartdrive Drivetrain = smartdrive(left_drive, right_drive, {imuName}, {travel}, {F(track)}, {F(track)}, inches, {F(ratio)});"
+                        : $"drivetrain Drivetrain = drivetrain(left_drive, right_drive, {travel}, {F(track)}, {F(track)}, inches, {F(ratio)});");
+                }
+            }
+            sb.AppendLine(CppEnd);
+            return sb.ToString();
+        }
 
         /// <summary>The drive measured by the last Generate (examples fill their numbers in from it); null: none.</summary>
         public static (float diameter, float track, float ratio, float motorRpm, bool imu)? LastDrive;
@@ -98,13 +211,20 @@ namespace Protobot.RobotCode {
             return sb.ToString();
         }
 
+        /// <summary>V2: an EZ-Template program (its chassis is an ez::Drive).</summary>
+        public static bool UsesEz(string source) => source != null && (source.Contains("ez::") || source.Contains("EZ-Template"));
+
         /// <summary>The program with its configuration block put in (replacing an old one), at the top.</summary>
         public static string InsertInto(string source) {
-            var config = Generate().TrimEnd('\n', '\r');
             source ??= "";
-            var start = source.IndexOf(Begin, StringComparison.Ordinal);
-            var end = source.IndexOf(End, StringComparison.Ordinal);
-            if (start >= 0 && end > start) return source.Substring(0, start) + config + source.Substring(end + End.Length);
+            // V2: a C++ program gets C++ (PROS style, or VEXcode C++ when it uses vex.h).
+            var cpp = Scripting.CppTranslator.LooksLikeCpp(source);
+            var config = (cpp ? GenerateCpp(!UsesVexcode(source), UsesEz(source)) : Generate()).TrimEnd('\n', '\r');
+            var begin = cpp ? CppBegin : Begin;
+            var stop = cpp ? CppEnd : End;
+            var start = source.IndexOf(begin, StringComparison.Ordinal);
+            var end = source.IndexOf(stop, StringComparison.Ordinal);
+            if (start >= 0 && end > start) return source.Substring(0, start) + config + source.Substring(end + stop.Length);
             // A program that imports vex already: the block (which imports it too) goes first.
             return config + "\n\n" + source;
         }
@@ -144,6 +264,16 @@ namespace Protobot.RobotCode {
         }
 
         // ------------------------------------------------------------------ the drive, measured
+
+        /// <summary>The track width (inches) between the wheels these motors drive, measured from the build; 12 when it
+        /// can't be (EZ-Template without an IMU turns by it).</summary>
+        internal static double TrackWidth(IEnumerable<VexMotor> left, IEnumerable<VexMotor> right) {
+            var l = left.Select(m => V5Brain.Get<MotorDevice>(m.port)).Where(d => d != null).ToList();
+            var r = right.Select(m => V5Brain.Get<MotorDevice>(m.port)).Where(d => d != null).ToList();
+            if (l.Count == 0 || r.Count == 0) return 12;
+            var (_, track, _, measured) = MeasureDrive(l, r);
+            return measured && track > 1 ? track : 12;
+        }
 
         private static (float diameter, float track, float ratio, bool measured) MeasureDrive(List<MotorDevice> left, List<MotorDevice> right) {
             try {

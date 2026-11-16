@@ -63,6 +63,17 @@ namespace Protobot.RobotCode {
         }
     }
 
+    // ---------------------------------------------------------------------- what other libraries' devices give it
+
+    /// <summary>Motors (a PROS MotorGroup's).</summary>
+    internal interface IMotorSet { VexMotor[] Motors { get; } }
+
+    /// <summary>A rotation sensor or encoder's degrees (PROS's Rotation, ADI encoder).</summary>
+    internal interface IAngleSource { double Degrees(); }
+
+    /// <summary>An Inertial sensor (PROS's Imu).</summary>
+    internal interface IInertialSource { VexInertial Inertial { get; } }
+
     // ---------------------------------------------------------------------- settings objects
 
     public sealed class MotionPose : VexObject {
@@ -107,6 +118,7 @@ namespace Protobot.RobotCode {
         internal static VexMotor[] Side(object o, string what) => o switch {
             VexMotor m => new[] { m },
             VexMotorGroup g => g.motors,
+            IMotorSet s => s.Motors,   // PROS motor groups
             _ => throw new PyError("TypeError", "the drivetrain's " + what + " side is a Motor or MotorGroup, not " + Ops.Describe(o)),
         };
     }
@@ -117,6 +129,7 @@ namespace Protobot.RobotCode {
         private readonly object sensor;
         public readonly double diameter, offset, ratio;
         private readonly object positionFn;
+        private readonly IAngleSource angle;
         private readonly VexMotor[] motors;
         private readonly double motorRpm;
 
@@ -129,6 +142,8 @@ namespace Protobot.RobotCode {
             // A Rotation sensor or encoder (degrees), or drive motors (their degrees times the wheel's rpm over theirs).
             if (sensor is VexMotorGroup g) motors = g.motors;
             else if (sensor is VexMotor m) motors = new[] { m };
+            else if (sensor is IMotorSet ms) motors = ms.Motors;
+            else if (sensor is IAngleSource src) angle = src;
             else if (sensor is VexObject o && o.TryGetAttr("position", out var f)) positionFn = f;
             else throw new PyError("TypeError", "a TrackingWheel takes a Rotation sensor, an Encoder or a Motor/MotorGroup");
             motorRpm = MotionModule.Arg(a, 4, "rpm", 0);
@@ -142,6 +157,7 @@ namespace Protobot.RobotCode {
                 var free = motors[0].Control?.FreeRpm ?? 200f;
                 if (motorRpm > 0) deg *= motorRpm / free;
             }
+            else if (angle != null) deg = angle.Degrees();
             else deg = Ops.ToDouble(program.vm.CallSync(positionFn, new object[] { Units["DEGREES"] }));
             return deg / 360.0 * Math.PI * diameter * ratio;
         }
@@ -158,7 +174,8 @@ namespace Protobot.RobotCode {
             horizontal1 = Wheel(a.Get(2, "horizontal1"));
             horizontal2 = Wheel(a.Get(3, "horizontal2"));
             var imuArg = a.Get(4, "imu");
-            imu = imuArg == null || imuArg is PyNone ? null : imuArg as VexInertial ?? throw new PyError("TypeError", "OdomSensors' fifth argument is an Inertial sensor (or None)");
+            imu = imuArg == null || imuArg is PyNone ? null : imuArg as VexInertial ?? (imuArg as IInertialSource)?.Inertial
+                  ?? throw new PyError("TypeError", "OdomSensors' fifth argument is an Inertial sensor (or None)");
         }
 
         private static TrackingWheel Wheel(object o) => o == null || o is PyNone ? null : o as TrackingWheel ?? throw new PyError("TypeError", "OdomSensors takes TrackingWheels (or None), not " + Ops.Describe(o));
@@ -258,17 +275,17 @@ namespace Protobot.RobotCode {
                 var radians = a2.Bool(0, "radians", false);
                 return new MotionPose(x, y, radians ? theta * Math.PI / 180 : theta);
             });
-            Method("turn_to_heading", a2 => Queue(a2, () => new TurnMotion(this, a2.Number(0, "theta", 0), Ms(a2, 1), Dir(a2), Opt(a2, "max_speed", 127), Opt(a2, "min_speed", 0), Opt(a2, "early_exit_range", 0), null, false)));
-            Method("turn_to_point", a2 => Queue(a2, () => new TurnMotion(this, 0, Ms(a2, 2), Dir(a2), Opt(a2, "max_speed", 127), Opt(a2, "min_speed", 0), Opt(a2, "early_exit_range", 0),
-                                                                         (a2.Number(0, "x", 0), a2.Number(1, "y", 0)), !a2.Bool(-1, "forwards", true))));
-            Method("swing_to_heading", a2 => Queue(a2, () => new SwingMotion(this, a2.Number(0, "theta", 0), Side(a2.Need(1, "locked_side")), Ms(a2, 2), Dir(a2), Opt(a2, "max_speed", 127), Opt(a2, "min_speed", 0), Opt(a2, "early_exit_range", 0), null)));
-            Method("swing_to_point", a2 => Queue(a2, () => new SwingMotion(this, 0, Side(a2.Need(2, "locked_side")), Ms(a2, 3), Dir(a2), Opt(a2, "max_speed", 127), Opt(a2, "min_speed", 0), Opt(a2, "early_exit_range", 0),
+            Method("turn_to_heading", a2 => Queue(a2, 2, () => new TurnMotion(this, a2.Number(0, "theta", 0), Ms(a2, 1), Dir(a2), Opt(a2, "max_speed", 127), Opt(a2, "min_speed", 0), Opt(a2, "early_exit_range", 0), null, false)));
+            Method("turn_to_point", a2 => Queue(a2, 3, () => new TurnMotion(this, 0, Ms(a2, 2), Dir(a2), Opt(a2, "max_speed", 127), Opt(a2, "min_speed", 0), Opt(a2, "early_exit_range", 0),
+                                                                         (a2.Number(0, "x", 0), a2.Number(1, "y", 0)), !Forwards(a2))));
+            Method("swing_to_heading", a2 => Queue(a2, 3, () => new SwingMotion(this, a2.Number(0, "theta", 0), Side(a2.Need(1, "locked_side")), Ms(a2, 2), Dir(a2), Opt(a2, "max_speed", 127), Opt(a2, "min_speed", 0), Opt(a2, "early_exit_range", 0), null)));
+            Method("swing_to_point", a2 => Queue(a2, 4, () => new SwingMotion(this, 0, Side(a2.Need(2, "locked_side")), Ms(a2, 3), Dir(a2), Opt(a2, "max_speed", 127), Opt(a2, "min_speed", 0), Opt(a2, "early_exit_range", 0),
                                                                           (a2.Number(0, "x", 0), a2.Number(1, "y", 0)))));
-            Method("move_to_point", a2 => Queue(a2, () => new PointMotion(this, a2.Number(0, "x", 0), a2.Number(1, "y", 0), Ms(a2, 2), a2.Bool(-1, "forwards", true),
+            Method("move_to_point", a2 => Queue(a2, 3, () => new PointMotion(this, a2.Number(0, "x", 0), a2.Number(1, "y", 0), Ms(a2, 2), Forwards(a2),
                                                                          Opt(a2, "max_speed", 127), Opt(a2, "min_speed", 0), Opt(a2, "early_exit_range", 0))));
-            Method("move_to_pose", a2 => Queue(a2, () => new PoseMotion(this, a2.Number(0, "x", 0), a2.Number(1, "y", 0), a2.Number(2, "theta", 0), Ms(a2, 3), a2.Bool(-1, "forwards", true),
+            Method("move_to_pose", a2 => Queue(a2, 4, () => new PoseMotion(this, a2.Number(0, "x", 0), a2.Number(1, "y", 0), a2.Number(2, "theta", 0), Ms(a2, 3), Forwards(a2),
                                                                         Opt(a2, "lead", 0.6), Opt(a2, "horizontal_drift", 0), Opt(a2, "max_speed", 127), Opt(a2, "min_speed", 0), Opt(a2, "early_exit_range", 0))));
-            Method("follow", a2 => Queue(a2, () => new PursuitMotion(this, Path(a2.Need(0, "path")), a2.Number(1, "lookahead", 15), Ms(a2, 2), a2.Bool(3, "forwards", true), Opt(a2, "max_speed", 127))));
+            Method("follow", a2 => Queue(a2, 4, () => new PursuitMotion(this, Path(a2.Need(0, "path")), a2.Number(1, "lookahead", 15), Ms(a2, 2), a2.Bool(3, "forwards", true), Opt(a2, "max_speed", 127))));
             Method("wait_until", a2 => {
                 var dist = a2.Number(0, "dist", 0);
                 var motion = current;
@@ -336,9 +353,22 @@ namespace Protobot.RobotCode {
         // ------------------------------------------------------------------ arguments
 
         private static double Ms(Args a, int i) => Math.Max(0, a.Number(i, "timeout", 0)) / 1000.0;
-        private static double Opt(Args a, string name, double fallback) => a.kw != null && a.kw.TryGetValue(name, out var v) && !(v is PyNone) ? Ops.ToDouble(v) : fallback;
+        // An option by its Python name (max_speed) or LemLib's C++ one (maxSpeed).
+        private static object Kw(Args a, string name) {
+            if (a.kw == null) return null;
+            if (a.kw.TryGetValue(name, out var v)) return v;
+            return a.kw.TryGetValue(Camel(name), out v) ? v : null;
+        }
 
-        private static int Dir(Args a) => a.kw != null && a.kw.TryGetValue("direction", out var d) && d is PyEnum e ? e.value : 0;
+        private static string Camel(string snake) {
+            var parts = snake.Split('_');
+            return parts[0] + string.Concat(parts.Skip(1).Select(x => x.Length > 0 ? char.ToUpperInvariant(x[0]) + x.Substring(1) : ""));
+        }
+
+        private static double Opt(Args a, string name, double fallback) => Kw(a, name) is object v && !(v is PyNone) ? Ops.ToDouble(v) : fallback;
+        private static bool Forwards(Args a) => !(Kw(a, "forwards") is object v) || Ops.Truthy(v);
+
+        private static int Dir(Args a) => Kw(a, "direction") is PyEnum e ? e.value : 0;
 
         private static bool Side(object o) => o is PyEnum e && e.type == "DriveSide" ? e.value == 1 : throw new PyError("TypeError", "the locked side is DriveSide.LEFT or DriveSide.RIGHT");
 
@@ -357,9 +387,12 @@ namespace Protobot.RobotCode {
         }
 
         // A motion call: waits for the one under way to end, starts, then (wait=True) waits for it too.
-        private object Queue(Args a, Func<Motion> make) {
+        private object Queue(Args a, int asyncIndex, Func<Motion> make) {
             StartOdom();
-            var wait = a.kw != null && a.kw.TryGetValue("wait", out var w) && Ops.Truthy(w);
+            // wait=True (Python), or LemLib's async argument false (C++: chassis.moveToPoint(0, 24, 2000, {}, false)).
+            var wait = a.kw != null && a.kw.TryGetValue("wait", out var w) && Ops.Truthy(w)
+                       || a.Count > asyncIndex && a.pos[asyncIndex] is bool async && !async
+                       || a.kw != null && a.kw.TryGetValue("async_", out var ak) && !Ops.Truthy(ak);
             Motion mine = null;
             var started = false;
             bool Try() {
