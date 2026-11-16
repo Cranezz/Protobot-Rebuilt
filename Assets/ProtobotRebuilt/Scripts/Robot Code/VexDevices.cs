@@ -21,10 +21,10 @@ namespace Protobot.RobotCode {
 
     internal sealed class VexBrain : VexObject {
         public override string TypeName => "Brain";
-        public readonly BrainScreen screen;
+        public readonly BrainCanvas screen;   // V2: the 480 x 240 touch screen (BrainCanvas)
 
         public VexBrain(RobotProgram p) {
-            screen = new BrainScreen(p, 12, 48, "Brain");
+            screen = new BrainCanvas(p);
             Field("screen", screen);
             Field("timer", new VexTimer(p));
             var battery = new Battery();
@@ -58,7 +58,8 @@ namespace Protobot.RobotCode {
         }
     }
 
-    /// <summary>The Brain's (or the controller's) text screen: rows of characters, as VEXcode prints them.</summary>
+    /// <summary>The controller's text screen (3 rows of 19 characters), as VEXcode prints on it. (The Brain's own
+    /// screen draws too: BrainCanvas.)</summary>
     public sealed class BrainScreen : VexObject {
         private readonly RobotProgram program;
         public readonly int rows, cols;
@@ -254,9 +255,35 @@ namespace Protobot.RobotCode {
             this.isPartner = isPartner;
             foreach (V5Axis axis in Enum.GetValues(typeof(V5Axis))) Field("axis" + (int)axis, new Axis(this, axis));
             foreach (V5Button button in Enum.GetValues(typeof(V5Button))) Field("button" + button, new Button(this, button));
-            Field("screen", new BrainScreen(p, 3, 19, "Controller"));
-            Method("rumble", _ => PyNone.Value);
+            screen = new BrainScreen(p, 3, 19, "Controller");
+            Field("screen", screen);
+            Method("rumble", a => {
+                // V2: shown on the code window's controller screen (it shakes) and played on a gamepad if one is in.
+                if (!isPartner) {
+                    RumblePattern = a.vm.StrOf(a.Need(0, "pattern"));
+                    RumbleStart = Time.unscaledTime;
+                }
+                return PyNone.Value;
+            });
             Method("installed", _ => !isPartner);
+        }
+
+        public readonly BrainScreen screen;
+        public static string RumblePattern;
+        public static float RumbleStart;
+
+        /// <summary>Whether the rumble pattern buzzes now: "." short, "-" long, " " a pause.</summary>
+        public static bool Buzzing() {
+            if (string.IsNullOrEmpty(RumblePattern)) return false;
+            var t = Time.unscaledTime - RumbleStart;
+            foreach (var ch in RumblePattern) {
+                var (on, gap) = ch switch { '.' => (0.15f, 0.1f), '-' => (0.4f, 0.1f), _ => (0f, 0.25f) };
+                if (t < on) return true;
+                t -= on + gap;
+                if (t < 0f) return false;
+            }
+            RumblePattern = null;
+            return false;
         }
 
         private bool Live => !isPartner && Sandbox.DriveEnabled && !InputEvents.TextInput.IsTyping && !InputEvents.TextInput.ShortcutsPaused;

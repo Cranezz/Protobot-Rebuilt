@@ -144,6 +144,7 @@ namespace Protobot.Game {
                 Interface.Interface.Say("The field couldn't be set up: " + e.Message, false);
                 return;
             }
+            game.PauseHoleTriggers();   // V2 (performance)
             game.savedBlocked = SelectionSystem.SelectionManager.Blocked;
             SelectionSystem.SelectionManager.Blocked = () => true;
             Sandbox.SetBuildInterface(false);
@@ -165,6 +166,7 @@ namespace Protobot.Game {
         public void Exit() {
             Exited?.Invoke();
             if (Sandbox.Running) Sandbox.Stop();
+            ResumeHoleTriggers();
             ClearHosting();
             if (field != null) Destroy(field.gameObject);
             if (tool != null) Destroy(tool.gameObject);
@@ -185,7 +187,38 @@ namespace Protobot.Game {
             Sandbox.DriveEnabled = true;
         }
 
+        // V2 (performance): the build can't change while a game is open, so the screws' hole-finding triggers rest
+        // (their OnTriggerStay ran for every screw every physics step: ~1 ms a frame on the demo robot). Switching a
+        // trigger off sends no exit: every screw keeps its holes. (The sandbox does the same while it runs.)
+        private readonly List<Collider> pausedTriggers = new();
+
+        private readonly List<HoleDetector> pausedDetectors = new();
+
+        private void PauseHoleTriggers() {
+            foreach (var detector in FindObjectsByType<HoleDetector>(FindObjectsSortMode.None)) {
+                if (detector.enabled) {   // (and their Update: 0.5 ms a frame on the demo robot)
+                    detector.enabled = false;
+                    pausedDetectors.Add(detector);
+                }
+                foreach (var trigger in detector.GetComponents<Collider>())
+                    if (trigger.enabled && trigger.isTrigger) {
+                        trigger.enabled = false;
+                        pausedTriggers.Add(trigger);
+                    }
+            }
+        }
+
+        private void ResumeHoleTriggers() {
+            foreach (var detector in pausedDetectors)
+                if (detector != null) detector.enabled = true;
+            pausedDetectors.Clear();
+            foreach (var trigger in pausedTriggers)
+                if (trigger != null) trigger.enabled = true;
+            pausedTriggers.Clear();
+        }
+
         private void OnDestroy() {
+            ResumeHoleTriggers();
             ShowGrid();
             if (Current == this) {
                 ClearHosting();

@@ -11,6 +11,11 @@ namespace Protobot {
         [SerializeField] HoleCollider.HoleType targetHoleType;
 
         private void Update() {
+            // V2 (performance): only copy the set when a hole is gone (it allocated a set for every screw every frame).
+            var gone = false;
+            foreach (var h in holes)
+                if (h == null || h.gameObject.IsDeleted()) { gone = true; break; }
+            if (!gone) return;
             var allHoles = new HashSet<HoleCollider>(holes);
             foreach (var holeCollider in allHoles) {
                 // V2: a hole destroyed outright (opening another build) is let go of too.

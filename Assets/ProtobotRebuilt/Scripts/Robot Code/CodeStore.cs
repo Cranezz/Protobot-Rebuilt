@@ -45,6 +45,7 @@ namespace Protobot.RobotCode {
                 Directory.CreateDirectory(Folder);
                 WriteExternal();
                 File.WriteAllText(Path.Combine(Folder, "vex.pyi"), ApiStub.Text);
+                File.WriteAllText(Path.Combine(Folder, "motion.pyi"), ApiStub.Motion);   // V2
                 Watching = true;
                 var path = ExternalPath;
                 var code = FindVsCode();

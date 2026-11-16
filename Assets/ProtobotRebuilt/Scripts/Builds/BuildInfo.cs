@@ -13,8 +13,15 @@ namespace Protobot.Builds {
         public static int Build {
             get {
                 if (build == null) {
-                    var text = Resources.Load<TextAsset>("Version/build");
-                    build = text != null && int.TryParse(text.text.Trim(), out var n) ? n : 0;
+                    // V2: a built app's own version ("Beta 1.9 build 50") first: the player build bumps the number in
+                    // its preprocess step, after Resources/Version/build.txt was already packed (it showed one less).
+                    var version = Application.version ?? "";
+                    var at = version.LastIndexOf("build ", System.StringComparison.Ordinal);
+                    if (!Application.isEditor && at >= 0 && int.TryParse(version.Substring(at + 6).Trim(), out var fromVersion)) build = fromVersion;
+                    else {
+                        var text = Resources.Load<TextAsset>("Version/build");
+                        build = text != null && int.TryParse(text.text.Trim(), out var n) ? n : 0;
+                    }
                 }
                 return build.Value;
             }

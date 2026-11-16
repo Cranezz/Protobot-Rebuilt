@@ -132,8 +132,12 @@ namespace Protobot {
             return false;
         }
 
+        private static int deletedLayerCache = -2;
+
         public static bool IsDeleted(this GameObject obj) {
-            int deletedLayer = LayerMask.NameToLayer("Deleted");
+            // V2 (performance): the layer looked up once (this is called for every part, every frame, all over).
+            if (deletedLayerCache == -2) deletedLayerCache = LayerMask.NameToLayer("Deleted");
+            int deletedLayer = deletedLayerCache;
 
             if (obj.layer == deletedLayer) return true;
             if (obj.transform.root.gameObject.layer == deletedLayer) return true;

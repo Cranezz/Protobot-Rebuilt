@@ -200,6 +200,12 @@ namespace Protobot.Scripting {
                 catch (IndexOutOfRangeException) {
                     Raise(f, new PyError("RuntimeError", "the interpreter's stack went wrong (please report this program)"));
                 }
+                catch (Exception ex) {
+                    // A fault in the app under a built-in (a device that went away...): the program gets a clear error
+                    // on its line instead of a broken stack.
+                    UnityEngine.Debug.LogException(ex);
+                    Raise(f, new PyError("RuntimeError", "something in the app failed under this line: " + ex.Message));
+                }
             }
         }
 
@@ -771,12 +777,15 @@ namespace Protobot.Scripting {
                 return CallSync(new PyBoundMethod(pi, s)) as string ?? throw new PyError("TypeError", "__str__ should return a string");
             if (o is PyInstance ex && ex.cls.mro.Any(c => c.name == "BaseException")) return Ops.ExceptionMessage(ex);
             if (o is PyList or PyTuple or PyDict) return ReprOf(o);
+            // V2: a built-in object can give its own text (a Pose prints its x, y and heading).
+            if (o is IPyObject po && (po.TryGetAttr("__str__", out var ps) || po.TryGetAttr("__repr__", out ps)) && CallSync(ps) is string text) return text;
             return Ops.Str(o);
         }
 
         public string ReprOf(object o) {
             if (o is PyInstance pi && pi.cls.Lookup("__repr__", out var r))
                 return CallSync(new PyBoundMethod(pi, r)) as string ?? throw new PyError("TypeError", "__repr__ should return a string");
+            if (o is IPyObject po && po.TryGetAttr("__repr__", out var pr) && CallSync(pr) is string text) return text;   // V2
             switch (o) {
                 case PyList l: return "[" + string.Join(", ", l.items.Select(ReprOf)) + "]";
                 case PyTuple t: return t.items.Length == 1 ? "(" + ReprOf(t.items[0]) + ",)" : "(" + string.Join(", ", t.items.Select(ReprOf)) + ")";

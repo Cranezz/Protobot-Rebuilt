@@ -12,6 +12,7 @@ namespace Protobot.Interface {
             IdleFrameRate.Busy.Add(() => Motion.MotorRunner.Active);
             IdleFrameRate.Busy.Add(() => GraphicsBenchmark.Running);
             IdleFrameRate.Busy.Add(() => Game.SkillsGame.Active);
+            IdleFrameRate.Busy.Add(() => Game.ReplayViewer.Active);   // V2: a replay plays on its own (it ran at the idle 30 FPS)
             IdleFrameRate.Busy.Add(() => DG.Tweening.DOTween.TotalPlayingTweens() > 0);
             if (Interface.Root != null)
                 FrameRateCounter.Create(Interface.Root);

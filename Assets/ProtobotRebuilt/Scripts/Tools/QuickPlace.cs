@@ -55,14 +55,33 @@ namespace Protobot.Tools {
             // The app's own shortcut on the same key (C: color picker, F: focus) waits while the mouse is over a hole
             // or screw (whatever the keys are changed to in Edit > Keyboard shortcuts).
             InputEvent.Claimed = e => {
+                // V2 (performance): asked by every shortcut every frame: off while a game or the simulation runs
+                // (quick placing is too), and each key's answer worked out once a frame (it was 1.7 ms a frame).
+                if (Game.SkillsGame.Active || Motion.Sandbox.Running) return false;
                 var key = e.ShortcutKey;
                 if (key == Key.None) return false;
+                if (claimFrame != Time.frameCount) {
+                    claimFrame = Time.frameCount;
+                    claims.Clear();
+                }
+                if (claims.TryGetValue((key, e.name == "Focus"), out var known)) return known;
+                var claimed = ClaimsKey(e, key);
+                claims[(key, e.name == "Focus")] = claimed;
+                return claimed;
+            };
+        }
+
+        private static int claimFrame = -1;
+        private static readonly Dictionary<(Key, bool), bool> claims = new();
+
+        private static bool ClaimsKey(InputEvent e, Key key) {
+            {
                 if (key == Keybinds.MainKey("QuickScrew") || key == Keybinds.MainKey("QuickScrewAll")) { if (HoverHole() != null) return true; }
                 if (key == Keybinds.MainKey("HoldScrew")) { if (ClaimsWheel || HoverHole() != null || HoverScrew() != null) return true; }
                 if (key == Keybinds.MainKey("HoldSpacer")) { if (ClaimsWheel || HoverHole() != null || HoverScrew() != null) return true; }
                 if (key == Keybinds.MainKey("PlaceTubing")) { if (HoverPort() != null || HoverWirePort() != null) return true; }
                 return e.name == "Focus" && ClaimsWheel;
-            };
+            }
         }
 
         private static bool Blocked(Keyboard keyboard) =>

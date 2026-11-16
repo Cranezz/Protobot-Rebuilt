@@ -9,8 +9,41 @@ namespace Protobot.RobotCode {
             ("Gyro turns (SmartDrive)", "Turns to exact headings with the Inertial sensor", Gyro),
             ("Pneumatics on a button", "Button A toggles a piston", Pneumatics),
             ("Read the sensors", "Prints every sensor to the Brain's screen", Sensors),
-            ("PID drive", "Your own PID loop to drive a distance", Pid),
+            ("PID tuning (graph)", "Your own PID loop: open the Graph tab and tune kP, kI, kD", Pid),
+            ("Odometry and motions (LemLib style)", "move_to_point, turn_to_heading, move_to_pose and pure pursuit, with odometry", Odometry),
+            ("Autonomous selector (touch screen)", "Tap a button on the Brain's screen to pick the autonomous", Selector),
+            ("Controller screen and rumble", "Prints on the controller and rumbles when A is pressed", ControllerScreen),
         };
+
+        // V2: an example's "# {devices}" ... "# {/devices}" lines are swapped for the robot's own configuration (Insert
+        // devices) when the build has a drivetrain, and {track} {wheel} {wheel_rpm} {deg_per_inch} for its numbers.
+        public static string Fill(string code) {
+            var start = code.IndexOf("# {devices}", System.StringComparison.Ordinal);
+            var end = code.IndexOf("# {/devices}", System.StringComparison.Ordinal);
+            string config = null;
+            try { config = DeviceConfig.Generate(); }
+            catch (System.Exception e) { UnityEngine.Debug.LogWarning("V2: example devices: " + e.Message); }
+            var drive = DeviceConfig.LastDrive;
+            if (start >= 0 && end > start) {
+                var lineEnd = code.IndexOf('\n', end);
+                if (lineEnd < 0) lineEnd = code.Length;
+                if (drive != null && config != null) {
+                    var mine = config.TrimEnd('\n', '\r');
+                    if (!drive.Value.imu) mine += "\nimu = None   # (no Inertial sensor on the robot: the heading comes from the drive wheels)";
+                    code = code.Substring(0, start) + mine + code.Substring(lineEnd);
+                }
+                else {
+                    var startEnd = code.IndexOf('\n', start);
+                    code = code.Substring(0, start) + code.Substring(startEnd + 1, end - startEnd - 1) + code.Substring(System.Math.Min(code.Length, lineEnd + 1));
+                }
+            }
+            string F(double v) => v.ToString("0.###", System.Globalization.CultureInfo.InvariantCulture);
+            var wheel = drive?.diameter ?? 4f;
+            var ratio = drive?.ratio ?? 1f;
+            var motorRpm = drive?.motorRpm ?? 200f;
+            return code.Replace("{track}", F(drive?.track ?? 12f)).Replace("{wheel}", F(wheel)).Replace("{wheel_rpm}", F(motorRpm / ratio))
+                       .Replace("{deg_per_inch}", F(360.0 * ratio / (System.Math.PI * wheel)));
+        }
 
         private const string Competition = @"# Competition template (VEXcode V5 Python style)
 from vex import *
@@ -145,46 +178,163 @@ while True:
     wait(100, MSEC)
 ";
 
-        private const string Pid = @"from vex import *
+        private const string Pid = @"# PID tuning with the Graph tab: it draws every ""name: number"" your program prints.
+# Run it, open Graph (under the code), then change kP, kI, kD and run again:
+#   kP first (the robot gets there, then rocks), then kD to calm it, kI last for the final bit.
+# The same code works on the real robot (the prints go to the terminal).
+from vex import *
 
-left_motor = Motor(Ports.PORT1, GearSetting.RATIO_18_1, False)
-right_motor = Motor(Ports.PORT10, GearSetting.RATIO_18_1, True)
+# {devices}
+left_drive = MotorGroup(Motor(Ports.PORT1, GearSetting.RATIO_18_1, False))
+right_drive = MotorGroup(Motor(Ports.PORT10, GearSetting.RATIO_18_1, True))
+# {/devices}
 
-WHEEL_CIRCUMFERENCE = 12.57   # inches (a 4"" wheel)
+kP = 0.3
+kI = 0.0
+kD = 1.5
+
+DEG_PER_INCH = {deg_per_inch}   # motor degrees for one inch of travel (your wheels and gearing)
+target = 24 * DEG_PER_INCH         # 24 inches
+
+left_drive.set_position(0, DEGREES)
+right_drive.set_position(0, DEGREES)
+integral = 0
+last_error = target
+for step in range(150):            # 3 seconds, every 20 ms
+    error = target - (left_drive.position(DEGREES) + right_drive.position(DEGREES)) / 2
+    integral += error
+    derivative = error - last_error
+    last_error = error
+    power = kP * error + kI * integral + kD * derivative
+    power = max(-100, min(100, power))
+    left_drive.spin(FORWARD, power, PERCENT)
+    right_drive.spin(FORWARD, power, PERCENT)
+    print(""error:"", round(error / DEG_PER_INCH, 2), ""power:"", round(power, 1))
+    wait(20, MSEC)
+left_drive.stop(BRAKE)
+right_drive.stop(BRAKE)
+";
+
+        private const string Odometry = @"# Odometry and autonomous motions, the way LemLib / EZ-Template teams write them
+# (same names as LemLib). x, y in inches; heading in degrees, clockwise from forward.
+from vex import *
+from motion import *
+
+# {devices}
+left_drive = MotorGroup(Motor(Ports.PORT1, GearSetting.RATIO_6_1, True), Motor(Ports.PORT2, GearSetting.RATIO_6_1, True))
+right_drive = MotorGroup(Motor(Ports.PORT3, GearSetting.RATIO_6_1, False), Motor(Ports.PORT4, GearSetting.RATIO_6_1, False))
+imu = Inertial(Ports.PORT10)
+# {/devices}
+
+# Track width (in), wheel diameter (in), wheel rpm, horizontal drift (2 with omnis all round, 8 with traction wheels)
+odom_drive = Drivetrain(left_drive, right_drive, {track}, {wheel}, {wheel_rpm}, 2)
+# kP, kI, kD, anti windup, small error, small error timeout (ms), large error, large error timeout (ms), slew
+lateral = ControllerSettings(10, 0, 3, 3, 1, 100, 3, 500, 20)
+angular = ControllerSettings(2, 0, 10, 3, 1, 100, 3, 500, 0)
+# Tracking wheels go here: TrackingWheel(Rotation(Ports.PORT5), Omniwheel.NEW_2, -2.5). None: the drive motors are used.
+sensors = OdomSensors(None, None, None, None, imu)
+chassis = Chassis(odom_drive, lateral, angular, sensors)
+
+chassis.calibrate()           # the Inertial sensor calibrates (about 2 s)
+chassis.set_pose(0, 0, 0)
+
+# Motions run in the background: each waits for the one before. wait=True waits for it to finish.
+chassis.move_to_point(0, 24, 2000)
+chassis.turn_to_heading(90, 1000)
+chassis.move_to_pose(24, 36, 0, 3000)       # boomerang: arrives at (24, 36) facing forward
+chassis.wait_until_done()
+print(""pose:"", chassis.get_pose())
+
+# Pure pursuit along a path of points, then back to the start backwards
+chassis.follow([(24, 36), (12, 48), (0, 48)], 10, 4000)
+chassis.move_to_point(0, 0, 4000, forwards=False, wait=True)
+print(""back at"", chassis.get_pose())
+";
+
+        private const string Selector = @"# Autonomous selector: tap a button on the Brain's screen before the match
+# (here: the Brain screen tab under the code, click a button). The competition
+# template then runs the one picked.
+from vex import *
+
+brain = Brain()
+controller = Controller()
+
+autons = [""Left side"", ""Right side"", ""Skills""]
+selected = 0
 
 
-class PID:
-    def __init__(self, kp, ki, kd):
-        self.kp, self.ki, self.kd = kp, ki, kd
-        self.total = 0
-        self.last = 0
+def draw_buttons():
+    brain.screen.clear_screen()
+    brain.screen.set_font(FontType.MONO20)
+    for i in range(len(autons)):
+        x = 20 + i * 150
+        brain.screen.set_pen_color(Color.WHITE)
+        brain.screen.set_fill_color(Color.GREEN if i == selected else Color(60, 60, 60))
+        brain.screen.draw_rectangle(x, 60, 140, 80)
+        brain.screen.print_at(autons[i], x=x + 12, y=106)
+    brain.screen.set_fill_color(Color.BLACK)
+    brain.screen.print_at(""Tap an autonomous"", x=20, y=200)
 
-    def step(self, error, dt):
-        self.total += error * dt
-        change = (error - self.last) / dt
-        self.last = error
-        return self.kp * error + self.ki * self.total + self.kd * change
+
+def screen_pressed():
+    global selected
+    x = brain.screen.x_position()
+    y = brain.screen.y_position()
+    if 60 <= y <= 140:
+        for i in range(len(autons)):
+            if 20 + i * 150 <= x <= 160 + i * 150:
+                selected = i
+                controller.screen.clear_screen()
+                controller.screen.print(""Auton: "" + autons[i])
+                controller.rumble(""."")
+    draw_buttons()
 
 
-def drive_inches(distance):
-    left_motor.reset_position()
-    right_motor.reset_position()
-    pid = PID(6.0, 0.0, 0.4)
+def autonomous():
+    brain.screen.clear_screen()
+    brain.screen.print(""Running: "" + autons[selected])
+    if selected == 0:
+        pass   # your left-side routine
+    elif selected == 1:
+        pass   # your right-side routine
+    else:
+        pass   # your skills routine
+
+
+def user_control():
     while True:
-        traveled = (left_motor.position(TURNS) + right_motor.position(TURNS)) / 2 * WHEEL_CIRCUMFERENCE
-        error = distance - traveled
-        if abs(error) < 0.25:
-            break
-        power = max(-80, min(80, pid.step(error, 0.02)))
-        left_motor.spin(FORWARD, power, PERCENT)
-        right_motor.spin(FORWARD, power, PERCENT)
         wait(20, MSEC)
-    left_motor.stop(BRAKE)
-    right_motor.stop(BRAKE)
-    print(""Stopped"", round(error, 2), ""inches from the target"")
 
 
-drive_inches(36)
+brain.screen.pressed(screen_pressed)
+draw_buttons()
+comp = Competition(user_control, autonomous)
+";
+
+        private const string ControllerScreen = @"# The controller's screen (3 rows of 19) and rumble.
+from vex import *
+
+brain = Brain()
+controller = Controller()
+presses = 0
+
+
+def on_a():
+    global presses
+    presses += 1
+    controller.screen.set_cursor(2, 1)
+    controller.screen.print(""A pressed:"", presses, ""   "")
+    controller.rumble(""."")   # . short, - long, space a pause
+
+
+controller.buttonA.pressed(on_a)
+controller.screen.clear_screen()
+controller.screen.set_cursor(1, 1)
+controller.screen.print(""Protobot robot"")
+while True:
+    controller.screen.set_cursor(3, 1)
+    controller.screen.print(""Battery:"", brain.battery.capacity(), ""%  "")
+    wait(500, MSEC)
 ";
     }
 }

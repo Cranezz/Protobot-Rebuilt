@@ -1481,6 +1481,8 @@ namespace Protobot.Motion {
         // loads, the ground on wheels), then the motors' torque for a step, implicitly (a DC motor: stall torque down
         // to nothing at free speed, so its torque is A - B * speed), and every shaft is set to its ratio of that.
         // Meshing gears keep their ratio this way, and a motor that isn't driven brakes (V5 motors short their windings).
+        private const float CoastDrag = 0.1f;
+
         private static void Turn(Train train) {
             var dt = Time.fixedDeltaTime;
             float inertia = 0f, momentum = 0f;
@@ -1500,6 +1502,9 @@ namespace Protobot.Motion {
             foreach (var (motor, k) in train.motors) {
                 var stall = motor.StallTorque * NewtonMeter;
                 if (motor.Coasting && Mathf.Abs(motor.Command) < 0.001f) {   // V2 (robot code): coast: no braking
+                    // ...but a V5 motor's gearbox still drags when it's turned by hand (about a tenth of the brake's
+                    // pull): without it an all-omni robot rolled on freely after a move and slowly spun round.
+                    b += k * k * stall / FreeSpeed(motor) * CoastDrag;
                     most += Mathf.Abs(k) * stall;
                     continue;
                 }
@@ -1541,10 +1546,16 @@ namespace Protobot.Motion {
         // Omni wheels: no friction across them (the rollers), the tire's grip along the way they roll.
         private const float RollerResistance = 0.05f;
 
+        private readonly Dictionary<Collider, int> pointsOn = new();
+
         private void Omnis() {
             if (contacts.Count == 0) return;
             var total = bodies.Sum(b => b.mass);
             var touching = Mathf.Max(1, contacts.Select(c => c.collider).Distinct().Count());
+            // V2: a wheel touching at several points shares its correction between them (each took half the slip:
+            // two or three points over-corrected and the wheel jittered).
+            pointsOn.Clear();
+            foreach (var c in contacts) pointsOn[c.collider] = pointsOn.TryGetValue(c.collider, out var n) ? n + 1 : 1;
             foreach (var (collider, point, normalIn, impulse, other) in contacts) {
                 var wheel = omnis.FirstOrDefault(w => w.collider == collider);
                 if (wheel == null || wheel.rb == null || wheel.rb.isKinematic) continue;
@@ -1557,8 +1568,10 @@ namespace Protobot.Motion {
                 along.Normalize();
                 var velocity = rb.GetPointVelocity(point) - (other != null ? other.GetPointVelocity(point) : Vector3.zero);
                 var slip = Vector3.Dot(velocity, along);
-                var spinMass = Inertia(rb, axis, collider.bounds.center) / Mathf.Max(wheel.radius * wheel.radius, 0.01f);
-                var mass = 0.5f * Mathf.Min(spinMass, total / touching);
+                // V2: the slip is taken up against the robot's weight on this wheel (still at most what friction
+                // allows). It was limited by the wheel's own spin inertia, which is tiny next to the gear train and
+                // motors it's geared to: under full power the omnis spun in place (a 24" move went 21.3").
+                var mass = 0.5f * total / touching / pointsOn[collider];
                 var most = 1.0f * impulse;
                 var j = Mathf.Clamp(-slip * mass, -most, most);
                 rb.AddForceAtPosition(along * j, point, ForceMode.Impulse);

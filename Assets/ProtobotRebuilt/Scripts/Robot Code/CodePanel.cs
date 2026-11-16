@@ -25,11 +25,13 @@ namespace Protobot.RobotCode {
 
         private static readonly string[] PeriodLabels = { "Program", "Autonomous 0:15", "Skills auton 1:00", "Driver 1:45" };
 
-        private RectTransform window, viewport, errorBar, outputContent, screenBox;
+        private RectTransform window, viewport, errorBar, outputContent, screenBox, graphBox;
         private TMP_InputField field;
-        private TextMeshProUGUI highlight, gutter, outputText, screenText, status, subtitle;
+        private TextMeshProUGUI highlight, gutter, outputText, status, subtitle;
+        private RectTransform bottomArea, editorArea;
+        private const float OutputHeight = 170f, ScreenTabHeight = 280f;
         private ScrollRect outputScroll;
-        private Button runButton, stopButton, outputTab, screenTab;
+        private Button runButton, stopButton, outputTab, screenTab, graphTab;
         private int period;
         private bool showScreen;
         private readonly StringBuilder output = new();
@@ -124,6 +126,10 @@ namespace Protobot.RobotCode {
             examples.GetComponent<HorizontalLayoutGroup>().padding.right = 24;
             examples.onClick.AddListener(() => Popup.Open((RectTransform)examples.transform, Examples.All.Select(e => e.name).ToArray(), -1, UseExample));
             Ui.Tip(examples, "Examples", null, "Starting programs: tank and arcade drive, an autonomous square, gyro turns, pneumatics, sensors, a PID loop. Replaces what's in the editor (Ctrl+Z brings it back).");
+            // V2: the robot's configuration (ports, cartridges, drivetrain measured from the build), as VEXcode writes it.
+            var devices = Ui.Button(header, "Insert devices", "Devices", InsertDevices, false, 5f, Theme.FontSmall);
+            devices.Size(-1, 26f);
+            Ui.Tip(devices, "Insert devices", null, "Writes the robot's configuration at the top of the program: every motor on its port with its cartridge and direction, the drive's motor groups and a drivetrain measured from your build (wheel size, track width, gear ratio), the sensors and pneumatics. Again after you change the robot: it replaces the old block.");
             var external = Ui.Button(header, "Open in VS Code", "VS Code", () => {
                 Commit();
                 CodeStore.OpenExternally();
@@ -161,7 +167,7 @@ namespace Protobot.RobotCode {
             status.Size(-1, 32f, 1f);
 
             // Output (bottom).
-            const float outputHeight = 170f;
+            const float outputHeight = OutputHeight;
             var bottom = Ui.Rect("Bottom", body);
             bottom.anchorMin = Vector2.zero;
             bottom.anchorMax = new Vector2(1f, 0f);
@@ -179,6 +185,9 @@ namespace Protobot.RobotCode {
             outputTab.Size(-1, 24f);
             screenTab = Ui.Button(tabs, "Brain screen", "Brain screen", () => SetTab(true), false, 5f, Theme.FontSmall);
             screenTab.Size(-1, 24f);
+            graphTab = Ui.Button(tabs, "Graph", "Graph", () => SetTab(2), false, 5f, Theme.FontSmall);
+            graphTab.Size(-1, 24f);
+            Ui.Tip(graphTab, "Tuning graph", null, "The motors your program drives (speed or position against what it asked for) and anything it prints as name: number, over time. For tuning PID.");
             Ui.Rect("Space", tabs).gameObject.AddComponent<LayoutElement>().flexibleWidth = 1f;
             var clear = Ui.Button(tabs, "Clear", "Clear", () => {
                 output.Clear();
@@ -210,18 +219,20 @@ namespace Protobot.RobotCode {
             outputScroll.movementType = ScrollRect.MovementType.Clamped;
             outputScroll.scrollSensitivity = 30f;
 
-            // The Brain's screen: 480 x 272, its text in rows (a tab over the output).
+            // V2: the Brain's screen (480 x 240: drawing, text, touch) and the controller's (a tab over the output; the
+            // bottom grows while it's shown so the screen is near its real size).
             screenBox = Ui.Image(bottom, "Brain Screen", new Color(0.02f, 0.02f, 0.03f, 1f), 6f).rectTransform;
             screenBox.Fill(0, 30, 0, 0);
-            screenText = Ui.Text(screenBox, "Text", "", 12f, new Color(0.85f, 0.95f, 1f), MonoFont.Get);
-            screenText.rectTransform.Fill(10, 6, 10, 6);
-            screenText.alignment = TextAlignmentOptions.TopLeft;
-            screenText.richText = false;
-            screenText.overflowMode = TextOverflowModes.Truncate;
+            BrainScreenView.Create(screenBox);
+            graphBox = Ui.Image(bottom, "Graph Box", new Color(0.05f, 0.055f, 0.065f, 1f), 6f).rectTransform;
+            graphBox.Fill(0, 30, 0, 0);
+            TuningGraphView.Create(graphBox);
+            bottomArea = bottom;
 
             // The editor (the rest).
             var editor = Ui.Image(body, "Editor", new Color(0.075f, 0.08f, 0.095f, 1f), 6f, true).rectTransform;
             editor.Fill(12, 88, 12, 12 + outputHeight + 8f);
+            editorArea = editor;
             var gutterBox = Ui.Rect("Gutter", editor);
             gutterBox.anchorMin = Vector2.zero;
             gutterBox.anchorMax = new Vector2(0f, 1f);
@@ -281,7 +292,7 @@ namespace Protobot.RobotCode {
             grip.gameObject.AddComponent<Resizer>().owner = this;
             Ui.Tip(grip, "Resize");
 
-            SetTab(PlayerPrefs.GetInt(TabKey, 0) == 1);
+            SetTab(Mathf.Clamp(PlayerPrefs.GetInt(TabKey, 0), 0, 2));
             if (RobotProgram.Current != null) OnState();
             UpdateButtons();
             KeepOnScreen();
@@ -299,13 +310,22 @@ namespace Protobot.RobotCode {
             t.raycastTarget = false;
         }
 
-        private void SetTab(bool screen) {
-            showScreen = screen;
-            PlayerPrefs.SetInt(TabKey, screen ? 1 : 0);
-            screenBox.gameObject.SetActive(screen);
-            outputScroll.gameObject.SetActive(!screen);
-            outputTab.targetGraphic.color = screen ? Theme.PanelRaised : Theme.Hover;
-            screenTab.targetGraphic.color = screen ? Theme.Hover : Theme.PanelRaised;
+        private void SetTab(bool screen) => SetTab(screen ? 1 : 0);
+
+        // V2: 0 output, 1 the Brain's (and controller's) screen, 2 the tuning graph.
+        private void SetTab(int tab) {
+            showScreen = tab == 1;
+            PlayerPrefs.SetInt(TabKey, tab);
+            screenBox.gameObject.SetActive(tab == 1);
+            graphBox.gameObject.SetActive(tab == 2);
+            // The Brain's screen and the graph get room (the editor gives some up while they're shown).
+            var height = tab == 0 ? OutputHeight : ScreenTabHeight;
+            if (bottomArea != null) bottomArea.offsetMax = new Vector2(-12f, 12f + height);
+            if (editorArea != null) editorArea.offsetMin = new Vector2(12f, 12f + height + 8f);
+            outputScroll.gameObject.SetActive(tab == 0);
+            outputTab.targetGraphic.color = tab == 0 ? Theme.Hover : Theme.PanelRaised;
+            screenTab.targetGraphic.color = tab == 1 ? Theme.Hover : Theme.PanelRaised;
+            graphTab.targetGraphic.color = tab == 2 ? Theme.Hover : Theme.PanelRaised;
             screenDirty = true;
         }
 
@@ -409,9 +429,25 @@ namespace Protobot.RobotCode {
             Snapshot();
         }
 
+        private void InsertDevices() {
+            string text;
+            try { text = DeviceConfig.InsertInto(field.text); }
+            catch (System.Exception e) {
+                Debug.LogException(e);
+                Interface.Interface.Say("The devices couldn't be read: " + e.Message, false);
+                return;
+            }
+            Snapshot();
+            SetText(text, 0);
+            Snapshot();
+            Commit();
+            output.Append("<color=#8A93A0>Robot configuration inserted from the build (Edit > Devices has the ports; names come from the names you gave the motors).</color>\n");
+            outputDirty = true;
+        }
+
         private void UseExample(int i) {
             Snapshot();
-            SetText(Examples.All[i].code, 0);
+            SetText(Examples.Fill(Examples.All[i].code), 0);   // V2: with the robot's own devices
             Snapshot();
             Commit();
             output.Append("<color=#8A93A0>Example: " + Escape(Examples.All[i].description) + ". Check its ports against Edit > Devices.</color>\n");
@@ -558,7 +594,7 @@ namespace Protobot.RobotCode {
             }
             output.Append("<color=#6FCF97>Running: " + Escape(PeriodLabels[period]) + "</color>\n");
             outputDirty = true;
-            SetTab(false);
+            // (The tab stays: the graph or the Brain's screen is often what's being watched.)
             UpdateButtons();
         }
 
@@ -632,10 +668,7 @@ namespace Protobot.RobotCode {
                     outputScroll.verticalNormalizedPosition = 0f;
                 }
             }
-            if (screenDirty && showScreen) {
-                screenDirty = false;
-                screenText.text = p != null ? p.Brain.screen.Text() : "";
-            }
+            screenDirty = false;   // (the Brain screen view redraws itself)
         }
 
         private void LateUpdate() {

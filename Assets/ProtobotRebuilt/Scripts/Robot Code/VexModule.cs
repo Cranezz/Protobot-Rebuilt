@@ -112,13 +112,13 @@ namespace Protobot.RobotCode {
             var ports = new PyClass("Ports", null);
             for (var i = 1; i <= 21; i++) ports.dict["PORT" + i] = new PyEnum("Ports", "PORT" + i, i);
             m.globals["Ports"] = ports;
-            var colors = new PyClass("Color", null);
+            var colors = new PyClass("Color", null) { construct = (_, a) => VexColorValue.Make(a) };   // V2: Color(r, g, b), Color(0xFF0000), Color("#FF0000")
             foreach (var (n, i) in new[] { ("RED", 0), ("GREEN", 1), ("BLUE", 2), ("YELLOW", 3), ("ORANGE", 4), ("PURPLE", 5), ("CYAN", 6), ("WHITE", 7), ("BLACK", 8), ("TRANSPARENT", 9) })
                 colors.dict[n] = new PyEnum("Color", n, i);
             m.globals["Color"] = colors;
             var fonts = new PyClass("FontType", null);
             foreach (var n in new[] { "MONO12", "MONO15", "MONO20", "MONO30", "MONO40", "MONO60", "PROP20", "PROP30", "PROP40", "PROP60" })
-                fonts.dict[n] = new PyEnum("FontType", n, 0);
+                fonts.dict[n] = new PyEnum("FontType", n, int.Parse(n.Substring(4)));   // V2: the value is its height in pixels
             m.globals["FontType"] = fonts;
 
             // ---------------------------------------------------------- functions

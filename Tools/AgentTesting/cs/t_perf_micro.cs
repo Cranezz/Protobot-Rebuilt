@@ -1,0 +1,14 @@
+var sw = new System.Diagnostics.Stopwatch();
+var sb = new System.Text.StringBuilder();
+System.Action<string, System.Action> time = (name, a) => { a(); sw.Restart(); for (var i = 0; i < 50; i++) a(); sw.Stop(); sb.AppendLine(name + ": " + (sw.Elapsed.TotalMilliseconds / 50).ToString("0.000") + " ms"); };
+time("SelectTool.SelectedPart", () => { var x = Protobot.Tools.SelectTool.SelectedPart; });
+time("GameObject.Find(Primary Selection Manager)", () => { var x = UnityEngine.GameObject.Find("Primary Selection Manager"); });
+time("ModelExport.BuildName", () => { var x = Protobot.Builds.ModelExport.BuildName(); });
+time("Keybinds.MainKey(QuickScrew)", () => { var x = Protobot.Tools.Keybinds.MainKey("QuickScrew"); });
+var events = UnityEngine.Object.FindObjectsByType<Protobot.InputEvents.InputEvent>(UnityEngine.FindObjectsSortMode.None);
+sb.AppendLine("InputEvents: " + events.Length);
+time("all InputEvent.Update", () => { foreach (var e in events) e.Update(); });
+time("Claimed on all", () => { foreach (var e in events) Protobot.InputEvents.InputEvent.Claimed(e); });
+time("ShortcutKey on all", () => { foreach (var e in events) { var k = e.ShortcutKey; } });
+sb.AppendLine("Primary Selection Manager found: " + (UnityEngine.GameObject.Find("Primary Selection Manager") != null));
+return sb.ToString();

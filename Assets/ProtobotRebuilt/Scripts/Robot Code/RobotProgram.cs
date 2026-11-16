@@ -51,6 +51,7 @@ namespace Protobot.RobotCode {
             vm.modules["vex"] = VexModule.Build(this);
             // PROS-style and VEXcode-style names some programs use for the same module.
             vm.modules["vexcode"] = vm.modules["vex"];
+            vm.modules["motion"] = MotionModule.Build(this);   // V2: odometry and LemLib-style motions
         }
 
         // ------------------------------------------------------------------ running
@@ -71,6 +72,7 @@ namespace Protobot.RobotCode {
                 return false;
             }
             Current = program;
+            TuningData.Begin();   // V2: a new run, a new graph
             V5Brain.Refresh(true);
             foreach (var d in V5Brain.Devices) d.PowerOn();
             Builds.ActionLog.Write("code", "start " + period + (limit > 0 ? " " + limit + " s" : ""));
@@ -115,6 +117,7 @@ namespace Protobot.RobotCode {
                 return;
             }
             foreach (var c in motors.Values) c.Control(dt);
+            TuningData.Sample((float)Time, motors.Values);   // V2: the tuning graph (50 samples a second)
             if (limit > 0 && periodStart >= 0 && Time - periodStart >= limit) {
                 Print("\n[" + PeriodName + " ended after " + limit.ToString("0") + " s]\n");
                 End(PeriodName + " over");
@@ -146,7 +149,13 @@ namespace Protobot.RobotCode {
         }
 
         internal void Print(string text) {
-            Printed?.Invoke(text);
+            // V2: each listener on its own: one that fails (a closed window's) must not break the program (an
+            // exception thrown up through print() left the interpreter's stack wrong).
+            if (Printed != null)
+                foreach (Action<string> listener in Printed.GetInvocationList())
+                    try { listener(text); }
+                    catch (Exception e) { Debug.LogWarning("V2: a print listener failed: " + e.Message); }
+            TuningData.Printed((float)Time, text);   // V2: "name: number" values go on the tuning graph
         }
 
         /// <summary>Once per thing a program does wrong without stopping (a motor on an empty port).</summary>
@@ -228,7 +237,7 @@ namespace Protobot.RobotCode {
         public float maxTorque = 1f;
         public double degrees;      // raw position since power on
         public bool done = true;
-        private float integral;
+        private float integral, settle;
 
         public MotorControl(MotorDrive motor) => this.motor = motor;
 
@@ -294,12 +303,17 @@ namespace Protobot.RobotCode {
                 case Mode.Position: {
                     var dps = FreeRpm * 6f;
                     var err = (float)(targetDeg - degrees);
-                    // Slow down in time to stop on the spot (a motion profile), then hold.
-                    var decel = dps / 0.12f;
+                    // Slow down in time to stop on the spot (a motion profile), then hold. V2: from full speed in about a
+                    // third of a second (0.12 s braked a drivetrain harder than its wheels grip: it slid on after the
+                    // wheels had stopped, and a coasting robot turned as it slid).
+                    var decel = dps / 0.35f;
                     var want = Mathf.Sign(err) * Mathf.Min(maxSpeed * dps, Mathf.Sqrt(2f * decel * Mathf.Abs(err)));
                     if (Mathf.Abs(err) < 3f) want = err * 12f;
                     cmd = VelocityLoop(want / dps, level, dt);
-                    if (!done && Mathf.Abs(err) < 1.5f && Mathf.Abs(level) < 0.03f) {
+                    // V2: done once it has stayed on target for a moment (a slide had ended moves early); the speed only
+                    // has to be low, not still (ground contact makes a held wheel jitter a little).
+                    settle = Mathf.Abs(err) < 2f && Mathf.Abs(level) < 0.15f ? settle + dt : 0f;
+                    if (!done && settle >= 0.08f) {
                         done = true;
                         if (stopping != "HOLD") {
                             mode = Mode.None;
@@ -318,11 +332,13 @@ namespace Protobot.RobotCode {
             motor.Coasting = mode == Mode.None && stopping == "COAST";
         }
 
-        // The motor's velocity loop: feed forward plus proportional and integral on the speed error.
+        // The motor's velocity loop: feed forward plus proportional and integral on the speed error. V2: the
+        // proportional gain stays under 1: a lightly loaded motor reaches what it's given within a physics step, so a
+        // gain of 2.5 overshot every step (the speed flipped sign each step near a target and moves never settled).
         private float VelocityLoop(float want, float level, float dt) {
             var err = want - level;
-            integral = Mathf.Clamp(integral + err * 6f * dt, -0.6f, 0.6f);
-            return want + 2.5f * err + integral;
+            integral = Mathf.Clamp(integral + err * 4f * dt, -0.5f, 0.5f);
+            return want + 0.5f * err + integral;
         }
     }
 }
