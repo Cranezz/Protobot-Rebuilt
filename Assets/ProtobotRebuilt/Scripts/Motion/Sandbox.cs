@@ -1544,7 +1544,13 @@ namespace Protobot.Motion {
         }
 
         // Omni wheels: no friction across them (the rollers), the tire's grip along the way they roll.
-        private const float RollerResistance = 0.05f;
+        // V2: the rollers' resistance across the wheel, as a share of the load. Nobody publishes a measured value for
+        // VEX omnis; on foam field tiles a small rubber roller sinks in (rolling resistance ~ sqrt(sinkage / diameter):
+        // ~0.03" into a 0.45" roller is ~0.25) and turns on a plain pin. At 0.05 a robot on all omnis slid like a puck
+        // (80" after a full-speed arc, faster than its top speed sideways); at 0.25 it drifts out ~25° in a full-speed
+        // arc and stops within ~3", as all-omni robots do (pushed sideways easily, drift in hard turns: EZ-Template
+        // recommends a sideways tracking wheel for them). Tests set it (t_slide.cs).
+        internal static float RollerResistance = 0.25f;
 
         private readonly Dictionary<Collider, int> pointsOn = new();
 
@@ -1576,8 +1582,8 @@ namespace Protobot.Motion {
                 var j = Mathf.Clamp(-slip * mass, -most, most);
                 rb.AddForceAtPosition(along * j, point, ForceMode.Impulse);
                 if (other != null) other.AddForceAtPosition(-along * j, point, ForceMode.Impulse);
-                // V2: the rollers' own rolling resistance across the wheel (about 5% of the load): without it a robot
-                // on all omnis kept sliding sideways forever after a turn.
+                // V2: the rollers' own rolling resistance across the wheel (RollerResistance of the load): without it a
+                // robot on all omnis kept sliding sideways forever after a turn.
                 var across = Vector3.ProjectOnPlane(axis, normal);
                 if (across.sqrMagnitude < 1e-6f) continue;
                 across.Normalize();

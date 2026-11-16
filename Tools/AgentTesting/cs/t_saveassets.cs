@@ -1,2 +1,2 @@
 UnityEditor.AssetDatabase.SaveAssets();
-return "saved";
+return "saved " + UnityEditor.PlayerSettings.bundleVersion;

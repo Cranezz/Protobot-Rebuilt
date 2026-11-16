@@ -1,1 +1,1 @@
-return "open=" + Protobot.Online.OnlineWindow.IsOpen + " paused=" + UnityEditor.EditorApplication.isPaused + " frame=" + UnityEngine.Time.frameCount;
+return "playing=" + UnityEditor.EditorApplication.isPlaying + " compiling=" + UnityEditor.EditorApplication.isCompiling;
