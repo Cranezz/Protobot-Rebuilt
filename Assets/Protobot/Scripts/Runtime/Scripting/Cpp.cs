@@ -167,7 +167,12 @@ namespace Protobot.Scripting {
                                 case 'n': sb.Append('\n'); break;
                                 case 't': sb.Append('\t'); break;
                                 case 'r': sb.Append('\r'); break;
-                                case '0': sb.Append('\0'); break;
+                                case >= '0' and <= '7': {   // V2: octal (\033 = escape)
+                                    var v = e - '0';
+                                    for (var k = 1; k < 3 && i + 1 < src.Length && src[i + 1] >= '0' && src[i + 1] <= '7'; k++) v = v * 8 + (src[++i] - '0');
+                                    sb.Append((char)v);
+                                    break;
+                                }
                                 case 'a': sb.Append('\a'); break;
                                 case 'b': sb.Append('\b'); break;
                                 case 'x': {
@@ -683,6 +688,13 @@ namespace Protobot.Scripting {
         }
 
         // Is "(" ... ")" a parameter list (then it's a function), not constructor arguments?
+        private bool IsKnownValue(string name) {
+            if (functions.Contains(PyName(name))) return true;
+            for (var c = ctx; c != null; c = c.parent)
+                if (c.declared.Contains(name) || c.declared.Contains(PyName(name))) return true;
+            return false;
+        }
+
         private bool IsParameterList() {
             var save = p;
             try {
@@ -692,8 +704,12 @@ namespace Protobot.Scripting {
                 while (true) {
                     if (Accept("...")) { }
                     else {
+                        var typeStart = p;
                         if (!TryType(out _)) return false;
                         if (IsId()) p++;
+                        // V2: a lone name that's a function or a variable isn't a type: pros::Task counter(count_task);
+                        // makes a task (it was taken for a function's declaration and the task never started).
+                        else if (p == typeStart + 1 && t[typeStart].kind == "id" && IsKnownValue(t[typeStart].text)) return false;
                         else if (!Is(",") && !Is(")") && !Is("=") && !Is("[")) return false;
                         if (Accept("[")) { while (!Is("]")) p++; p++; }
                         if (Accept("=")) {

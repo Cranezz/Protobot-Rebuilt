@@ -1444,7 +1444,7 @@ namespace Protobot.Motion {
             }
             foreach (var train in trains)
                 foreach (var (motor, _) in train.motors) motor.Sound(Paused ? 0f : motor.Level);
-            if (Paused && Keyboard.current != null && Tools.Keybinds.Pressed("StepFrame")) Physics.Simulate(Time.fixedDeltaTime);
+            if (Paused && Keyboard.current != null && Tools.Keybinds.Pressed("StepFrame")) StepOnce();
         }
 
         private void LateUpdate() {
@@ -1467,6 +1467,19 @@ namespace Protobot.Motion {
 
         private void FixedUpdate() {
             if (instance != this) return;   // V2 (it ran the robot program a second time each step)
+            if (Paused) return;   // V2: paused, nothing moves (the robot program's time and the motors ran on)
+            Advance();
+        }
+
+        /// <summary>V2: one physics step while paused (the "." key, the code window's Step): the robot program,
+        /// the gear trains and the physics, as a running step does them.</summary>
+        public void StepOnce() {
+            if (!Paused) return;
+            Advance();
+            Physics.Simulate(Time.fixedDeltaTime);
+        }
+
+        private void Advance() {
             if (!Puppet) RobotCode.RobotProgram.Step(Time.fixedDeltaTime);   // V2 (Phase 9): robot code, before the trains turn
             foreach (var train in trains)
                 if (!train.rotors.Any(r => r.rb != null && r.rb.isKinematic)) Turn(train);   // V2: (another computer drives that robot)

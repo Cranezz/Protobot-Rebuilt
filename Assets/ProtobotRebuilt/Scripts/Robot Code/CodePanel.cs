@@ -25,13 +25,21 @@ namespace Protobot.RobotCode {
 
         private static readonly string[] PeriodLabels = { "Program", "Autonomous 0:15", "Skills auton 1:00", "Driver 1:45" };
 
-        private RectTransform window, viewport, errorBar, outputContent, screenBox, graphBox;
+        private RectTransform window, viewport, errorBar, outputContent, screenBox, graphBox, monitorBox;
         private TMP_InputField field;
         private TextMeshProUGUI highlight, gutter, outputText, status, subtitle;
         private RectTransform bottomArea, editorArea;
         private const float OutputHeight = 170f, ScreenTabHeight = 280f;
         private ScrollRect outputScroll;
-        private Button runButton, stopButton, outputTab, screenTab, graphTab;
+        private Button runButton, stopButton, outputTab, screenTab, graphTab, monitorTab, pauseButton, stepButton;
+        // V2: the Monitor tab (threads, lines, variables), the markers on the lines the threads are on, and the
+        // console's text color (set_console_text_color, [31m).
+        private readonly CodeMonitor monitor = new();
+        private TextMeshProUGUI monitorText;
+        private float monitorNext;
+        private int tab;
+        private readonly List<RectTransform> runBars = new();
+        private string consoleColor;
         private int period;
         private bool showScreen;
         private readonly StringBuilder output = new();
@@ -164,6 +172,12 @@ namespace Protobot.RobotCode {
             stopButton = Ui.Button(bar, "Stop", "Stop", () => RobotProgram.Stop("Stopped"), false, 6f, Theme.FontBody);
             stopButton.Size(-1, 32f);
             Ui.Tip(stopButton, "Stop the program", "Shift+F5", "Its motors stop; the simulation keeps going (the keys drive again).");
+            pauseButton = Ui.Button(bar, "Pause", "Pause", TogglePause, false, 6f, Theme.FontBody);
+            pauseButton.Size(-1, 32f);
+            Ui.Tip(pauseButton, "Pause", "F6", "Stops time: the robot, the program and its timers hold still, so the Monitor shows where each thread is and what its variables hold.");
+            stepButton = Ui.Button(bar, "Step", "Step", () => StepTime(Keyboard.current != null && Keyboard.current.shiftKey.isPressed ? 24 : 1), false, 6f, Theme.FontBody);
+            stepButton.Size(-1, 32f);
+            Ui.Tip(stepButton, "Step", "F10", "While paused: one physics step (1/240 s) of the robot and its program. Shift: 0.1 s.");
             status = Ui.Text(bar, "Status", "", Theme.FontSmall, Theme.TextDim);
             status.Size(-1, 32f, 1f);
 
@@ -189,6 +203,9 @@ namespace Protobot.RobotCode {
             graphTab = Ui.Button(tabs, "Graph", "Graph", () => SetTab(2), false, 5f, Theme.FontSmall);
             graphTab.Size(-1, 24f);
             Ui.Tip(graphTab, "Tuning graph", null, "The motors your program drives (speed or position against what it asked for) and anything it prints as name: number, over time. For tuning PID.");
+            monitorTab = Ui.Button(tabs, "Monitor", "Monitor", () => SetTab(3), false, 5f, Theme.FontSmall);
+            monitorTab.Size(-1, 24f);
+            Ui.Tip(monitorTab, "Monitor", null, "While the program runs: each thread and the line it's on (click to open its calls and local variables), the variables and sensors monitor_variable() and monitor_sensor() ask for, and every global variable (click a name to pin it). Values that just changed are lit. Pause stops time to look; Step moves it on.");
             Ui.Rect("Space", tabs).gameObject.AddComponent<LayoutElement>().flexibleWidth = 1f;
             var clear = Ui.Button(tabs, "Clear", "Clear", () => {
                 output.Clear();
@@ -228,6 +245,30 @@ namespace Protobot.RobotCode {
             graphBox = Ui.Image(bottom, "Graph Box", new Color(0.05f, 0.055f, 0.065f, 1f), 6f).rectTransform;
             graphBox.Fill(0, 30, 0, 0);
             TuningGraphView.Create(graphBox);
+            monitorBox = Ui.Image(bottom, "Monitor Box", new Color(0.05f, 0.055f, 0.065f, 1f), 6f, true).rectTransform;
+            monitorBox.Fill(0, 30, 0, 0);
+            var monViewport = Ui.Rect("Viewport", monitorBox).Fill(8, 6, 8, 6);
+            monViewport.gameObject.AddComponent<RectMask2D>();
+            var monContent = Ui.Rect("Content", monViewport);
+            monContent.anchorMin = new Vector2(0f, 1f);
+            monContent.anchorMax = new Vector2(1f, 1f);
+            monContent.pivot = new Vector2(0.5f, 1f);
+            monContent.sizeDelta = Vector2.zero;
+            Ui.Column(monContent, 0f);
+            monContent.gameObject.AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+            monitorText = Ui.Text(monContent, "Text", "", 13f, Theme.Text, MonoFont.Get);
+            monitorText.textWrappingMode = TextWrappingModes.Normal;
+            monitorText.overflowMode = TextOverflowModes.Overflow;
+            monitorText.alignment = TextAlignmentOptions.TopLeft;
+            monitorText.richText = true;
+            monitorText.raycastTarget = true;
+            monitorText.gameObject.AddComponent<LinkClicks>().owner = this;
+            var monScroll = monitorBox.gameObject.AddComponent<ScrollRect>();
+            monScroll.viewport = monViewport;
+            monScroll.content = monContent;
+            monScroll.horizontal = false;
+            monScroll.movementType = ScrollRect.MovementType.Clamped;
+            monScroll.scrollSensitivity = 30f;
             bottomArea = bottom;
 
             // The editor (the rest).
@@ -254,6 +295,14 @@ namespace Protobot.RobotCode {
             errorBar.anchorMax = new Vector2(1f, 1f);
             errorBar.pivot = new Vector2(0.5f, 1f);
             errorBar.gameObject.SetActive(false);
+            for (var i = 0; i < 6; i++) {
+                var bar2 = Ui.Image(viewport, "Running Line", new Color(Theme.Accent.r, Theme.Accent.g, Theme.Accent.b, 0.1f)).rectTransform;
+                bar2.anchorMin = new Vector2(0f, 1f);
+                bar2.anchorMax = new Vector2(1f, 1f);
+                bar2.pivot = new Vector2(0.5f, 1f);
+                bar2.gameObject.SetActive(false);
+                runBars.Add(bar2);
+            }
             highlight = Ui.Text(viewport, "Highlight", "", FontSize, new Color(0.83f, 0.83f, 0.83f), MonoFont.Get, TextAlignmentOptions.TopLeft);
             Setup(highlight);
             highlight.richText = true;
@@ -293,7 +342,7 @@ namespace Protobot.RobotCode {
             grip.gameObject.AddComponent<Resizer>().owner = this;
             Ui.Tip(grip, "Resize");
 
-            SetTab(Mathf.Clamp(PlayerPrefs.GetInt(TabKey, 0), 0, 2));
+            SetTab(Mathf.Clamp(PlayerPrefs.GetInt(TabKey, 0), 0, 3));
             if (RobotProgram.Current != null) OnState();
             UpdateButtons();
             KeepOnScreen();
@@ -313,9 +362,13 @@ namespace Protobot.RobotCode {
 
         private void SetTab(bool screen) => SetTab(screen ? 1 : 0);
 
-        // V2: 0 output, 1 the Brain's (and controller's) screen, 2 the tuning graph.
+        // V2: 0 output, 1 the Brain's (and controller's) screen, 2 the tuning graph, 3 the Monitor.
         private void SetTab(int tab) {
+            this.tab = tab;
             showScreen = tab == 1;
+            monitorBox.gameObject.SetActive(tab == 3);
+            monitorTab.targetGraphic.color = tab == 3 ? Theme.Hover : Theme.PanelRaised;
+            monitorNext = 0f;
             PlayerPrefs.SetInt(TabKey, tab);
             screenBox.gameObject.SetActive(tab == 1);
             graphBox.gameObject.SetActive(tab == 2);
@@ -489,6 +542,14 @@ namespace Protobot.RobotCode {
                 else Run();
                 return;
             }
+            if (kb.f6Key.wasPressedThisFrame) {   // V2: pause / go on
+                TogglePause();
+                return;
+            }
+            if (kb.f10Key.wasPressedThisFrame) {   // V2: a step while paused (Shift: 0.1 s)
+                StepTime(kb.shiftKey.isPressed ? 24 : 1);
+                return;
+            }
             if (!field.isFocused) return;
             if (pastedTabs) {
                 pastedTabs = false;
@@ -623,7 +684,9 @@ namespace Protobot.RobotCode {
                 Sandbox.Begin();
                 if (!Sandbox.Running) return;
             }
+            if (Sandbox.Instance != null && Sandbox.Instance.Paused) Sandbox.Instance.SetPaused(false);   // V2: Run goes on from a pause
             output.Clear();
+            consoleColor = null;
             errorLine = 0;
             highlightDirty = true;
             if (!RobotProgram.Start(CodeStore.Source, ProgramPeriod, Limit, out var error, out var line)) {
@@ -650,7 +713,7 @@ namespace Protobot.RobotCode {
             if (text.StartsWith("\nError on line")) output.Append("<color=#EB5757>" + Escape(text) + "</color>");
             else if (text.StartsWith("[warning")) output.Append("<color=#F2C94C>" + Escape(text) + "</color>");
             else if (text.StartsWith("[")) output.Append("<color=#8A93A0>" + Escape(text) + "</color>");
-            else output.Append(Escape(text));
+            else Console(text);
             if (output.Length > 40000) output.Remove(0, output.Length - 30000);
             outputDirty = true;
         }
@@ -684,6 +747,17 @@ namespace Protobot.RobotCode {
                 : p.Status == "Running" ? "Running · " + p.Time.ToString("0.0", CultureInfo.InvariantCulture) + " s"
                 : p.Status;
             stopButton.interactable = RobotProgram.Active;
+            // V2: Pause / Step, and the Monitor (10 times a second; at once after a click, a pause or a step).
+            var paused = Sandbox.Running && Sandbox.Instance != null && Sandbox.Instance.Paused;
+            if (paused) status.text = "<color=#F2C94C>Paused</color> · " + status.text;
+            pauseButton.interactable = Sandbox.Running;
+            var pauseLabel = pauseButton.GetComponentInChildren<TextMeshProUGUI>();
+            if (pauseLabel != null) pauseLabel.text = paused ? "Go on" : "Pause";
+            if (stepButton.gameObject.activeSelf != paused) stepButton.gameObject.SetActive(paused);
+            if (tab == 3 && Time.unscaledTime >= monitorNext) {
+                monitorNext = Time.unscaledTime + 0.1f;
+                monitorText.text = monitor.Build(p);
+            }
             var lines = 1 + field.text.Count(c => c == '\n');
             subtitle.text = (Scripting.CppTranslator.LooksLikeCpp(field.text) ? "C++ · " : "Python · ") + lines + (lines == 1 ? " line" : " lines") + (CodeStore.Watching ? " · synced with VS Code" : "");
             if (highlightDirty) {
@@ -720,6 +794,24 @@ namespace Protobot.RobotCode {
                 errorBar.sizeDelta = new Vector2(0f, top - bottom);
             }
             else errorBar.gameObject.SetActive(false);
+            // V2: the lines the program's threads are on (the one opened in the Monitor brighter).
+            var p = RobotProgram.Current;
+            var count = 0;
+            if (p != null && RobotProgram.Active) {
+                var threads = p.Threads.ToList();
+                var selected = Mathf.Clamp(monitor.selectedThread, 0, Mathf.Max(0, threads.Count - 1));
+                for (var i = 0; i < threads.Count && count < runBars.Count; i++) {
+                    var line = threads[i].Line;
+                    if (line <= 0 || line == errorLine || !LineBounds(line, out var top2, out var bottom2)) continue;
+                    var bar = runBars[count++];
+                    bar.gameObject.SetActive(true);
+                    bar.anchoredPosition = new Vector2(0f, t.anchoredPosition.y + top2);
+                    bar.sizeDelta = new Vector2(0f, top2 - bottom2);
+                    bar.GetComponent<Image>().color = new Color(Theme.Accent.r, Theme.Accent.g, Theme.Accent.b, i == selected ? 0.22f : 0.09f);
+                }
+            }
+            for (var i = count; i < runBars.Count; i++)
+                if (runBars[i].gameObject.activeSelf) runBars[i].gameObject.SetActive(false);
         }
 
         // A line's top and bottom in the text's own space (y down from its top edge, negative).
@@ -782,11 +874,116 @@ namespace Protobot.RobotCode {
             "Thread(function) runs a function at the same time; Competition(driver_control, autonomous) runs one of them by what you pick beside Run.\n\n" +
             "<b>Python</b>\n" +
             "Functions, classes, lists, dicts, f-strings, try/except, lambda, comprehensions, global/nonlocal, and the math, random and time modules. Not supported: generators (yield), 'with', async.\n\n" +
+            "<b>Finding mistakes</b>\n" +
+            "print() writes to Output (set_console_text_color(Color.RED) or \\033[31m color it, clear_console() empties it; \"name: value\" prints go on the Graph). " +
+            "The <b>Monitor</b> tab shows each thread and the line it's on (marked in the editor), its calls and their local variables, and the program's variables; " +
+            "monitor_variable(\"speed\") and monitor_sensor(\"left_motor.position\") put those at the top. <b>Pause</b> (F6) stops time to look, <b>Step</b> (F10) moves it 1/240 s (Shift: 0.1 s).\n\n" +
             "<b>Keys</b>\n" +
-            "F5 runs, Shift+F5 stops. Tab indents (4 spaces), Shift+Tab un-indents, Ctrl+/ comments lines, Ctrl+Z / Ctrl+Y undo and redo. " +
+            "F5 runs, Shift+F5 stops, F6 pauses, F10 steps. Tab indents (4 spaces), Shift+Tab un-indents, Ctrl+/ comments lines, Ctrl+Z / Ctrl+Y undo and redo. " +
             "The program is saved in the build. Open in VS Code edits it there (completions included); every save comes back here.";
 
         private static string Escape(string s) => "<noparse>" + s.Replace("</noparse>", "") + "</noparse>";
+
+        // ------------------------------------------------------------------ V2: debugging
+
+        private void TogglePause() {
+            var sandbox = Sandbox.Instance;
+            if (!Sandbox.Running || sandbox == null) {
+                Interface.Interface.Say("Nothing to pause: run the program first", false);
+                return;
+            }
+            if (Game.SkillsGame.Active && !sandbox.Paused) {
+                Interface.Interface.Say("A game's run can't be paused (its clock and score keep going)", false);
+                return;
+            }
+            sandbox.SetPaused(!sandbox.Paused);
+            monitorNext = 0f;
+            UpdateButtons();
+        }
+
+        private void StepTime(int steps) {
+            var sandbox = Sandbox.Instance;
+            if (sandbox == null || !sandbox.Paused) {
+                Interface.Interface.Say("Step works while paused (Pause, F6)", false);
+                return;
+            }
+            for (var i = 0; i < steps; i++) sandbox.StepOnce();
+            monitorNext = 0f;
+        }
+
+        // The console: VEXcode's escape codes (\033[31m colors, \033[0m back to normal, \033[2J clears).
+        private void Console(string text) {
+            var start = 0;
+            while (start < text.Length) {
+                var esc = text.IndexOf('\u001b', start);
+                var piece = esc < 0 ? text.Substring(start) : text.Substring(start, esc - start);
+                if (piece.Length > 0) {
+                    if (consoleColor != null) output.Append("<color=").Append(consoleColor).Append('>').Append(Escape(piece)).Append("</color>");
+                    else output.Append(Escape(piece));
+                }
+                if (esc < 0) break;
+                // ESC [ numbers ; ... letter
+                var end = esc + 1;
+                if (end < text.Length && text[end] == '[') end++;
+                var codeStart = end;
+                while (end < text.Length && (char.IsDigit(text[end]) || text[end] == ';')) end++;
+                if (end >= text.Length) break;
+                var codes = text.Substring(codeStart, end - codeStart);
+                var kind = text[end];
+                start = end + 1;
+                if (kind == 'J' && (codes == "2" || codes == "3")) output.Clear();
+                else if (kind == 'm') consoleColor = AnsiColor(codes, consoleColor);
+            }
+        }
+
+        private static string AnsiColor(string codes, string current) {
+            var n = codes.Split(';').Select(c => int.TryParse(c, out var v) ? v : 0).ToArray();
+            if (n.Length == 0 || n[0] == 0 || n[0] == 39) return null;
+            Color32 c;
+            if (n[0] == 38 && n.Length >= 5 && n[1] == 2) c = new Color32((byte)n[2], (byte)n[3], (byte)n[4], 255);
+            else if (n[0] >= 30 && n[0] <= 37 || n[0] >= 90 && n[0] <= 97) {
+                var i = n[0] % 10;
+                c = i switch {
+                    0 => new Color32(0, 0, 0, 255),
+                    1 => new Color32(255, 0, 0, 255),
+                    2 => new Color32(0, 255, 0, 255),
+                    3 => new Color32(255, 255, 0, 255),
+                    4 => new Color32(0, 0, 255, 255),
+                    5 => new Color32(255, 0, 255, 255),
+                    6 => new Color32(0, 255, 255, 255),
+                    _ => new Color32(255, 255, 255, 255),
+                };
+            }
+            else return current;
+            // On the dark console: pure blue or black would be unreadable, so dark colors are lightened.
+            var col = (Color)c;
+            var luma = 0.3f * col.r + 0.59f * col.g + 0.11f * col.b;
+            if (luma < 0.1f) col = new Color(0.55f, 0.58f, 0.63f);
+            else if (luma < 0.55f) col = Color.Lerp(col, Color.white, 0.45f);
+            return "#" + ColorUtility.ToHtmlStringRGB(col);
+        }
+
+        internal void ClickedLink(string id) {
+            if (id.StartsWith("t:") && int.TryParse(id.Substring(2), out var thread)) monitor.selectedThread = thread;
+            else if (id.StartsWith("l:") && int.TryParse(id.Substring(2), out var line)) ScrollToLine(line);
+            else if (id.StartsWith("v:")) {
+                var name = id.Substring(2);
+                if (!monitor.pinned.Remove(name)) monitor.pinned.Add(name);
+            }
+            monitorNext = 0f;
+        }
+
+        // The Monitor's links (threads, lines, variable names).
+        private class LinkClicks : MonoBehaviour, IPointerClickHandler {
+            public CodePanel owner;
+
+            public void OnPointerClick(PointerEventData e) {
+                var text = GetComponent<TextMeshProUGUI>();
+                var link = TMP_TextUtilities.FindIntersectingLink(text, e.position, null);
+                if (link < 0) return;
+                owner.ClickedLink(text.textInfo.linkInfo[link].GetLinkID());
+            }
+        }
 
         // ------------------------------------------------------------------ moving and resizing
 

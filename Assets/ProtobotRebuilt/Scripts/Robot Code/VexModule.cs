@@ -137,6 +137,28 @@ namespace Protobot.RobotCode {
             });
             m.globals["sleep"] = new PyBuiltin("sleep", a => new Suspend(a.vm.Time + Math.Max(0, a.Number(0, "time", 0) / 1000.0)));
 
+            // V2: VEXcode's Monitor and Console: variables and sensor readings watched in the code window's Monitor
+            // tab (names as strings, global variables), the console cleared and its text colored.
+            m.globals["monitor_variable"] = new PyBuiltin("monitor_variable", a => {
+                for (var i = 0; i < a.Count; i++)
+                    if (a.pos[i] is string name && !program.monitoredVariables.Contains(name)) program.monitoredVariables.Add(name);
+                return PyNone.Value;
+            });
+            m.globals["monitor_sensor"] = new PyBuiltin("monitor_sensor", a => {
+                for (var i = 0; i < a.Count; i++)
+                    if (!program.monitoredSensors.Contains(a.pos[i])) program.monitoredSensors.Add(a.pos[i]);
+                return PyNone.Value;
+            });
+            m.globals["clear_console"] = new PyBuiltin("clear_console", _ => {
+                program.Print("\u001b[2J");
+                return PyNone.Value;
+            });
+            m.globals["set_console_text_color"] = new PyBuiltin("set_console_text_color", a => {
+                var c = BrainCanvas.ColorOf(a.Get(0, "color"));
+                program.Print(c.a == 0 ? "\u001b[0m" : "\u001b[38;2;" + c.r + ";" + c.g + ";" + c.b + "m");
+                return PyNone.Value;
+            });
+
             // ---------------------------------------------------------- classes
             void Class(string name, Func<Args, object> make) => m.globals[name] = new PyClass(name, null) { construct = (_, a) => make(a) };
             Class("Brain", _ => program.Brain);

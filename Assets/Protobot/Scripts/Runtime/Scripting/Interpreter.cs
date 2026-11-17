@@ -19,6 +19,26 @@ namespace Protobot.Scripting {
         internal object result;
         internal bool sync;   // run to the end at once (a key function, a dunder method): no waiting
         public int Line => frames.Count > 0 ? frames[frames.Count - 1].Line : 0;
+        /// <summary>V2: a key function or dunder call run to its end at once (not a thread of the program).</summary>
+        public bool Sync => sync;
+
+        /// <summary>V2 (the code window's Monitor): the calls this thread is in, outermost first: the function's name
+        /// (null: the program's top level), the line it's on and its local variables that have a value.</summary>
+        public List<(string function, int line, List<KeyValuePair<string, object>> locals)> Snapshot() {
+            var list = new List<(string, int, List<KeyValuePair<string, object>>)>();
+            foreach (var f in frames) {
+                var locals = new List<KeyValuePair<string, object>>();
+                if (f.scope != null && !f.code.isModule) {
+                    var names = f.code.slotNames;
+                    for (var i = 0; i < names.Length && i < f.scope.slots.Length; i++) {
+                        var v = f.scope.slots[i];
+                        if (v != Interpreter.Unbound) locals.Add(new KeyValuePair<string, object>(names[i], v));
+                    }
+                }
+                list.Add((f.code.isModule ? null : f.code.isClassBody ? "class " + f.code.name : f.code.name, f.Line, locals));
+            }
+            return list;
+        }
     }
 
     internal sealed class Frame {
@@ -33,7 +53,8 @@ namespace Protobot.Scripting {
         public readonly List<PyInstance> handling = new();   // exceptions being handled (bare 'raise')
         public PyInstance initSelf;                          // an __init__ call returns the instance
         public (string name, PyClass[] bases)? classBuild;   // a class body returns the class
-        public int Line => pc > 0 && pc <= code.code.Count ? code.code[pc - 1].line : code.code.Count > 0 ? code.code[0].line : 0;
+        public int last = -1;   // V2: the instruction run last (after a jump, pc - 1 isn't it: a loop showed the line before it)
+        public int Line => last >= 0 && last < code.code.Count ? code.code[last].line : pc > 0 && pc <= code.code.Count ? code.code[pc - 1].line : code.code.Count > 0 ? code.code[0].line : 0;
 
         public void Push(object o) {
             if (sp == stack.Length) Array.Resize(ref stack, stack.Length * 2);
@@ -50,7 +71,7 @@ namespace Protobot.Scripting {
     /// anywhere, in any nested call, and the host (the simulation) steps all of them every physics step.
     /// </summary>
     public sealed class Interpreter {
-        private static readonly object Unbound = new();
+        internal static readonly object Unbound = new();   // V2: (internal: the Monitor skips unset locals)
         public const int MaxDepth = 200;
 
         public readonly Dictionary<string, object> builtins = new();
@@ -354,7 +375,7 @@ namespace Protobot.Scripting {
             var frame = f.frames[f.frames.Count - 1];
             var code = frame.code.code;
             while (budget-- > 0) {
-                var ins = code[frame.pc++];
+                var ins = code[frame.last = frame.pc++];
                 Executed++;
                 switch (ins.op) {
                     case Op.Nop: break;

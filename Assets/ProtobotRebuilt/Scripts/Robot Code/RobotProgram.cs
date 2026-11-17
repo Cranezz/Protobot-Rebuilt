@@ -45,6 +45,15 @@ namespace Protobot.RobotCode {
         private readonly Dictionary<MotorDrive, MotorControl> motors = new();
         private readonly HashSet<string> warned = new();
 
+        // V2 (the code window's Monitor): what monitor_variable / monitor_sensor asked for, and the names the
+        // interpreter had before the program ran (not the program's own variables).
+        internal readonly List<string> monitoredVariables = new();
+        internal readonly List<object> monitoredSensors = new();
+        internal HashSet<string> systemNames = new();
+        /// <summary>V2: the program's threads still running (the main program first).</summary>
+        public IEnumerable<Fiber> Threads => vm.fibers.Where(f => !f.Done && !f.Sync);
+        public Fiber MainThread => mainFiber;
+
         private RobotProgram(Period period, double limit) {
             this.period = period;
             this.limit = limit;
@@ -82,6 +91,7 @@ namespace Protobot.RobotCode {
                 line = e.line;
                 return false;
             }
+            program.systemNames = new HashSet<string>(program.vm.main.globals.Keys);   // V2 (Monitor)
             Current = program;
             TuningData.Begin();   // V2: a new run, a new graph
             V5Brain.Refresh(true);

@@ -230,7 +230,12 @@ namespace Protobot.Scripting {
                         case 'n': sb.Append('\n'); break;
                         case 't': sb.Append('\t'); break;
                         case 'r': sb.Append('\r'); break;
-                        case '0': sb.Append('\0'); break;
+                        case >= '0' and <= '7': {   // V2: octal (\033 = escape, for console colors)
+                            var v = n - '0';
+                            for (var k = 1; k < 3 && pos < src.Length && src[pos] >= '0' && src[pos] <= '7'; k++) v = v * 8 + (src[pos++] - '0');
+                            sb.Append((char)v);
+                            break;
+                        }
                         case '\\': sb.Append('\\'); break;
                         case '\'': sb.Append('\''); break;
                         case '"': sb.Append('"'); break;
