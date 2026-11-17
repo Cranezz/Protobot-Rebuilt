@@ -70,7 +70,7 @@ template <class F> class function;
 template <class R, class... A> class function<R(A...)> {
  public:
   function();
-  template <class F> function(F f);
+  template <class F> function(F) {}
   R operator()(A... args) const;
 };
 double abs(double x);

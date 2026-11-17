@@ -362,6 +362,7 @@ namespace Protobot.RobotCode {
                 brakeMode = n.Contains("HOLD") ? "HOLD" : n.Contains("BRAKE") && !n.EndsWith("COAST") ? "BRAKE" : "COAST";
                 foreach (var m in left.Concat(right)) m.stopping = brakeMode;
             }));
+            Method("drive_brake_get", _ => new PyEnum("MotorBrake", "E_MOTOR_BRAKE_" + brakeMode, brakeMode == "HOLD" ? 2 : brakeMode == "BRAKE" ? 1 : 0));
             Method("drive_set", a => None(() => {
                 current = null;
                 Output(a.Number(0, "left", 0), a.Number(1, "right", 0));

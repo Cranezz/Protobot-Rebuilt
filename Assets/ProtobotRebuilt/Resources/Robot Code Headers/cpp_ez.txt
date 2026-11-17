@@ -152,6 +152,7 @@ class Drive {
   int drive_sensor_left();
   int drive_sensor_right();
   void drive_brake_set(pros::motor_brake_mode_e_t brake_type);
+  pros::motor_brake_mode_e_t drive_brake_get();
   void drive_set(int left, int right);
   e_mode drive_mode_get();
   void pid_targets_reset();
@@ -201,6 +202,9 @@ class Drive {
   void opcontrol_speed_max_set(int speed);
   void pid_tuner_toggle();
   void pid_tuner_iterate();
+  void pid_tuner_enable();
+  void pid_tuner_disable();
+  bool pid_tuner_enabled();   // always false here
   void pid_print_toggle(bool toggle);
 
   // ---- EZ-Template v2's names

@@ -13,8 +13,12 @@ namespace Protobot.RobotCode {
         private const string MainH = @"// Protobot Rebuilt V2: a PROS project's main.h, written by the app (changes are replaced). The app runs main.cpp
 // on the simulated robot; these headers are for VS Code's completions and checks.
 #pragma once
+#ifndef PROS_USE_SIMPLE_NAMES
 #define PROS_USE_SIMPLE_NAMES
+#endif
+#ifndef PROS_USE_LITERALS
 #define PROS_USE_LITERALS
+#endif
 #include ""api.h""
 #include ""lemlib/api.hpp""
 #include ""EZ-Template/api.hpp""
