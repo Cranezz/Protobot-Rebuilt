@@ -34,6 +34,10 @@ namespace Protobot.RobotCode {
             // PROS's controller names are macros (usable without pros::).
             foreach (var kv in pros.globals.Where(kv => kv.Key.StartsWith("E_CONTROLLER_")).ToList()) g[kv.Key.Substring("E_CONTROLLER_".Length)] = kv.Value;
             foreach (var kv in pros.globals.Where(kv => kv.Key.StartsWith("E_MOTOR_")).ToList()) g[kv.Key.Substring(2)] = kv.Value;   // MOTOR_BRAKE_HOLD
+            // V2: the rest of PROS's short names (as its headers define them).
+            g["CONTROLLER_MASTER"] = pros.globals["E_CONTROLLER_MASTER"];
+            g["CONTROLLER_PARTNER"] = pros.globals["E_CONTROLLER_PARTNER"];
+            g["MOTOR_GEARSET_6"] = pros.globals["E_MOTOR_GEARSET_06"];
             // EZ-Template (ez::), and the names its files make global (master, fwd, rev).
             var ez = EzTemplate.Build(program);
             vm.modules["cpp:ez"] = ez;
@@ -58,6 +62,9 @@ namespace Protobot.RobotCode {
         private static PyModule VexCpp(RobotProgram program, PyModule py) {
             var m = new PyModule("vex");
             foreach (var kv in py.globals) m.globals[kv.Key] = kv.Value;
+            // V2: Python's Brain class isn't VEXcode C++'s (that's brain): with using namespace vex it hid the robot's
+            // Brain (robot-config's), so Brain.ThreeWirePort.A failed in a program that doesn't make its own.
+            m.globals.Remove("Brain");
             var u = Units;
             void Alias(string name, string target) { if (u.TryGetValue(target, out var e)) m.globals[name] = e; }
             foreach (var (n, t) in new[] {
@@ -206,6 +213,7 @@ namespace Protobot.RobotCode {
             foreach (var (n, rpm) in new[] { ("red", 100), ("green", 200), ("blue", 600), ("rpm_100", 100), ("rpm_200", 200), ("rpm_600", 600), ("ratio_36_to_1", 100), ("ratio_18_to_1", 200), ("ratio_6_to_1", 600), ("invalid", 0) })
                 gearsets.dict[n] = new PyEnum("MotorGearset", n, rpm);
             m.globals["MotorGearset"] = gearsets;
+            m.globals["MotorGears"] = gearsets;   // V2: PROS 4's name
             m.globals["motor_gearset_e"] = gearsets;
             foreach (var (n, rpm) in new[] { ("E_MOTOR_GEARSET_36", 100), ("E_MOTOR_GEARSET_18", 200), ("E_MOTOR_GEARSET_06", 600), ("E_MOTOR_GEAR_RED", 100), ("E_MOTOR_GEAR_GREEN", 200), ("E_MOTOR_GEAR_BLUE", 600),
                                              ("E_MOTOR_GEAR_100", 100), ("E_MOTOR_GEAR_200", 200), ("E_MOTOR_GEAR_600", 600) })
@@ -230,6 +238,7 @@ namespace Protobot.RobotCode {
             Class("MotorGroup", a => new ProsMotorGroup(program, a));
             Class("Controller", a => new ProsController(program, a));
             Class("Imu", a => new ProsImu(program, a));
+            m.globals["IMU"] = m.globals["Imu"];   // V2
             Class("Rotation", a => new ProsRotation(program, a));
             Class("Distance", a => new ProsSensor(program, a, "Distance"));
             Class("Optical", a => new ProsSensor(program, a, "Optical"));

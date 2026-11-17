@@ -1,0 +1,315 @@
+// Protobot Rebuilt V2: PROS (pros::), as far as the simulator runs it. Written by the app (changes are replaced).
+// Ports: smart ports 1-21 (negative = reversed); 3-wire ports 'A'-'H'. Times in milliseconds.
+#pragma once
+#include "protobot_sim.h"
+
+namespace pros {
+
+// ---------------------------------------------------------------- controller
+typedef enum { E_CONTROLLER_MASTER = 0, E_CONTROLLER_PARTNER } controller_id_e_t;
+typedef enum {
+  E_CONTROLLER_ANALOG_LEFT_X = 0,
+  E_CONTROLLER_ANALOG_LEFT_Y,
+  E_CONTROLLER_ANALOG_RIGHT_X,
+  E_CONTROLLER_ANALOG_RIGHT_Y
+} controller_analog_e_t;
+typedef enum {
+  E_CONTROLLER_DIGITAL_L1 = 6,
+  E_CONTROLLER_DIGITAL_L2,
+  E_CONTROLLER_DIGITAL_R1,
+  E_CONTROLLER_DIGITAL_R2,
+  E_CONTROLLER_DIGITAL_UP,
+  E_CONTROLLER_DIGITAL_DOWN,
+  E_CONTROLLER_DIGITAL_LEFT,
+  E_CONTROLLER_DIGITAL_RIGHT,
+  E_CONTROLLER_DIGITAL_X,
+  E_CONTROLLER_DIGITAL_B,
+  E_CONTROLLER_DIGITAL_Y,
+  E_CONTROLLER_DIGITAL_A
+} controller_digital_e_t;
+enum class ControllerId { master = 0, partner = 1 };
+
+class Controller {
+ public:
+  explicit Controller(controller_id_e_t id);
+  explicit Controller(ControllerId id);
+  /** -127 to 127 (the stick's keys or gamepad stick, Edit > Controller). */
+  std::int32_t get_analog(controller_analog_e_t channel);
+  std::int32_t get_digital(controller_digital_e_t button);
+  /** True once per press. */
+  std::int32_t get_digital_new_press(controller_digital_e_t button);
+  std::int32_t get_digital_new_release(controller_digital_e_t button);
+  /** The controller's 3 x 19 screen (shown beside the Brain's screen in the code window). */
+  std::int32_t print(std::uint8_t line, std::uint8_t col, const char* fmt, ...);
+  std::int32_t set_text(std::uint8_t line, std::uint8_t col, const char* str);
+  std::int32_t set_text(std::uint8_t line, std::uint8_t col, const std::string& str);
+  std::int32_t clear();
+  std::int32_t clear_line(std::uint8_t line);
+  /** "." short, "-" long, " " pause. */
+  std::int32_t rumble(const char* rumble_pattern);
+  std::int32_t get_battery_capacity();
+  std::int32_t get_battery_level();
+  std::int32_t is_connected();
+};
+
+// ---------------------------------------------------------------- motors
+typedef enum {
+  E_MOTOR_GEARSET_36 = 0,
+  E_MOTOR_GEARSET_18 = 1,
+  E_MOTOR_GEARSET_06 = 2,
+  E_MOTOR_GEAR_RED = 0,
+  E_MOTOR_GEAR_GREEN = 1,
+  E_MOTOR_GEAR_BLUE = 2,
+  E_MOTOR_GEAR_100 = 0,
+  E_MOTOR_GEAR_200 = 1,
+  E_MOTOR_GEAR_600 = 2
+} motor_gearset_e_t;
+typedef motor_gearset_e_t motor_gearset_e;
+typedef enum { E_MOTOR_BRAKE_COAST = 0, E_MOTOR_BRAKE_BRAKE = 1, E_MOTOR_BRAKE_HOLD = 2 } motor_brake_mode_e_t;
+typedef motor_brake_mode_e_t motor_brake_mode_e;
+typedef enum { E_MOTOR_ENCODER_DEGREES = 0, E_MOTOR_ENCODER_ROTATIONS = 1, E_MOTOR_ENCODER_COUNTS = 2 } motor_encoder_units_e_t;
+typedef motor_encoder_units_e_t motor_encoder_units_e;
+enum class MotorGears { red = 0, green = 1, blue = 2, rpm_100 = 0, rpm_200 = 1, rpm_600 = 2, ratio_36_to_1 = 0, ratio_18_to_1 = 1, ratio_6_to_1 = 2, invalid = 3 };
+typedef MotorGears MotorGearset;
+enum class MotorBrake { coast = 0, brake = 1, hold = 2, invalid = 3 };
+enum class MotorUnits { degrees = 0, rotations = 1, counts = 2, invalid = 3 };
+typedef MotorUnits MotorEncoderUnits;
+
+/** The motor API (a MotorGroup fans each call out to its motors; reads come from the first one). */
+class AbstractMotor {
+ public:
+  /** -127 to 127: the share of 12 V. */
+  std::int32_t move(std::int32_t voltage) const;
+  std::int32_t move_voltage(std::int32_t voltage) const;   // -12000 to 12000 mV
+  /** rpm, held by the motor's own speed loop. */
+  std::int32_t move_velocity(std::int32_t velocity) const;
+  /** Degrees (or the encoder units given), at up to this rpm, then held. */
+  std::int32_t move_absolute(double position, std::int32_t velocity) const;
+  std::int32_t move_relative(double position, std::int32_t velocity) const;
+  std::int32_t brake() const;
+  std::int32_t set_brake_mode(motor_brake_mode_e_t mode) const;
+  std::int32_t set_brake_mode(MotorBrake mode) const;
+  std::int32_t set_brake_mode_all(motor_brake_mode_e_t mode) const;
+  std::int32_t set_brake_mode_all(MotorBrake mode) const;
+  std::int32_t tare_position() const;
+  std::int32_t tare_position_all() const;
+  std::int32_t set_zero_position(double position) const;
+  double get_position() const;
+  std::vector<double> get_position_all() const;
+  double get_actual_velocity() const;
+  std::vector<double> get_actual_velocity_all() const;
+  std::int32_t get_target_velocity() const;
+  double get_target_position() const;
+  std::int32_t get_current_draw() const;   // mA
+  double get_torque() const;               // N·m
+  double get_power() const;                // W
+  double get_temperature() const;
+  std::int32_t get_voltage() const;        // mV
+  double get_efficiency() const;
+  std::int32_t is_stopped() const;
+  std::int32_t is_over_temp() const;
+  std::int32_t is_reversed() const;
+  std::int32_t set_reversed(bool reverse) const;
+  std::int32_t set_reversed_all(bool reverse) const;
+  std::int32_t set_gearing(motor_gearset_e_t gearset) const;
+  std::int32_t set_gearing(MotorGears gearset) const;
+  std::int32_t set_gearing_all(MotorGears gearset) const;
+  std::int32_t set_encoder_units(motor_encoder_units_e_t units) const;
+  std::int32_t set_encoder_units(MotorUnits units) const;
+  std::int32_t set_encoder_units_all(MotorUnits units) const;
+  std::int32_t set_current_limit(std::int32_t limit) const;
+  std::int32_t set_voltage_limit(std::int32_t limit) const;
+  MotorGears get_gearing() const;
+  std::int8_t size() const;
+  std::int8_t get_port() const;
+};
+
+class Motor : public AbstractMotor {
+ public:
+  /** port 1-21, negative to reverse it. */
+  Motor(std::int8_t port, MotorGears gearset = MotorGears::green, MotorUnits encoder_units = MotorUnits::degrees);
+  Motor(std::int8_t port, motor_gearset_e_t gearset, motor_encoder_units_e_t encoder_units = E_MOTOR_ENCODER_DEGREES);
+};
+
+class MotorGroup : public AbstractMotor {
+ public:
+  /** MotorGroup left({-1, 2, -3}, pros::MotorGears::blue); negative ports are reversed. */
+  MotorGroup(std::initializer_list<std::int8_t> ports, MotorGears gearset = MotorGears::green, MotorUnits encoder_units = MotorUnits::degrees);
+  MotorGroup(std::initializer_list<std::int8_t> ports, motor_gearset_e_t gearset);
+  /** PROS 3: a group of Motor objects. */
+  MotorGroup(std::initializer_list<Motor> motors);
+};
+typedef MotorGroup Motor_Group;
+
+// ---------------------------------------------------------------- sensors
+class Imu {
+ public:
+  explicit Imu(std::uint8_t port);
+  /** Calibrates (about 2 s); blocking waits for it. */
+  std::int32_t reset(bool blocking = false) const;
+  std::int32_t is_calibrating() const;
+  /** 0 to 360, clockwise. */
+  double get_heading() const;
+  /** Turns added up, clockwise. */
+  double get_rotation() const;
+  std::int32_t set_heading(double target) const;
+  std::int32_t set_rotation(double target) const;
+  std::int32_t tare_heading() const;
+  std::int32_t tare_rotation() const;
+  std::int32_t tare() const;
+  double get_yaw() const;
+  double get_pitch() const;
+  double get_roll() const;
+  bool is_installed() const;
+};
+typedef Imu IMU;
+
+class Rotation {
+ public:
+  /** port 1-21, negative to reverse it. */
+  explicit Rotation(std::int8_t port);
+  /** Centidegrees (36000 a turn), added up. */
+  std::int32_t get_position() const;
+  /** Centidegrees, 0 to 35999. */
+  std::int32_t get_angle() const;
+  /** Centidegrees a second. */
+  std::int32_t get_velocity() const;
+  std::int32_t reset_position() const;
+  std::int32_t reset() const;
+  std::int32_t set_position(std::int32_t position) const;
+  std::int32_t set_reversed(bool value) const;
+  std::int32_t reverse() const;
+  std::int32_t set_data_rate(std::uint32_t rate) const;
+};
+
+class Distance {
+ public:
+  explicit Distance(std::uint8_t port);
+  /** mm (20 to 2000). */
+  std::int32_t get() const;
+  std::int32_t get_distance() const;
+  std::int32_t get_confidence() const;
+  std::int32_t get_object_size() const;
+  double get_object_velocity() const;   // m/s
+};
+
+class Optical {
+ public:
+  explicit Optical(std::uint8_t port);
+  double get_hue() const;          // 0 to 359.99
+  double get_saturation() const;
+  double get_brightness() const;   // 0 to 1
+  std::int32_t get_proximity() const;   // 0 to 255
+  std::int32_t set_led_pwm(std::uint8_t value) const;
+};
+
+// ---------------------------------------------------------------- 3-wire (ADI)
+namespace adi {
+/** 'A' to 'H' (or 1 to 8). */
+class DigitalOut {
+ public:
+  explicit DigitalOut(std::uint8_t port, bool init_state = false);
+  std::int32_t set_value(std::int32_t value) const;
+};
+/** A solenoid: extended = air to the cylinders on its valve. */
+class Pneumatics {
+ public:
+  explicit Pneumatics(std::uint8_t port, bool start_extended, bool extended_is_low = false);
+  std::int32_t extend();
+  std::int32_t retract();
+  std::int32_t toggle();
+  bool is_extended() const;
+};
+class DigitalIn {
+ public:
+  explicit DigitalIn(std::uint8_t port);
+  std::int32_t get_value() const;
+  std::int32_t get_new_press();
+};
+typedef DigitalIn Button;
+/** The optical shaft encoder: degrees. */
+class Encoder {
+ public:
+  Encoder(std::uint8_t port_top, std::uint8_t port_bottom, bool reversed = false);
+  std::int32_t get_value() const;
+  std::int32_t reset() const;
+};
+}  // namespace adi
+typedef adi::DigitalOut ADIDigitalOut;
+typedef adi::DigitalIn ADIDigitalIn;
+typedef adi::Encoder ADIEncoder;
+
+// ---------------------------------------------------------------- tasks and time
+/** Waits this many milliseconds (simulated time). */
+void delay(std::uint32_t milliseconds);
+std::uint32_t millis();
+std::uint64_t micros();
+
+class Task {
+ public:
+  /** Runs the function at the same time as the rest of the program. */
+  Task(std::function<void()> function, const char* name = "");
+  Task(void (*function)(void*), void* parameters = nullptr, const char* name = "");
+  void remove();
+  void suspend();
+  void resume();
+  std::uint32_t get_state();
+  const char* get_name();
+  std::uint32_t notify();
+  static void delay(std::uint32_t milliseconds);
+  static void delay_until(std::uint32_t* prev_time, std::uint32_t delta);
+};
+
+/** The Brain's screen as PROS's LCD emulator (lines 0-7). */
+namespace lcd {
+bool initialize();
+bool is_initialized();
+bool shutdown();
+bool print(std::int16_t line, const char* fmt, ...);
+bool set_text(std::int16_t line, std::string text);
+bool clear_line(std::int16_t line);
+bool clear();
+std::uint8_t read_buttons();
+}  // namespace lcd
+
+/** The simulator isn't on a field controller: the app's periods (Run > Autonomous / Driver) decide. */
+namespace competition {
+std::uint8_t get_status();
+std::uint8_t is_autonomous();
+std::uint8_t is_connected();
+std::uint8_t is_disabled();
+std::uint8_t is_field_control();
+std::uint8_t is_competition_switch();
+}  // namespace competition
+
+}  // namespace pros
+
+// PROS's short names (PROS_USE_SIMPLE_NAMES, on in its template).
+#define CONTROLLER_MASTER pros::E_CONTROLLER_MASTER
+#define CONTROLLER_PARTNER pros::E_CONTROLLER_PARTNER
+#define ANALOG_LEFT_X pros::E_CONTROLLER_ANALOG_LEFT_X
+#define ANALOG_LEFT_Y pros::E_CONTROLLER_ANALOG_LEFT_Y
+#define ANALOG_RIGHT_X pros::E_CONTROLLER_ANALOG_RIGHT_X
+#define ANALOG_RIGHT_Y pros::E_CONTROLLER_ANALOG_RIGHT_Y
+#define DIGITAL_L1 pros::E_CONTROLLER_DIGITAL_L1
+#define DIGITAL_L2 pros::E_CONTROLLER_DIGITAL_L2
+#define DIGITAL_R1 pros::E_CONTROLLER_DIGITAL_R1
+#define DIGITAL_R2 pros::E_CONTROLLER_DIGITAL_R2
+#define DIGITAL_UP pros::E_CONTROLLER_DIGITAL_UP
+#define DIGITAL_DOWN pros::E_CONTROLLER_DIGITAL_DOWN
+#define DIGITAL_LEFT pros::E_CONTROLLER_DIGITAL_LEFT
+#define DIGITAL_RIGHT pros::E_CONTROLLER_DIGITAL_RIGHT
+#define DIGITAL_X pros::E_CONTROLLER_DIGITAL_X
+#define DIGITAL_B pros::E_CONTROLLER_DIGITAL_B
+#define DIGITAL_Y pros::E_CONTROLLER_DIGITAL_Y
+#define DIGITAL_A pros::E_CONTROLLER_DIGITAL_A
+#define MOTOR_BRAKE_COAST pros::E_MOTOR_BRAKE_COAST
+#define MOTOR_BRAKE_BRAKE pros::E_MOTOR_BRAKE_BRAKE
+#define MOTOR_BRAKE_HOLD pros::E_MOTOR_BRAKE_HOLD
+#define MOTOR_GEARSET_36 pros::E_MOTOR_GEARSET_36
+#define MOTOR_GEARSET_18 pros::E_MOTOR_GEARSET_18
+#define MOTOR_GEARSET_06 pros::E_MOTOR_GEARSET_06
+#define MOTOR_GEARSET_6 pros::E_MOTOR_GEARSET_06
+#define MOTOR_ENCODER_DEGREES pros::E_MOTOR_ENCODER_DEGREES
+#define MOTOR_ENCODER_ROTATIONS pros::E_MOTOR_ENCODER_ROTATIONS
+#define MOTOR_ENCODER_COUNTS pros::E_MOTOR_ENCODER_COUNTS

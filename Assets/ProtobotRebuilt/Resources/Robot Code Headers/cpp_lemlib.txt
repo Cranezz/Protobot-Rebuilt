@@ -1,0 +1,145 @@
+// Protobot Rebuilt V2: LemLib (lemlib::), as far as the simulator runs it. Written by the app (changes are replaced).
+// Distances in inches, angles in degrees (clockwise from +Y), timeouts in milliseconds, speeds 0 to 127.
+#pragma once
+#include "api.h"
+
+namespace lemlib {
+
+struct Pose {
+  float x, y, theta;
+  Pose(float x, float y, float theta = 0);
+  float distance(Pose other) const;
+  float angle(Pose other) const;
+};
+
+enum class AngularDirection { CW_CLOCKWISE, CCW_COUNTERCLOCKWISE, AUTO };
+enum class DriveSide { LEFT, RIGHT };
+
+/** VEX wheel sizes, inches. */
+namespace Omniwheel {
+constexpr float NEW_2 = 2.125, NEW_275 = 2.75, OLD_275 = 2.75, NEW_275_HALF = 2.744, OLD_275_HALF = 2.74, NEW_325 = 3.25,
+                OLD_325 = 3.25, NEW_325_HALF = 3.246, OLD_325_HALF = 3.246, NEW_4 = 4, OLD_4 = 4.18, NEW_4_HALF = 3.995,
+                OLD_4_HALF = 4.175;
+}
+
+class Drivetrain {
+ public:
+  /** rpm = the wheels' speed; horizontalDrift: 2 for omnis all round, 8 with traction wheels. */
+  Drivetrain(pros::MotorGroup* leftMotors, pros::MotorGroup* rightMotors, float trackWidth, float wheelDiameter, float rpm,
+             float horizontalDrift);
+};
+
+class TrackingWheel {
+ public:
+  /** distance: the wheel's offset from the robot's middle (vertical wheels: + right; horizontal: + forward). */
+  TrackingWheel(pros::adi::Encoder* encoder, float wheelDiameter, float distance, float gearRatio = 1);
+  TrackingWheel(pros::Rotation* encoder, float wheelDiameter, float distance, float gearRatio = 1);
+  /** A drive side's motors as the tracking wheel. */
+  TrackingWheel(pros::MotorGroup* motors, float wheelDiameter, float distance, float rpm);
+};
+
+class OdomSensors {
+ public:
+  OdomSensors(TrackingWheel* vertical1, TrackingWheel* vertical2, TrackingWheel* horizontal1, TrackingWheel* horizontal2,
+              pros::Imu* imu);
+};
+
+class ControllerSettings {
+ public:
+  ControllerSettings(float kP, float kI, float kD, float windupRange, float smallError, float smallErrorTimeout, float largeError,
+                     float largeErrorTimeout, float slew);
+};
+
+class DriveCurve {
+ public:
+  virtual float curve(float input) = 0;
+};
+class ExpoDriveCurve : public DriveCurve {
+ public:
+  ExpoDriveCurve(float deadband, float minOutput, float curve);
+  float curve(float input) override;
+};
+
+struct TurnToPointParams {
+  bool forwards = true;
+  AngularDirection direction = AngularDirection::AUTO;
+  int maxSpeed = 127;
+  int minSpeed = 0;
+  float earlyExitRange = 0;
+};
+struct TurnToHeadingParams {
+  AngularDirection direction = AngularDirection::AUTO;
+  int maxSpeed = 127;
+  int minSpeed = 0;
+  float earlyExitRange = 0;
+};
+struct SwingToPointParams {
+  bool forwards = true;
+  AngularDirection direction = AngularDirection::AUTO;
+  float maxSpeed = 127;
+  float minSpeed = 0;
+  float earlyExitRange = 0;
+};
+struct SwingToHeadingParams {
+  AngularDirection direction = AngularDirection::AUTO;
+  float maxSpeed = 127;
+  float minSpeed = 0;
+  float earlyExitRange = 0;
+};
+struct MoveToPointParams {
+  bool forwards = true;
+  float maxSpeed = 127;
+  float minSpeed = 0;
+  float earlyExitRange = 0;
+};
+struct MoveToPoseParams {
+  bool forwards = true;
+  float horizontalDrift = 0;
+  float lead = 0.6;
+  float maxSpeed = 127;
+  float minSpeed = 0;
+  float earlyExitRange = 0;
+};
+
+class Chassis {
+ public:
+  Chassis(Drivetrain drivetrain, ControllerSettings linearSettings, ControllerSettings angularSettings, OdomSensors sensors,
+          DriveCurve* throttleCurve = nullptr, DriveCurve* steerCurve = nullptr);
+  /** Calibrates the IMU (about 2 s) and starts odometry. */
+  void calibrate(bool calibrateIMU = true);
+  void setPose(float x, float y, float theta, bool radians = false);
+  void setPose(Pose pose, bool radians = false);
+  Pose getPose(bool radians = false, bool standardPos = false);
+  /** Waits until the motion has gone this far (inches, or degrees for turns). */
+  void waitUntil(float error);
+  void waitUntilDone();
+  void turnToPoint(float x, float y, int timeout, TurnToPointParams params = {}, bool async = true);
+  void turnToHeading(float theta, int timeout, TurnToHeadingParams params = {}, bool async = true);
+  void swingToHeading(float theta, DriveSide lockedSide, int timeout, SwingToHeadingParams params = {}, bool async = true);
+  void swingToPoint(float x, float y, DriveSide lockedSide, int timeout, SwingToPointParams params = {}, bool async = true);
+  void moveToPoint(float x, float y, int timeout, MoveToPointParams params = {}, bool async = true);
+  /** Boomerang: arrives at (x, y) facing theta. */
+  void moveToPose(float x, float y, float theta, int timeout, MoveToPoseParams params = {}, bool async = true);
+  /** Pure pursuit through the points ({{0, 0}, {0, 24}, {24, 36}}); LemLib's path files (ASSET) aren't read yet. */
+  void follow(std::vector<Pose> path, float lookahead, int timeout, bool forwards = true, bool async = true);
+  void tank(int left, int right, bool disableDriveCurve = false);
+  void arcade(int throttle, int turn, bool disableDriveCurve = false, float desaturateBias = 0.5);
+  void curvature(int throttle, int turn, bool disableDriveCurve = false);
+  void cancelMotion();
+  void cancelAllMotions();
+  bool isInMotion() const;
+  void setBrakeMode(pros::motor_brake_mode_e mode);
+};
+
+/** LemLib's logger: telemetrySink()->info("pose: {}", chassis.getPose()) prints to the output. */
+class TelemetrySink {
+ public:
+  template <class... Args> void debug(const char* format, Args... args);
+  template <class... Args> void info(const char* format, Args... args);
+  template <class... Args> void warn(const char* format, Args... args);
+  template <class... Args> void error(const char* format, Args... args);
+  template <class... Args> void log(const char* format, Args... args);
+};
+TelemetrySink* telemetrySink();
+
+}  // namespace lemlib

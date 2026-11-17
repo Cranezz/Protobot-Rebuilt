@@ -209,6 +209,11 @@ namespace Protobot.RobotCode {
                 return PyNone.Value;
             });
             Method("is_alive", _ => !fiber.Done);
+            Method("interrupt", _ => {   // V2: VEXcode C++'s names
+                fiber.Stop();
+                return PyNone.Value;
+            });
+            Method("join", _ => new Suspend(() => fiber.Done));
         }
     }
 
@@ -438,6 +443,10 @@ namespace Protobot.RobotCode {
             Method("velocity", a2 => Velocity(UnitName(a2.Get(0, "units"), "RPM")));
             Method("current", _ => (double)(Device?.Current ?? 0f));
             Method("power", _ => (double)(Device?.Power ?? 0f));
+            Method("voltage", a2 => {   // V2: the volts it's driven with (12 V at full)
+                var v = (double)(Control?.motor.Command ?? 0f) * 12 * Sign;
+                return UnitName(a2.Get(0, "units"), "VOLT") == "MV" ? v * 1000 : v;
+            });
             Method("torque", a2 => {
                 var t = (double)(Device?.Torque ?? 0f) * Sign;
                 return UnitName(a2.Get(0, "units"), "NM") == "INLB" ? t / 0.113 : t;
@@ -818,6 +827,7 @@ namespace Protobot.RobotCode {
                 return PyNone.Value;
             });
             Method("is_calibrating", _ => p.Time < calibratingUntil);
+            Field("start_calibration", Member("calibrate"));   // V2: VEXcode C++'s startCalibration()
             Method("heading", _ => Heading());
             Method("rotation", _ => Rotation());
             Method("set_heading", a2 => {
@@ -883,6 +893,10 @@ namespace Protobot.RobotCode {
             Method("object_size", _ => {
                 var s = (D()?.Size ?? "None").ToUpperInvariant();
                 return new PyEnum("ObjectSizeType", s, s == "SMALL" ? 1 : s == "MEDIUM" ? 2 : s == "LARGE" ? 3 : 0);
+            });
+            Method("object_raw_size", _ => {   // V2: (C++ objectRawSize)
+                var s = D()?.Size ?? "None";
+                return s == "Small" ? 50L : s == "Medium" ? 150L : s == "Large" ? 350L : 0L;
             });
             Method("object_rawsize", _ => {
                 var s = D()?.Size ?? "None";
@@ -1032,6 +1046,10 @@ namespace Protobot.RobotCode {
                 offset = (D()?.Position ?? 0) - ToDegrees(a2.Number(0, "value", 0), UnitName(a2.Get(1, "units"), "DEGREES"));
                 return PyNone.Value;
             });
+            // V2: VEXcode C++'s older encoder names (rotation, resetRotation, setRotation).
+            Field("rotation", Member("position"));
+            Field("reset_rotation", Member("reset_position"));
+            Field("set_rotation", Member("set_position"));
             Method("angle", a2 => {
                 var deg = (double)(D()?.Angle ?? 0f);
                 return UnitName(a2.Get(0, "units"), "DEGREES") == "PERCENT" ? deg / ShaftSensor.PotRange * 100 : FromDegrees(deg, UnitName(a2.Get(0, "units"), "DEGREES"));
@@ -1076,6 +1094,8 @@ namespace Protobot.RobotCode {
                         offset = (p.Device<YawGyro>(port, three, "Gyro")?.Heading ?? 0f) - a2.Number(0, "value", 0);
                         return PyNone.Value;
                     });
+                    Field("set_rotation", Member("set_heading"));   // V2 (this gyro's rotation is its heading)
+                    Method("is_calibrating", _ => false);
                     break;
             }
         }

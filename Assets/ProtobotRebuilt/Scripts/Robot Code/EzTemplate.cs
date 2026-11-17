@@ -427,7 +427,7 @@ namespace Protobot.RobotCode {
                 var chain = current is TurnMotion ? turnChain : current is SwingMotion ? swingChain : current.Direction >= 0 ? driveChainFwd : driveChainBack;
                 return WaitUntilTarget(current, chain);
             });
-            Method("interfered", _ => false);
+            Field("interfered", false);   // V2: a bool in EZ-Template (as a method, if (chassis.interfered) was always true)
             Method("drive_mode_get", _ => current == null ? 0L : 1L);
 
             // Driver control.

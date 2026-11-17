@@ -46,6 +46,7 @@ namespace Protobot.RobotCode {
                 WriteExternal();
                 File.WriteAllText(Path.Combine(Folder, "vex.pyi"), ApiStub.Text);
                 File.WriteAllText(Path.Combine(Folder, "motion.pyi"), ApiStub.Motion);   // V2
+                CppHeaders.Write(Folder);   // V2: C++ (PROS, VEXcode C++, LemLib, EZ-Template) for VS Code's IntelliSense
                 Watching = true;
                 var path = ExternalPath;
                 var code = FindVsCode();

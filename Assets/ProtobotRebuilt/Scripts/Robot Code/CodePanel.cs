@@ -144,7 +144,7 @@ namespace Protobot.RobotCode {
                 CodeStore.OpenExternally();
             }, false, 5f, Theme.FontSmall);
             external.Size(-1, 26f);
-            Ui.Tip(external, "Open in your own editor", null, "Opens the program in VS Code (or Notepad), with the vex API for completions. Saving there updates it here.");
+            Ui.Tip(external, "Open in your own editor", null, "Opens the program in VS Code (or Notepad) with the APIs for completions and checks: Python's vex and motion stubs, and headers for C++ (PROS, VEXcode C++, LemLib, EZ-Template; VS Code offers its C/C++ extension). Saving there updates it here.");
             var help = Ui.Button(header, "Help", "?", ShowHelp, false, 5f, Theme.FontTitle);
             help.Size(28f, 26f);
             Ui.Tip(help, "How robot code works", null, "The API, the ports and the keys.");

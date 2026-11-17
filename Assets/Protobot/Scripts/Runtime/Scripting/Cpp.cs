@@ -688,6 +688,20 @@ namespace Protobot.Scripting {
         }
 
         // Is "(" ... ")" a parameter list (then it's a function), not constructor arguments?
+        private static readonly HashSet<string> PlainTypes = new() {
+            "void", "bool", "char", "float", "double", "auto", "string", "std::string", "wchar_t", "uint", "std::function",
+        };
+
+        private bool LooksLikeType(TypeInfo type, int from) {
+            if (type.pointer || type.reference) return true;
+            for (var k = from; k < p; k++) if (t[k].text == "<" || t[k].text == "const") return true;
+            var name = type.name ?? "";
+            if (name.Contains(' ') || IntTypes.Contains(name) || PlainTypes.Contains(name)) return true;
+            var last = name.Contains("::") ? name.Substring(name.LastIndexOf("::", StringComparison.Ordinal) + 2) : name;
+            if (IsKnownValue(last)) return false;
+            return classes.ContainsKey(name) || classes.ContainsKey(last) || IntTypes.Contains(last) || PlainTypes.Contains(last);
+        }
+
         private bool IsKnownValue(string name) {
             if (functions.Contains(PyName(name))) return true;
             for (var c = ctx; c != null; c = c.parent)
@@ -705,11 +719,13 @@ namespace Protobot.Scripting {
                     if (Accept("...")) { }
                     else {
                         var typeStart = p;
-                        if (!TryType(out _)) return false;
+                        if (!TryType(out var ptype)) return false;
                         if (IsId()) p++;
-                        // V2: a lone name that's a function or a variable isn't a type: pros::Task counter(count_task);
-                        // makes a task (it was taken for a function's declaration and the task never started).
-                        else if (p == typeStart + 1 && t[typeStart].kind == "id" && IsKnownValue(t[typeStart].text)) return false;
+                        // V2: a parameter without a name must look like a type (int, Pid&, a class of the program...);
+                        // otherwise it's a value and this is a variable made with it: pros::Task counter(count_task),
+                        // pros::Controller master(pros::E_CONTROLLER_MASTER), motor m(PORT2) (all were taken for
+                        // function declarations: the object never existed).
+                        else if (!LooksLikeType(ptype, typeStart)) return false;
                         else if (!Is(",") && !Is(")") && !Is("=") && !Is("[")) return false;
                         if (Accept("[")) { while (!Is("]")) p++; p++; }
                         if (Accept("=")) {
@@ -1155,6 +1171,26 @@ namespace Protobot.Scripting {
                     }
                     case "do": return DoWhile();
                     case "for": return For();
+                    // V2: vex.h's macros: waitUntil(condition) checks every 5 ms; repeat(n) runs its body n times.
+                    case "waitUntil" when Is("(", 1) && !functions.Contains("waitUntil"): {
+                        p++;
+                        Expect("(");
+                        var test = Condition();
+                        Expect(")");
+                        Accept(";");
+                        var sleep = At(new CallExpr { func = At(new AttrExpr { target = At(new AttrExpr { target = At(new NameExpr { name = "vex" }, tok), name = "this_thread" }, tok), name = "sleep_for" }, tok) }, tok);
+                        sleep.args.Add(At(new ConstExpr { value = 5L }, tok));
+                        var body = new List<Stmt> { At(new ExprStmt { expr = sleep }, tok) };
+                        return new List<Stmt> { At(new WhileStmt { test = At(new UnaryExpr { op = "not", operand = test }, tok), body = body, orElse = new List<Stmt>() }, tok) };
+                    }
+                    case "repeat" when Is("(", 1) && !functions.Contains("repeat"): {
+                        p++;
+                        Expect("(");
+                        var count = Assignment();
+                        Expect(")");
+                        var body = Loop(Statement);
+                        return new List<Stmt> { At(new ForStmt { target = At(new NameExpr { name = "__repeat" }, tok), iter = Call("range", tok, Call("int", tok, count)), body = body, orElse = new List<Stmt>() }, tok) };
+                    }
                     case "switch": return Switch();
                     case "return": {
                         p++;

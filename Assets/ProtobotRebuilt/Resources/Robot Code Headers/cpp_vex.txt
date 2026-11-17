@@ -1,0 +1,500 @@
+// Protobot Rebuilt V2: VEXcode V5 C++ (vex::), as far as the simulator runs it. Written by the app (changes are
+// replaced). Brain and Controller1 are there already (VEXcode's robot-config), unless the program makes its own.
+#pragma once
+#include "protobot_sim.h"
+
+namespace vex {
+
+// ---------------------------------------------------------------- units and kinds
+enum class directionType { fwd = 0, rev, undefined };
+enum class turnType { left = 0, right };
+enum class velocityUnits { pct = 0, rpm, dps };
+typedef velocityUnits percentUnits;
+enum class rotationUnits { deg = 0, rev, raw };
+enum class timeUnits { sec = 0, msec };
+enum class distanceUnits { mm = 0, in, cm };
+enum class brakeType { coast = 0, brake, hold, undefined };
+enum class gearSetting { ratio36_1 = 0, ratio18_1, ratio6_1 };
+enum class voltageUnits { volt = 0, mV };
+enum class currentUnits { amp = 0 };
+enum class torqueUnits { Nm = 0, InLb };
+enum class powerUnits { watt = 0 };
+enum class temperatureUnits { celsius = 0, fahrenheit };
+enum class controllerType { primary = 0, partner };
+enum class axisType { xaxis = 0, yaxis, zaxis };
+enum class orientationType { roll = 0, pitch, yaw };
+enum class fontType { mono12 = 0, mono15, mono20, mono30, mono40, mono60, prop20, prop30, prop40, prop60 };
+enum class ledState { off = 0, on };
+
+const directionType fwd = directionType::fwd, forward = directionType::fwd, reverse = directionType::rev;
+const turnType left = turnType::left, right = turnType::right;
+const velocityUnits pct = velocityUnits::pct, percent = velocityUnits::pct, rpm = velocityUnits::rpm, dps = velocityUnits::dps;
+const rotationUnits deg = rotationUnits::deg, degrees = rotationUnits::deg, rev = rotationUnits::rev, turns = rotationUnits::rev, raw = rotationUnits::raw;
+const timeUnits sec = timeUnits::sec, seconds = timeUnits::sec, msec = timeUnits::msec;
+const distanceUnits mm = distanceUnits::mm, inches = distanceUnits::in, cm = distanceUnits::cm;
+const brakeType coast = brakeType::coast, brake = brakeType::brake, hold = brakeType::hold;
+const gearSetting ratio36_1 = gearSetting::ratio36_1, ratio18_1 = gearSetting::ratio18_1, ratio6_1 = gearSetting::ratio6_1;
+const voltageUnits volt = voltageUnits::volt, mV = voltageUnits::mV;
+const currentUnits amp = currentUnits::amp;
+const torqueUnits Nm = torqueUnits::Nm, InLb = torqueUnits::InLb;
+const powerUnits watt = powerUnits::watt;
+const temperatureUnits celsius = temperatureUnits::celsius, fahrenheit = temperatureUnits::fahrenheit;
+const controllerType primary = controllerType::primary, partner = controllerType::partner;
+const axisType xaxis = axisType::xaxis, yaxis = axisType::yaxis, zaxis = axisType::zaxis;
+const orientationType roll = orientationType::roll, pitch = orientationType::pitch, yaw = orientationType::yaw;
+const fontType mono12 = fontType::mono12, mono15 = fontType::mono15, mono20 = fontType::mono20, mono30 = fontType::mono30,
+               mono40 = fontType::mono40, mono60 = fontType::mono60, prop20 = fontType::prop20, prop30 = fontType::prop30,
+               prop40 = fontType::prop40, prop60 = fontType::prop60;
+
+const std::int32_t PORT1 = 0, PORT2 = 1, PORT3 = 2, PORT4 = 3, PORT5 = 4, PORT6 = 5, PORT7 = 6, PORT8 = 7, PORT9 = 8,
+                   PORT10 = 9, PORT11 = 10, PORT12 = 11, PORT13 = 12, PORT14 = 13, PORT15 = 14, PORT16 = 15, PORT17 = 16,
+                   PORT18 = 17, PORT19 = 18, PORT20 = 19, PORT21 = 20;
+
+/** color::red, or color(255, 0, 0), color(0xFF0000), color("#FF0000"). */
+class color {
+ public:
+  color(int r, int g, int b);
+  color(std::uint32_t rgb);
+  color(const char* hex);
+  std::uint32_t rgb() const;
+  bool isTransparent() const;
+  static const color black, white, red, green, blue, yellow, orange, purple, cyan, transparent;
+};
+extern const color black, white, red, green, blue, yellow, orange, purple, cyan, transparent;
+
+/** Waits (simulated time). */
+void wait(double time, timeUnits units);
+
+// ---------------------------------------------------------------- the Brain
+/** Brain.ThreeWirePort.A to .H */
+class triport {
+ public:
+  class port {};
+  port A, B, C, D, E, F, G, H;
+};
+
+class brain {
+ public:
+  brain();
+  /** 480 x 240 pixels; text in rows and columns of the font's size. */
+  class lcd {
+   public:
+    template <class... Args> void print(const char* format, Args... args);
+    template <class... Args> void print(double value);
+    template <class... Args> void printAt(int x, int y, const char* format, Args... args);
+    void setCursor(std::int32_t row, std::int32_t col);
+    void newLine();
+    void clearScreen();
+    void clearScreen(const color& c);
+    void clearLine();
+    void clearLine(std::int32_t number);
+    std::int32_t row();
+    std::int32_t column();
+    void setFont(fontType font);
+    void setPenColor(const color& c);
+    void setFillColor(const color& c);
+    void setPenWidth(std::uint32_t width);
+    void setOrigin(std::int32_t x, std::int32_t y);
+    void setClipRegion(int x, int y, int width, int height);
+    void drawPixel(int x, int y);
+    void drawLine(int x1, int y1, int x2, int y2);
+    void drawRectangle(int x, int y, int width, int height);
+    void drawRectangle(int x, int y, int width, int height, const color& fill);
+    void drawCircle(int x, int y, int radius);
+    void drawCircle(int x, int y, int radius, const color& fill);
+    /** Double buffering: drawing shows at render(). */
+    bool render();
+    bool pressing();
+    std::int32_t xPosition();
+    std::int32_t yPosition();
+    void pressed(void (*callback)());
+    void released(void (*callback)());
+  };
+  class timer_ {
+   public:
+    double time(timeUnits units = timeUnits::msec);
+    double value();
+    void clear();
+  };
+  class battery {
+   public:
+    std::uint32_t capacity(percentUnits units = percentUnits::pct);
+    double voltage(voltageUnits units = voltageUnits::volt);
+    double current(currentUnits units = currentUnits::amp);
+  };
+  lcd Screen;
+  timer_ Timer;
+  battery Battery;
+  triport ThreeWirePort;
+  /** Seconds or milliseconds since the program started. */
+  double timer(timeUnits units);
+};
+
+// ---------------------------------------------------------------- the controller
+class controller {
+ public:
+  controller(controllerType id = controllerType::primary);
+  class axis {
+   public:
+    /** -100 to 100. */
+    std::int32_t position(percentUnits units = percentUnits::pct);
+    std::int32_t value();
+    void changed(void (*callback)());
+  };
+  class button {
+   public:
+    bool pressing();
+    void pressed(void (*callback)());
+    void released(void (*callback)());
+  };
+  class lcd {
+   public:
+    template <class... Args> void print(const char* format, Args... args);
+    template <class... Args> void print(double value);
+    void setCursor(std::int32_t row, std::int32_t col);
+    void clearScreen();
+    void clearLine();
+    void clearLine(std::int32_t number);
+    void newLine();
+  };
+  axis Axis1, Axis2, Axis3, Axis4;
+  button ButtonL1, ButtonL2, ButtonR1, ButtonR2, ButtonUp, ButtonDown, ButtonLeft, ButtonRight, ButtonX, ButtonB, ButtonY, ButtonA;
+  lcd Screen;
+  /** "." short, "-" long, " " pause. */
+  void rumble(const char* pattern);
+};
+
+// ---------------------------------------------------------------- motors
+class motor {
+ public:
+  motor(std::int32_t index);
+  motor(std::int32_t index, bool reverse);
+  motor(std::int32_t index, gearSetting gears, bool reverse = false);
+  void spin(directionType dir);
+  void spin(directionType dir, double velocity, velocityUnits units);
+  void spin(directionType dir, double voltage, voltageUnits units);
+  bool spinFor(directionType dir, double rotation, rotationUnits units, bool waitForCompletion = true);
+  bool spinFor(directionType dir, double rotation, rotationUnits units, double velocity, velocityUnits units_v, bool waitForCompletion = true);
+  bool spinFor(double rotation, rotationUnits units, bool waitForCompletion = true);
+  bool spinFor(double rotation, rotationUnits units, double velocity, velocityUnits units_v, bool waitForCompletion = true);
+  void spinFor(directionType dir, double time, timeUnits units);
+  void spinFor(double time, timeUnits units);
+  bool spinToPosition(double rotation, rotationUnits units, bool waitForCompletion = true);
+  bool spinToPosition(double rotation, rotationUnits units, double velocity, velocityUnits units_v, bool waitForCompletion = true);
+  void stop();
+  void stop(brakeType mode);
+  void setVelocity(double velocity, velocityUnits units);
+  void setStopping(brakeType mode);
+  void setPosition(double value, rotationUnits units);
+  void resetPosition();
+  void setTimeout(std::int32_t time, timeUnits units);
+  void setMaxTorque(double value, percentUnits units);
+  void setMaxTorque(double value, currentUnits units);
+  void setMaxTorque(double value, torqueUnits units);
+  void setReversed(bool value);
+  double position(rotationUnits units);
+  double velocity(velocityUnits units);
+  double current(currentUnits units = currentUnits::amp);
+  double torque(torqueUnits units = torqueUnits::Nm);
+  double power(powerUnits units = powerUnits::watt);
+  double temperature(temperatureUnits units = temperatureUnits::celsius);
+  double efficiency(percentUnits units = percentUnits::pct);
+  double voltage(voltageUnits units = voltageUnits::volt);
+  directionType direction();
+  bool isSpinning();
+  bool isDone();
+  bool installed();
+};
+
+class motor_group {
+ public:
+  motor_group();
+  template <class... Args> motor_group(motor& m1, Args&... more);
+  std::int32_t count();
+  void spin(directionType dir);
+  void spin(directionType dir, double velocity, velocityUnits units);
+  void spin(directionType dir, double voltage, voltageUnits units);
+  bool spinFor(directionType dir, double rotation, rotationUnits units, bool waitForCompletion = true);
+  bool spinFor(directionType dir, double rotation, rotationUnits units, double velocity, velocityUnits units_v, bool waitForCompletion = true);
+  bool spinFor(double rotation, rotationUnits units, bool waitForCompletion = true);
+  void spinFor(directionType dir, double time, timeUnits units);
+  bool spinToPosition(double rotation, rotationUnits units, bool waitForCompletion = true);
+  bool spinToPosition(double rotation, rotationUnits units, double velocity, velocityUnits units_v, bool waitForCompletion = true);
+  void stop();
+  void stop(brakeType mode);
+  void setVelocity(double velocity, velocityUnits units);
+  void setStopping(brakeType mode);
+  void setPosition(double value, rotationUnits units);
+  void resetPosition();
+  void setTimeout(std::int32_t time, timeUnits units);
+  void setMaxTorque(double value, percentUnits units);
+  double position(rotationUnits units);
+  double velocity(velocityUnits units);
+  double current(currentUnits units = currentUnits::amp);
+  double torque(torqueUnits units = torqueUnits::Nm);
+  double power(powerUnits units = powerUnits::watt);
+  bool isSpinning();
+  bool isDone();
+};
+
+// ---------------------------------------------------------------- sensors
+class inertial {
+ public:
+  inertial(std::int32_t index, turnType dir = turnType::right);
+  /** About 2 s; isCalibrating() is true until it's done. */
+  void calibrate();
+  void startCalibration();
+  bool isCalibrating();
+  /** 0 to 360, clockwise. */
+  double heading(rotationUnits units = rotationUnits::deg);
+  double rotation(rotationUnits units = rotationUnits::deg);
+  void setHeading(double value, rotationUnits units);
+  void setRotation(double value, rotationUnits units);
+  void resetHeading();
+  void resetRotation();
+  double roll(rotationUnits units = rotationUnits::deg);
+  double pitch(rotationUnits units = rotationUnits::deg);
+  double yaw(rotationUnits units = rotationUnits::deg);
+  double orientation(orientationType type, rotationUnits units);
+  double acceleration(axisType axis);
+  double gyroRate(axisType axis, velocityUnits units);
+  bool installed();
+};
+
+class rotation {
+ public:
+  rotation(std::int32_t index, bool reverse = false);
+  double angle(rotationUnits units = rotationUnits::deg);
+  double position(rotationUnits units);
+  double velocity(velocityUnits units);
+  void resetPosition();
+  void setPosition(double value, rotationUnits units);
+  void setReversed(bool value);
+  bool installed();
+};
+
+class distance {
+ public:
+  distance(std::int32_t index);
+  double objectDistance(distanceUnits units);
+  double objectRawSize();
+  double objectVelocity();
+  bool isObjectDetected();
+  bool installed();
+};
+
+class optical {
+ public:
+  optical(std::int32_t index);
+  double hue();
+  double brightness(bool bRaw = false);
+  vex::color color();
+  bool isNearObject();
+  void setLight(ledState state);
+  void setLightPower(std::int32_t value, percentUnits units = percentUnits::pct);
+  void objectDetected(void (*callback)());
+  void objectLost(void (*callback)());
+  bool installed();
+};
+
+class bumper {
+ public:
+  bumper(triport::port& port);
+  std::int32_t pressing();
+  void pressed(void (*callback)());
+  void released(void (*callback)());
+};
+class limit {
+ public:
+  limit(triport::port& port);
+  std::int32_t pressing();
+  void pressed(void (*callback)());
+  void released(void (*callback)());
+};
+class digital_out {
+ public:
+  digital_out(triport::port& port);
+  void set(bool value);
+  std::int32_t value();
+};
+class digital_in {
+ public:
+  digital_in(triport::port& port);
+  std::int32_t value();
+};
+/** A solenoid on a 3-wire port: open() = air to the cylinders on its valve. */
+class pneumatics {
+ public:
+  pneumatics(triport::port& port);
+  void open();
+  void close();
+  std::int32_t value();
+};
+/** The optical shaft encoder (two ports: give the first). */
+class encoder {
+ public:
+  encoder(triport::port& port);
+  double position(rotationUnits units);
+  double rotation(rotationUnits units);
+  double velocity(velocityUnits units);
+  void resetRotation();
+  void setPosition(double value, rotationUnits units);
+  void setRotation(double value, rotationUnits units);
+};
+class pot {
+ public:
+  pot(triport::port& port);
+  double angle(rotationUnits units = rotationUnits::deg);
+  double angle(percentUnits units);
+};
+class potV2 {
+ public:
+  potV2(triport::port& port);
+  double angle(rotationUnits units = rotationUnits::deg);
+  double angle(percentUnits units);
+};
+class line {
+ public:
+  line(triport::port& port);
+  std::int32_t reflectivity(percentUnits units = percentUnits::pct);
+  std::int32_t value(percentUnits units = percentUnits::pct);
+};
+class light {
+ public:
+  light(triport::port& port);
+  std::int32_t brightness(percentUnits units = percentUnits::pct);
+  std::int32_t value(percentUnits units = percentUnits::pct);
+};
+/** The ultrasonic range finder (two ports: give the first). */
+class sonar {
+ public:
+  sonar(triport::port& port);
+  double distance(distanceUnits units);
+  bool foundObject();
+};
+class gyro {
+ public:
+  gyro(triport::port& port);
+  void calibrate();
+  bool isCalibrating();
+  double heading(rotationUnits units = rotationUnits::deg);
+  double rotation(rotationUnits units = rotationUnits::deg);
+  void setHeading(double value, rotationUnits units);
+  void setRotation(double value, rotationUnits units);
+};
+
+// ---------------------------------------------------------------- drivetrains
+class drivetrain {
+ public:
+  /** wheelTravel = the wheel's circumference; externalGearRatio = motor turns per wheel turn. */
+  drivetrain(motor_group& left, motor_group& right, double wheelTravel = 320, double trackWidth = 320, double wheelBase = 130,
+             distanceUnits unit = distanceUnits::mm, double externalGearRatio = 1.0);
+  void drive(directionType dir);
+  void drive(directionType dir, double velocity, velocityUnits units);
+  bool driveFor(directionType dir, double distance, distanceUnits units, bool waitForCompletion = true);
+  bool driveFor(directionType dir, double distance, distanceUnits units, double velocity, velocityUnits units_v, bool waitForCompletion = true);
+  bool driveFor(double distance, distanceUnits units, bool waitForCompletion = true);
+  bool driveFor(double distance, distanceUnits units, double velocity, velocityUnits units_v, bool waitForCompletion = true);
+  void turn(turnType dir);
+  void turn(turnType dir, double velocity, velocityUnits units);
+  bool turnFor(turnType dir, double angle, rotationUnits units, bool waitForCompletion = true);
+  bool turnFor(turnType dir, double angle, rotationUnits units, double velocity, velocityUnits units_v, bool waitForCompletion = true);
+  bool turnFor(double angle, rotationUnits units, bool waitForCompletion = true);
+  void arcade(double drivePower, double turnPower, percentUnits units = percentUnits::pct);
+  void stop();
+  void stop(brakeType mode);
+  void setDriveVelocity(double velocity, velocityUnits units);
+  void setTurnVelocity(double velocity, velocityUnits units);
+  void setStopping(brakeType mode);
+  void setTimeout(std::int32_t time, timeUnits units);
+  void setGearRatio(double ratio);
+  bool isDone();
+  bool isMoving();
+  double velocity(velocityUnits units);
+  double current(currentUnits units = currentUnits::amp);
+};
+
+/** A drivetrain that turns by its inertial sensor (or gyro). */
+class smartdrive : public drivetrain {
+ public:
+  smartdrive(motor_group& left, motor_group& right, inertial& g, double wheelTravel = 320, double trackWidth = 320,
+             double wheelBase = 130, distanceUnits unit = distanceUnits::mm, double externalGearRatio = 1.0);
+  smartdrive(motor_group& left, motor_group& right, gyro& g, double wheelTravel = 320, double trackWidth = 320,
+             double wheelBase = 130, distanceUnits unit = distanceUnits::mm, double externalGearRatio = 1.0);
+  bool turnToHeading(double angle, rotationUnits units, bool waitForCompletion = true);
+  bool turnToHeading(double angle, rotationUnits units, double velocity, velocityUnits units_v, bool waitForCompletion = true);
+  bool turnToRotation(double angle, rotationUnits units, bool waitForCompletion = true);
+  bool turnToRotation(double angle, rotationUnits units, double velocity, velocityUnits units_v, bool waitForCompletion = true);
+  void setHeading(double value, rotationUnits units);
+  void setRotation(double value, rotationUnits units);
+  double heading(rotationUnits units = rotationUnits::deg);
+  double rotation(rotationUnits units = rotationUnits::deg);
+};
+
+// ---------------------------------------------------------------- time, threads, events, competition
+class timer {
+ public:
+  timer();
+  double time(timeUnits units = timeUnits::msec);
+  double value();
+  void clear();
+  void event(void (*callback)(), std::uint32_t delay);
+};
+
+class thread {
+ public:
+  thread(void (*callback)());
+  thread(int (*callback)());
+  thread(int (*callback)(void*), void* arg);
+  void interrupt();
+  void join();
+};
+
+class task {
+ public:
+  task(int (*callback)());
+  task(int (*callback)(void*), void* arg);
+  void stop();
+  static void sleep(std::uint32_t time);
+};
+
+namespace this_thread {
+void sleep_for(std::uint32_t time);
+void yield();
+}  // namespace this_thread
+
+class event {
+ public:
+  event();
+  event(void (*callback)());
+  void operator()(void (*callback)());
+  void broadcast();
+  void broadcastAndWait();
+};
+
+/** Runs autonomous / driver control by the period the app (or a game) runs. */
+class competition {
+ public:
+  competition();
+  void autonomous(void (*callback)());
+  void drivercontrol(void (*callback)());
+  bool isEnabled();
+  bool isDriverControl();
+  bool isAutonomous();
+  bool isCompetitionSwitch();
+  bool isFieldControl();
+};
+
+}  // namespace vex
+
+/** Checks the condition every 5 ms until it's true. */
+#define waitUntil(condition) \
+  do {                       \
+    vex::wait(5, vex::msec); \
+  } while (!(condition))
+#define repeat(iterations) for (int iterator = 0; iterator < iterations; iterator++)
+
+// VEXcode's robot-config.
+using namespace vex;
+extern brain Brain;
+extern controller Controller1;

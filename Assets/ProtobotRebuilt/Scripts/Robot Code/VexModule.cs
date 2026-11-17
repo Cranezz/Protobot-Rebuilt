@@ -11,6 +11,7 @@ namespace Protobot.RobotCode {
 
         protected void Method(string name, Func<Args, object> fn) => members[name] = new PyBuiltin(name, fn);
         protected void Field(string name, object value) => members[name] = value;
+        protected object Member(string name) => members[name];   // V2 (another name for a member)
         internal void Add(string name, object value) => members[name] = value;   // V2 (C++ libraries' members)
 
         public virtual bool TryGetAttr(string name, out object value) {   // V2: EZ-Template's chassis answers to more

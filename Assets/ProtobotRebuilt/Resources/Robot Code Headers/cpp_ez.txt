@@ -1,0 +1,278 @@
+// Protobot Rebuilt V2: EZ-Template (ez::), v3 names and v2's, as far as the simulator runs it. Written by the app
+// (changes are replaced). Distances in inches (24_in), angles in degrees (90_deg, clockwise), times in ms, speeds 0-127.
+#pragma once
+#include "api.h"
+
+// Units (EZ-Template's okapi literals): numbers in inches, degrees and milliseconds.
+constexpr double operator""_in(long double v) { return (double)v; }
+constexpr double operator""_in(unsigned long long v) { return (double)v; }
+constexpr double operator""_ft(long double v) { return (double)v * 12; }
+constexpr double operator""_ft(unsigned long long v) { return (double)v * 12; }
+constexpr double operator""_cm(long double v) { return (double)v / 2.54; }
+constexpr double operator""_cm(unsigned long long v) { return (double)v / 2.54; }
+constexpr double operator""_mm(long double v) { return (double)v / 25.4; }
+constexpr double operator""_mm(unsigned long long v) { return (double)v / 25.4; }
+constexpr double operator""_m(long double v) { return (double)v / 0.0254; }
+constexpr double operator""_m(unsigned long long v) { return (double)v / 0.0254; }
+constexpr double operator""_tile(long double v) { return (double)v * 24; }
+constexpr double operator""_tile(unsigned long long v) { return (double)v * 24; }
+constexpr double operator""_deg(long double v) { return (double)v; }
+constexpr double operator""_deg(unsigned long long v) { return (double)v; }
+constexpr double operator""_rad(long double v) { return (double)v * 57.29577951308232; }
+constexpr double operator""_rad(unsigned long long v) { return (double)v * 57.29577951308232; }
+constexpr double operator""_rot(long double v) { return (double)v * 360; }
+constexpr double operator""_rot(unsigned long long v) { return (double)v * 360; }
+constexpr double operator""_ms(long double v) { return (double)v; }
+constexpr double operator""_ms(unsigned long long v) { return (double)v; }
+constexpr double operator""_s(long double v) { return (double)v * 1000; }
+constexpr double operator""_s(unsigned long long v) { return (double)v * 1000; }
+constexpr double operator""_min(long double v) { return (double)v * 60000; }
+constexpr double operator""_min(unsigned long long v) { return (double)v * 60000; }
+
+namespace ez {
+
+enum e_type { SINGLE = 0, SPLIT = 1 };
+enum e_swing { LEFT_SWING = 0, RIGHT_SWING = 1 };
+enum e_angle_behavior { raw = 0, left_turn = 1, right_turn = 2, longest = 3, shortest = 4 };
+const e_angle_behavior ccw = left_turn, cw = right_turn;
+enum drive_directions { FWD = 0, fwd = 0, REV = 1, rev = 1 };
+enum e_mode { DISABLE = 0, SWING, TURN, TURN_TO_POINT, DRIVE, POINT_TO_POINT, PURE_PURSUIT };
+
+constexpr double ANGLE_NOT_SET = 0.0000000000000000000000000000001;
+/** {x, y} or {x, y, theta}: inches and degrees. */
+struct pose {
+  double x;
+  double y;
+  double theta = ANGLE_NOT_SET;
+};
+/** {{x, y}, fwd, speed} or {{x, y, theta}, fwd, speed} (theta: boomerang). */
+struct odom {
+  pose target;
+  drive_directions drive_direction;
+  int max_xy_speed;
+  e_angle_behavior turn_behavior = shortest;
+};
+
+/** EZ-Template's PID gains and exit conditions as v2 named them (set_pid_constants(&chassis.headingPID, ...)). */
+struct PID {};
+
+class tracking_wheel {
+ public:
+  /** A Rotation sensor (port, negative = reversed) or a 3-wire encoder ({'A', 'B'}). */
+  tracking_wheel(int port, double wheel_diameter, double distance_to_center = 0.0, double ratio = 1.0);
+  tracking_wheel(std::vector<int> ports, double wheel_diameter, double distance_to_center = 0.0, double ratio = 1.0);
+  void distance_to_center_set(double input);
+  double distance_to_center_get();
+  double get();
+  void reset();
+};
+
+class Drive {
+ public:
+  /** v3: left and right ports (negative: reversed), the IMU's port, wheel diameter, rpm at the wheels. */
+  Drive(std::vector<int> left_motor_ports, std::vector<int> right_motor_ports, int imu_port, double wheel_diameter, double wheel_rpm);
+  /** v2: ..., the cartridge's rpm, then driven gear / driving gear. */
+  Drive(std::vector<int> left_motor_ports, std::vector<int> right_motor_ports, int imu_port, double wheel_diameter, double ticks,
+        double ratio);
+
+  void initialize();
+
+  // ---- PID constants and exit conditions
+  void pid_drive_constants_set(double p, double i = 0.0, double d = 0.0, double p_start_i = 0.0);
+  void pid_drive_constants_forward_set(double p, double i = 0.0, double d = 0.0, double p_start_i = 0.0);
+  void pid_drive_constants_backward_set(double p, double i = 0.0, double d = 0.0, double p_start_i = 0.0);
+  void pid_heading_constants_set(double p, double i = 0.0, double d = 0.0, double p_start_i = 0.0);
+  void pid_turn_constants_set(double p, double i = 0.0, double d = 0.0, double p_start_i = 0.0);
+  void pid_swing_constants_set(double p, double i = 0.0, double d = 0.0, double p_start_i = 0.0);
+  void pid_swing_constants_forward_set(double p, double i = 0.0, double d = 0.0, double p_start_i = 0.0);
+  void pid_swing_constants_backward_set(double p, double i = 0.0, double d = 0.0, double p_start_i = 0.0);
+  void pid_odom_angular_constants_set(double p, double i = 0.0, double d = 0.0, double p_start_i = 0.0);
+  void pid_odom_boomerang_constants_set(double p, double i = 0.0, double d = 0.0, double p_start_i = 0.0);
+  /** small exit time and error, big exit time and error, not-moving time, motor-current time (90_ms, 1_in, ...). */
+  void pid_turn_exit_condition_set(double small_exit_time, double small_error, double big_exit_time, double big_error,
+                                   double velocity_exit_time, double mA_timeout, bool use_imu = true);
+  void pid_swing_exit_condition_set(double small_exit_time, double small_error, double big_exit_time, double big_error,
+                                    double velocity_exit_time, double mA_timeout, bool use_imu = true);
+  void pid_drive_exit_condition_set(double small_exit_time, double small_error, double big_exit_time, double big_error,
+                                    double velocity_exit_time, double mA_timeout, bool use_imu = true);
+  void pid_odom_turn_exit_condition_set(double small_exit_time, double small_error, double big_exit_time, double big_error,
+                                        double velocity_exit_time, double mA_timeout, bool use_imu = true);
+  void pid_odom_drive_exit_condition_set(double small_exit_time, double small_error, double big_exit_time, double big_error,
+                                         double velocity_exit_time, double mA_timeout, bool use_imu = true);
+  /** How close to the target a *_quick_chain wait moves on to the next motion. */
+  void pid_turn_chain_constant_set(double input);
+  void pid_swing_chain_constant_set(double input);
+  void pid_swing_chain_forward_constant_set(double input);
+  void pid_swing_chain_backward_constant_set(double input);
+  void pid_drive_chain_constant_set(double input);
+  void pid_drive_chain_forward_constant_set(double input);
+  void pid_drive_chain_backward_constant_set(double input);
+  /** Starts at min_speed, full speed after distance. */
+  void slew_drive_constants_set(double distance, int min_speed);
+  void slew_drive_constants_forward_set(double distance, int min_speed);
+  void slew_drive_constants_backward_set(double distance, int min_speed);
+  void slew_turn_constants_set(double distance, int min_speed);
+  void slew_swing_constants_set(double distance, int min_speed);
+  void slew_swing_constants_forward_set(double distance, int min_speed);
+  void slew_swing_constants_backward_set(double distance, int min_speed);
+  void pid_angle_behavior_set(e_angle_behavior behavior);
+  void pid_turn_behavior_set(e_angle_behavior behavior);
+  void pid_swing_behavior_set(e_angle_behavior behavior);
+  void pid_speed_max_set(int speed);
+
+  // ---- odometry
+  void odom_turn_bias_set(double bias);
+  void odom_look_ahead_set(double distance);
+  void odom_boomerang_distance_set(double distance);
+  void odom_boomerang_dlead_set(double input);
+  void odom_tracker_left_set(tracking_wheel* input);
+  void odom_tracker_right_set(tracking_wheel* input);
+  void odom_tracker_front_set(tracking_wheel* input);
+  void odom_tracker_back_set(tracking_wheel* input);
+  void odom_xyt_set(double x, double y, double t);
+  void odom_xy_set(double x, double y);
+  void odom_x_set(double x);
+  void odom_y_set(double y);
+  void odom_theta_set(double a);
+  void odom_reset();
+  double odom_x_get();
+  double odom_y_get();
+  double odom_theta_get();
+  pose odom_pose_get();
+  void odom_enable(bool input);
+  bool odom_enabled();
+
+  // ---- sensors and motors
+  bool drive_imu_calibrate(bool run_loading_animation = true);
+  bool drive_imu_calibrated();
+  void drive_imu_reset(double new_heading = 0);
+  double drive_imu_get();
+  void drive_imu_scaler_set(double scaler);
+  void drive_sensor_reset();
+  int drive_sensor_left();
+  int drive_sensor_right();
+  void drive_brake_set(pros::motor_brake_mode_e_t brake_type);
+  void drive_set(int left, int right);
+  e_mode drive_mode_get();
+  void pid_targets_reset();
+
+  // ---- motions (each starts at once and holds until the next one)
+  void pid_drive_set(double target, int speed, bool slew_on = false, bool toggle_heading = true);
+  void pid_turn_set(double target, int speed, bool slew_on = false);
+  void pid_turn_set(double target, int speed, e_angle_behavior behavior, bool slew_on = false);
+  void pid_turn_relative_set(double target, int speed, bool slew_on = false);
+  void pid_turn_relative_set(double target, int speed, e_angle_behavior behavior, bool slew_on = false);
+  void pid_swing_set(e_swing type, double target, int speed, int opposite_speed = 0, bool slew_on = false);
+  void pid_swing_set(e_swing type, double target, int speed, e_angle_behavior behavior, bool slew_on = false);
+  void pid_swing_set(e_swing type, double target, int speed, int opposite_speed, e_angle_behavior behavior, bool slew_on = false);
+  void pid_swing_relative_set(e_swing type, double target, int speed, int opposite_speed = 0, bool slew_on = false);
+  /** A distance, a point {{x, y}, fwd, speed}, a pose {{x, y, theta}, fwd, speed} (boomerang) or a list (pure pursuit). */
+  void pid_odom_set(double target, int speed, bool slew_on = false);
+  void pid_odom_set(odom imovement, bool slew_on = false);
+  void pid_odom_set(std::vector<odom> imovements, bool slew_on = false);
+  void pid_odom_ptp_set(odom imovement, bool slew_on = false);
+  void pid_odom_boomerang_set(odom imovement, bool slew_on = false);
+  void pid_odom_pp_set(std::vector<odom> imovements, bool slew_on = false);
+  void pid_odom_injected_pp_set(std::vector<odom> imovements, bool slew_on = false);
+  void pid_odom_smooth_pp_set(std::vector<odom> imovements, bool slew_on = false);
+  /** Waits until the motion settles (its exit conditions). */
+  void pid_wait();
+  void pid_wait_until(double target);
+  void pid_wait_until_index(int index);
+  void pid_wait_until_point(pose target);
+  void pid_wait_quick();
+  /** Moves on just before the target, so the robot doesn't stop between motions. */
+  void pid_wait_quick_chain();
+  bool interfered = false;
+
+  // ---- driver control
+  void opcontrol_tank();
+  void opcontrol_arcade_standard(e_type stick_type);
+  void opcontrol_arcade_flipped(e_type stick_type);
+  void opcontrol_curve_default_set(double left, double right = 0);
+  void opcontrol_drive_activebrake_set(double kp);
+  double opcontrol_drive_activebrake_get();
+  void opcontrol_joystick_threshold_set(int threshold);
+  double opcontrol_curve_left(double x);
+  double opcontrol_curve_right(double x);
+  /** These do nothing here (there's no tuner or curve buttons in the simulator). */
+  void opcontrol_curve_buttons_toggle(bool toggle);
+  void opcontrol_curve_sd_initialize();
+  void opcontrol_speed_max_set(int speed);
+  void pid_tuner_toggle();
+  void pid_tuner_iterate();
+  void pid_print_toggle(bool toggle);
+
+  // ---- EZ-Template v2's names
+  PID headingPID, turnPID, swingPID, forward_drivePID, backward_drivePID, leftPID, rightPID;
+  int turn_exit, swing_exit, drive_exit;
+  void set_drive_pid(double target, int speed, bool slew_on = false, bool toggle_heading = true);
+  void set_turn_pid(double target, int speed);
+  void set_swing_pid(e_swing type, double target, int speed);
+  void wait_drive();
+  void wait_until(double target);
+  void set_max_speed(int speed);
+  void reset_pid_targets();
+  void reset_gyro(double new_heading = 0);
+  void reset_drive_sensor();
+  void set_drive_brake(pros::motor_brake_mode_e_t brake_type);
+  void set_tank(int left, int right);
+  void tank();
+  void arcade_standard(e_type stick_type);
+  void arcade_flipped(e_type stick_type);
+  void set_active_brake(double kp);
+  void set_curve_default(double left, double right = 0);
+  void set_joystick_threshold(int threshold);
+  double get_gyro();
+  bool imu_calibrate(bool run_loading_animation = true);
+  void set_pid_constants(PID* pid, double p, double i, double d, double p_start_i);
+  void set_exit_condition(int type, int small_exit_time, double small_error, int big_exit_time, double big_error,
+                          int velocity_exit_time, int mA_timeout = 0);
+  void set_slew_min_power(int fwd, int rev);
+  void set_slew_distance(int fwd, int rev);
+};
+
+/** {"Name\n\nWhat it does", function} */
+struct Auton {
+  Auton(std::string name, std::function<void()> callback);
+};
+
+/** The auton selector on the Brain's screen: touch its left or right third to page. */
+namespace as {
+class AutonSelector {
+ public:
+  void autons_add(std::vector<Auton> autons);
+  void add_autons(std::vector<Auton> autons);
+  void selected_auton_call();
+  void call_selected_auton();
+  void selected_auton_print();
+  int auton_count();
+};
+extern AutonSelector auton_selector;
+void initialize();
+void init_auton_selector();
+void shutdown();
+void page_up();
+void page_down();
+}  // namespace as
+
+namespace util {
+const int DELAY_TIME = 10;
+int sgn(double input);
+double clamp(double input, double max, double min);
+double to_deg(double input);
+double to_rad(double input);
+}  // namespace util
+
+void ez_template_print();
+void print_ez_template();
+
+}  // namespace ez
+
+/** EZ-Template's controller (the master controller). */
+extern pros::Controller master;
+using ez::fwd;
+using ez::rev;
+// EZ-Template 2.x named these without ez::
+using ez::Drive;
+using ez::Auton;

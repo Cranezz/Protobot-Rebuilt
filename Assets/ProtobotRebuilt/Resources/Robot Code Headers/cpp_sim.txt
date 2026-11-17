@@ -1,0 +1,104 @@
+// Protobot Rebuilt V2: shared by the robot API headers here (written by the app; changes to them are replaced).
+// These headers declare what the simulator runs, so VS Code's IntelliSense (C/C++ or clangd) completes and checks
+// your program. The app runs main.cpp itself: nothing here is compiled.
+#pragma once
+
+#if defined(__has_include)
+#if __has_include(<functional>)
+#include <cmath>
+#include <cstdint>
+#include <cstdio>
+#include <functional>
+#include <initializer_list>
+#include <string>
+#include <vector>
+#define PROTOBOT_HAS_STD 1
+#endif
+#endif
+
+#ifndef PROTOBOT_HAS_STD
+// No C++ standard library on this computer (no compiler installed): small stand-ins so the robot APIs still read
+// right. Installing a compiler (Visual Studio Build Tools, or LLVM) gives the real ones.
+namespace std {
+typedef decltype(sizeof 0) size_t;
+typedef signed char int8_t;
+typedef short int16_t;
+typedef int int32_t;
+typedef long long int64_t;
+typedef unsigned char uint8_t;
+typedef unsigned short uint16_t;
+typedef unsigned int uint32_t;
+typedef unsigned long long uint64_t;
+template <class E> class initializer_list {
+  const E* first;
+  const E* last;
+ public:
+  initializer_list() : first(nullptr), last(nullptr) {}
+  size_t size() const { return last - first; }
+  const E* begin() const { return first; }
+  const E* end() const { return last; }
+};
+class string {
+ public:
+  string();
+  string(const char* s);
+  const char* c_str() const;
+  size_t size() const;
+  size_t length() const;
+  string substr(size_t pos, size_t count = 0) const;
+  char& operator[](size_t i);
+  string operator+(const string& other) const;
+};
+string to_string(double value);
+template <class T> class vector {
+ public:
+  vector();
+  vector(initializer_list<T> items);
+  vector(size_t count, const T& value = T());
+  size_t size() const;
+  bool empty() const;
+  T& operator[](size_t i);
+  T& back();
+  T& front();
+  void push_back(const T& value);
+  void pop_back();
+  void clear();
+  T* begin();
+  T* end();
+};
+template <class F> class function;
+template <class R, class... A> class function<R(A...)> {
+ public:
+  function();
+  template <class F> function(F f);
+  R operator()(A... args) const;
+};
+double abs(double x);
+double fabs(double x);
+double sqrt(double x);
+double pow(double x, double y);
+double sin(double x);
+double cos(double x);
+double tan(double x);
+double atan2(double y, double x);
+double hypot(double x, double y);
+double fmod(double x, double y);
+double round(double x);
+double floor(double x);
+double ceil(double x);
+double min(double a, double b);
+double max(double a, double b);
+double clamp(double v, double lo, double hi);
+}  // namespace std
+using std::int8_t;
+using std::int16_t;
+using std::int32_t;
+using std::int64_t;
+using std::uint8_t;
+using std::uint16_t;
+using std::uint32_t;
+using std::uint64_t;
+extern "C" int printf(const char* format, ...);
+extern "C" int sprintf(char* buffer, const char* format, ...);
+#define M_PI 3.14159265358979323846
+#endif
