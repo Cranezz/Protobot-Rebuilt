@@ -777,6 +777,13 @@ namespace Protobot.Online {
             var spacer = Ui.Rect("Space", invite);
             spacer.Size(140f, 10f);
             ToolOptions.Switch(invite, "Invite only (not in the server list: friends join with the code)", o.inviteOnly, v => o.inviteOnly = v);
+            // V2 (Phase 9): the 0:15 autonomous period, run by each robot's own program.
+            var auton = Row(40f);
+            Ui.Rect("Space", auton).Size(140f, 10f);
+            ToolOptions.Switch(auton, "Autonomous period (0:15 of each robot's own program before driver control)", o.autonomous, v => {
+                o.autonomous = v;
+                PlayerPrefs.SetInt("V2.Online.Autonomous", v ? 1 : 0);
+            });
 
             var gap = Ui.Rect("Gap", content);
             gap.Size(-1, 10f);
@@ -806,7 +813,7 @@ namespace Protobot.Online {
             var session = MatchSessions.Current;
             var props = session.Properties;
             string Prop(string key) => props != null && props.TryGetValue(key, out var p) ? p.Value : "";
-            Heading(session.Name, Prop(MatchSessions.GameKey) + " · " + Prop(MatchSessions.ModeKey) + " · " + session.PlayerCount + "/" + session.MaxPlayers + " players"
+            Heading(session.Name, Prop(MatchSessions.GameKey) + " · " + Prop(MatchSessions.ModeKey) + (Prop(MatchSessions.AutonKey) == "1" ? " · autonomous" : "") + " · " + session.PlayerCount + "/" + session.MaxPlayers + " players"
                                   + (session.HasPassword ? " · password" : "") + (session.IsPrivate ? " · invite only" : ""));
 
             // The invite code, big, with Copy.

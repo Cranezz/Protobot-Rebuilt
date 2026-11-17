@@ -23,8 +23,11 @@ namespace Protobot.Builds {
         /// <summary>The GitHub "new issue" page reports open (empty: reports are saved and copied only).</summary>
         public const string IssuesUrl = "https://github.com/Cranezz/Protobot-Rebuilt/issues/new";   // V2: the public repository
 
-        public static string LogFolder => Path.Combine(Application.persistentDataPath, "Logs");
-        public static string RecoveryFolder => Path.Combine(Application.persistentDataPath, "Recovery");
+        // V2: read once on the main thread (errors logged from other threads write the bug log too).
+        private static string dataPath, fixedContext;
+        private static string DataPath => dataPath ??= Application.persistentDataPath;
+        public static string LogFolder => Path.Combine(DataPath, "Logs");
+        public static string RecoveryFolder => Path.Combine(DataPath, "Recovery");
         private static string BugLog => Path.Combine(LogFolder, "bugs.log");
         private static string Marker => Path.Combine(LogFolder, "running.lock");
         private static string RecoveryFile => Path.Combine(RecoveryFolder, "recovery.pbb");
@@ -52,6 +55,8 @@ namespace Protobot.Builds {
         }
 
         private void Awake() {
+            dataPath = Application.persistentDataPath;
+            fixedContext = BuildInfo.Full + ", " + SystemInfo.operatingSystem + ", " + SystemInfo.graphicsDeviceName;
             try {
                 Directory.CreateDirectory(LogFolder);
                 crashedLastTime = File.Exists(Marker) && !Application.isEditor;
@@ -104,7 +109,7 @@ namespace Protobot.Builds {
 
         private static string context = "";
 
-        private static string Context() => BuildInfo.Full + ", " + SystemInfo.operatingSystem + ", " + SystemInfo.graphicsDeviceName + context;
+        private static string Context() => fixedContext + context;
 
         private void LateUpdate() {
             // Things the log thread can't ask Unity for.

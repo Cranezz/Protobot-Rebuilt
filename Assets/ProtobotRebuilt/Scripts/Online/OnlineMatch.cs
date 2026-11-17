@@ -244,6 +244,8 @@ namespace Protobot.Online {
             }
             if (newPlan.seats.Count < 2) return "A match needs two players at least.";
             newPlan.hostRobot = newPlan.seats.FirstOrDefault(s => s.playerId == OnlineServices.PlayerId)?.robot ?? 0;
+            // V2 (Phase 9): the host's choice; each computer runs its own robot's program in it.
+            newPlan.skipAutonomous = !(session.Properties != null && session.Properties.TryGetValue(MatchSessions.AutonKey, out var auton) && auton.Value == "1");
             var data = Bytes(JsonUtility.ToJson(newPlan));
             ToClients(Msg.Plan, data, true);
             Dispatch(NetworkManager.ServerClientId, Msg.Plan, data);
@@ -1470,6 +1472,7 @@ namespace Protobot.Online {
             game.timeLeft = info.timeLeft;
             game.state = info.running ? SkillsGame.State.Running : SkillsGame.State.Countdown;
             Sandbox.DriveEnabled = info.running && !game.InAutonomous;
+            game.ResumeCode();   // V2 (Phase 9): its program, in the period the match is in
             ToHost(Msg.RejoinReady, BitConverter.GetBytes(me), true);
         }
 

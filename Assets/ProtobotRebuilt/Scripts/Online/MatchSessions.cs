@@ -24,6 +24,7 @@ namespace Protobot.Online {
     public static class MatchSessions {
         public const string SessionType = "match";
         // Session property keys (indexed ones can be filtered and sorted in the server list).
+        public const string AutonKey = "auton";   // V2 (Phase 9): "1" = matches have the 0:15 autonomous period
         public const string GameKey = "game", ModeKey = "mode", BuildKey = "build", VersionKey = "version", HostKey = "hostname";
         // Player property keys.
         public const string NameKey = "name", TeamKey = "team", ReadyKey = "ready", RobotKey = "robot";
@@ -102,6 +103,7 @@ namespace Protobot.Online {
             public string password;
             public bool inviteOnly;
             public string game = "Override";
+            public bool autonomous = PlayerPrefs.GetInt("V2.Online.Autonomous", 1) == 1;   // V2 (Phase 9): robot code runs it
         }
 
         public static async Task<string> Host(HostOptions o) {
@@ -122,6 +124,7 @@ namespace Protobot.Online {
                         [HostKey] = new(OnlineServices.Name, VisibilityPropertyOptions.Public, PropertyIndex.String3),
                         [BuildKey] = new(BuildInfo.Build.ToString(), VisibilityPropertyOptions.Public, PropertyIndex.Number1),
                         [VersionKey] = new(BuildInfo.Display, VisibilityPropertyOptions.Public),
+                        [AutonKey] = new(o.autonomous ? "1" : "0", VisibilityPropertyOptions.Public),
                     },
                     PlayerProperties = MyProperties(0),
                 }.WithRelayNetwork();

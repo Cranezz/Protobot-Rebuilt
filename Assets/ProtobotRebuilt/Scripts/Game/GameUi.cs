@@ -303,7 +303,7 @@ namespace Protobot.Game {
                         b.Size(80f, 30f);
                     }
                     Ui.Tip(quadrantRow, "Start Quadrant", null, "SG1: each robot starts in its own Quadrant on its Alliance's side of the Autonomous Line (the dashed diagonal), touching the Field Perimeter.");
-                    ToolOptions.Switch(column, "Skip autonomous (robot code comes later)", game.skipAutonomous, game.SetSkipAutonomous);
+                    ToolOptions.Switch(column, "Skip autonomous (straight to driver control; the 0:15 runs the robot's program)", game.skipAutonomous, game.SetSkipAutonomous);
                 }
 
                 // V2: the robot always touches its wall (SG1): where along it, and which way it's turned.

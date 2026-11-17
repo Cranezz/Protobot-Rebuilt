@@ -19,6 +19,11 @@ namespace Protobot.Devices {
         private static readonly List<V5Device> devices = new();
         private static long seenVersion = -1;
         private static int seenWires = -1, seenParts = -1;
+        private static System.Func<GameObject, int> seenRobotOf;
+
+        /// <summary>V2 (Phase 9): online, several robots are on the field: this computer's Brain is only its own
+        /// robot's (the others' devices belong to their players' Brains).</summary>
+        private static bool Mine(GameObject part) => Sandbox.RobotOf == null || part == null || Sandbox.RobotOf(part) == Sandbox.LocalRobot;
         private static bool wasRunning;
 
         /// <summary>Every device, smart ones by port, then the 3-wire ones by port.</summary>
@@ -118,7 +123,8 @@ namespace Protobot.Devices {
         /// <summary>Finds the devices again when the build changed.</summary>
         public static void Refresh(bool force = false) {
             var wires = Wire.Wires.Sum(w => w != null ? w.nodes.Count + (w.gameObject.IsDeleted() ? 1000 : 0) : 0);
-            if (!force && seenVersion == Dynamics.Version && seenWires == wires && seenParts == CountParts()) return;
+            if (!force && seenVersion == Dynamics.Version && seenWires == wires && seenParts == CountParts() && seenRobotOf == Sandbox.RobotOf) return;
+            seenRobotOf = Sandbox.RobotOf;
             seenVersion = Dynamics.Version;
             seenWires = wires;
             seenParts = CountParts();
@@ -131,9 +137,9 @@ namespace Protobot.Devices {
             devices.Clear();
             var found = new List<V5Device>();
             var parts = Object.FindObjectsByType<SavedObject>(FindObjectsSortMode.InstanceID)
-                        .Where(s => s != null && !s.gameObject.IsDeleted() && s.gameObject.activeInHierarchy).Select(s => s.gameObject).ToList();
+                        .Where(s => s != null && !s.gameObject.IsDeleted() && s.gameObject.activeInHierarchy && Mine(s.gameObject)).Select(s => s.gameObject).ToList();
             // Motors in the order they were added (their numbers as before), then everything else in build order.
-            var motors = MotorDrive.Live().Select(m => m.gameObject).ToList();
+            var motors = MotorDrive.Live().Select(m => m.gameObject).Where(Mine).ToList();
             foreach (var part in motors.Concat(parts.Where(p => !motors.Contains(p)))) {
                 var kind = KindOf(part);
                 if (kind == null || kind == DeviceKind.Solenoid) continue;
@@ -200,7 +206,7 @@ namespace Protobot.Devices {
                 device.cylinders.AddRange(found);
                 result.Add(device);
             }
-            foreach (var c in cylinders.Where(c => !reached.Contains(c))) {
+            foreach (var c in cylinders.Where(c => !reached.Contains(c) && Mine(c.gameObject))) {
                 var key = c.gameObject.GetInstanceID() + ":cylinder";
                 var device = old.TryGetValue(key, out var same) ? (SolenoidDevice)same : new SolenoidDevice(null) { own = c };
                 device.cylinders.Clear();

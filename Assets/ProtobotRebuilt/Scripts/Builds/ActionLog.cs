@@ -46,6 +46,7 @@ namespace Protobot.Builds {
                 CurrentFile = Path.Combine(Folder, DateTime.Now.ToString("yyyy-MM-dd HH-mm-ss", Inv) + ".log");
             }
             catch (Exception) { }
+            clockOffset = Time.realtimeSinceStartupAsDouble - clock.Elapsed.TotalSeconds;
             Application.logMessageReceivedThreaded += OnUnityLog;
             Application.quitting += Flush;
             Write("start", BuildInfo.Full + " | " + SystemInfo.operatingSystem + " | " + SystemInfo.processorType + " x" + SystemInfo.processorCount
@@ -63,9 +64,13 @@ namespace Protobot.Builds {
 
         // ------------------------------------------------------------------ writing
 
+        private static readonly System.Diagnostics.Stopwatch clock = System.Diagnostics.Stopwatch.StartNew();
+        private static double clockOffset;   // seconds since start-up when the clock started (set on the main thread)
+
         /// <summary>Logs an event (any thread).</summary>
         public static void Write(string kind, string text) {
-            var t = Time.realtimeSinceStartupAsDouble;
+            // V2: Time can only be read on the main thread, and Unity logs from other threads come here too.
+            var t = clockOffset + clock.Elapsed.TotalSeconds;
             lock (gate) pending.Append('+').Append(t.ToString("0.000", Inv)).Append(' ').Append(kind.PadRight(6)).Append(' ')
                                 .Append((text ?? "").Replace("\r", "").Replace("\n", " ⏎ ")).Append('\n');
         }

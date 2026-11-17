@@ -791,6 +791,21 @@ namespace Protobot.Game {
             return false;
         }
 
+        /// <summary>V2 (Phase 9): a program with a driver control part (VEXcode's Competition, PROS/EZ's opcontrol).</summary>
+        private static bool CompetitionProgram {
+            get {
+                var s = RobotCode.CodeStore.Source ?? "";
+                return s.Contains("Competition(") || s.Contains("opcontrol") || s.Contains("competition.drivercontrol") || s.Contains("Competition.drivercontrol");
+            }
+        }
+
+        /// <summary>V2 (Phase 9): online, a player who rejoins mid-match: their program picks up the period it's in.</summary>
+        public void ResumeCode() {
+            if (state != State.Running) return;
+            if (InAutonomous) StartCode(RobotCode.RobotProgram.Period.Autonomous, timeLeft - DriverSeconds);
+            else if (CompetitionProgram) StartCode(RobotCode.RobotProgram.Period.Driver, timeLeft);
+        }
+
         /// <summary>Ends the run now (the robot stops; the score is taken when everything is still).</summary>
         public void EndRun() {
             if (state != State.Running && state != State.Countdown) return;
@@ -921,7 +936,8 @@ namespace Protobot.Game {
                             break;
                         }
                         Sandbox.DriveEnabled = !InAutonomous;
-                        var runsCode = InAutonomous && !online && StartCode(RobotCode.RobotProgram.Period.Autonomous, AutonomousSeconds);
+                        // (online too: each computer runs its own robot's program on its own robot)
+                        var runsCode = InAutonomous && StartCode(RobotCode.RobotProgram.Period.Autonomous, AutonomousSeconds);
                         Interface.Interface.Say(!InAutonomous ? "Go!" : runsCode ? "Autonomous: 0:15 (the robot's program runs)" : "Autonomous: 0:15 (the robot has no program: it waits; Code in the top bar)", true);
                     }
                     if (keyboard != null && keyboard.escapeKey.wasPressedThisFrame && !typing && !online) BackToSetup();
@@ -933,7 +949,7 @@ namespace Protobot.Game {
                         Sandbox.DriveEnabled = true;
                         // V2 (Phase 9): its program's driver control (a Competition's), else the keys drive.
                         RobotCode.RobotProgram.Stop(null);
-                        if (!online && RobotCode.CodeStore.Source.Contains("Competition(")) StartCode(RobotCode.RobotProgram.Period.Driver, DriverSeconds);
+                        if (CompetitionProgram) StartCode(RobotCode.RobotProgram.Period.Driver, DriverSeconds);
                         Audio.Sounds.Play(Audio.Sounds.Tick);
                         Interface.Interface.Say("Driver control: 1:45", true);
                         Changed?.Invoke();
