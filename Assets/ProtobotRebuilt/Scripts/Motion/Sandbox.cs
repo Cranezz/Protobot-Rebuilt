@@ -131,6 +131,9 @@ namespace Protobot.Motion {
         private class Train {
             public readonly List<(Rigidbody rb, Rigidbody frame, Vector3 axisLocal, Vector3 pointLocal, float k)> rotors = new();
             public readonly List<(MotorDrive motor, float k)> motors = new();
+            // V2: its shafts' hinges (with each one's ratio), whose drives hold a stopped train (GearboxFriction).
+            public readonly List<(ConfigurableJoint joint, float k)> hinges = new();
+            public float holding = -1f;   // the torque the hinges' drives hold now
         }
 
         private class Slide {
@@ -1254,6 +1257,12 @@ namespace Protobot.Motion {
                         && !bodies.Any(b => b.rb.GetComponents<ConfigurableJoint>().Any(j => j.connectedBody == body.rb && j.angularXMotion == ConfigurableJointMotion.Free)))
                         continue;   // not hinged to anything: the train can't turn it
                     train.rotors.Add((body.rb, HingedTo(body.rb), body.rb.transform.InverseTransformDirection(rotor.axis), body.rb.transform.InverseTransformPoint(rotor.start), system.ratio[rotor]));
+                    // V2: its hinges, for the stopped motors' hold (Hold)
+                    foreach (var hinge in body.rb.GetComponents<ConfigurableJoint>())
+                        if (hinge.angularXMotion == ConfigurableJointMotion.Free) train.hinges.Add((hinge, system.ratio[rotor]));
+                    foreach (var holder in bodies)
+                        foreach (var hinge in holder.rb.GetComponents<ConfigurableJoint>())
+                            if (hinge.connectedBody == body.rb && hinge.angularXMotion == ConfigurableJointMotion.Free) train.hinges.Add((hinge, system.ratio[rotor]));
                 }
                 foreach (var motor in system.Motors)
                     if (bodyOf.TryGetValue(motor.gameObject, out var motorBody) && !seen.Contains(motorBody.rb))
@@ -1495,6 +1504,9 @@ namespace Protobot.Motion {
         // to nothing at free speed, so its torque is A - B * speed), and every shaft is set to its ratio of that.
         // Meshing gears keep their ratio this way, and a motor that isn't driven brakes (V5 motors short their windings).
         private const float CoastDrag = 0.1f;
+        // V2: a stopped V5 motor's static friction, as a share of its stall torque (back-driving one by hand takes a
+        // firm push through its gears; this keeps a robot still on a level field, a hard shove still moves it).
+        internal static float GearboxFriction = 0.05f;
 
         private static void Turn(Train train) {
             var dt = Time.fixedDeltaTime;
@@ -1525,9 +1537,17 @@ namespace Protobot.Motion {
                 b += k * k * stall / FreeSpeed(motor);
                 most += Mathf.Abs(k) * stall;
             }
+            // V2: motors that aren't driven hold against a steady push, as a stopped V5 motor's gearbox does (static
+            // friction, GearboxFriction of its stall torque; hold mode up to the stall torque): the shafts' hinges
+            // get a drive to stand still, capped at that torque, which the physics solves with the contacts. The brake
+            // alone only slows a turning train, so a small steady push (the 48-sided wheels settling, a slope) turned
+            // it slowly: a robot standing still crept ~0.07"/s.
+            var stopped = train.motors.Count > 0 && train.motors.All(m => Mathf.Abs(m.motor.Command) < 0.001f);
+            var hold = stopped && train.motors.Any(m => Controls.Hold(m.motor.gameObject));
+            Hold(train, stopped ? (hold ? most : most * GearboxFriction) : 0f);
             var next = (inertia * speed + a * dt) / (inertia + b * dt);
             // V2: hold mode (Controls.Hold): not driven, its motors stop the train where it is (up to their stall torque).
-            if (train.motors.All(m => Mathf.Abs(m.motor.Command) < 0.001f) && train.motors.Any(m => Controls.Hold(m.motor.gameObject))) next = 0f;
+            if (hold) next = 0f;
             // The V5 motor's current limit: no more than its stall torque.
             var torque = (next - speed) * inertia / dt;
             if (Mathf.Abs(torque) > most && most > 0f) next = speed + Mathf.Sign(torque) * most * dt / inertia;
@@ -1541,6 +1561,19 @@ namespace Protobot.Motion {
                 rb.WakeUp();
             }
             foreach (var (motor, k) in train.motors) motor.Level = k * next / FreeSpeed(motor);
+        }
+
+        // V2: the train's hinges hold up to this torque at the motors (each shares it by its ratio).
+        private static void Hold(Train train, float torque) {
+            if (Mathf.Abs(torque - train.holding) < 1e-3f * Mathf.Max(1f, torque)) return;
+            train.holding = torque;
+            var sum = train.hinges.Sum(h => h.k * h.k);
+            if (sum <= 0f) return;
+            foreach (var (joint, k) in train.hinges) {
+                if (joint == null) continue;
+                joint.targetAngularVelocity = Vector3.zero;
+                joint.angularXDrive = new JointDrive { positionSpring = 0f, positionDamper = torque > 0f ? 1e7f : 0f, maximumForce = torque * Mathf.Abs(k) / sum };
+            }
         }
 
         private static float Inertia(Rigidbody body, Vector3 axis, Vector3 point) {
@@ -1566,15 +1599,30 @@ namespace Protobot.Motion {
         internal static float RollerResistance = 0.25f;
 
         private readonly Dictionary<Collider, int> pointsOn = new();
+        // V2: what each wheel's grip held last step (along its roll, across it) and what it can hold (its load).
+        // Grip only took away the speed a step had left, so a steady push (the 48-sided wheels settling onto their
+        // flats, a slope) moved the robot a little every step: standing still it crept ~0.1"/s. Holding on to the
+        // push (an integral, like static friction) stops it. Only while the wheel stands still on the ground
+        // (StaticSpeed): rolling or sliding it lets go (held through a drive, a 24" move came out 0.6" short).
+        private readonly Dictionary<Collider, Vector2> held = new(), holding = new();
+        private readonly Dictionary<Collider, float> loadOn = new();
+        private readonly HashSet<Collider> slidingAlong = new(), slidingAcross = new();
+        internal static float HoldGain = 0.3f;   // tests set it (t_creep3.cs)
+        private const float StaticSpeed = 0.3f;   // in/s
 
         private void Omnis() {
-            if (contacts.Count == 0) return;
+            if (contacts.Count == 0) { held.Clear(); return; }
             var total = bodies.Sum(b => b.mass);
             var touching = Mathf.Max(1, contacts.Select(c => c.collider).Distinct().Count());
             // V2: a wheel touching at several points shares its correction between them (each took half the slip:
             // two or three points over-corrected and the wheel jittered).
             pointsOn.Clear();
             foreach (var c in contacts) pointsOn[c.collider] = pointsOn.TryGetValue(c.collider, out var n) ? n + 1 : 1;
+            loadOn.Clear();
+            foreach (var c in contacts) loadOn[c.collider] = (loadOn.TryGetValue(c.collider, out var l) ? l : 0f) + c.impulse;
+            holding.Clear();
+            slidingAlong.Clear();
+            slidingAcross.Clear();
             foreach (var (collider, point, normalIn, impulse, other) in contacts) {
                 var wheel = omnis.FirstOrDefault(w => w.collider == collider);
                 if (wheel == null || wheel.rb == null || wheel.rb.isKinematic) continue;
@@ -1592,18 +1640,38 @@ namespace Protobot.Motion {
                 // motors it's geared to: under full power the omnis spun in place (a 24" move went 21.3").
                 var mass = 0.5f * total / touching / pointsOn[collider];
                 var most = 1.0f * impulse;
-                var j = Mathf.Clamp(-slip * mass, -most, most);
+                held.TryGetValue(collider, out var hold);
+                holding.TryGetValue(collider, out var next);
+                var share = 1f / pointsOn[collider];
+                var j = Mathf.Clamp(-slip * mass + hold.x * share, -most, most);
+                next.x += hold.x * share - slip * mass * HoldGain;
+                // (a rolling wheel's contact doesn't slip either: the wheel itself moving lets go too)
+                var moving = (rb.linearVelocity - (other != null ? other.linearVelocity : Vector3.zero)).magnitude > StaticSpeed;
+                if (moving || Mathf.Abs(slip) > StaticSpeed) slidingAlong.Add(collider);
                 rb.AddForceAtPosition(along * j, point, ForceMode.Impulse);
                 if (other != null) other.AddForceAtPosition(-along * j, point, ForceMode.Impulse);
                 // V2: the rollers' own rolling resistance across the wheel (RollerResistance of the load): without it a
                 // robot on all omnis kept sliding sideways forever after a turn.
                 var across = Vector3.ProjectOnPlane(axis, normal);
-                if (across.sqrMagnitude < 1e-6f) continue;
+                if (across.sqrMagnitude < 1e-6f) { holding[collider] = next; continue; }
                 across.Normalize();
                 var drift = Vector3.Dot(velocity, across);
-                var roll = Mathf.Clamp(-drift * total / touching, -RollerResistance * impulse, RollerResistance * impulse);
+                // V2: shared between the wheel's contact points like the grip (each point took the whole wheel's
+                // share: four points over-corrected 4x, the sideways speed flipped every step and the clamp turned that
+                // into a slow drift: a robot standing still crept ~0.1"/s).
+                var roll = Mathf.Clamp(-drift * mass + hold.y * share, -RollerResistance * impulse, RollerResistance * impulse);
+                next.y += hold.y * share - drift * mass * HoldGain;
+                if (moving || Mathf.Abs(drift) > StaticSpeed) slidingAcross.Add(collider);
+                holding[collider] = next;
                 rb.AddForceAtPosition(across * roll, point, ForceMode.Impulse);
                 if (other != null) other.AddForceAtPosition(-across * roll, point, ForceMode.Impulse);
+            }
+            // A wheel holds at most what its load allows (sliding lets go); a wheel off the ground holds nothing.
+            held.Clear();
+            foreach (var (collider, h) in holding) {
+                var load = loadOn[collider];
+                held[collider] = new Vector2(slidingAlong.Contains(collider) ? 0f : Mathf.Clamp(h.x, -load, load),
+                    slidingAcross.Contains(collider) ? 0f : Mathf.Clamp(h.y, -RollerResistance * load, RollerResistance * load));
             }
             contacts.Clear();
         }

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Protobot.Devices;
 using Protobot.Scripting;
 using UnityEngine;
 using static Protobot.RobotCode.VexModule;
@@ -248,6 +249,18 @@ namespace Protobot.RobotCode {
             Class("Rotation", a => new ProsRotation(program, a));
             Class("Distance", a => new ProsSensor(program, a, "Distance"));
             Class("Optical", a => new ProsSensor(program, a, "Optical"));
+            // V2: the Vision Sensor (PROS: pros::Vision, signature_from_utility, get_by_sig / get_by_size / get_by_code).
+            Class("Vision", a => new ProsVision(program, a));
+            var fromUtility = new PyBuiltin("signature_from_utility", a => new VexVisionSignature(a));
+            ((PyClass)m.globals["Vision"]).dict["signature_from_utility"] = fromUtility;
+            m.globals["vision_signature_from_utility"] = fromUtility;
+            m.globals["VISION_OBJECT_ERR_SIG"] = 255L;
+            m.globals["VISION_FOV_WIDTH"] = 316L;
+            m.globals["VISION_FOV_HEIGHT"] = 212L;
+            E("vision_zero_e_t", "E_VISION_ZERO_TOPLEFT", 0);
+            E("vision_zero_e_t", "E_VISION_ZERO_CENTER", 1);
+            E("vision_object_type_e_t", "E_VISION_OBJECT_NORMAL", 0);
+            E("vision_object_type_e_t", "E_VISION_OBJECT_COLOR_CODE", 1);
             Class("Task", a => new ProsTask(program, a));
             // (PROS 3's names)
             m.globals["Motor_Group"] = m.globals["MotorGroup"];
@@ -525,6 +538,98 @@ namespace Protobot.RobotCode {
             }
 
             public double Degrees() => Ops.ToDouble(Call(program, sensor, "position", Units["DEGREES"]));
+        }
+
+        /// <summary>V2: PROS's pros::Vision on the simulated sensor. Objects are vision_object_s_t (signature, type,
+        /// left_coord, top_coord, width, height, angle, x_middle_coord, y_middle_coord); none found: signature 255.
+        /// Signatures kept on the sensor (the Vision Utility's) count until set_signature replaces one.</summary>
+        private sealed class ProsVision : VexObject {
+            public override string TypeName => "Vision";
+            private bool center;
+
+            public ProsVision(RobotProgram p, Args a) {
+                var port = (int)Ops.ToLong(a.Need(0, "port"));
+                if (a.Count > 1 && a.pos[1] is PyEnum z) center = z.value == 1;
+                VisionSensor Sensor() => p.Device<VisionSensor>(port, false, "Vision Sensor");
+                List<VisionBlob> All() {
+                    var s = Sensor();
+                    if (s == null) return new List<VisionBlob>();
+                    s.Snapshot(0, 1);   // (keeps it taking pictures)
+                    return s.blobs;
+                }
+                object Obj(VisionBlob? found) {
+                    var o = new ProsVisionObject(found, center);
+                    return o;
+                }
+                Method("get_by_sig", a2 => {
+                    var size = (int)a2.Number(0, "size_id", 0);
+                    var sig = (int)a2.Number(1, "sig_id", 1);
+                    var list = All().Where(b => !b.code && b.id == sig).ToList();
+                    return Obj(size < list.Count ? list[size] : (VisionBlob?)null);
+                });
+                Method("get_by_size", a2 => {
+                    var size = (int)a2.Number(0, "size_id", 0);
+                    var list = All();
+                    return Obj(size < list.Count ? list[size] : (VisionBlob?)null);
+                });
+                Method("get_by_code", a2 => {
+                    var size = (int)a2.Number(0, "size_id", 0);
+                    var code = (int)a2.Number(1, "color_code", 0);
+                    var list = All().Where(b => b.code && b.id == code).ToList();
+                    return Obj(size < list.Count ? list[size] : (VisionBlob?)null);
+                });
+                Method("get_object_count", _ => (long)All().Count);
+                Method("set_signature", a2 => {
+                    var s = Sensor();
+                    if (s != null && a2.Need(1, "signature") is VexVisionSignature sig) {
+                        var v = sig.sig;
+                        v.id = (int)a2.Number(0, "signature_id", v.id);
+                        s.SetSignature(v);
+                    }
+                    return 1L;
+                });
+                Method("get_signature", a2 => {
+                    var s = Sensor();
+                    var id = (int)a2.Number(0, "signature_id", 1);
+                    var sig = s != null && id >= 1 && id <= 7 ? s.Signatures[id - 1] : null;
+                    return sig.HasValue ? new VexVisionSignature(sig.Value) : (object)PyNone.Value;
+                });
+                Method("create_color_code", a2 => {
+                    var ids = a2.pos.Select(x => (int)Ops.ToLong(x)).Where(x => x >= 1 && x <= 7).ToArray();
+                    var s = Sensor();
+                    if (s != null && ids.Length >= 2 && !s.codes.Any(c => c.SequenceEqual(ids))) s.codes.Add(ids);
+                    return (long)VisionSensor.CodeId(ids);
+                });
+                Method("set_zero_point", a2 => { center = a2.Need(0, "zero_point") is PyEnum e && e.value == 1; return 1L; });
+                Method("set_exposure", a2 => {
+                    var s = Sensor();
+                    if (s != null) s.brightness = Mathf.Clamp(Mathf.RoundToInt((float)a2.Number(0, "exposure", 75) / 150f * 100f), 1, 100);
+                    return 1L;
+                });
+                Method("get_exposure", _ => (long)Mathf.RoundToInt((Sensor()?.brightness ?? 50) * 1.5f));
+                foreach (var n in new[] { "set_led", "clear_led", "set_auto_white_balance", "set_white_balance", "set_wifi_mode", "print_signature" })
+                    Method(n, _ => 1L);
+                Method("get_white_balance", _ => 0L);
+                Method("get_port", _ => (long)port);
+            }
+        }
+
+        private sealed class ProsVisionObject : VexObject {
+            public override string TypeName => "vision_object_s_t";
+            public ProsVisionObject(VisionBlob? found, bool center) {
+                var b = found ?? default;
+                var dx = center ? -VisionSensor.Width / 2 : 0;
+                var dy = center ? -VisionSensor.Height / 2 : 0;
+                Field("signature", found.HasValue ? (long)b.id : 255L);
+                Field("type", b.code ? 1L : 0L);
+                Field("left_coord", (long)(b.x + dx));
+                Field("top_coord", (long)(b.y + dy));
+                Field("width", (long)b.width);
+                Field("height", (long)b.height);
+                Field("angle", (long)Mathf.RoundToInt(b.angle));
+                Field("x_middle_coord", (long)(b.CenterX + dx));
+                Field("y_middle_coord", (long)(b.CenterY + dy));
+            }
         }
 
         private sealed class ProsSensor : VexObject {

@@ -212,6 +212,54 @@ class Optical {
   std::int32_t set_led_pwm(std::uint8_t value) const;
 };
 
+// The V5 Vision Sensor (simulated: it sees the field and the robots; signatures from its Vision Utility are kept on it).
+#define VISION_OBJECT_ERR_SIG 255
+#define VISION_FOV_WIDTH 316
+#define VISION_FOV_HEIGHT 212
+typedef enum { E_VISION_ZERO_TOPLEFT = 0, E_VISION_ZERO_CENTER = 1 } vision_zero_e_t;
+typedef enum { E_VISION_OBJECT_NORMAL = 0, E_VISION_OBJECT_COLOR_CODE = 1 } vision_object_type_e_t;
+typedef std::uint16_t vision_color_code_t;
+/** A signature: Vision::signature_from_utility(id, uMin, uMax, uMean, vMin, vMax, vMean, range, type). */
+typedef struct {
+  std::uint8_t id;
+  float range;
+  std::int32_t u_min, u_max, u_mean, v_min, v_max, v_mean;
+  std::uint32_t rgb, type;
+} vision_signature_s_t;
+/** An object found: none found: signature is VISION_OBJECT_ERR_SIG (255). */
+typedef struct {
+  std::uint16_t signature;
+  vision_object_type_e_t type;
+  std::int16_t left_coord, top_coord, width, height, angle, x_middle_coord, y_middle_coord;
+} vision_object_s_t;
+
+class Vision {
+ public:
+  explicit Vision(std::uint8_t port, vision_zero_e_t zero_point = E_VISION_ZERO_TOPLEFT);
+  static vision_signature_s_t signature_from_utility(std::int32_t id, std::int32_t u_min, std::int32_t u_max, std::int32_t u_mean,
+                                                     std::int32_t v_min, std::int32_t v_max, std::int32_t v_mean, float range, std::int32_t type);
+  /** size_id 0 = the largest. */
+  vision_object_s_t get_by_sig(std::uint32_t size_id, std::uint32_t sig_id) const;
+  vision_object_s_t get_by_size(std::uint32_t size_id) const;
+  vision_object_s_t get_by_code(std::uint32_t size_id, vision_color_code_t color_code) const;
+  std::int32_t get_object_count() const;
+  std::int32_t set_signature(std::uint8_t signature_id, vision_signature_s_t* signature_ptr) const;
+  vision_signature_s_t get_signature(std::uint8_t signature_id) const;
+  vision_color_code_t create_color_code(std::uint32_t sig_id1, std::uint32_t sig_id2, std::uint32_t sig_id3 = 0,
+                                        std::uint32_t sig_id4 = 0, std::uint32_t sig_id5 = 0) const;
+  std::int32_t set_zero_point(vision_zero_e_t zero_point) const;
+  std::int32_t set_exposure(std::uint8_t exposure) const;   // 0 to 150
+  std::int32_t get_exposure() const;
+  std::int32_t set_led(std::int32_t rgb) const;
+  std::int32_t clear_led() const;
+  std::int32_t set_auto_white_balance(std::uint8_t enable) const;
+  std::int32_t set_white_balance(std::int32_t rgb) const;
+  std::int32_t get_white_balance() const;
+  std::int32_t set_wifi_mode(std::uint8_t enable) const;
+  std::int32_t print_signature(vision_signature_s_t signature) const;
+  std::uint8_t get_port() const;
+};
+
 // ---------------------------------------------------------------- 3-wire (ADI)
 namespace adi {
 /** 'A' to 'H' (or 1 to 8). */

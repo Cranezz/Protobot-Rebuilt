@@ -9,12 +9,12 @@ var progs = new System.Collections.Generic.Dictionary<string, string>();
 var maps = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.Dictionary<string, string>>();
 progs["cpp_pros"] = "#include \"main.h\"\n" +
     "pros::Motor m(1, pros::MotorGears::blue);\npros::MotorGroup g({1, -2});\npros::Controller c(pros::E_CONTROLLER_MASTER);\npros::Imu imu(10);\n" +
-    "pros::Rotation r(11);\npros::Distance d(12);\npros::Optical o(13);\npros::adi::DigitalOut dout('A');\npros::adi::Pneumatics pn('B', false);\n" +
+    "pros::Rotation r(11);\npros::Distance d(12);\npros::Optical o(13);\npros::Vision vis(14);\npros::adi::DigitalOut dout('A');\npros::adi::Pneumatics pn('B', false);\n" +
     "pros::adi::DigitalIn din('C');\npros::adi::Encoder enc('E', 'F');\nvoid f() { pros::delay(10); }\npros::Task t(f);\n" +
     "void opcontrol() { pros::delay(10); }\n";
 maps["cpp_pros"] = new System.Collections.Generic.Dictionary<string, string> {
     { "pros.AbstractMotor", "m" }, { "pros.Motor", "m" }, { "pros.MotorGroup", "g" }, { "pros.Controller", "c" }, { "pros.Imu", "imu" },
-    { "pros.Rotation", "r" }, { "pros.Distance", "d" }, { "pros.Optical", "o" }, { "pros.adi.DigitalOut", "dout" }, { "pros.adi.Pneumatics", "pn" },
+    { "pros.Rotation", "r" }, { "pros.Distance", "d" }, { "pros.Optical", "o" }, { "pros.Vision", "vis" }, { "pros.adi.DigitalOut", "dout" }, { "pros.adi.Pneumatics", "pn" },
     { "pros.adi.DigitalIn", "din" }, { "pros.adi.Encoder", "enc" }, { "pros.Task", "t" }, { "pros", "pros" }, { "pros.adi", "pros.adi" },
     { "pros.lcd", "pros.lcd" }, { "pros.competition", "pros.competition" },
 };

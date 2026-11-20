@@ -1131,57 +1131,141 @@ namespace Protobot.RobotCode {
             }
         }
     }
-    /// <summary>V2: the V5 Vision Sensor's API (VEXcode's vision / Vision: signatures, take_snapshot, objects,
-    /// largest_object, object_count). What it sees isn't simulated yet: a snapshot finds nothing (warned once).</summary>
+    /// <summary>V2: the V5 Vision Sensor's API (VEXcode's Vision / vision: Vision(port, brightness, signatures and codes),
+    /// take_snapshot / takeSnapshot, objects, largest_object, object_count, set_signature, set_brightness) on the
+    /// simulated sensor (`VisionSensor`: it draws what's in front of it and finds the signatures' colors). Python's
+    /// take_snapshot returns the objects (largest first), C++'s takeSnapshot their count.</summary>
     internal sealed class VexVision : VexObject {
         public override string TypeName => "Vision";
+        private readonly RobotProgram p;
+        private readonly int port;
+        private readonly PyList objects = new();
+
         public VexVision(RobotProgram p, Args a) {
-            var (port, _) = Port(a.Need(0, "port"), "Vision");
-            var none = new VexVisionObject();
-            var objects = new PyList();
-            for (var i = 0; i < 16; i++) objects.items.Add(new VexVisionObject());
+            this.p = p;
+            (port, _) = Port(a.Need(0, "port"), "Vision");
+            for (var i = 0; i < 16; i++) objects.items.Add(new VexVisionObject(null));
+            var none = new VexVisionObject(null);
             Field("objects", objects);
             Field("object_count", 0L);
-            Field("largest_object", none);
-            void Seen() {
-                if (p.Device<V5Device>(port, false, "Vision Sensor") != null)
-                    p.Warn("vision" + port, "Vision Sensor on port " + port + ": what it sees isn't simulated yet, so a snapshot finds no objects");
+            if (p.Cpp) Field("largest_object", none);
+            else Method("largest_object", _ => objects.items[0]);
+            var brightness = a.Count > 1 && !(a.pos[1] is VexVisionSignature) && !(a.pos[1] is VexVisionCode) ? (int)Ops.ToLong(a.pos[1]) : -1;
+            var sensor = Sensor(false);
+            if (sensor != null) {
+                if (brightness > 0) sensor.brightness = Mathf.Clamp(brightness, 1, 100);
+                foreach (var s in a.pos.Skip(1)) AddSig(sensor, s);
             }
-            Method("take_snapshot", _ => {
-                Seen();
-                Field("object_count", 0L);
-                return p.Cpp ? (object)0L : new PyTuple(new object[0]);
+            Method("take_snapshot", a2 => {
+                var what = a2.Need(0, "signature");
+                var count = (int)a2.Number(1, "count", 8);
+                var id = what switch {
+                    VexVisionSignature s => s.sig.id,
+                    VexVisionCode c => VisionSensor.CodeId(c.ids),
+                    _ => (int)Ops.ToLong(what),
+                };
+                var found = Snap(id, count);
+                if (p.Cpp) return (long)found.Count;
+                return new PyTuple(found.Select(b => (object)new VexVisionObject(b)).ToArray());
             });
-            Method("installed", _ => p.Device<V5Device>(port, false, "Vision Sensor") != null);
+            Method("set_signature", a2 => {
+                var s = Sensor(true);
+                if (s != null) AddSig(s, a2.Need(0, "signature"));
+                return PyNone.Value;
+            });
+            Method("set_brightness", a2 => {
+                var s = Sensor(true);
+                if (s != null) s.brightness = Mathf.Clamp((int)a2.Number(0, "value", 50), 1, 100);
+                return PyNone.Value;
+            });
+            Method("installed", _ => Sensor(false) != null);
             Method("timestamp", _ => (long)(p.Time * 1000));
-            foreach (var n in new[] { "set_brightness", "set_signature", "set_led", "set_led_mode", "set_led_brightness", "set_led_color", "set_white_balance", "set_white_balance_mode", "set_wifi_mode" })
+            foreach (var n in new[] { "set_led", "set_led_mode", "set_led_brightness", "set_led_color", "set_white_balance", "set_white_balance_mode", "set_wifi_mode" })
                 Method(n, _ => PyNone.Value);
         }
-    }
 
-    /// <summary>V2: one object a Vision snapshot found (none found: exists is false).</summary>
-    internal sealed class VexVisionObject : VexObject {
-        public override string TypeName => "VisionObject";
-        public VexVisionObject() {
-            Field("id", 0L);
-            Field("center_x", 0L);
-            Field("center_y", 0L);
-            Field("origin_x", 0L);
-            Field("origin_y", 0L);
-            Field("width", 0L);
-            Field("height", 0L);
-            Field("angle", 0.0);
-            Field("exists", false);
+        private VisionSensor Sensor(bool warn) => warn ? p.Device<VisionSensor>(port, false, "Vision Sensor") : V5Brain.Get<VisionSensor>(port, false);
+
+        private static void AddSig(VisionSensor sensor, object s) {
+            switch (s) {
+                case VexVisionSignature sig: sensor.SetSignature(sig.sig); break;
+                case VexVisionCode code:
+                    foreach (var part in code.sigs) sensor.SetSignature(part.sig);
+                    if (!sensor.codes.Any(c => c.SequenceEqual(code.ids))) sensor.codes.Add(code.ids);
+                    break;
+            }
+        }
+
+        /// <summary>The objects of a signature (or code) in the sensor's latest picture; objects / object_count /
+        /// largest_object follow it (VEXcode keeps the last snapshot's).</summary>
+        private List<VisionBlob> Snap(int id, int count) {
+            var sensor = Sensor(true);
+            var found = sensor != null ? sensor.Snapshot(id, count) : new List<VisionBlob>();
+            for (var i = 0; i < 16; i++) objects.items[i] = new VexVisionObject(i < found.Count ? found[i] : (VisionBlob?)null);
+            Add("object_count", (long)found.Count);
+            if (p.Cpp) Add("largest_object", objects.items[0]);
+            return found;
         }
     }
 
-    /// <summary>V2: a Vision signature (VEXcode's Signature(index, uMin, uMax, uMean, vMin, vMax, vMean, range, type))
-    /// or color code: kept as given.</summary>
+    /// <summary>V2: one object a Vision snapshot found (none: exists is false, everything 0). VEXcode's names:
+    /// centerX/center_x, originX, width, height, angle, exists, id.</summary>
+    internal sealed class VexVisionObject : VexObject {
+        public override string TypeName => "VisionObject";
+        public VexVisionObject(VisionBlob? found) {
+            var b = found ?? default;
+            Field("id", (long)b.id);
+            Field("center_x", (long)b.CenterX);
+            Field("center_y", (long)b.CenterY);
+            Field("origin_x", (long)b.x);
+            Field("origin_y", (long)b.y);
+            Field("width", (long)b.width);
+            Field("height", (long)b.height);
+            Field("angle", (double)b.angle);
+            Field("exists", found.HasValue);
+            Field("centerX", (long)b.CenterX);
+            Field("centerY", (long)b.CenterY);
+            Field("originX", (long)b.x);
+            Field("originY", (long)b.y);
+        }
+    }
+
+    /// <summary>V2: a Vision signature (VEXcode's Signature(index, uMin, uMax, uMean, vMin, vMax, vMean, range, type),
+    /// C++ vision::signature), as the Vision Utility writes it.</summary>
     internal sealed class VexVisionSignature : VexObject {
         public override string TypeName => "Signature";
+        public readonly VisionSignature sig;
+
         public VexVisionSignature(Args a) {
-            Field("id", a.pos.Length > 0 ? a.pos[0] : 0L);
+            int I(int i) => a.Count > i ? (int)Math.Round(Ops.ToDouble(a.pos[i])) : 0;
+            sig = new VisionSignature { id = I(0), uMin = I(1), uMax = I(2), uMean = I(3), vMin = I(4), vMax = I(5), vMean = I(6),
+                range = a.Count > 7 ? (float)Ops.ToDouble(a.pos[7]) : 2.5f, type = I(8), name = "SIG_" + I(0) };
+            if (!sig.Valid) throw new PyError("ValueError", "a Signature's index is 1 to 7, then uMin, uMax, uMean, vMin, vMax, vMean (min below max), range, type: copy them from the Vision Utility");
+            Field("id", (long)sig.id);
             Field("values", new PyList(a.pos));
+        }
+
+        public VexVisionSignature(VisionSignature s) {
+            sig = s;
+            Field("id", (long)s.id);
+        }
+    }
+
+    /// <summary>V2: a color code: 2 to 5 signatures side by side, seen as one object with an angle (VEXcode's Code(sig1,
+    /// sig2, ...), C++ vision::code). Its id is its signatures as octal digits.</summary>
+    internal sealed class VexVisionCode : VexObject {
+        public override string TypeName => "Code";
+        public readonly List<VexVisionSignature> sigs = new();
+        public readonly int[] ids;
+
+        public VexVisionCode(Args a) {
+            foreach (var s in a.pos) {
+                if (s is VexVisionSignature sig) sigs.Add(sig);
+                else if (s is long n && n >= 1 && n <= 7) sigs.Add(new VexVisionSignature(new VisionSignature { id = (int)n, uMin = 0, uMax = 0, vMin = 0, vMax = 0 }));
+            }
+            if (sigs.Count < 2 || sigs.Count > 5) throw new PyError("ValueError", "a Code takes 2 to 5 signatures");
+            ids = sigs.Select(s => s.sig.id).ToArray();
+            Field("id", (long)VisionSensor.CodeId(ids));
         }
     }
 }

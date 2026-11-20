@@ -77,6 +77,10 @@ namespace Protobot.RobotCode {
                     if (pros) return threeWire ? $"pros::adi::{prosType} {n}({port3});" : $"pros::{prosType} {n}({d.port});";
                     return threeWire ? $"{vexType} {n} = {vexType}(Brain.ThreeWirePort.{(char)('A' + Mathf.Clamp(d.port - 1, 0, 7))});" : $"{vexType} {n} = {vexType}(PORT{d.port});";
                 }
+                if (d.kind == DeviceKind.Vision) {   // V2
+                    foreach (var l in VisionLines(d, used, pros ? "pros" : "vex", out _).Split('\n')) sb.AppendLine(l);
+                    continue;
+                }
                 var line = d.kind switch {
                     DeviceKind.Inertial => Line("Imu", "inertial", "imu", false),
                     DeviceKind.Distance => Line("Distance", "distance", "distance_" + d.port, false),
@@ -231,6 +235,7 @@ namespace Protobot.RobotCode {
 
         private static string SensorLine(V5Device d, HashSet<string> used, out string name) {
             name = null;
+            if (d.kind == DeviceKind.Vision) return VisionLines(d, used, "py", out name);   // V2
             string Smart(string cls, string fallback) {
                 var n = Name(Controls.GivenName(d.part) ?? fallback, used);
                 return $"{n} = {cls}(Ports.PORT{d.port})";
@@ -261,6 +266,36 @@ namespace Protobot.RobotCode {
             else if (d.kind == DeviceKind.Gps || d.kind == DeviceKind.Vision)
                 line = "# " + V5Device.KindName(d.kind) + " sensor on port " + d.port + ": not simulated yet";
             return line;
+        }
+
+        /// <summary>V2: a Vision Sensor and the signatures kept on it (made in its Vision Utility), as VEXcode writes
+        /// them: vision_5__RED = Signature(1, ...), vision_5 = Vision(Ports.PORT5, 50, vision_5__RED). PROS keeps the
+        /// signatures on the sensor, so only their values are written (set_signature puts them back from code).</summary>
+        internal static string VisionLines(V5Device d, HashSet<string> used, string language, out string name) {
+            var n = Name(Controls.GivenName(d.part) ?? "vision_" + d.port, used);
+            name = n;
+            var bright = VisionSensor.SavedBrightness(d.part);
+            var lines = new List<string>();
+            var sigNames = new List<string>();
+            foreach (var s in VisionSensor.Saved(d.part).Where(s => s.HasValue).Select(s => s.Value)) {
+                var sn = n + "__" + VisionSignature.Clean(s.name);
+                for (var i = 2; used.Contains(sn); i++) sn = n + "__" + VisionSignature.Clean(s.name) + "_" + i;
+                used.Add(sn);
+                sigNames.Add(sn);
+                var values = string.Join(", ", s.id, s.uMin, s.uMax, s.uMean, s.vMin, s.vMax, s.vMean, s.range.ToString("0.0##", System.Globalization.CultureInfo.InvariantCulture), s.type);
+                lines.Add(language switch {
+                    "pros" => $"pros::vision_signature_s_t {sn} = pros::Vision::signature_from_utility({values});",
+                    "vex" => $"vision::signature {sn} = vision::signature({values});",
+                    _ => $"{sn} = Signature({values})",
+                });
+            }
+            var args = string.Join(", ", new[] { language == "py" ? "Ports.PORT" + d.port : "PORT" + d.port, bright.ToString() }.Concat(sigNames));
+            lines.Add(language switch {
+                "pros" => $"pros::Vision {n}({d.port});" + (sigNames.Count > 0 ? "   // its signatures are kept on the sensor" : "   // no signatures yet: make them in Devices > its card > Vision Utility"),
+                "vex" => $"vision {n} = vision({args});",
+                _ => $"{n} = Vision({args})" + (sigNames.Count == 0 ? "   # no signatures yet: make them in Devices > its card > Vision Utility" : ""),
+            });
+            return string.Join("\n", lines);
         }
 
         // ------------------------------------------------------------------ the drive, measured

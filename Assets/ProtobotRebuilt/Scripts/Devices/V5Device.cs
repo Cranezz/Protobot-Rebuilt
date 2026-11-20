@@ -258,14 +258,13 @@ namespace Protobot.Devices {
         }
     }
 
-    /// <summary>A device with no readings in the app yet (vision, GPS, radio, the 3-wire expander).</summary>
+    /// <summary>A device with no readings in the app yet (GPS, radio, the 3-wire expander).</summary>
     public class PlainDevice : V5Device {
         public PlainDevice(GameObject part, DeviceKind kind) : base(part, kind) { }
 
         public string Note => kind switch {
             DeviceKind.Radio => "Links the brain to the controller (VEXnet / Bluetooth).",
             DeviceKind.Expander => "Adds eight more 3-wire ports on a smart port.",
-            DeviceKind.Vision => "Sees colored objects. Not simulated yet.",
             DeviceKind.Gps => "Reads the field's code strip for its position. Not simulated yet.",
             _ => "",
         };

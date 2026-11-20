@@ -189,6 +189,44 @@ namespace Protobot.Devices {
 
         // ------------------------------------------------------------------ sensors
 
+        // V2: the Vision Sensor: what it sees (its picture, the objects of its signatures boxed), the objects found,
+        // and the Vision Utility (signatures from the picture).
+        private void VisionDashboard(RectTransform card, VisionSensor s) {
+            var holder = Box(card, "Picture", Color.black, 6f);
+            holder.rect.Size(-1, 190f);
+            var image = Ui.Rect("Image", holder.rect).Fill(3f, 3f, 3f, 3f);
+            var fitter = image.gameObject.AddComponent<AspectRatioFitter>();
+            fitter.aspectMode = AspectRatioFitter.AspectMode.FitInParent;
+            fitter.aspectRatio = (float)VisionSensor.Width / VisionSensor.Height;
+            var raw = image.gameObject.AddComponent<RawImage>();
+            raw.raycastTarget = false;
+            var shapes = ShapeGraphic.Create(image);
+            var row = TileRow(card);
+            Tile(row, "Objects", () => s.blobs.Count.ToString(), 1f, "Objects of its signatures in the picture (50 pictures a second while it's watched).");
+            Tile(row, "Largest", () => s.blobs.Count == 0 ? "—" : (s.blobs[0].code ? "code" : "SIG " + s.blobs[0].id) + " " + s.blobs[0].width + "×" + s.blobs[0].height, 1.4f,
+                "The biggest object: its signature and size in the sensor's 316 × 212 pixels.");
+            var sigs = s.Signatures.Count(x => x.HasValue);
+            Note(card, sigs == 0 ? "No signatures yet: open the Vision Utility, drag a box over a colored object and Set one." : sigs + (sigs == 1 ? " signature" : " signatures") + (s.programSet ? " (from the program)" : " kept on the sensor") + ".", Theme.TextFaint, 30f);
+            var buttons = ButtonRow(card);
+            var open = Ui.Button(buttons, "Vision Utility", "Vision Utility…", () => VisionUtility.Open(s), false, 5f, Theme.FontSmall);
+            open.Size(-1, 28f, 1f);
+            Ui.Tip(open, "Vision Utility", null, "What it sees, larger: drag a box over an object and Set a signature (1-7), as VEXcode's Vision Utility does.");
+            live.Add(() => {
+                s.Want();
+                raw.texture = s.Picture;
+                raw.color = s.Picture != null ? Color.white : Color.black;
+                shapes.Clear();
+                var r = image.rect;
+                var all = s.Signatures;
+                foreach (var b in s.blobs.Take(16)) {
+                    var color = b.code ? Theme.Warning : all[Mathf.Clamp(b.id, 1, 7) - 1].HasValue ? VisionUtility.SigColor(all[b.id - 1].Value) : Theme.Accent;
+                    var min = new Vector2(r.xMin + (float)b.x / VisionSensor.Width * r.width, r.yMax - (float)(b.y + b.height) / VisionSensor.Height * r.height);
+                    var max = new Vector2(r.xMin + (float)(b.x + b.width) / VisionSensor.Width * r.width, r.yMax - (float)b.y / VisionSensor.Height * r.height);
+                    VisionUtility.Box(shapes, min, max, color, 1.5f);
+                }
+            });
+        }
+
         private void DistanceDashboard(RectTransform card, DistanceSensor s) {
             var row = TileRow(card);
             var (big, _) = Tile(row, "Distance", () => s.Found ? DevicesFormat.Distance(s.Mm) : "—", 1.4f, "Click to show it in " + (DevicesFormat.Millimeters ? "inches" : "millimeters") + ". Range 20-2000 mm (0.8\"-78.7\").");

@@ -1,3 +1,5 @@
+using System.Linq;
+
 namespace Protobot.RobotCode {
     /// <summary>V2 (Phase 9): starting programs for the code panel's Examples menu (VEXcode V5 Python style).</summary>
     public static class Examples {
@@ -9,6 +11,7 @@ namespace Protobot.RobotCode {
             ("Gyro turns (SmartDrive)", "Turns to exact headings with the Inertial sensor", Gyro),
             ("Pneumatics on a button", "Button A toggles a piston", Pneumatics),
             ("Read the sensors", "Prints every sensor to the Brain's screen", Sensors),
+            ("Vision: drive to a color", "Turns toward the largest object of a Vision signature and drives up to it", Vision),
             ("PID tuning (graph)", "Your own PID loop: open the Graph tab and tune kP, kI, kD", Pid),
             ("Odometry and motions (LemLib style)", "move_to_point, turn_to_heading, move_to_pose and pure pursuit, with odometry", Odometry),
             ("Autonomous selector (touch screen)", "Tap a button on the Brain's screen to pick the autonomous", Selector),
@@ -25,6 +28,7 @@ namespace Protobot.RobotCode {
             var start = code.IndexOf(cpp ? "// {devices}" : "# {devices}", System.StringComparison.Ordinal);
             var end = code.IndexOf(cpp ? "// {/devices}" : "# {/devices}", System.StringComparison.Ordinal);
             string config = null;
+            string visionName = "vision_5", sigName = "vision_5__SIG_1";
             try { config = cpp ? DeviceConfig.GenerateCpp(!DeviceConfig.UsesVexcode(code), DeviceConfig.UsesEz(code)) : DeviceConfig.Generate(); }
             catch (System.Exception e) { UnityEngine.Debug.LogWarning("V2: example devices: " + e.Message); }
             var drive = DeviceConfig.LastDrive;
@@ -33,6 +37,16 @@ namespace Protobot.RobotCode {
                 if (lineEnd < 0) lineEnd = code.Length;
                 if (drive != null && config != null) {
                     var mine = config.TrimEnd('\n', '\r');
+                    // V2: the Vision example names the robot's own sensor and its first signature (none: the example's).
+                    if (code.Contains("{vision}")) {
+                        var vis = Devices.V5Brain.Devices.OfType<Devices.VisionSensor>().FirstOrDefault(v => v.OnBrain);
+                        if (vis != null) {
+                            visionName = DeviceConfig.Name(Motion.Controls.GivenName(vis.part) ?? "vision_" + vis.port, new System.Collections.Generic.HashSet<string>());
+                            var first = Devices.VisionSensor.Saved(vis.part).FirstOrDefault(s => s.HasValue);
+                            sigName = first.HasValue ? visionName + "__" + Devices.VisionSignature.Clean(first.Value.name) : "Signature(1, 8000, 11000, 9500, -1500, -500, -1000, 2.5, 0)";
+                        }
+                        else mine += "\n" + DefaultVision + "   # (no Vision Sensor on the robot yet: add one from Electronics)";
+                    }
                     if (!drive.Value.imu) mine += cpp ? (DeviceConfig.UsesVexcode(code) || DeviceConfig.UsesEz(code) ? "" : "\n// (no Inertial sensor on the robot: LemLib takes the heading from the drive wheels)")
                                                       : "\nimu = None   # (no Inertial sensor on the robot: the heading comes from the drive wheels)";
                     code = code.Substring(0, start) + mine + code.Substring(lineEnd);
@@ -42,6 +56,7 @@ namespace Protobot.RobotCode {
                     code = code.Substring(0, start) + code.Substring(startEnd + 1, end - startEnd - 1) + code.Substring(System.Math.Min(code.Length, lineEnd + 1));
                 }
             }
+            code = code.Replace("{vision}", visionName).Replace("{sig}", sigName);
             string F(double v) => v.ToString("0.###", System.Globalization.CultureInfo.InvariantCulture);
             var wheel = drive?.diameter ?? 4f;
             var ratio = drive?.ratio ?? 1f;
@@ -184,6 +199,44 @@ while True:
     brain.screen.next_row()
     brain.screen.print(""Hue:"", optical.hue())
     wait(100, MSEC)
+";
+
+        private const string DefaultVision = "vision_5__SIG_1 = Signature(1, 8000, 11000, 9500, -1500, -500, -1000, 2.5, 0)\nvision_5 = Vision(Ports.PORT5, 50, vision_5__SIG_1)";
+
+        // V2: the Vision Sensor, as VEXcode's vision tutorials use it: snapshot a signature, steer by the largest
+        // object's centerX, stop when it's big (close).
+        private const string Vision = @"# Vision Sensor: turns toward the largest object of a color and drives up to it.
+# First make the color's signature: Edit > Devices..., open the Vision Sensor's card > Vision Utility,
+# drag a box over the object and Set signature 1. Then run this (Insert devices puts your robot's in).
+from vex import *
+
+brain = Brain()
+# {devices}
+left_drive = MotorGroup(Motor(Ports.PORT1, GearSetting.RATIO_18_1, False))
+right_drive = MotorGroup(Motor(Ports.PORT10, GearSetting.RATIO_18_1, True))
+vision_5__SIG_1 = Signature(1, 8000, 11000, 9500, -1500, -500, -1000, 2.5, 0)
+vision_5 = Vision(Ports.PORT5, 50, vision_5__SIG_1)
+# {/devices}
+
+CENTER = 158     # the middle of the picture (it's 316 wide, 212 high)
+CLOSE = 140      # wide enough on the picture: we're there
+
+while True:
+    objects = {vision}.take_snapshot({sig})
+    brain.screen.clear_screen()
+    brain.screen.set_cursor(1, 1)
+    if objects:
+        target = objects[0]          # the largest
+        turn = (target.centerX - CENTER) * 0.25   # to the right of the middle: turn right
+        forward = 0 if target.width > CLOSE else 30
+        left_drive.spin(FORWARD, forward + turn, PERCENT)
+        right_drive.spin(FORWARD, forward - turn, PERCENT)
+        brain.screen.print(""x"", target.centerX, ""width"", target.width)
+    else:
+        left_drive.spin(FORWARD, 12, PERCENT)    # look round for it
+        right_drive.spin(REVERSE, 12, PERCENT)
+        brain.screen.print(""looking..."")
+    wait(20, MSEC)
 ";
 
         private const string Pid = @"# PID tuning with the Graph tab: it draws every ""name: number"" your program prints.

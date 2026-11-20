@@ -283,7 +283,7 @@ class distance {
   bool installed();
 };
 
-/** The V5 Vision Sensor. What it sees isn't simulated yet: a snapshot finds no objects. */
+/** The V5 Vision Sensor: sees the field and robots; takeSnapshot finds a signature's (or code's) objects, largest first. */
 class vision {
  public:
   class signature {
@@ -304,6 +304,7 @@ class vision {
   template <class... S> vision(std::int32_t index, std::uint8_t brightness = 50, S... signatures);
   std::int32_t takeSnapshot(const signature& sig, std::int32_t count = 8);
   std::int32_t takeSnapshot(std::uint32_t id, std::int32_t count = 8);
+  std::int32_t takeSnapshot(const code& c, std::int32_t count = 8);
   object objects[16];
   object largestObject;
   std::int32_t objectCount;

@@ -115,6 +115,7 @@ namespace Protobot.Devices {
             DeviceKind.Accelerometer => new Accelerometer(part),
             DeviceKind.Gyro => new YawGyro(part),
             DeviceKind.Bumper or DeviceKind.Limit => new SwitchSensor(part, kind),
+            DeviceKind.Vision => new VisionSensor(part),   // V2
             _ => new PlainDevice(part, kind),
         };
 
