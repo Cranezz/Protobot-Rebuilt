@@ -1,0 +1,20 @@
+// (Code window open in blocks mode) reload the program as a build would; Show the Python; Convert to text; back.
+var T = typeof(Protobot.RobotCode.CodePanel);
+var F = System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance;
+var panel = UnityEngine.Object.FindAnyObjectByType<Protobot.RobotCode.CodePanel>();
+var editor = (Protobot.RobotCode.Blocks.BlockEditor)T.GetField("blocks", F).GetValue(panel);
+var before = editor.program.Json();
+var src = Protobot.RobotCode.CodeStore.Source;
+Protobot.RobotCode.CodeStore.Load("print('text')\n");
+var textMode = !editor.gameObject.activeSelf;
+Protobot.RobotCode.CodeStore.Load(src);
+var after = editor.program.Json();
+var sb = new System.Text.StringBuilder();
+sb.Append("text mode after loading text " + textMode + "; blocks back " + editor.gameObject.activeSelf + ", same blocks " + (before == after) + "; ");
+T.GetField("showPython", F).SetValue(panel, true); T.GetMethod("UpdateMode", F).Invoke(panel, null);
+var field = (TMPro.TMP_InputField)T.GetField("field", F).GetValue(panel);
+sb.Append("show python: blocks hidden " + !editor.gameObject.activeSelf + ", read-only " + field.readOnly + "; ");
+T.GetField("showPython", F).SetValue(panel, false); T.GetMethod("UpdateMode", F).Invoke(panel, null);
+T.GetMethod("ConvertToText", F).Invoke(panel, null);
+sb.Append("converted: blocks " + Protobot.RobotCode.Blocks.BlockProgram.IsBlocks(Protobot.RobotCode.CodeStore.Source) + ", editable " + !field.readOnly + ", starts '" + Protobot.RobotCode.CodeStore.Source.Substring(0, 16) + "'; ");
+return sb.ToString();

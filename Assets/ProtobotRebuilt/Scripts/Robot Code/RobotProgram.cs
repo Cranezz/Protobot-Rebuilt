@@ -44,6 +44,9 @@ namespace Protobot.RobotCode {
         internal readonly List<Action> pollers = new();        // events: each step, after the threads
         private readonly Dictionary<MotorDrive, MotorControl> motors = new();
         private readonly HashSet<string> warned = new();
+        /// <summary>V2: the program as written (a project: all its files) and its files that aren't code (path files).</summary>
+        internal string source = "";
+        internal Dictionary<string, string> files = new(StringComparer.OrdinalIgnoreCase);
 
         // V2 (the code window's Monitor): what monitor_variable / monitor_sensor asked for, and the names the
         // interpreter had before the program ran (not the program's own variables).
@@ -74,6 +77,10 @@ namespace Protobot.RobotCode {
             error = null;
             line = 0;
             var program = new RobotProgram(period, limit);
+            // V2: a project (several files): its code files are the program, the rest are files it reads.
+            program.source = source ?? "";
+            program.files = CodeProject.Files(source);
+            source = CodeProject.CodeOnly(source);
             try {
                 // V2: C++ (PROS / LemLib / VEXcode C++) runs on the same interpreter, translated.
                 if (Scripting.CppTranslator.LooksLikeCpp(source)) {
@@ -87,7 +94,7 @@ namespace Protobot.RobotCode {
                 else program.mainFiber = program.vm.Load(source ?? "");
             }
             catch (SyntaxErr e) {
-                error = "Line " + e.line + ": " + e.Message;
+                error = "Line " + e.line + program.InFile(e.line) + ": " + e.Message;
                 line = e.line;
                 return false;
             }
@@ -161,7 +168,7 @@ namespace Protobot.RobotCode {
             Failed = true;
             ErrorLine = e.line;
             var sb = new StringBuilder();
-            sb.Append("\nError on line ").Append(e.line).Append(": ").Append(e.Describe).Append('\n');
+            sb.Append("\nError on line ").Append(e.line).Append(": ").Append(e.Describe).Append(InFile(e.line)).Append('\n');
             foreach (var t in e.trace.Skip(1).Reverse()) sb.Append("  called from ").Append(t).Append('\n');
             Print(sb.ToString());
             Builds.ActionLog.Write("code", "error line " + e.line + " " + e.Describe);
@@ -181,7 +188,13 @@ namespace Protobot.RobotCode {
 
         /// <summary>Once per thing a program does wrong without stopping (a motor on an empty port).</summary>
         internal void Warn(string key, string text) {
-            if (warned.Add(key)) Print("[warning, line " + vm.Current?.Line + "] " + text + "\n");
+            if (warned.Add(key)) Print("[warning, line " + vm.Current?.Line + InFile(vm.Current?.Line ?? 0) + "] " + text + "\n");
+        }
+
+        /// <summary>V2: " (src/main.cpp line 42)" for a line of a project, "" for a single program.</summary>
+        internal string InFile(int line) {
+            var where = CodeProject.Where(source, line);
+            return where == "" ? "" : " (" + where + ")";
         }
 
         internal int Line => vm.Current?.Line ?? 0;

@@ -354,6 +354,7 @@ namespace Protobot.RobotCode {
         public string stopping = "COAST";
         public double timeout;             // seconds, 0: none
         private MotorControl control;
+        private int spinning;              // V2: spin(dir) under way: set_velocity changes its speed (VEXcode)
 
         public VexMotor(RobotProgram p, Args a) {
             program = p;
@@ -369,6 +370,7 @@ namespace Protobot.RobotCode {
                 var dir = Dir(a2.Need(0, "direction"));
                 var unit = UnitName(a2.Get(2, "units"), "RPM");
                 var c = Control;
+                spinning = 0;
                 if (c == null) return PyNone.Value;
                 if (unit == "VOLT" || unit == "MV") {
                     var v = a2.Number(1, "velocity", 12);
@@ -377,9 +379,11 @@ namespace Protobot.RobotCode {
                 }
                 var share = a2.Has(1, "velocity") && !(a2.Get(1, "velocity") is PyNone) ? Share(a2.Number(1, "velocity", 0), unit) : velocity;
                 c.Spin((float)(dir * Sign * share));
+                spinning = dir < 0 ? -1 : 1;
                 return PyNone.Value;
             });
             Method("spin_for", a2 => {
+                spinning = 0;
                 a2 = WaitFlag(a2, 5);   // V2 (C++): spinFor(fwd, 90, deg, false)
                 var dir = Dir(a2.Need(0, "direction"));
                 var amount = a2.Number(1, "rotation", 0);
@@ -395,6 +399,7 @@ namespace Protobot.RobotCode {
                 return MoveTo(Position() + dir * deg, speed, a2, 5);
             });
             Method("spin_to_position", a2 => {
+                spinning = 0;
                 a2 = WaitFlag(a2, 4);
                 var target = ToDegrees(a2.Number(0, "rotation", 0), UnitName(a2.Get(1, "units"), "DEGREES"));
                 var speed = a2.Has(2, "velocity") && !(a2.Get(2, "velocity") is PyNone) ? Share(a2.Number(2, "velocity", 0), UnitName(a2.Get(3, "units_v"), "RPM")) : velocity;
@@ -402,11 +407,15 @@ namespace Protobot.RobotCode {
             });
             Method("stop", a2 => {
                 var how = a2.Count > 0 ? UnitName(a2.pos[0], stopping) : stopping;
+                spinning = 0;
                 Control?.StopMotor(how);
                 return PyNone.Value;
             });
             Method("set_velocity", a2 => {
                 velocity = Share(a2.Number(0, "velocity", 50), UnitName(a2.Get(1, "units"), "RPM"));
+                // V2: on a motor already spinning it changes the speed at once (VEXcode; VEX's forum answers).
+                var c = Control;
+                if (spinning != 0 && c != null && c.mode == MotorControl.Mode.Velocity) c.Spin((float)(spinning * Sign * velocity));
                 return PyNone.Value;
             });
             Method("set_stopping", a2 => {
@@ -571,6 +580,11 @@ namespace Protobot.RobotCode {
             Method("is_done", _ => motors.All(m => m.Control == null || m.Control.done));
             Method("is_spinning", _ => motors.Any(m => m.Control != null && Mathf.Abs(m.Control.Level) > 0.01f));
             Method("count", _ => (long)motors.Length);
+            // V2: the rest of VEXcode's MotorGroup (the VS Code stub check found them missing).
+            Method("temperature", a => motors.Average(m => Ops.ToDouble(p.vm.CallSync(Get(m, "temperature"), a.pos, a.kw))));
+            Method("efficiency", a => motors.Average(m => Ops.ToDouble(p.vm.CallSync(Get(m, "efficiency"), a.pos, a.kw))));
+            Method("direction", a => p.vm.CallSync(Get(motors[0], "direction"), a.pos, a.kw));
+            Method("installed", a => motors.All(m => Ops.Truthy(p.vm.CallSync(Get(m, "installed"), a.pos, a.kw))));
         }
 
         private static object Get(VexMotor m, string name) => m.TryGetAttr(name, out var f) ? f : null;
@@ -604,6 +618,7 @@ namespace Protobot.RobotCode {
         private double turnThreshold = 1.0;
         private double turnConstant = 1.0;
         private bool turning;   // a gyro turn under way
+        private int driving, spinningTurn;   // V2: drive(dir) / turn(dir) under way: the set velocities change their speed
 
         public VexDrive(RobotProgram p, Args a, bool smart) {
             program = p;
@@ -626,9 +641,12 @@ namespace Protobot.RobotCode {
                 var v = a2.Has(1, "velocity") && !(a2.Get(1, "velocity") is PyNone) ? Share(a2.Number(1, "velocity", 0), UnitName(a2.Get(2, "units"), "RPM")) : driveVelocity;
                 turning = false;
                 foreach (var m in left.Concat(right)) m.Control?.Spin((float)(dir * m.Sign * v));
+                driving = dir < 0 ? -1 : 1;
+                spinningTurn = 0;
                 return PyNone.Value;
             });
             Method("drive_for", a2 => {
+                driving = spinningTurn = 0;
                 a2 = WaitFlag(a2, 5);
                 var dir = Dir(a2.Need(0, "direction"));
                 var mm = Mm(a2.Number(1, "distance", 0), UnitName(a2.Get(2, "units"), "MM"));
@@ -643,9 +661,12 @@ namespace Protobot.RobotCode {
                 turning = false;
                 foreach (var m in left) m.Control?.Spin((float)(dir * m.Sign * v));
                 foreach (var m in right) m.Control?.Spin((float)(-dir * m.Sign * v));
+                spinningTurn = dir < 0 ? -1 : 1;
+                driving = 0;
                 return PyNone.Value;
             });
             Method("turn_for", a2 => {
+                driving = spinningTurn = 0;
                 a2 = WaitFlag(a2, 5);
                 var dir = Turn(a2.Need(0, "direction"));
                 var angle = a2.Number(1, "angle", 0);
@@ -658,6 +679,7 @@ namespace Protobot.RobotCode {
                 return Move(deg, -deg, v, wait);
             });
             Method("turn_to_heading", a2 => {
+                driving = spinningTurn = 0;
                 a2 = WaitFlag(a2, 4);
                 RequireSmart("turn_to_heading");
                 var target = a2.Number(0, "angle", 0);
@@ -667,18 +689,21 @@ namespace Protobot.RobotCode {
                 return GyroTurn(gyro.Rotation() + delta, v, a2.Bool(4, "wait", true));
             });
             Method("turn_to_rotation", a2 => {
+                driving = spinningTurn = 0;
                 a2 = WaitFlag(a2, 4);
                 RequireSmart("turn_to_rotation");
                 var v = a2.Has(2, "velocity") && !(a2.Get(2, "velocity") is PyNone) ? Share(a2.Number(2, "velocity", 0), UnitName(a2.Get(3, "units_v"), "RPM")) : turnVelocity;
                 return GyroTurn(a2.Number(0, "angle", 0), v, a2.Bool(4, "wait", true));
             });
             Method("stop", a2 => {
+                driving = spinningTurn = 0;
                 var how = a2.Count > 0 ? UnitName(a2.pos[0], stopping) : stopping;
                 turning = false;
                 foreach (var m in left.Concat(right)) m.Control?.StopMotor(how);
                 return PyNone.Value;
             });
-            Method("arcade", a2 => {   // (PROS-style) arcade(forward, turn) in percent
+            Method("arcade", a2 => {
+                driving = spinningTurn = 0;   // (PROS-style) arcade(forward, turn) in percent
                 var f = a2.Number(0, "drive_power", 0) / 100.0;
                 var t = a2.Number(1, "turn_power", 0) / 100.0;
                 turning = false;
@@ -688,10 +713,16 @@ namespace Protobot.RobotCode {
             });
             Method("set_drive_velocity", a2 => {
                 driveVelocity = Share(a2.Number(0, "velocity", 50), UnitName(a2.Get(1, "units"), "RPM"));
+                if (driving != 0)   // V2: driving already: the new speed at once (VEXcode)
+                    foreach (var m in left.Concat(right)) if (m.Control is MotorControl c && c.mode == MotorControl.Mode.Velocity) c.Spin((float)(driving * m.Sign * driveVelocity));
                 return PyNone.Value;
             });
             Method("set_turn_velocity", a2 => {
                 turnVelocity = Share(a2.Number(0, "velocity", 50), UnitName(a2.Get(1, "units"), "RPM"));
+                if (spinningTurn != 0) {
+                    foreach (var m in left) if (m.Control is MotorControl c && c.mode == MotorControl.Mode.Velocity) c.Spin((float)(spinningTurn * m.Sign * turnVelocity));
+                    foreach (var m in right) if (m.Control is MotorControl c && c.mode == MotorControl.Mode.Velocity) c.Spin((float)(-spinningTurn * m.Sign * turnVelocity));
+                }
                 return PyNone.Value;
             });
             Method("set_stopping", a2 => {
@@ -1098,6 +1129,59 @@ namespace Protobot.RobotCode {
                     Method("is_calibrating", _ => false);
                     break;
             }
+        }
+    }
+    /// <summary>V2: the V5 Vision Sensor's API (VEXcode's vision / Vision: signatures, take_snapshot, objects,
+    /// largest_object, object_count). What it sees isn't simulated yet: a snapshot finds nothing (warned once).</summary>
+    internal sealed class VexVision : VexObject {
+        public override string TypeName => "Vision";
+        public VexVision(RobotProgram p, Args a) {
+            var (port, _) = Port(a.Need(0, "port"), "Vision");
+            var none = new VexVisionObject();
+            var objects = new PyList();
+            for (var i = 0; i < 16; i++) objects.items.Add(new VexVisionObject());
+            Field("objects", objects);
+            Field("object_count", 0L);
+            Field("largest_object", none);
+            void Seen() {
+                if (p.Device<V5Device>(port, false, "Vision Sensor") != null)
+                    p.Warn("vision" + port, "Vision Sensor on port " + port + ": what it sees isn't simulated yet, so a snapshot finds no objects");
+            }
+            Method("take_snapshot", _ => {
+                Seen();
+                Field("object_count", 0L);
+                return p.Cpp ? (object)0L : new PyTuple(new object[0]);
+            });
+            Method("installed", _ => p.Device<V5Device>(port, false, "Vision Sensor") != null);
+            Method("timestamp", _ => (long)(p.Time * 1000));
+            foreach (var n in new[] { "set_brightness", "set_signature", "set_led", "set_led_mode", "set_led_brightness", "set_led_color", "set_white_balance", "set_white_balance_mode", "set_wifi_mode" })
+                Method(n, _ => PyNone.Value);
+        }
+    }
+
+    /// <summary>V2: one object a Vision snapshot found (none found: exists is false).</summary>
+    internal sealed class VexVisionObject : VexObject {
+        public override string TypeName => "VisionObject";
+        public VexVisionObject() {
+            Field("id", 0L);
+            Field("center_x", 0L);
+            Field("center_y", 0L);
+            Field("origin_x", 0L);
+            Field("origin_y", 0L);
+            Field("width", 0L);
+            Field("height", 0L);
+            Field("angle", 0.0);
+            Field("exists", false);
+        }
+    }
+
+    /// <summary>V2: a Vision signature (VEXcode's Signature(index, uMin, uMax, uMean, vMin, vMax, vMean, range, type))
+    /// or color code: kept as given.</summary>
+    internal sealed class VexVisionSignature : VexObject {
+        public override string TypeName => "Signature";
+        public VexVisionSignature(Args a) {
+            Field("id", a.pos.Length > 0 ? a.pos[0] : 0L);
+            Field("values", new PyList(a.pos));
         }
     }
 }

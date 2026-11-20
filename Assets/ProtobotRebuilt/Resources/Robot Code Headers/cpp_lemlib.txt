@@ -3,6 +3,12 @@
 #pragma once
 #include "api.h"
 
+/** A path file of the project's static folder (path.jerryio "x, y, speed" lines); ASSET(path_txt) = static/path.txt. */
+struct asset {
+  const char* name;
+};
+#define ASSET(x) static asset x = {#x};
+
 namespace lemlib {
 
 struct Pose {
@@ -48,6 +54,28 @@ class ControllerSettings {
  public:
   ControllerSettings(float kP, float kI, float kD, float windupRange, float smallError, float smallErrorTimeout, float largeError,
                      float largeErrorTimeout, float slew);
+  /** LemLib 0.5's pre-release: (kP, kD, smallError, smallErrorTimeout, largeError, largeErrorTimeout, slew). */
+  ControllerSettings(float kP, float kD, float smallError, float smallErrorTimeout, float largeError, float largeErrorTimeout,
+                     float slew);
+};
+
+// LemLib 0.4's settings (brace-initialized).
+struct Drivetrain_t {
+  pros::MotorGroup* leftMotors;
+  pros::MotorGroup* rightMotors;
+  float trackWidth;
+  float wheelDiameter;
+  float rpm;
+};
+struct ChassisController_t {
+  float kP, kD, smallError, smallErrorTimeout, largeError, largeErrorTimeout, slew;
+};
+struct OdomSensors_t {
+  TrackingWheel* vertical1;
+  TrackingWheel* vertical2;
+  TrackingWheel* horizontal1;
+  TrackingWheel* horizontal2;
+  pros::Imu* imu;
 };
 
 class DriveCurve {
@@ -105,6 +133,8 @@ class Chassis {
  public:
   Chassis(Drivetrain drivetrain, ControllerSettings linearSettings, ControllerSettings angularSettings, OdomSensors sensors,
           DriveCurve* throttleCurve = nullptr, DriveCurve* steerCurve = nullptr);
+  /** LemLib 0.4. */
+  Chassis(Drivetrain_t drivetrain, ChassisController_t lateralSettings, ChassisController_t angularSettings, OdomSensors_t sensors);
   /** Calibrates the IMU (about 2 s) and starts odometry. */
   void calibrate(bool calibrateIMU = true);
   void setPose(float x, float y, float theta, bool radians = false);
@@ -120,8 +150,19 @@ class Chassis {
   void moveToPoint(float x, float y, int timeout, MoveToPointParams params = {}, bool async = true);
   /** Boomerang: arrives at (x, y) facing theta. */
   void moveToPose(float x, float y, float theta, int timeout, MoveToPoseParams params = {}, bool async = true);
-  /** Pure pursuit through the points ({{0, 0}, {0, 24}, {24, 36}}); LemLib's path files (ASSET) aren't read yet. */
+  /** Pure pursuit through the points ({{0, 0}, {0, 24}, {24, 36}}). */
   void follow(std::vector<Pose> path, float lookahead, int timeout, bool forwards = true, bool async = true);
+  /** Pure pursuit along a path file: ASSET(path_txt) then follow(path_txt, lookahead, timeout). */
+  void follow(const asset& path, float lookahead, int timeout, bool forwards = true, bool async = true);
+  /** LemLib 0.4: a path file from the SD card (here: the project's), waits. */
+  void follow(const char* filePath, int timeout, float lookahead, bool reverse = false, float maxSpeed = 127, bool log = false);
+  /** LemLib 0.4 (x, y, timeout, reversed, maxSpeed) and 0.5's pre-release (x, y, timeout, forwards, maxSpeed, async). */
+  template <class... Args> void turnTo(float x, float y, int timeout, Args... more);
+  /** LemLib 0.4: (x, y, timeout, maxSpeed), waits; 0.5's pre-release: (x, y, theta, timeout, forwards, chasePower, lead,
+      maxSpeed, async), boomerang. */
+  template <class... Args> void moveTo(float x, float y, Args... more);
+  /** LemLib 0.5's pre-release: 0.4's moveTo. */
+  void moveToOld(float x, float y, int timeout, bool forwards = true, bool async = false, float maxSpeed = 127);
   void tank(int left, int right, bool disableDriveCurve = false);
   void arcade(int throttle, int turn, bool disableDriveCurve = false, float desaturateBias = 0.5);
   void curvature(int throttle, int turn, bool disableDriveCurve = false);

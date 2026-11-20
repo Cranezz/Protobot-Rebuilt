@@ -129,6 +129,11 @@ class Motor : public AbstractMotor {
   /** port 1-21, negative to reverse it. */
   Motor(std::int8_t port, MotorGears gearset = MotorGears::green, MotorUnits encoder_units = MotorUnits::degrees);
   Motor(std::int8_t port, motor_gearset_e_t gearset, motor_encoder_units_e_t encoder_units = E_MOTOR_ENCODER_DEGREES);
+  /** PROS 3: a reversed flag in place of a negative port. */
+  Motor(std::int8_t port, motor_gearset_e_t gearset, bool reverse, motor_encoder_units_e_t encoder_units = E_MOTOR_ENCODER_DEGREES);
+  Motor(std::int8_t port, bool reverse);
+  /** motor = power: move(power), -127 to 127. */
+  std::int32_t operator=(std::int32_t voltage);
 };
 
 class MotorGroup : public AbstractMotor {
@@ -138,6 +143,8 @@ class MotorGroup : public AbstractMotor {
   MotorGroup(std::initializer_list<std::int8_t> ports, motor_gearset_e_t gearset);
   /** PROS 3: a group of Motor objects. */
   MotorGroup(std::initializer_list<Motor> motors);
+  /** group = power: move(power), -127 to 127. */
+  std::int32_t operator=(std::int32_t voltage);
 };
 typedef MotorGroup Motor_Group;
 
@@ -168,6 +175,8 @@ class Rotation {
  public:
   /** port 1-21, negative to reverse it. */
   explicit Rotation(std::int8_t port);
+  /** PROS 3: a reversed flag in place of a negative port. */
+  Rotation(std::int8_t port, bool reverse_flag);
   /** Centidegrees (36000 a turn), added up. */
   std::int32_t get_position() const;
   /** Centidegrees, 0 to 35999. */
@@ -269,6 +278,7 @@ bool print(std::int16_t line, const char* fmt, ...);
 bool set_text(std::int16_t line, std::string text);
 bool clear_line(std::int16_t line);
 bool clear();
+/** The LLEMU buttons pressed (LCD_BTN_LEFT 4, LCD_BTN_CENTER 2, LCD_BTN_RIGHT 1); the simulator has none pressed. */
 std::uint8_t read_buttons();
 }  // namespace lcd
 
@@ -285,6 +295,9 @@ std::uint8_t is_competition_switch();
 }  // namespace pros
 
 // PROS's short names (PROS_USE_SIMPLE_NAMES, on in its template).
+#define LCD_BTN_LEFT 4
+#define LCD_BTN_CENTER 2
+#define LCD_BTN_RIGHT 1
 #define CONTROLLER_MASTER pros::E_CONTROLLER_MASTER
 #define CONTROLLER_PARTNER pros::E_CONTROLLER_PARTNER
 #define ANALOG_LEFT_X pros::E_CONTROLLER_ANALOG_LEFT_X

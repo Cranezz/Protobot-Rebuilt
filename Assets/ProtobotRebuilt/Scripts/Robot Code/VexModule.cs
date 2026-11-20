@@ -189,6 +189,15 @@ namespace Protobot.RobotCode {
             Class("Thread", a => new VexThread(program, a));
             Class("Competition", a => program.SetCompetition(a.Need(0, "driver_control"), a.Need(1, "autonomous")));
             Class("Event", a => new VexEvent(program, a));
+            // V2: the Vision Sensor (vision.signature / vision.code in C++).
+            var vision = new PyClass("Vision", null) { construct = (_, a) => new VexVision(program, a) };
+            var signature = new PyClass("Signature", null) { construct = (_, a) => new VexVisionSignature(a) };
+            var code = new PyClass("Code", null) { construct = (_, a) => new VexVisionSignature(a) };
+            vision.dict["signature"] = signature;
+            vision.dict["code"] = code;
+            m.globals["Vision"] = vision;
+            m.globals["Signature"] = signature;
+            m.globals["Code"] = code;
             return m;
         }
 

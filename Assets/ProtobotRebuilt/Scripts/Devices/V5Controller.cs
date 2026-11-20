@@ -142,37 +142,72 @@ namespace Protobot.Devices {
 
         // ------------------------------------------------------------------ reading it
 
-        private static readonly Dictionary<string, InputControl> padControls = new();
-        private static Gamepad padFor;
+        private static readonly Dictionary<string, (InputControl control, float sign)> padControls = new();
+        private static InputDevice padFor;
 
-        private static InputControl Pad(string id) {
-            var pad = Gamepad.current;
-            if (pad == null) return null;
-            if (pad != padFor) {
-                padControls.Clear();
-                padFor = pad;
+        /// <summary>V2: the controller in use: a gamepad (Xbox, PlayStation, Switch...) first, else any other USB
+        /// joystick or game controller Windows sees as a plain joystick (generic HID), or null.</summary>
+        public static InputDevice Device => (InputDevice)Gamepad.current ?? Joystick.current;
+
+        /// <summary>V2: what to call it on screen ("Xbox Controller"), or null when none is plugged in.</summary>
+        public static string DeviceName {
+            get {
+                var device = Device;
+                if (device == null) return null;
+                var name = string.IsNullOrEmpty(device.description.product) ? device.displayName : device.description.product;
+                return string.IsNullOrEmpty(name) ? device.name : name;
             }
+        }
+
+        // V2: a gamepad binding on a plain joystick: its stick is the left stick, its second stick (z / rz on most HID
+        // game controllers) the right one, its hat the d-pad. Buttons have no standard places: bind them on the
+        // controller screen.
+        private static string JoystickFallback(string relative) => relative switch {
+            "leftStick/up" => "stick/up", "leftStick/down" => "stick/down", "leftStick/left" => "stick/left", "leftStick/right" => "stick/right",
+            "rightStick/up" => "rz/-", "rightStick/down" => "rz/+", "rightStick/left" => "z/-", "rightStick/right" => "z/+",
+            "dpad/up" => "hat/up", "dpad/down" => "hat/down", "dpad/left" => "hat/left", "dpad/right" => "hat/right",
+            _ => null,
+        };
+
+        private static (InputControl control, float sign) Pad(string id) {
             var path = PadOf(id);
-            if (string.IsNullOrEmpty(path)) return null;
-            var cacheKey = id + "|" + path;
-            if (!padControls.TryGetValue(cacheKey, out var control)) {
-                control = InputSystem.FindControl(path.Replace("<Gamepad>", pad.path));
-                if (control == null) {
-                    var relative = path.Replace("<Gamepad>/", "");
-                    control = pad.TryGetChildControl(relative);
-                }
-                padControls[cacheKey] = control;
+            if (string.IsNullOrEmpty(path)) return (null, 1f);
+            var slash = path.IndexOf('/');
+            if (slash < 0) return (null, 1f);
+            var relative = path.Substring(slash + 1);
+            InputDevice device;
+            if (path.StartsWith("<Joystick>")) device = Joystick.current;
+            else if (Gamepad.current != null) device = Gamepad.current;
+            else {
+                device = Joystick.current;
+                relative = device == null ? null : JoystickFallback(relative);
             }
-            return control;
+            if (device == null || relative == null) return (null, 1f);
+            if (device != padFor) {
+                padControls.Clear();
+                padFor = device;
+            }
+            var cacheKey = id + "|" + path;
+            if (!padControls.TryGetValue(cacheKey, out var found)) {
+                // A plain axis bound one way: "rz/-" is rz pushed negative.
+                var sign = 1f;
+                if (relative.EndsWith("/+") || relative.EndsWith("/-")) {
+                    sign = relative.EndsWith("-") ? -1f : 1f;
+                    relative = relative.Substring(0, relative.Length - 2);
+                }
+                found = (device.TryGetChildControl(relative), sign);
+                padControls[cacheKey] = found;
+            }
+            return found;
         }
 
         private static float PadValue(string id) {
-            var control = Pad(id);
+            var (control, sign) = Pad(id);
             if (control == null) return 0f;
             try {
                 return control switch {
                     ButtonControl b => b.ReadValue(),
-                    AxisControl a => Mathf.Max(0f, a.ReadValue()),
+                    AxisControl a => Mathf.Max(0f, sign * a.ReadValue()),
                     _ => Convert.ToSingle(control.ReadValueAsObject()),
                 };
             }
@@ -211,7 +246,7 @@ namespace Protobot.Devices {
 
         /// <summary>Whether the gamepad control of the button a key is on is held (a motor set to that key runs).</summary>
         public static bool PadHeldForKey(Key key) {
-            if (key == Key.None || Gamepad.current == null) return false;
+            if (key == Key.None || Device == null) return false;
             foreach (var id in Buttons)
                 if (KeyOf(id) == key && PadValue(id) > 0.5f) return true;
             return false;
@@ -219,7 +254,7 @@ namespace Protobot.Devices {
 
         /// <summary>Whether that gamepad control went down this frame.</summary>
         public static bool PadPressedForKey(Key key) {
-            if (key == Key.None || Gamepad.current == null) return false;
+            if (key == Key.None || Device == null) return false;
             if (padFrame != Time.frameCount) {
                 padFrame = Time.frameCount;
                 padWas.Clear();
@@ -241,6 +276,11 @@ namespace Protobot.Devices {
         public static string PadLabel(string id) {
             var path = PadOf(id);
             if (string.IsNullOrEmpty(path)) return "—";
+            if (path.StartsWith("<Joystick>/")) {   // V2: a plain joystick's control: "Joy button 3", "Joy stick up", "Joy z+"
+                var joy = path.Substring("<Joystick>/".Length).Replace("/+", "+").Replace("/-", "-").Replace("/", " ");
+                joy = System.Text.RegularExpressions.Regex.Replace(joy, @"^button(\d+)", "button $1");
+                return "Joy " + joy;
+            }
             var name = path.Replace("<Gamepad>/", "");
             return name switch {
                 "leftShoulder" => "LB", "rightShoulder" => "RB", "leftTrigger" => "LT", "rightTrigger" => "RT",
@@ -257,8 +297,13 @@ namespace Protobot.Devices {
             _ => id,
         };
 
+        // V2: a plain joystick's axes where they were when binding began (a trigger may rest at -1).
+        private static readonly Dictionary<InputControl, float> axisRest = new();
+        private static int restFrame = -10;
+
         /// <summary>The gamepad control pressed this frame (to bind it), as a path, or null.</summary>
         public static string PressedPadControl() {
+            if (Gamepad.current == null && Joystick.current != null) return PressedJoystickControl(Joystick.current);
             var pad = Gamepad.current;
             if (pad == null) return null;
             foreach (var c in pad.allControls) {
@@ -273,6 +318,33 @@ namespace Protobot.Devices {
                 if (v.magnitude < 0.6f) continue;
                 var dir = Mathf.Abs(v.x) > Mathf.Abs(v.y) ? (v.x > 0 ? "right" : "left") : (v.y > 0 ? "up" : "down");
                 return "<Gamepad>/" + name + "/" + dir;
+            }
+            return null;
+        }
+
+        /// <summary>V2: the same for a plain joystick: a button or hat, its stick pushed a way, or another axis moved
+        /// well away from where it rested when binding began ("&lt;Joystick&gt;/rz/-").</summary>
+        private static string PressedJoystickControl(Joystick joystick) {
+            var fresh = Time.frameCount - restFrame > 1;
+            restFrame = Time.frameCount;
+            if (fresh) axisRest.Clear();
+            string Relative(InputControl c) => c.path.Substring(joystick.path.Length + 1);
+            foreach (var c in joystick.allControls) {
+                if (c is ButtonControl b && !c.synthetic && b.wasPressedThisFrame && !(c.parent is StickControl) && c.parent != null)
+                    return "<Joystick>/" + Relative(c);
+            }
+            foreach (var c in joystick.allControls) {
+                if (c is StickControl stick) {
+                    var v = stick.ReadValue();
+                    if (v.magnitude < 0.6f) continue;
+                    var dir = Mathf.Abs(v.x) > Mathf.Abs(v.y) ? (v.x > 0 ? "right" : "left") : (v.y > 0 ? "up" : "down");
+                    return "<Joystick>/" + Relative(stick) + "/" + dir;
+                }
+                if (c is AxisControl axis && !(c is ButtonControl) && c.parent == joystick && !c.synthetic) {
+                    var value = axis.ReadValue();
+                    if (!axisRest.TryGetValue(axis, out var rest)) { axisRest[axis] = value; continue; }
+                    if (Mathf.Abs(value - rest) > 0.6f) return "<Joystick>/" + Relative(axis) + (value > rest ? "/+" : "/-");
+                }
             }
             return null;
         }

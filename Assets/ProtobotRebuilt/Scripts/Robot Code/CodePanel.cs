@@ -55,6 +55,13 @@ namespace Protobot.RobotCode {
         private readonly List<(string text, int caret)> undo = new(), redo = new();
         private float lastSnapshot;
 
+        // V2: Blocks (a blocks program is Python with its blocks in its first line; the editor shows the blocks, or
+        // the Python they make, read-only, with "Show the Python").
+        private Blocks.BlockEditor blocks;
+        private RectTransform gutterArea;
+        private bool showPython;
+        private string blocksSource;
+
         public static bool IsOpen => open != null;
 
         public static void Open() {
@@ -128,6 +135,22 @@ namespace Protobot.RobotCode {
             title.Size(96f, 30f);
             subtitle = Ui.Text(header, "Subtitle", "Python", Theme.FontSmall, Theme.TextDim);
             subtitle.Size(-1, 30f, 1f);
+            // V2: Blocks (VEXcode-style blocks that make the Python).
+            var blocksButton = Ui.Button(header, "Blocks", "Blocks", null, false, 5f, Theme.FontSmall);
+            blocksButton.Size(-1, 26f);
+            Popup.Chevron(blocksButton.transform);
+            blocksButton.transform.Find("Chevron").gameObject.AddComponent<LayoutElement>().ignoreLayout = true;
+            blocksButton.GetComponent<HorizontalLayoutGroup>().padding.right = 24;
+            blocksButton.onClick.AddListener(() => BlocksMenu((RectTransform)blocksButton.transform));
+            Ui.Tip(blocksButton, "Blocks", null, "Program with blocks, as in VEXcode V5 Blocks: drag them from the left, snap them together, Run. They make Python (Show the Python), which you can turn into a text program to go on in Python.");
+            // V2: a project (a PROS / VEXcode folder: several files and path files).
+            var project = Ui.Button(header, "Project", "Project", null, false, 5f, Theme.FontSmall);
+            project.Size(-1, 26f);
+            Popup.Chevron(project.transform);
+            project.transform.Find("Chevron").gameObject.AddComponent<LayoutElement>().ignoreLayout = true;
+            project.GetComponent<HorizontalLayoutGroup>().padding.right = 24;
+            project.onClick.AddListener(() => ProjectMenu((RectTransform)project.transform));
+            Ui.Tip(project, "Project", null, "Open a PROS or VEXcode project folder (its src files, your headers and its path files go in as one program, a marker line before each file), add path.jerryio path files for LemLib's follow(), or jump to a file of the project.");
             var examples = Ui.Button(header, "Examples", "Examples", null, false, 5f, Theme.FontSmall);
             examples.Size(-1, 26f);
             Popup.Chevron(examples.transform);
@@ -282,6 +305,7 @@ namespace Protobot.RobotCode {
             gutterBox.offsetMin = new Vector2(0f, 6f);
             gutterBox.offsetMax = new Vector2(46f, -6f);
             gutterBox.gameObject.AddComponent<RectMask2D>();
+            gutterArea = gutterBox;
             gutter = Ui.Text(gutterBox, "Numbers", "1", FontSize, Theme.TextFaint, MonoFont.Get, TextAlignmentOptions.TopRight);
             gutter.rectTransform.Fill(0, 0, 8, 0);
             gutter.overflowMode = TextOverflowModes.Overflow;
@@ -316,6 +340,9 @@ namespace Protobot.RobotCode {
             field.fontAsset = MonoFont.Get;
             field.pointSize = FontSize;
             field.lineType = TMP_InputField.LineType.MultiLineNewline;
+            // V2: the input field turns wrapping on for multi-line text; the colored copy shown doesn't wrap, so
+            // below a long line the caret and clicks were lines off from the text seen.
+            text.textWrappingMode = TextWrappingModes.NoWrap;
             field.richText = false;
             field.caretColor = new Color(0.9f, 0.9f, 0.9f);
             field.customCaretColor = true;
@@ -335,6 +362,11 @@ namespace Protobot.RobotCode {
                 InputEvents.TextInput.EditEndedFrame = Time.frameCount;
                 Commit();
             });
+
+            // V2: the blocks editor (over the text box while the program is made of blocks).
+            blocks = Blocks.BlockEditor.Create(editor);
+            blocks.onChanged = FromBlocks;
+            UpdateMode();
 
             // Resize from the bottom-right corner.
             var grip = Ui.Image(window, "Grip", new Color(1f, 1f, 1f, 0.12f), 3f, true).rectTransform;
@@ -506,9 +538,127 @@ namespace Protobot.RobotCode {
             Snapshot();
             SetText(CodeStore.Source, field.stringPosition);
             Snapshot();
+            UpdateMode();   // V2: a blocks program opened (another build, VS Code)
+        }
+
+        // ------------------------------------------------------------------ V2: Blocks
+
+        private bool BlocksMode => Blocks.BlockProgram.IsBlocks(field != null ? field.text : CodeStore.Source);
+
+        /// <summary>Shows the blocks or the text box for the program in it (loading its blocks when they changed).</summary>
+        private void UpdateMode() {
+            if (blocks == null) return;
+            var isBlocks = BlocksMode;
+            if (!isBlocks) showPython = false;
+            if (isBlocks && field.text != blocksSource) {
+                var program = Blocks.BlockProgram.FromSource(field.text);
+                if (program != null) {
+                    blocksSource = field.text;
+                    blocks.Load(program);
+                }
+            }
+            var showBlocks = isBlocks && !showPython;
+            blocks.gameObject.SetActive(showBlocks);
+            viewport.gameObject.SetActive(!showBlocks);
+            gutterArea.gameObject.SetActive(!showBlocks);
+            field.readOnly = isBlocks;   // (the Python of a blocks program is made by its blocks)
+            if (isBlocks && window.sizeDelta.x < 900f) {
+                var rootRect = ((RectTransform)Interface.Interface.Root).rect;
+                window.sizeDelta = new Vector2(Mathf.Min(980f, rootRect.width - window.anchoredPosition.x - 20f), window.sizeDelta.y);
+                KeepOnScreen();
+            }
+        }
+
+        // The blocks changed: their program into the text box and the store.
+        private void FromBlocks(string source) {
+            blocksSource = source;
+            syncing = true;
+            field.text = source;
+            syncing = false;
+            highlightDirty = true;
+            errorLine = 0;
+            CodeStore.Set(source);
+        }
+
+        // An error in a blocks program names the block (shown red), not the Python's line numbers.
+        private string BlockError(string text) {
+            var m = System.Text.RegularExpressions.Regex.Match(text, @"^\nError on line (\d+): ([^\n]*)");
+            if (!m.Success) return text;
+            var block = blocks.BlockAt(int.Parse(m.Groups[1].Value));
+            var where = block != null ? "\"" + Blocks.BlockCode.Spec(block) + "\"" : "a block";
+            return "\nError in " + where + " (shown in red): " + m.Groups[2].Value + "\n";
+        }
+
+        private void BlocksMenu(RectTransform anchor) {
+            var examples = Blocks.BlockExamples.Names;
+            if (BlocksMode) {
+                Popup.Open(anchor, new[] { showPython ? "Show the blocks" : "Show the Python", "Convert to a text program", "Clean up blocks", "New blocks program" }.Concat(examples).ToArray(), -1, i => {
+                    if (i == 0) {
+                        showPython = !showPython;
+                        UpdateMode();
+                    }
+                    else if (i == 1) ConvertToText();
+                    else if (i == 2) blocks.CleanUp();
+                    else NewBlocks(i - 4);
+                });
+            }
+            else Popup.Open(anchor, new[] { "New blocks program" }.Concat(examples).ToArray(), -1, i => NewBlocks(i - 1));
+        }
+
+        /// <summary>A new blocks program: empty (a "when started"), or one of the examples (index).</summary>
+        private void NewBlocks() => NewBlocks(-1);
+
+        private void NewBlocks(int example) {
+            var config = "";
+            try { config = DeviceConfig.Generate().TrimEnd('\n', '\r'); }
+            catch (System.Exception e) { Debug.LogWarning("[Blocks] devices: " + e.Message); }
+            Blocks.BlockProgram program;
+            if (example >= 0) program = Blocks.BlockExamples.Make(example, config);
+            else {
+                program = new Blocks.BlockProgram { config = config };
+                var start = Blocks.Block.Make(Blocks.BlockDefs.ById["when_started"]);
+                start.x = 20f;
+                start.y = 20f;
+                program.stacks.Add(start);
+            }
+            var source = program.ToSource(out _);
+            Snapshot();   // (Convert to a text program, then Ctrl+Z, brings the old text back)
+            SetText(source, 0);
+            Snapshot();
+            Commit();
+            showPython = false;
+            UpdateMode();
+            if (!string.IsNullOrWhiteSpace(undo.Count > 1 ? undo[undo.Count - 2].text : ""))
+                output.Append("<color=#8A93A0>New blocks program. The text program it replaced comes back with Blocks > Convert to a text program, then Ctrl+Z.</color>\n");
+            outputDirty = true;
+        }
+
+        private void ConvertToText() {
+            var program = Blocks.BlockProgram.FromSource(field.text);
+            if (program == null) return;
+            var code = Blocks.BlockCode.Generate(program);
+            Snapshot();
+            SetText(code.python, 0);
+            Snapshot();
+            Commit();
+            showPython = false;
+            UpdateMode();
+            output.Append("<color=#8A93A0>Now a text program (Python): Ctrl+Z turns it back into blocks.</color>\n");
+            outputDirty = true;
         }
 
         private void InsertDevices() {
+            if (BlocksMode && blocks != null) {   // V2: the blocks' device dropdowns and configuration from the build again
+                try { blocks.RefreshDevices(DeviceConfig.Generate().TrimEnd('\n', '\r')); }
+                catch (System.Exception e) {
+                    Debug.LogException(e);
+                    Interface.Interface.Say("The devices couldn't be read: " + e.Message, false);
+                    return;
+                }
+                output.Append("<color=#8A93A0>The robot's devices read again: the blocks' dropdowns list them.</color>\n");
+                outputDirty = true;
+                return;
+            }
             string text;
             try { text = DeviceConfig.InsertInto(field.text); }
             catch (System.Exception e) {
@@ -524,11 +674,81 @@ namespace Protobot.RobotCode {
             outputDirty = true;
         }
 
+        // ------------------------------------------------------------------ V2: projects
+
+        private void ProjectMenu(RectTransform anchor) {
+            var sections = CodeProject.Split(field.text);
+            var items = new List<string> { "Open a project folder…", "Add path files…" };
+            items.AddRange(sections.Select(s => "Go to " + s.path));
+            Popup.Open(anchor, items.ToArray(), -1, i => {
+                if (i == 0) OpenProjectFolder();
+                else if (i == 1) AddPathFiles();
+                else if (i - 2 < sections.Count) ScrollToLine(sections[i - 2].markerLine + 1);
+            });
+        }
+
+        private void OpenProjectFolder() {
+            string[] dirs;
+            try { dirs = SFB.StandaloneFileBrowser.OpenFolderPanel("Open a PROS or VEXcode project folder", "", false); }
+            finally { InputEvents.TextInput.AfterFileWindow(); }
+            if (dirs == null || dirs.Length == 0 || string.IsNullOrEmpty(dirs[0])) return;
+            string text, summary;
+            try { text = CodeProject.FromFolder(dirs[0], out summary); }
+            catch (Exception e) {
+                Interface.Interface.Say("That folder couldn't be read: " + e.Message, false);
+                return;
+            }
+            if (text == null) {
+                Interface.Interface.Say("No robot code in that folder (a PROS or VEXcode project has a src folder with .cpp files)", false);
+                return;
+            }
+            Snapshot();
+            SetText(text, 0);
+            Snapshot();
+            Commit();
+            UpdateMode();
+            output.Append("<color=#8A93A0>Opened " + Escape(System.IO.Path.GetFileName(dirs[0].TrimEnd('\\', '/'))) + " (" + Escape(summary) + "). Project > Go to jumps to a file. Check its ports against Edit > Devices (Ctrl+Z puts back what was here).</color>\n");
+            outputDirty = true;
+        }
+
+        private void AddPathFiles() {
+            string[] paths;
+            try { paths = SFB.StandaloneFileBrowser.OpenFilePanel("Add path files (path.jerryio, LemLib)", "", "txt", true); }
+            finally { InputEvents.TextInput.AfterFileWindow(); }
+            if (paths == null || paths.Length == 0) return;
+            var text = field.text;
+            var added = new List<string>();
+            foreach (var path in paths.Where(x => !string.IsNullOrEmpty(x))) {
+                try {
+                    var content = System.IO.File.ReadAllText(path);
+                    if (CodeProject.ParsePath(content).Count < 2) {
+                        Interface.Interface.Say(System.IO.Path.GetFileName(path) + " has no path points (path.jerryio's \"x, y, speed\" lines)", false);
+                        continue;
+                    }
+                    // LemLib 0.5's ASSET(...) reads static/; 0.4's follow("x.txt") finds it by name too.
+                    var name = "static/" + System.IO.Path.GetFileName(path);
+                    text = CodeProject.WithFile(text, name, content);
+                    added.Add(name);
+                }
+                catch (Exception e) {
+                    Interface.Interface.Say(System.IO.Path.GetFileName(path) + " couldn't be read: " + e.Message, false);
+                }
+            }
+            if (added.Count == 0) return;
+            Snapshot();
+            SetText(text, field.stringPosition);
+            Snapshot();
+            Commit();
+            output.Append("<color=#8A93A0>Added " + Escape(string.Join(", ", added)) + ": ASSET(name_txt) and follow(\"name.txt\") read it.</color>\n");
+            outputDirty = true;
+        }
+
         private void UseExample(int i) {
             Snapshot();
             SetText(Examples.Fill(Examples.All[i].code), 0);   // V2: with the robot's own devices
             Snapshot();
             Commit();
+            UpdateMode();
             output.Append("<color=#8A93A0>Example: " + Escape(Examples.All[i].description) + ". Check its ports against Edit > Devices.</color>\n");
             outputDirty = true;
         }
@@ -583,6 +803,10 @@ namespace Protobot.RobotCode {
                     undo.RemoveAt(undo.Count - 1);
                     var (t, c) = undo[undo.Count - 1];
                     SetText(t, c);
+                    if (BlocksMode) {   // V2: back to a blocks program
+                        Commit();
+                        UpdateMode();
+                    }
                 }
             }
             else if (ctrl && (kb.yKey.wasPressedThisFrame || kb.zKey.wasPressedThisFrame && kb.shiftKey.isPressed)) {
@@ -591,6 +815,10 @@ namespace Protobot.RobotCode {
                     redo.RemoveAt(redo.Count - 1);
                     undo.Add(r);
                     SetText(r.text, r.caret);
+                    if (BlocksMode) {
+                        Commit();
+                        UpdateMode();
+                    }
                 }
             }
             else if (ctrl && kb.slashKey.wasPressedThisFrame) ToggleComment();
@@ -710,7 +938,8 @@ namespace Protobot.RobotCode {
         }
 
         private void OnPrinted(string text) {
-            if (text.StartsWith("\nError on line")) output.Append("<color=#EB5757>" + Escape(text) + "</color>");
+            if (text.StartsWith("\nError on line") && blocks != null && BlocksMode) text = BlockError(text);   // V2: Blocks
+            if (text.StartsWith("\nError on line") || text.StartsWith("\nError in")) output.Append("<color=#EB5757>" + Escape(text) + "</color>");
             else if (text.StartsWith("[warning")) output.Append("<color=#F2C94C>" + Escape(text) + "</color>");
             else if (text.StartsWith("[")) output.Append("<color=#8A93A0>" + Escape(text) + "</color>");
             else Console(text);
@@ -743,7 +972,7 @@ namespace Protobot.RobotCode {
             HandleKeys();
             var p = RobotProgram.Current;
             status.text = p == null ? (Sandbox.Running ? "Not running: the keys drive the robot" : "Not running")
-                : p.Failed ? "<color=#EB5757>" + p.Status + "</color>"
+                : p.Failed ? "<color=#EB5757>" + (blocks != null && blocks.gameObject.activeSelf ? "Error: see the red block" : p.Status) + "</color>"
                 : p.Status == "Running" ? "Running · " + p.Time.ToString("0.0", CultureInfo.InvariantCulture) + " s"
                 : p.Status;
             stopButton.interactable = RobotProgram.Active;
@@ -759,7 +988,13 @@ namespace Protobot.RobotCode {
                 monitorText.text = monitor.Build(p);
             }
             var lines = 1 + field.text.Count(c => c == '\n');
-            subtitle.text = (Scripting.CppTranslator.LooksLikeCpp(field.text) ? "C++ · " : "Python · ") + lines + (lines == 1 ? " line" : " lines") + (CodeStore.Watching ? " · synced with VS Code" : "");
+            if (blocks != null && blocks.gameObject.activeSelf) {   // V2
+                var count = blocks.program.Everything().Count();
+                subtitle.text = "Blocks · " + count + (count == 1 ? " block" : " blocks") + (CodeStore.Watching ? " · synced with VS Code" : "");
+            }
+            else subtitle.text = (BlocksMode ? "Blocks' Python (read-only) · " : Scripting.CppTranslator.LooksLikeCpp(field.text) ? "C++ · " : "Python · ")
+                + (CodeProject.FileCount(field.text) is var files && files > 0 ? files + " files · " : "")   // V2: a project
+                + lines + (lines == 1 ? " line" : " lines") + (CodeStore.Watching ? " · synced with VS Code" : "");
             if (highlightDirty) {
                 highlightDirty = false;
                 highlight.text = PythonColors.Highlight(field.text);
@@ -797,6 +1032,11 @@ namespace Protobot.RobotCode {
             // V2: the lines the program's threads are on (the one opened in the Monitor brighter).
             var p = RobotProgram.Current;
             var count = 0;
+            if (blocks != null && blocks.gameObject.activeSelf) {   // V2: on the blocks instead
+                blocks.ShowLines(p != null && RobotProgram.Active ? p.Threads.Select(th => th.Line).ToList() : new List<int>(), errorLine);
+                for (var i = 0; i < runBars.Count; i++) if (runBars[i].gameObject.activeSelf) runBars[i].gameObject.SetActive(false);
+                return;
+            }
             if (p != null && RobotProgram.Active) {
                 var threads = p.Threads.ToList();
                 var selected = Mathf.Clamp(monitor.selectedThread, 0, Mathf.Max(0, threads.Count - 1));
@@ -831,6 +1071,17 @@ namespace Protobot.RobotCode {
             EventSystem.current?.SetSelectedGameObject(field.gameObject);
             field.ActivateInputField();
             field.stringPosition = field.selectionStringAnchorPosition = field.selectionStringFocusPosition = Mathf.Clamp(index, 0, text.Length);
+            // V2: and show it (the input field only scrolls to a caret moved by typing): the line a third of the way down.
+            var tc = field.textComponent;
+            tc.ForceMeshUpdate();
+            var info = tc.textInfo;
+            if (info.characterCount == 0 || info.lineCount == 0) return;
+            var ln = info.characterInfo[Mathf.Clamp(index, 0, info.characterCount - 1)].lineNumber;
+            var top = info.lineInfo[0].ascender;
+            var view = field.textViewport.rect.height;
+            var total = top - info.lineInfo[info.lineCount - 1].descender;
+            var y = Mathf.Clamp(top - info.lineInfo[ln].ascender - view / 3f, 0f, Mathf.Max(0f, total - view + 8f));
+            tc.rectTransform.anchoredPosition = new Vector2(tc.rectTransform.anchoredPosition.x, y);
         }
 
         private void ShowHelp() {

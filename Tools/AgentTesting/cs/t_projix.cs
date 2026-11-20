@@ -1,0 +1,1 @@
+UnityEngine.PlayerPrefs.SetInt("t_proj_index", 18); UnityEngine.PlayerPrefs.SetString("t_hdr_period", "a"); return "ok";

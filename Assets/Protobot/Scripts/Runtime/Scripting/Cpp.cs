@@ -478,6 +478,24 @@ namespace Protobot.Scripting {
                 }
                 return TopLevel();
             }
+            if (Is("extern")) {   // extern motor flywheel; (robot-config.h): declared only, made in another file
+                var k = p + 1;
+                var depth = 0;
+                var init = false;
+                for (; k < t.Count && t[k].kind != "eof"; k++) {
+                    var x = t[k].text;
+                    if (x == "(" || x == "{" || x == "[") depth++;
+                    else if (x == ")" || x == "}" || x == "]") depth--;
+                    else if (depth == 0 && (x == "=" || x == "{")) init = true;
+                    else if (depth == 0 && x == ";") break;
+                }
+                if (!init) {
+                    for (var j = p + 1; j < k; j++)
+                        if (t[j].kind == "id" && (t[j + 1].text == ";" || t[j + 1].text == ",")) module.declared.Add(t[j].text);
+                    p = k + 1;
+                    return new List<Stmt>();
+                }
+            }
             if (Is("enum")) return Enum();
             if ((Is("struct") || Is("class")) && IsId(1) && (Is("{", 2) || Is(":", 2) || Is("final", 2))) return Class();
             if (Is("ASSET") && Is("(", 1)) {   // LemLib's path file
@@ -485,9 +503,12 @@ namespace Protobot.Scripting {
                 var name = ExpectId("the path's name");
                 Expect(")");
                 Accept(";");
-                warnings.Add("line " + tok.line + ": ASSET(" + name + ") path files aren't loaded yet (follow() needs a list of points here)");
+                // V2: the project's static/<name>.txt (ASSET(path_txt): the last '_' was the '.').
                 module.declared.Add(name);
-                return new List<Stmt> { At(new AssignStmt { targets = { At(new NameExpr { name = name }, tok) }, value = At(new ConstExpr { value = PyNone.Value }, tok) }, tok) };
+                var file = name.LastIndexOf('_') > 0 ? name.Substring(0, name.LastIndexOf('_')) + "." + name.Substring(name.LastIndexOf('_') + 1) : name;
+                var load = At(new CallExpr { func = At(new NameExpr { name = "__asset" }, tok) }, tok);
+                load.args.Add(At(new ConstExpr { value = file }, tok));
+                return new List<Stmt> { At(new AssignStmt { targets = { At(new NameExpr { name = name }, tok) }, value = load }, tok) };
             }
             var decl = Declaration(true);
             if (decl != null) return decl;
@@ -772,9 +793,13 @@ namespace Protobot.Scripting {
             else value = DefaultValue(type, nameTok);
             if (value is CAssign || value is CIncr) throw Error("an assignment can't be a variable's starting value here", nameTok);
             if (type.kind == "int" && !type.pointer && TypeOfExpr(value) != "int" && !(value is ConstExpr c && c.value is long)) value = Call("__cint", nameTok, value);
-            Declare(name, type.pointer ? "class" : type.kind, cls);
+            Declare(name, type.pointer ? "class" : IsProsMotor(type.name) ? "motor" : type.kind, cls);
             return At(new AssignStmt { targets = { target }, value = value }, nameTok);
         }
+
+        // V2: PROS motors and motor groups: "motors = 127;" is their operator= (move at that voltage).
+        private static bool IsProsMotor(string name) => name is "pros::Motor" or "pros::MotorGroup" or "pros::Motor_Group" or "pros::v5::Motor"
+            or "pros::v5::MotorGroup" or "Motor" or "MotorGroup" or "Motor_Group";
 
         private void Declare(string name, string kind, ClassInfo cls) {
             if (cls != null) {
@@ -1493,6 +1518,11 @@ namespace Protobot.Scripting {
         private Stmt AssignStatement(CAssign a, CppToken tok) {
             if (a.target is NameExpr n) ctx.assigned.Add(n.name);
             var targetKind = TypeOfExpr(a.target);
+            if (a.op == "=" && targetKind == "motor") {   // V2: PROS' motor = power; (operator=: move)
+                var move = At(new CallExpr { func = At(new AttrExpr { target = a.target, name = "move" }, tok) }, tok);
+                move.args.Add(a.value);
+                return At(new ExprStmt { expr = move }, tok);
+            }
             if (a.op == "=") {
                 var v = a.value;
                 if (targetKind == "int" && TypeOfExpr(v) != "int") v = Call("__cint", tok, v);

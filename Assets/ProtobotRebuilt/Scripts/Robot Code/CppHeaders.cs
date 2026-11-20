@@ -87,6 +87,12 @@ void opcontrol(void);
                 Put(Path.Combine(include, "robot-config.h"), RobotConfig);
                 Put(Path.Combine(include, "lemlib", "api.hpp"), Resource("cpp_lemlib"));
                 Put(Path.Combine(include, "EZ-Template", "api.hpp"), Resource("cpp_ez"));
+                // V2: the headers PROS and LemLib programs include one by one: each brings in the whole API.
+                foreach (var h in new[] { "misc.h", "misc.hpp", "motors.h", "motors.hpp", "rtos.h", "rtos.hpp", "adi.h", "adi.hpp", "llemu.h", "llemu.hpp", "imu.h", "imu.hpp",
+                                          "rotation.h", "rotation.hpp", "optical.h", "optical.hpp", "distance.h", "distance.hpp", "motor_group.hpp", "screen.h", "screen.hpp" })
+                    Put(Path.Combine(include, "pros", h), "#pragma once\n#include \"api.h\"\n");
+                foreach (var h in new[] { "logger/stdout.hpp", "logger/logger.hpp", "chassis/chassis.hpp", "chassis/trackingWheel.hpp", "chassis/odom.hpp", "pose.hpp", "pid.hpp", "util.hpp", "asset.hpp" })
+                    Put(Path.Combine(include, "lemlib", h), "#pragma once\n#include \"lemlib/api.hpp\"\n");
                 Put(Path.Combine(include, "autons.hpp"), Empty);
                 Put(Path.Combine(include, "subsystems.hpp"), Empty);
                 Put(Path.Combine(folder, ".vscode", "c_cpp_properties.json"), CppProperties);

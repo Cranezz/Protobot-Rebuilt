@@ -38,6 +38,10 @@ namespace Protobot.RobotCode {
             g["CONTROLLER_MASTER"] = pros.globals["E_CONTROLLER_MASTER"];
             g["CONTROLLER_PARTNER"] = pros.globals["E_CONTROLLER_PARTNER"];
             g["MOTOR_GEARSET_6"] = pros.globals["E_MOTOR_GEARSET_06"];
+            // V2: the LLEMU buttons (read_buttons() & LCD_BTN_LEFT).
+            g["LCD_BTN_LEFT"] = 4L;
+            g["LCD_BTN_CENTER"] = 2L;
+            g["LCD_BTN_RIGHT"] = 1L;
             // EZ-Template (ez::), and the names its files make global (master, fwd, rev).
             var ez = EzTemplate.Build(program);
             vm.modules["cpp:ez"] = ez;
@@ -48,6 +52,7 @@ namespace Protobot.RobotCode {
             g["Brain"] = program.Brain;
             g["Controller1"] = program.Controller(false);
             g["__competition"] = new PyBuiltin("__competition", a => program.SetCompetition(a.Get(0, "driver"), a.Get(1, "autonomous")));
+            g["__asset"] = new PyBuiltin("__asset", a => new PathAsset(a.vm.StrOf(a.Need(0, "name"))));   // V2: LemLib's ASSET(name_txt)
         }
 
         internal static object Call(RobotProgram p, VexObject o, string method, params object[] args) {
@@ -124,7 +129,8 @@ namespace Protobot.RobotCode {
                 ("distance", "Distance"), ("optical", "Optical"), ("bumper", "Bumper"), ("limit", "Limit"), ("digital_out", "DigitalOut"),
                 ("digital_in", "DigitalIn"), ("pneumatics", "Pneumatics"), ("encoder", "Encoder"), ("pot", "Potentiometer"),
                 ("potV2", "PotentiometerV2"), ("line", "Line"), ("light", "Light"), ("sonar", "Sonar"), ("gyro", "Gyro"),
-                ("timer", "Timer"), ("thread", "Thread"), ("event", "Event"),
+                ("timer", "Timer"), ("thread", "Thread"), ("event", "Event"), ("vision", "Vision"),
+                ("signature", "Signature"),   // V2: using signature = vision::signature; (VEXcode's robot-config)
             })
                 if (py.globals.TryGetValue(python, out var cls)) m.globals[cpp] = cls;
             // motor(PORT1, ratio18_1, false) as Python's; motor_group(m1, m2) too. task(f) = thread(f), and sleeping.
@@ -310,8 +316,18 @@ namespace Protobot.RobotCode {
             private string units = "degrees";
             public VexMotor[] Motors => new[] { motor };
 
-            public ProsMotor(RobotProgram p, Args a) : this(p, (int)Ops.ToLong(a.Need(0, "port")), a.Get(1, "gearset")) {
-                if (a.Get(2, "encoder_units") is PyEnum u) units = u.name.Replace("E_MOTOR_ENCODER_", "").ToLowerInvariant();
+            public ProsMotor(RobotProgram p, Args a) : this(p, SignedPort(a), a.Get(1, "gearset") is bool ? null : a.Get(1, "gearset")) {
+                var u = a.Get(1, "gearset") is bool ? null : a.Get(2, "encoder_units") is bool ? a.Get(3, "encoder_units") : a.Get(2, "encoder_units");
+                if (u is PyEnum e) units = e.name.Replace("E_MOTOR_ENCODER_", "").ToLowerInvariant();
+            }
+
+            // V2: PROS 4: Motor(-port, gearset, units) is reversed; PROS 3: Motor(port, gearset, reverse, units) and
+            // Motor(port, reverse) (a reversed flag in place of the sign).
+            private static int SignedPort(Args a) {
+                var port = (int)Ops.ToLong(a.Need(0, "port"));
+                var reverse = a.Get(1, "gearset") is bool r1 ? r1 : a.Get(2, "encoder_units") is bool r2 && r2;
+                if (a.kw != null && a.kw.TryGetValue("reverse", out var kr)) reverse = Ops.Truthy(kr);
+                return reverse ? -Math.Abs(port) : port;
             }
 
             public ProsMotor(RobotProgram p, int port, object gearset) {

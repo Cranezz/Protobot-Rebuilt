@@ -18,6 +18,12 @@ namespace Protobot.RobotCode {
         public static string Folder => Path.Combine(Application.persistentDataPath, "Robot Code");
         public static string ExternalPath => Path.Combine(Folder, Scripting.CppTranslator.LooksLikeCpp(Source) ? "main.cpp" : "main.py");   // V2: C++ too
         public static bool Watching { get; private set; }
+        // V2: the file VS Code was given. Kept until it's opened again, so a program that turns from Python into C++
+        // (or back) in either editor keeps syncing through the same file instead of switching to a stale main.py/.cpp.
+        private static string watchedPath;
+        // V2: a project (CodeProject): each of its files is written into the folder (src/main.cpp, include/..., static/...)
+        // and a save in any of them comes back; null: a single program (watchedPath).
+        private static System.Collections.Generic.List<string> projectFiles;
         private static DateTime lastWrite;
         private static float nextPoll;
 
@@ -43,12 +49,25 @@ namespace Protobot.RobotCode {
         public static void OpenExternally() {
             try {
                 Directory.CreateDirectory(Folder);
-                WriteExternal();
                 File.WriteAllText(Path.Combine(Folder, "vex.pyi"), ApiStub.Text);
                 File.WriteAllText(Path.Combine(Folder, "motion.pyi"), ApiStub.Motion);   // V2
                 CppHeaders.Write(Folder);   // V2: C++ (PROS, VEXcode C++, LemLib, EZ-Template) for VS Code's IntelliSense
+                // V2: a project's files each in their place (after the headers: its own robot-config.h wins).
+                var sections = CodeProject.Split(Source);
+                if (sections.Count > 0) {
+                    projectFiles = sections.Select(s => s.path).ToList();
+                    var main = sections.FirstOrDefault(s => Path.GetFileNameWithoutExtension(s.path).Equals("main", StringComparison.OrdinalIgnoreCase) && CodeProject.IsCode(s.path))
+                               ?? sections.FirstOrDefault(s => CodeProject.IsCode(s.path)) ?? sections[0];
+                    watchedPath = Path.Combine(Folder, main.path);
+                }
+                else {
+                    projectFiles = null;
+                    watchedPath = ExternalPath;   // V2: the language the program is in now
+                }
+                WriteExternal();
                 Watching = true;
-                var path = ExternalPath;
+                var path = watchedPath;
+                Watcher.Ensure();   // V2: saves come back with the code window closed too
                 var code = FindVsCode();
                 if (code != null) {
                     // The folder too, so VS Code finds vex.pyi for completions.
@@ -67,15 +86,64 @@ namespace Protobot.RobotCode {
         }
 
         private static void WriteExternal() {
+            if (projectFiles != null) {
+                WriteProject();
+                return;
+            }
             try {
                 Directory.CreateDirectory(Folder);
-                var current = File.Exists(ExternalPath) ? File.ReadAllText(ExternalPath) : null;
-                if (current != Source) File.WriteAllText(ExternalPath, Source);
-                lastWrite = File.GetLastWriteTimeUtc(ExternalPath);
+                watchedPath ??= ExternalPath;
+                var current = File.Exists(watchedPath) ? File.ReadAllText(watchedPath) : null;
+                if (current != Source) File.WriteAllText(watchedPath, Source);
+                lastWrite = File.GetLastWriteTimeUtc(watchedPath);
             }
             catch (Exception e) {
-                Debug.LogWarning("[Robot code] couldn't write " + ExternalPath + ": " + e.Message);
+                Debug.LogWarning("[Robot code] couldn't write " + watchedPath + ": " + e.Message);
             }
+        }
+
+        // V2: each file of the project (a file the program no longer has is left on disk).
+        private static void WriteProject() {
+            try {
+                var sections = CodeProject.Split(Source);
+                if (sections.Count == 0) return;   // (turned into a single program here: the files stay as they were)
+                projectFiles = sections.Select(s => s.path).ToList();
+                var newest = DateTime.MinValue;
+                foreach (var s in sections) {
+                    var file = Path.Combine(Folder, s.path);
+                    Directory.CreateDirectory(Path.GetDirectoryName(file));
+                    var current = File.Exists(file) ? File.ReadAllText(file).Replace("\r\n", "\n") : null;
+                    if (current != s.text) File.WriteAllText(file, s.text);
+                    var w = File.GetLastWriteTimeUtc(file);
+                    if (w > newest) newest = w;
+                }
+                lastWrite = newest;
+            }
+            catch (Exception e) {
+                Debug.LogWarning("[Robot code] couldn't write the project: " + e.Message);
+            }
+        }
+
+        // V2: a save in any of the project's files: the project again from all of them.
+        private static void PollProject() {
+            var newest = DateTime.MinValue;
+            foreach (var f in projectFiles) {
+                var file = Path.Combine(Folder, f);
+                if (File.Exists(file)) {
+                    var w = File.GetLastWriteTimeUtc(file);
+                    if (w > newest) newest = w;
+                }
+            }
+            if (newest <= lastWrite) return;
+            lastWrite = newest;
+            var sections = CodeProject.Split(Source);
+            var text = CodeProject.Join(sections.Select(s => {
+                var file = Path.Combine(Folder, s.path);
+                return (s.path, File.Exists(file) ? File.ReadAllText(file).Replace("\r\n", "\n") : s.text);
+            }));
+            if (text == Source) return;
+            Source = text;
+            Changed?.Invoke();
         }
 
         /// <summary>Picks up a save in the outside editor (called every frame by the code panel; checks 4x a second).</summary>
@@ -83,11 +151,15 @@ namespace Protobot.RobotCode {
             if (!Watching || Time.unscaledTime < nextPoll) return;
             nextPoll = Time.unscaledTime + 0.25f;
             try {
-                if (!File.Exists(ExternalPath)) return;
-                var write = File.GetLastWriteTimeUtc(ExternalPath);
+                if (projectFiles != null) {
+                    PollProject();
+                    return;
+                }
+                if (watchedPath == null || !File.Exists(watchedPath)) return;
+                var write = File.GetLastWriteTimeUtc(watchedPath);
                 if (write == lastWrite) return;
                 lastWrite = write;
-                var text = File.ReadAllText(ExternalPath).Replace("\r\n", "\n");
+                var text = File.ReadAllText(watchedPath).Replace("\r\n", "\n");
                 if (text == Source) return;
                 Source = text;
                 Changed?.Invoke();
@@ -95,6 +167,18 @@ namespace Protobot.RobotCode {
             catch (IOException) {
                 // The editor is still writing: next time.
             }
+        }
+
+        /// <summary>V2: checks for saves every frame (Poll limits it to 4x a second) whether or not the code window is open.</summary>
+        private class Watcher : MonoBehaviour {
+            private static Watcher instance;
+            public static void Ensure() {
+                if (instance != null) return;
+                var go = new GameObject("Robot Code Watcher") { hideFlags = HideFlags.HideAndDontSave };
+                DontDestroyOnLoad(go);
+                instance = go.AddComponent<Watcher>();
+            }
+            private void Update() => Poll();
         }
 
         private static string FindVsCode() {

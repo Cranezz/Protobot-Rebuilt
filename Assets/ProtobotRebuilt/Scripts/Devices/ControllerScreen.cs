@@ -29,6 +29,9 @@ namespace Protobot.Devices {
         private enum Capture { None, Key, Pad }
         private Capture capture;
         private TextMeshProUGUI captureNote;
+        private TextMeshProUGUI status;   // V2
+        private Image statusDot;
+        private string shownDevice;
         private float captureSince;
 
         private static readonly Color Control = new(0.22f, 0.235f, 0.27f, 1f);
@@ -62,6 +65,12 @@ namespace Protobot.Devices {
             var help = Ui.Text(top, "Help", "", Theme.FontSmall, Theme.TextDim);
             help.Size(-1, 32f, 1f);
             help.name = "DriveHelp";
+            // V2: whether a gamepad or joystick is plugged in, and which.
+            var holder = Ui.Rect("Connected", top).Size(10f, 10f);   // a rounded Image would ask the row for 66 px
+            statusDot = Ui.Image(holder, "Dot", Theme.TextFaint, 5f);
+            statusDot.rectTransform.Fill(0, 0, 0, 0);
+            status = Ui.Text(top, "Controller", "", Theme.FontSmall, Theme.TextDim, Theme.Medium).Size(-1, 32f);
+            shownDevice = "?";
 
             // The controller.
             var stage = Ui.Image(body, "Stage", new Color(0f, 0f, 0f, 0.18f), 12f);
@@ -350,6 +359,18 @@ namespace Protobot.Devices {
         }
 
         private void Update() {
+            // V2: the connected light (a controller can be plugged in or out while this is open).
+            var device = V5Controller.DeviceName;
+            if (status != null && device != shownDevice) {
+                shownDevice = device;
+                status.text = device == null ? "No controller: keys only" : device + (V5Controller.Device is Gamepad ? "" : " (joystick)");
+                status.color = device == null ? Theme.TextFaint : Theme.Text;
+                statusDot.color = device == null ? Theme.TextFaint : Theme.Success;
+                Ui.Tip(status, device == null ? "No controller" : device, null,
+                    device == null ? "Plug in a gamepad (Xbox, PlayStation, Switch...) or a USB joystick and it works at once with these bindings."
+                        : V5Controller.Device is Gamepad ? "Connected: the gamepad column shows what each control is on."
+                        : "A plain joystick: its stick is the left stick, its second stick and hat the right stick and d-pad. Bind its buttons here: click a control, then press the button.");
+            }
             // Held controls light up; the sticks show where they are.
             foreach (var (id, (image, _)) in controls)
                 image.color = id == selected ? (V5Controller.Held(id) ? Lit : new Color(0.3f, 0.33f, 0.4f, 1f)) : V5Controller.Held(id) ? Lit : Control;

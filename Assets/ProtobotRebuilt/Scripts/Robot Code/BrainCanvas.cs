@@ -32,9 +32,15 @@ namespace Protobot.RobotCode {
         public sealed class Layer {
             public readonly Color32[] pixels = new Color32[Width * Height];
             public readonly List<TextItem> texts = new();
+            // V2: every pixel this color (a clear): clearing it again costs nothing (a loop clearing the screen
+            // hundreds of times a step slowed the whole simulation).
+            public bool uniform;
+            public Color32 uniformColor;
 
             public void CopyTo(Layer other) {
                 Array.Copy(pixels, other.pixels, pixels.Length);
+                other.uniform = uniform;
+                other.uniformColor = uniformColor;
                 other.texts.Clear();
                 other.texts.AddRange(texts);
             }
@@ -67,7 +73,7 @@ namespace Protobot.RobotCode {
 
         internal BrainCanvas(RobotProgram p) {
             program = p;
-            Fill(front.pixels, Black);
+            Fill(front, Black);
             Method("print", a => { Print(Text(a), true); return PyNone.Value; });
             Method("print_at", a => {
                 var x = a.Number(-1, "x", 0) + originX;
@@ -88,7 +94,7 @@ namespace Protobot.RobotCode {
             Method("column", _ => (long)col + 1);
             Method("clear_screen", a => {
                 var color = a.Count > 0 ? ColorOf(a.pos[0]) : Black;
-                Fill(Draw.pixels, color);
+                Fill(Draw, color);
                 Draw.texts.Clear();
                 row = col = 0;
                 Touched();
@@ -287,12 +293,22 @@ namespace Protobot.RobotCode {
             Changed?.Invoke();
         }
 
-        private static void Fill(Color32[] pixels, Color32 c) {
+        private static void Fill(Layer layer, Color32 c) {
+            if (layer.uniform && Same(layer.uniformColor, c)) return;
+            var pixels = layer.pixels;
             for (var i = 0; i < pixels.Length; i++) pixels[i] = c;
+            layer.uniform = true;
+            layer.uniformColor = c;
         }
+
+        private static bool Same(Color32 a, Color32 b) => a.r == b.r && a.g == b.g && a.b == b.b && a.a == b.a;
 
         private void Plot(int x, int y, Color32 c) {
             if (c.a == 0 || x < clip.xMin || x >= clip.xMax || y < clip.yMin || y >= clip.yMax) return;
+            if (Draw.uniform) {
+                if (Same(Draw.uniformColor, c)) return;
+                Draw.uniform = false;
+            }
             Draw.pixels[(Height - 1 - y) * Width + x] = c;   // (textures count rows from the bottom)
         }
 
@@ -302,6 +318,11 @@ namespace Protobot.RobotCode {
             var x1 = Mathf.Min(x + w, clip.xMax);
             var y0 = Mathf.Max(y, clip.yMin);
             var y1 = Mathf.Min(y + h, clip.yMax);
+            if (x1 <= x0 || y1 <= y0) return;
+            if (Draw.uniform) {
+                if (Same(Draw.uniformColor, c)) return;
+                Draw.uniform = false;
+            }
             var px = Draw.pixels;
             for (var yy = y0; yy < y1; yy++) {
                 var line = (Height - 1 - yy) * Width;

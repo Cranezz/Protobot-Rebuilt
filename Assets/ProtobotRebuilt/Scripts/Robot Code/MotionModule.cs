@@ -33,6 +33,11 @@ namespace Protobot.RobotCode {
             Class("TrackingWheel", a => new TrackingWheel(program, a));
             Class("OdomSensors", a => new OdomSensors(a));
             Class("ControllerSettings", a => new ControllerSettings(a));
+            // V2: LemLib 0.4's names (Drivetrain_t {left, right, track, wheel, rpm}; ChassisController_t {kP, kD,
+            // smallError, smallErrorTimeout, largeError, largeErrorTimeout, slew}; OdomSensors_t).
+            Class("Drivetrain_t", a => new MotionDrivetrain(a) { v04 = true });
+            Class("ChassisController_t", a => new ControllerSettings(a, true));
+            Class("OdomSensors_t", a => new OdomSensors(a));
             Class("ExpoDriveCurve", a => new ExpoCurve(a));
             Class("Chassis", a => new MotionChassis(program, a));
             foreach (var (n, v) in new[] { ("AUTO", 0), ("CW_CLOCKWISE", 1), ("CCW_COUNTERCLOCKWISE", 2) }) m.globals[n] = new PyEnum("AngularDirection", n, v);
@@ -104,6 +109,7 @@ namespace Protobot.RobotCode {
         public override string TypeName => "Drivetrain";
         public readonly VexMotor[] left, right;
         public readonly double trackWidth, wheelDiameter, rpm, horizontalDrift;
+        public bool v04;   // V2: LemLib 0.4's Drivetrain_t
 
         public MotionDrivetrain(Args a) {
             left = Side(a.Need(0, "left_motors"), "left");
@@ -184,8 +190,24 @@ namespace Protobot.RobotCode {
     internal sealed class ControllerSettings : VexObject {
         public override string TypeName => "ControllerSettings";
         public readonly double kP, kI, kD, windup, smallError, smallTimeout, largeError, largeTimeout, slew;
+        /// <summary>V2: LemLib before 0.5's final release: 7 numbers (kP, kD, smallError, smallErrorTimeout, largeError,
+        /// largeErrorTimeout, slew); 0.4 named it ChassisController_t.</summary>
+        public readonly bool sevenNumbers, v04;
 
-        public ControllerSettings(Args a) {
+        public ControllerSettings(Args a, bool v04 = false) {
+            this.v04 = v04;
+            if (v04 || a.Count == 7 && (a.kw == null || a.kw.Count == 0)) {
+                sevenNumbers = true;
+                kP = a.Number(0, "kP", 0);
+                kD = MotionModule.Arg(a, 1, "kD", 0);
+                smallError = MotionModule.Arg(a, 2, "smallError", 0);
+                smallTimeout = MotionModule.Arg(a, 3, "smallErrorTimeout", 0);
+                largeError = MotionModule.Arg(a, 4, "largeError", 0);
+                largeTimeout = MotionModule.Arg(a, 5, "largeErrorTimeout", 0);
+                slew = MotionModule.Arg(a, 6, "slew", 0);
+                foreach (var (n, v) in new[] { ("kP", kP), ("kI", kI), ("kD", kD) }) Field(n, v);
+                return;
+            }
             kP = a.Number(0, "kP", 0);
             kI = MotionModule.Arg(a, 1, "kI", 0);
             kD = MotionModule.Arg(a, 2, "kD", 0);
@@ -231,6 +253,7 @@ namespace Protobot.RobotCode {
         private readonly ControllerSettings lateral, angular;
         private readonly OdomSensors sensors;
         private readonly ExpoCurve throttleCurve, steerCurve;
+        private readonly string legacy;   // V2: "0.4", "0.5-rc" (LemLib before 0.5.0) or null
 
         // Odometry.
         private double x, y, theta;   // inches, degrees clockwise from +Y
@@ -250,6 +273,8 @@ namespace Protobot.RobotCode {
             lateral = a.Need(1, "linear_settings") as ControllerSettings ?? throw new PyError("TypeError", "Chassis' second argument is the lateral ControllerSettings(...)");
             angular = a.Need(2, "angular_settings") as ControllerSettings ?? throw new PyError("TypeError", "Chassis' third argument is the angular ControllerSettings(...)");
             sensors = a.Get(3, "sensors") as OdomSensors ?? new OdomSensors(new Args(a.vm, "OdomSensors", new object[0], null));
+            // V2: which LemLib the program was written for (their turnTo/moveTo/follow take different arguments).
+            legacy = drive.v04 || lateral.v04 ? "0.4" : lateral.sevenNumbers ? "0.5-rc" : null;
             throttleCurve = a.Get(4, "throttle_curve") as ExpoCurve;
             steerCurve = a.Get(5, "steer_curve") as ExpoCurve;
             p.pollers.Add(Step);
@@ -285,7 +310,40 @@ namespace Protobot.RobotCode {
                                                                          Opt(a2, "max_speed", 127), Opt(a2, "min_speed", 0), Opt(a2, "early_exit_range", 0))));
             Method("move_to_pose", a2 => Queue(a2, 4, () => new PoseMotion(this, a2.Number(0, "x", 0), a2.Number(1, "y", 0), a2.Number(2, "theta", 0), Ms(a2, 3), Forwards(a2),
                                                                         Opt(a2, "lead", 0.6), Opt(a2, "horizontal_drift", 0), Opt(a2, "max_speed", 127), Opt(a2, "min_speed", 0), Opt(a2, "early_exit_range", 0))));
-            Method("follow", a2 => Queue(a2, 4, () => new PursuitMotion(this, Path(a2.Need(0, "path")), a2.Number(1, "lookahead", 15), Ms(a2, 2), a2.Bool(3, "forwards", true), Opt(a2, "max_speed", 127))));
+            Method("follow", a2 => {
+                var path = a2.Need(0, "path");
+                // V2: LemLib 0.4: follow("file.txt", timeout, lookahead, reverse, maxSpeed), waits; the file was on the SD card.
+                if (path is string file) {
+                    var pts = PathFile(file);
+                    if (pts == null) return PyNone.Value;
+                    return Queue(a2, 99, () => new PursuitMotion(this, pts, a2.Number(2, "lookahead", 15), Ms(a2, 1), !a2.Bool(3, "reverse", false), MotionModule.Arg(a2, 4, "maxSpeed", 127)), true);
+                }
+                if (path is PathAsset asset) {
+                    var pts = asset.Points(program);
+                    if (pts == null) return PyNone.Value;
+                    return Queue(a2, 4, () => new PursuitMotion(this, pts, a2.Number(1, "lookahead", 15), Ms(a2, 2), a2.Bool(3, "forwards", true), Opt(a2, "max_speed", 127)));
+                }
+                return Queue(a2, 4, () => new PursuitMotion(this, Path(path), a2.Number(1, "lookahead", 15), Ms(a2, 2), a2.Bool(3, "forwards", true), Opt(a2, "max_speed", 127)));
+            });
+            // V2: LemLib 0.4 / 0.5-rc: turnTo(x, y, timeout, reversed (0.4) or forwards (0.5-rc), maxSpeed, async);
+            // moveTo(x, y, timeout, maxSpeed) in 0.4 (waits), moveTo(x, y, theta, timeout, forwards, chasePower, lead,
+            // maxSpeed, async) in 0.5-rc (boomerang); moveToOld = 0.4's moveTo.
+            Method("turnTo", a2 => {
+                var old = legacy == "0.4";
+                var away = old ? a2.Bool(3, "reversed", false) : !a2.Bool(3, "forwards", true);
+                return Queue(a2, old ? 99 : 5, () => new TurnMotion(this, 0, Ms(a2, 2), 0, MotionModule.Arg(a2, 4, "maxSpeed", 127), 0, 0, (a2.Number(0, "x", 0), a2.Number(1, "y", 0)), away), old);
+            });
+            Method("moveTo", a2 => {
+                if (legacy == "0.4")
+                    return Queue(a2, 99, () => new PointMotion(this, a2.Number(0, "x", 0), a2.Number(1, "y", 0), Ms(a2, 2), true, Math.Min(127, MotionModule.Arg(a2, 3, "maxSpeed", 127)), 0, 0), true);
+                return Queue(a2, 8, () => new PoseMotion(this, a2.Number(0, "x", 0), a2.Number(1, "y", 0), a2.Number(2, "theta", 0), Ms(a2, 3), a2.Bool(4, "forwards", true),
+                                                         MotionModule.Arg(a2, 6, "lead", 0.6), MotionModule.Arg(a2, 5, "chasePower", 0), Math.Min(127, MotionModule.Arg(a2, 7, "maxSpeed", 127)), 0, 0));
+            });
+            Method("moveToOld", a2 => {
+                // (x, y, timeout, forwards, async = false, maxSpeed)
+                var wait = !(a2.Count > 4 && a2.pos[4] is bool b && b);
+                return Queue(a2, 99, () => new PointMotion(this, a2.Number(0, "x", 0), a2.Number(1, "y", 0), Ms(a2, 2), a2.Bool(3, "forwards", true), Math.Min(127, MotionModule.Arg(a2, 5, "maxSpeed", 127)), 0, 0), wait);
+            });
             Method("wait_until", a2 => {
                 var dist = a2.Number(0, "dist", 0);
                 var motion = current;
@@ -372,14 +430,29 @@ namespace Protobot.RobotCode {
 
         private static bool Side(object o) => o is PyEnum e && e.type == "DriveSide" ? e.value == 1 : throw new PyError("TypeError", "the locked side is DriveSide.LEFT or DriveSide.RIGHT");
 
-        private static List<(double x, double y)> Path(object o) {
-            var points = new List<(double, double)>();
+        // V2: a path file of the project (LemLib 0.4 read it from the SD card). Null (warned): not there.
+        private List<(double x, double y, double speed)> PathFile(string name) {
+            var text = CodeProject.Find(program.files, name);
+            if (text == null) {
+                program.Warn("path:" + name, "follow(\"" + name + "\"): that path file isn't in the project (LemLib 0.4 reads it from the SD card). Add it in the code window: Project > Add path files. This follow() was skipped");
+                return null;
+            }
+            var pts = CodeProject.ParsePath(text);
+            if (pts.Count < 2) {
+                program.Warn("path:" + name, "follow(\"" + name + "\"): no points in that file (path.jerryio's \"x, y, speed\" lines); skipped");
+                return null;
+            }
+            return pts;
+        }
+
+        private static List<(double x, double y, double speed)> Path(object o) {
+            var points = new List<(double, double, double)>();
             foreach (var p in Ops.Iterate(o)) {
-                if (p is MotionPose pose) points.Add((pose.x, pose.y));
+                if (p is MotionPose pose) points.Add((pose.x, pose.y, double.NaN));
                 else {
                     var xy = Ops.Iterate(p).Take(2).Select(v => Ops.ToDouble(v)).ToArray();
                     if (xy.Length < 2) throw new PyError("TypeError", "a path is a list of points like [(0, 0), (0, 24), (24, 36)]");
-                    points.Add((xy[0], xy[1]));
+                    points.Add((xy[0], xy[1], double.NaN));
                 }
             }
             if (points.Count < 2) throw new PyError("ValueError", "a path needs at least 2 points");
@@ -387,10 +460,10 @@ namespace Protobot.RobotCode {
         }
 
         // A motion call: waits for the one under way to end, starts, then (wait=True) waits for it too.
-        private object Queue(Args a, int asyncIndex, Func<Motion> make) {
+        private object Queue(Args a, int asyncIndex, Func<Motion> make, bool alwaysWait = false) {
             StartOdom();
             // wait=True (Python), or LemLib's async argument false (C++: chassis.moveToPoint(0, 24, 2000, {}, false)).
-            var wait = a.kw != null && a.kw.TryGetValue("wait", out var w) && Ops.Truthy(w)
+            var wait = alwaysWait || a.kw != null && a.kw.TryGetValue("wait", out var w) && Ops.Truthy(w)
                        || a.Count > asyncIndex && a.pos[asyncIndex] is bool async && !async
                        || a.kw != null && a.kw.TryGetValue("async_", out var ak) && !Ops.Truthy(ak);
             Motion mine = null;
@@ -857,14 +930,16 @@ namespace Protobot.RobotCode {
 
         // Pure pursuit: steer for the point on the path a lookahead away; done near its end.
         private sealed class PursuitMotion : Motion {
-            private readonly List<(double x, double y)> path;
+            private readonly List<(double x, double y, double speed)> path;
+            private readonly bool speeds;   // V2: the path file's speed at each point (path.jerryio), else our own
             private readonly double lookahead, maxSpeed;
             private readonly bool forwards;
             private int closest;
             private double startX, startY;
 
-            public PursuitMotion(MotionChassis c, List<(double x, double y)> path, double lookahead, double timeout, bool forwards, double maxSpeed) : base(c, timeout) {
+            public PursuitMotion(MotionChassis c, List<(double x, double y, double speed)> path, double lookahead, double timeout, bool forwards, double maxSpeed) : base(c, timeout) {
                 this.path = path;
+                speeds = path.All(q => !double.IsNaN(q.speed));
                 this.lookahead = Math.Max(1, lookahead);
                 this.forwards = forwards;
                 this.maxSpeed = maxSpeed;
@@ -882,12 +957,13 @@ namespace Protobot.RobotCode {
                     if (d < best) { best = d; closest = i; }
                 }
                 var end = path[path.Count - 1];
-                if (closest == path.Count - 1 && Dist(end, p) < 2) {
+                // (A path file's last speeds are 0: done when the nearest point is the last, as LemLib.)
+                if (closest == path.Count - 1 && (speeds || Dist(end, p) < 2)) {
                     finished = true;
                     return;
                 }
                 // The lookahead point: where a circle round the robot crosses the path after the nearest point.
-                var target = end;
+                var target = (end.x, end.y);
                 for (var i = Math.Max(1, closest); i < path.Count; i++) {
                     if (Intersect(path[i - 1], path[i], p, lookahead, out var hit)) { target = hit; }
                     if (Dist(path[i], p) > lookahead) break;
@@ -899,8 +975,9 @@ namespace Protobot.RobotCode {
                 var localX = dx * Math.Cos(heading) - dy * Math.Sin(heading);
                 var l2 = dx * dx + dy * dy;
                 var curvature = l2 > 1e-6 ? 2 * localX / l2 : 0;
-                // Slow down for tight curves and near the end.
-                var speed = maxSpeed * Math.Min(1, 3 / Math.Max(0.5, Math.Abs(curvature) * 40)) * Math.Min(1, Dist(end, p) / 12 + 0.3);
+                // Slow down for tight curves and near the end (a path file: its own speed at the nearest point).
+                var speed = speeds ? Math.Min(maxSpeed, Math.Max(12, path[closest].speed))
+                    : maxSpeed * Math.Min(1, 3 / Math.Max(0.5, Math.Abs(curvature) * 40)) * Math.Min(1, Dist(end, p) / 12 + 0.3);
                 var left = speed * (2 + curvature * c.TrackWidth) / 2;
                 var right = speed * (2 - curvature * c.TrackWidth) / 2;
                 var most = Math.Max(Math.Abs(left), Math.Abs(right)) / maxSpeed;
@@ -909,10 +986,10 @@ namespace Protobot.RobotCode {
                 else c.Output(-right, -left);
             }
 
-            private static double Dist((double x, double y) a, Pose p) => Math.Sqrt((a.x - p.x) * (a.x - p.x) + (a.y - p.y) * (a.y - p.y));
+            private static double Dist((double x, double y, double speed) a, Pose p) => Math.Sqrt((a.x - p.x) * (a.x - p.x) + (a.y - p.y) * (a.y - p.y));
 
-            private static bool Intersect((double x, double y) a, (double x, double y) b, Pose p, double r, out (double x, double y) hit) {
-                hit = b;
+            private static bool Intersect((double x, double y, double speed) a, (double x, double y, double speed) b, Pose p, double r, out (double x, double y) hit) {
+                hit = (b.x, b.y);
                 var dx = b.x - a.x;
                 var dy = b.y - a.y;
                 var fx = a.x - p.x;
@@ -930,6 +1007,31 @@ namespace Protobot.RobotCode {
                 hit = (a.x + t * dx, a.y + t * dy);
                 return true;
             }
+        }
+    }
+
+    /// <summary>V2: LemLib's ASSET(name_txt): the project's path file (static/name.txt), read when a motion follows it.</summary>
+    internal sealed class PathAsset : VexObject {
+        public override string TypeName => "asset";
+        public readonly string name;
+
+        public PathAsset(string name) {
+            this.name = name;
+            Field("name", name);
+        }
+
+        public List<(double x, double y, double speed)> Points(RobotProgram p) {
+            var text = CodeProject.Find(p.files, "static/" + name) ?? CodeProject.Find(p.files, name);
+            if (text == null) {
+                p.Warn("asset:" + name, "ASSET(" + name.Replace('.', '_') + "): static/" + name + " isn't in the project (Project > Add path files adds it); this follow() was skipped");
+                return null;
+            }
+            var pts = CodeProject.ParsePath(text);
+            if (pts.Count < 2) {
+                p.Warn("asset:" + name, name + " has no path points (path.jerryio's \"x, y, speed\" lines); this follow() was skipped");
+                return null;
+            }
+            return pts;
         }
     }
 }

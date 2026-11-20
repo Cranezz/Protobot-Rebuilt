@@ -283,6 +283,40 @@ class distance {
   bool installed();
 };
 
+/** The V5 Vision Sensor. What it sees isn't simulated yet: a snapshot finds no objects. */
+class vision {
+ public:
+  class signature {
+   public:
+    signature(std::int32_t id, std::int32_t uMin, std::int32_t uMax, std::int32_t uMean, std::int32_t vMin, std::int32_t vMax,
+              std::int32_t vMean, float range, std::int32_t type);
+  };
+  class code {
+   public:
+    template <class... S> code(S... signatures);
+  };
+  class object {
+   public:
+    std::int32_t id, originX, originY, centerX, centerY, width, height;
+    double angle;
+    bool exists;
+  };
+  template <class... S> vision(std::int32_t index, std::uint8_t brightness = 50, S... signatures);
+  std::int32_t takeSnapshot(const signature& sig, std::int32_t count = 8);
+  std::int32_t takeSnapshot(std::uint32_t id, std::int32_t count = 8);
+  object objects[16];
+  object largestObject;
+  std::int32_t objectCount;
+  bool installed();
+  std::int32_t timestamp();
+  void setBrightness(std::uint8_t value);
+  void setSignature(const signature& sig);
+  void setLedMode(std::int32_t mode);
+  void setLedBrightness(std::uint8_t value);
+  void setLedColor(std::uint8_t r, std::uint8_t g, std::uint8_t b);
+  void setWifiMode(std::int32_t mode);
+};
+
 class optical {
  public:
   optical(std::int32_t index);

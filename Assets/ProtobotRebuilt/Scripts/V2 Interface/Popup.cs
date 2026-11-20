@@ -66,6 +66,7 @@ namespace Protobot.Interface {
             scroll.movementType = ScrollRect.MovementType.Clamped;
             scroll.scrollSensitivity = 24f;
 
+            var widest = 0f;
             for (var i = 0; i < labels.Length; i++) {
                 var index = i;
                 var item = Ui.Image(content, labels[i], i == selected ? Theme.AccentSoft : new Color(1f, 1f, 1f, 0f), 4f, true);
@@ -78,6 +79,7 @@ namespace Protobot.Interface {
                 hover.target = item;
                 var text = Ui.Text(item.transform, "Text", labels[i], Theme.FontBody, i == selected ? Theme.Text : Theme.TextDim);
                 text.rectTransform.Fill(10, 0, 10, 0);
+                widest = Mathf.Max(widest, text.GetPreferredValues(labels[i]).x);
                 var button = item.gameObject.AddComponent<Button>();
                 button.transition = Selectable.Transition.None;
                 button.onClick.AddListener(() => {
@@ -85,6 +87,9 @@ namespace Protobot.Interface {
                     onSelect(index);
                 });
             }
+            // V2: as wide as the longest label ("Go to src/robot-config.cpp"), up to 420.
+            var wide = Mathf.Min(widest + 32f, 420f);
+            if (wide > panel.sizeDelta.x) panel.sizeDelta = new Vector2(wide, panel.sizeDelta.y);
             // Show the chosen item.
             if (selected > 0)
                 content.anchoredPosition = new Vector2(0f, Mathf.Clamp(selected * itemHeight - height / 2f, 0f, Mathf.Max(0f, labels.Length * itemHeight - height + 8f)));

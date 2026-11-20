@@ -1,0 +1,1 @@
+Protobot.Devices.V5Controller.ResetToDefault(); UnityEngine.PlayerPrefs.SetString("t_pad_with", "0"); return "reset " + Protobot.Devices.V5Controller.PadOf("L1") + " own " + Protobot.Devices.V5Controller.HasOwn;

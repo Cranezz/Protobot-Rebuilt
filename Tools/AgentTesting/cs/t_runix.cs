@@ -1,0 +1,1 @@
+UnityEngine.PlayerPrefs.SetString("t_hdr_prog", @"C:/Users/kille/AppData/Local/Temp/claude/5b0c4ec0a185a9e3/8d21650f-8a3d-4b32-911f-851c0b975844/scratchpad/runs/9.cpp"); UnityEngine.PlayerPrefs.SetString("t_hdr_period", "a"); UnityEngine.PlayerPrefs.SetFloat("t_run_limit", 15); return "ok";
