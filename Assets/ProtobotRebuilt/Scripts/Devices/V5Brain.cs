@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Protobot.Devices {
     public enum DeviceKind {
-        Motor, Distance, Optical, Rotation, Inertial, Vision, Gps, Radio, Expander,
+        Motor, Distance, Optical, Rotation, Inertial, Vision, Gps, Radio, Expander, AiVision,
         Light, LineTracker, Potentiometer, Bumper, Limit, Encoder, Ultrasonic, Accelerometer, Gyro, Solenoid,
     }
 
@@ -88,6 +88,7 @@ namespace Protobot.Devices {
                 if (id.Contains("Optical Sensor")) return DeviceKind.Optical;
                 if (id.Contains("Rotation")) return DeviceKind.Rotation;
                 if (id.Contains("Inertial")) return DeviceKind.Inertial;
+                if (id.Contains("AI Vision")) return DeviceKind.AiVision;   // V2
                 if (id.Contains("Vision")) return DeviceKind.Vision;
                 return null;
             }
@@ -116,6 +117,8 @@ namespace Protobot.Devices {
             DeviceKind.Gyro => new YawGyro(part),
             DeviceKind.Bumper or DeviceKind.Limit => new SwitchSensor(part, kind),
             DeviceKind.Vision => new VisionSensor(part),   // V2
+            DeviceKind.Gps => new GpsSensor(part),         // V2
+            DeviceKind.AiVision => new AiVisionSensor(part),   // V2
             _ => new PlainDevice(part, kind),
         };
 

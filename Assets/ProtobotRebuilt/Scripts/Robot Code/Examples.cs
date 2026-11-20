@@ -12,6 +12,7 @@ namespace Protobot.RobotCode {
             ("Pneumatics on a button", "Button A toggles a piston", Pneumatics),
             ("Read the sensors", "Prints every sensor to the Brain's screen", Sensors),
             ("Vision: drive to a color", "Turns toward the largest object of a Vision signature and drives up to it", Vision),
+            ("GPS: drive to points", "Drives to points on the field by the GPS Sensor (in a game: File > Play game)", Gps),
             ("PID tuning (graph)", "Your own PID loop: open the Graph tab and tune kP, kI, kD", Pid),
             ("Odometry and motions (LemLib style)", "move_to_point, turn_to_heading, move_to_pose and pure pursuit, with odometry", Odometry),
             ("Autonomous selector (touch screen)", "Tap a button on the Brain's screen to pick the autonomous", Selector),
@@ -28,7 +29,7 @@ namespace Protobot.RobotCode {
             var start = code.IndexOf(cpp ? "// {devices}" : "# {devices}", System.StringComparison.Ordinal);
             var end = code.IndexOf(cpp ? "// {/devices}" : "# {/devices}", System.StringComparison.Ordinal);
             string config = null;
-            string visionName = "vision_5", sigName = "vision_5__SIG_1";
+            string visionName = "vision_5", sigName = "vision_5__SIG_1", gpsName = "gps_8";
             try { config = cpp ? DeviceConfig.GenerateCpp(!DeviceConfig.UsesVexcode(code), DeviceConfig.UsesEz(code)) : DeviceConfig.Generate(); }
             catch (System.Exception e) { UnityEngine.Debug.LogWarning("V2: example devices: " + e.Message); }
             var drive = DeviceConfig.LastDrive;
@@ -47,6 +48,12 @@ namespace Protobot.RobotCode {
                         }
                         else mine += "\n" + DefaultVision + "   # (no Vision Sensor on the robot yet: add one from Electronics)";
                     }
+                    // V2: the GPS example names the robot's own GPS Sensor (none: the example's).
+                    if (code.Contains("{gps}")) {
+                        var gps = Devices.V5Brain.Devices.OfType<Devices.GpsSensor>().FirstOrDefault(v => v.OnBrain);
+                        if (gps != null) gpsName = DeviceConfig.Name(Motion.Controls.GivenName(gps.part) ?? "gps_" + gps.port, new System.Collections.Generic.HashSet<string>());
+                        else mine += "\ngps_8 = Gps(Ports.PORT8, 0.00, 0.00, MM, 180, RIGHT)   # (no GPS Sensor on the robot yet: add one from Electronics)";
+                    }
                     if (!drive.Value.imu) mine += cpp ? (DeviceConfig.UsesVexcode(code) || DeviceConfig.UsesEz(code) ? "" : "\n// (no Inertial sensor on the robot: LemLib takes the heading from the drive wheels)")
                                                       : "\nimu = None   # (no Inertial sensor on the robot: the heading comes from the drive wheels)";
                     code = code.Substring(0, start) + mine + code.Substring(lineEnd);
@@ -56,7 +63,7 @@ namespace Protobot.RobotCode {
                     code = code.Substring(0, start) + code.Substring(startEnd + 1, end - startEnd - 1) + code.Substring(System.Math.Min(code.Length, lineEnd + 1));
                 }
             }
-            code = code.Replace("{vision}", visionName).Replace("{sig}", sigName);
+            code = code.Replace("{vision}", visionName).Replace("{sig}", sigName).Replace("{gps}", gpsName);
             string F(double v) => v.ToString("0.###", System.Globalization.CultureInfo.InvariantCulture);
             var wheel = drive?.diameter ?? 4f;
             var ratio = drive?.ratio ?? 1f;
@@ -237,6 +244,55 @@ while True:
         right_drive.spin(REVERSE, 12, PERCENT)
         brain.screen.print(""looking..."")
     wait(20, MSEC)
+";
+
+        // V2: the GPS Sensor, as VEX's GPS tutorials use it: turn toward a point, drive while it's far, check quality.
+        private const string Gps = @"# GPS Sensor: drives to points on the field.
+# The GPS reads the black-and-white code strip on the field's walls, so try it in a game (File > Play game...).
+# (0, 0) is the field's middle; +X toward the blue drivers, +Y away from the audience; heading 0 = the far wall,
+# clockwise. Mount it level, high enough to see over game pieces, facing a wall (VEX: on the back, facing back).
+from vex import *
+import math
+
+brain = Brain()
+# {devices}
+left_drive = MotorGroup(Motor(Ports.PORT1, GearSetting.RATIO_18_1, False))
+right_drive = MotorGroup(Motor(Ports.PORT10, GearSetting.RATIO_18_1, True))
+gps_8 = Gps(Ports.PORT8, 0.00, 0.00, MM, 180, RIGHT)
+# {/devices}
+
+POINTS = [(-24, -24), (24, -24), (0, 24)]   # inches from the field's middle
+
+def drive_to(x, y):
+    while True:
+        if {gps}.quality() < 90:          # can't see the strip: stop rather than guess
+            left_drive.stop()
+            right_drive.stop()
+            wait(20, MSEC)
+            continue
+        dx = x - {gps}.x_position(INCHES)
+        dy = y - {gps}.y_position(INCHES)
+        distance = math.sqrt(dx * dx + dy * dy)
+        if distance < 2:
+            break
+        target = math.degrees(math.atan2(dx, dy))                 # clockwise from +Y, like the GPS
+        error = (target - {gps}.heading() + 540) % 360 - 180      # -180 to 180
+        turn = error * 0.6
+        forward = min(50, distance * 3) if abs(error) < 45 else 0
+        left_drive.spin(FORWARD, forward + turn, PERCENT)
+        right_drive.spin(FORWARD, forward - turn, PERCENT)
+        brain.screen.clear_screen()
+        brain.screen.set_cursor(1, 1)
+        brain.screen.print(""x"", round({gps}.x_position(INCHES), 1), ""y"", round({gps}.y_position(INCHES), 1))
+        brain.screen.next_row()
+        brain.screen.print(""heading"", round({gps}.heading()), ""quality"", {gps}.quality())
+        wait(20, MSEC)
+    left_drive.stop()
+    right_drive.stop()
+
+for (x, y) in POINTS:
+    drive_to(x, y)
+    print(""at"", x, y)
 ";
 
         private const string Pid = @"# PID tuning with the Graph tab: it draws every ""name: number"" your program prints.

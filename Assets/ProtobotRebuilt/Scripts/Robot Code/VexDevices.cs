@@ -910,6 +910,154 @@ namespace Protobot.RobotCode {
         public void SetRotation(double v) => rotationOffset = v - (Device?.Rotation ?? 0);
     }
 
+    /// <summary>V2: VEXcode's GPS Sensor (Python Gps, C++ gps): the reference point's field position and heading.
+    /// Gps(port, heading_offset) or Gps(port, origin_x, origin_y, units, heading_offset, turn_direction); the origin is
+    /// where the sensor sits from the reference point (x right, y forward of the robot), the heading offset the sensor's
+    /// turn from the robot's forward (180 = mounted on the back, facing backward, as VEX advises).</summary>
+    internal sealed class VexGps : VexObject {
+        public override string TypeName => "Gps";
+        private readonly RobotProgram p;
+        private readonly int port;
+        private double ox, oy, headingOffset;   // inches, degrees
+        private bool left;
+        private double dx, dy, dLocation, dHeading, rotationBase, lastHeading = double.NaN, rotation, calibratingUntil;
+
+        public VexGps(RobotProgram p, Args a) {
+            this.p = p;
+            (port, _) = Port(a.Need(0, "port"), "GPS");
+            if (a.Count == 2 || (a.Count == 3 && !(a.pos[2] is double || a.pos[2] is long))) {
+                headingOffset = Ops.ToDouble(a.pos[1]);
+                if (a.Count == 3) left = UnitName(a.pos[2], "RIGHT") == "LEFT";
+            }
+            else {
+                var units = UnitName(a.Get(3, "units"), "MM");
+                ox = Mm(a.Number(1, "origin_x", 0), units) / 25.4;
+                oy = Mm(a.Number(2, "origin_y", 0), units) / 25.4;
+                headingOffset = a.Number(4, "heading_offset", 0);
+                left = UnitName(a.Get(5, "turn_direction"), "RIGHT") == "LEFT";
+            }
+            Method("x_position", a2 => FromMm(Reference().x * 25.4, UnitName(a2.Get(0, "units"), "MM")));
+            Method("y_position", a2 => FromMm(Reference().y * 25.4, UnitName(a2.Get(0, "units"), "MM")));
+            Method("heading", a2 => Angle(Heading(), a2.Get(0, "units")));
+            Method("rotation", a2 => Angle(Rotation(), a2.Get(0, "units")));
+            Method("quality", _ => (long)Mathf.RoundToInt(Device?.Quality ?? 0f));
+            Method("set_origin", a2 => {
+                if (a2.Count == 0) ox = oy = 0;
+                else {
+                    var units = UnitName(a2.Get(2, "units"), "MM");
+                    ox = Mm(a2.Number(0, "x", 0), units) / 25.4;
+                    oy = Mm(a2.Number(1, "y", 0), units) / 25.4;
+                }
+                return PyNone.Value;
+            });
+            Method("set_location", a2 => {
+                // (x, y, units, heading, heading units) or C++'s (x, y, heading)
+                double x = a2.Number(0, "x", 0), y = a2.Number(1, "y", 0), heading;
+                var units = "MM";
+                if (a2.Count == 3 && (a2.pos[2] is double || a2.pos[2] is long)) heading = Ops.ToDouble(a2.pos[2]);
+                else {
+                    units = UnitName(a2.Get(2, "units"), "MM");
+                    heading = ToDegrees(a2.Number(3, "heading", 0), UnitName(a2.Get(4, "heading_units"), "DEGREES"));
+                }
+                // (a real GPS reading the code strip reports where it is: a location set by code holds only while
+                // it can't see the strip, as with the start position given to PROS's Gps)
+                dx = dy = dLocation = 0;
+                var now = Reference();
+                dx = Mm(x, units) / 25.4 - now.x;
+                dy = Mm(y, units) / 25.4 - now.y;
+                dLocation = heading - Heading();
+                return PyNone.Value;
+            });
+            Method("calibrate", _ => {
+                calibratingUntil = p.Time + 2.0;
+                return PyNone.Value;
+            });
+            Field("start_calibration", Member("calibrate"));
+            Method("is_calibrating", _ => p.Time < calibratingUntil);
+            Method("set_heading", a2 => {
+                dHeading += ToDegrees(a2.Number(0, "value", 0), UnitName(a2.Get(1, "units"), "DEGREES")) - Heading();
+                return PyNone.Value;
+            });
+            Method("reset_heading", _ => {
+                dHeading -= Heading();
+                return PyNone.Value;
+            });
+            Method("set_rotation", a2 => {
+                rotationBase += ToDegrees(a2.Number(0, "value", 0), UnitName(a2.Get(1, "units"), "DEGREES")) - Rotation();
+                return PyNone.Value;
+            });
+            Method("reset_rotation", _ => {
+                rotationBase -= Rotation();
+                return PyNone.Value;
+            });
+            Method("orientation", a2 => UnitName(a2.Need(0, "axis"), "YAW") switch {
+                "ROLL" => (double)(Device?.Roll ?? 0f),
+                "PITCH" => (double)(Device?.Pitch ?? 0f),
+                _ => (double)Mathf.DeltaAngle(0f, (float)Heading()),
+            });
+            Method("gyro_rate", a2 => {
+                var rate = UnitName(a2.Get(0, "axis"), "ZAXIS") == "ZAXIS" ? (double)(Device?.Rate ?? 0f) : 0.0;
+                return UnitName(a2.Get(1, "units"), "DPS") == "RPM" ? rate / 6.0 : rate;
+            });
+            Method("acceleration", a2 => {
+                var g = Device?.Accel ?? Vector3.zero;
+                return UnitName(a2.Get(0, "axis"), "XAXIS") switch {
+                    "YAXIS" => (double)g.y,
+                    "ZAXIS" => (double)g.z,
+                    _ => (double)g.x,
+                };
+            });
+            Method("installed", _ => V5Brain.Get<GpsSensor>(port) != null);
+            Method("timestamp", _ => Math.Round(p.Time * 1000));
+            Method("changed", _ => PyNone.Value);
+            Method("set_sensor_rotation", a2 => {
+                headingOffset = ToDegrees(a2.Number(0, "value", 0), UnitName(a2.Get(1, "units"), "DEGREES"));
+                return PyNone.Value;
+            });
+        }
+
+        internal int PortNumber => port;
+        private GpsSensor Device => p.Device<GpsSensor>(port, false, "GPS Sensor");
+        private static double Angle(double deg, object units) => UnitName(units, "DEGREES") == "TURNS" ? deg / 360.0 : deg;
+        private static double Repeat(double v) => ((v % 360) + 360) % 360;
+
+        /// <summary>The robot's heading: the sensor's less its turn on the robot.</summary>
+        private double RobotHeading() {
+            var d = Device;
+            if (d == null) return 0;
+            var h = d.Heading - headingOffset;
+            return left ? -h : h;
+        }
+
+        public double Heading() => p.Time < calibratingUntil ? 0 : Repeat(RobotHeading() + dHeading + Located().h);
+
+        /// <summary>The location set by code, while the strip is out of view (dropped once it's seen).</summary>
+        private (double x, double y, double h) Located() {
+            if (Device is GpsSensor d && d.Seeing) dx = dy = dLocation = 0;
+            return (dx, dy, dLocation);
+        }
+
+        public double Rotation() {
+            var h = Heading();
+            if (double.IsNaN(lastHeading)) lastHeading = h;
+            rotation += Mathf.DeltaAngle((float)lastHeading, (float)h);
+            lastHeading = h;
+            return rotation + rotationBase;
+        }
+
+        /// <summary>The reference point (inches, field frame): the sensor less its origin offset, turned with the robot.</summary>
+        public Vector2 Reference() {
+            var d = Device;
+            if (d == null) return Vector2.zero;
+            var h = (float)RobotHeading() * Mathf.Deg2Rad;
+            var forward = new Vector2(Mathf.Sin(h), Mathf.Cos(h));
+            var right = new Vector2(Mathf.Cos(h), -Mathf.Sin(h));
+            var offset = right * (float)ox + forward * (float)oy;
+            var at = Located();
+            return new Vector2(d.X, d.Y) - offset + new Vector2((float)at.x, (float)at.y);
+        }
+    }
+
     internal sealed class VexDistance : VexObject {
         public override string TypeName => "Distance";
         public VexDistance(RobotProgram p, Args a) {

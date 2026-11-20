@@ -261,6 +261,38 @@ class inertial {
   bool installed();
 };
 
+/** V5 GPS Sensor: (0, 0) the field middle, +X toward the blue drivers, +Y away from the audience; heading clockwise
+ *  from the far wall. ox/oy: where the sensor sits from the turning center (x right, y forward); heading_offset: its
+ *  turn from the robot's front (180: on the back facing back). Quality 100 = reading the field code. */
+class gps {
+ public:
+  gps(std::int32_t index, double heading_offset = 0, turnType dir = turnType::right);
+  gps(std::int32_t index, double ox, double oy, distanceUnits units = distanceUnits::mm, double heading_offset = 0, turnType dir = turnType::right);
+  void calibrate();
+  void startCalibration();
+  bool isCalibrating();
+  void setOrigin(double x, double y, distanceUnits units = distanceUnits::mm);
+  void setOrigin();
+  void setLocation(double x, double y, distanceUnits units = distanceUnits::mm, double angle = 0, rotationUnits units_r = rotationUnits::deg);
+  void setLocation(double x, double y, double angle);
+  void setSensorRotation(double value, rotationUnits units = rotationUnits::deg);
+  double xPosition(distanceUnits units = distanceUnits::mm);
+  double yPosition(distanceUnits units = distanceUnits::mm);
+  double heading(rotationUnits units = rotationUnits::deg);
+  double rotation(rotationUnits units = rotationUnits::deg);
+  void setHeading(double value, rotationUnits units);
+  void setRotation(double value, rotationUnits units);
+  void resetHeading();
+  void resetRotation();
+  double orientation(orientationType axis, rotationUnits units);
+  double acceleration(axisType axis);
+  double gyroRate(axisType axis, velocityUnits units);
+  std::int32_t quality();
+  std::uint32_t timestamp();
+  bool installed();
+  void changed(void (*callback)(void));
+};
+
 class rotation {
  public:
   rotation(std::int32_t index, bool reverse = false);
@@ -316,6 +348,42 @@ class vision {
   void setLedBrightness(std::uint8_t value);
   void setLedColor(std::uint8_t r, std::uint8_t g, std::uint8_t b);
   void setWifiMode(std::int32_t mode);
+};
+
+/** The V5 AI Vision Sensor, 320 x 240: takeSnapshot with a colordesc, a codedesc, aivision::ALL_AIOBJS or ALL_TAGS
+ *  fills objects[] widest first and returns how many. AI classes here (Override): 0 Red Pin, 1 Blue Pin, 2 Yellow
+ *  Pin, 3 Cup. */
+class aivision {
+ public:
+  class colordesc {
+   public:
+    colordesc(std::int32_t index, std::uint8_t red, std::uint8_t green, std::uint8_t blue, float hangle = 10, float hdsat = 0.2);
+  };
+  class codedesc {
+   public:
+    template <class... C> codedesc(std::int32_t index, C... colors);
+  };
+  class object {
+   public:
+    std::int32_t id, originX, originY, centerX, centerY, width, height, score;
+    double angle;
+    bool exists;
+  };
+  enum objectType { ALL_AIOBJS = 1, ALL_TAGS = 2, ALL_COLORS = 3, ALL_CODES = 4, ALL_OBJECTS = 5 };
+  template <class... D> aivision(std::int32_t index, D... descriptions);
+  std::int32_t takeSnapshot(const colordesc& c, std::int32_t count = 8);
+  std::int32_t takeSnapshot(const codedesc& c, std::int32_t count = 8);
+  std::int32_t takeSnapshot(objectType type, std::int32_t count = 8);
+  object objects[24];
+  object largestObject;
+  std::int32_t objectCount;
+  void tagDetection(bool enable);
+  void colorDetection(bool enable, bool merge = false);
+  void modelDetection(bool enable);
+  void setColor(const colordesc& c);
+  void startAwb();
+  bool installed();
+  std::int32_t timestamp();
 };
 
 class optical {

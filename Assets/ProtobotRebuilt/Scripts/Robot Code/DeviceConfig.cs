@@ -77,8 +77,9 @@ namespace Protobot.RobotCode {
                     if (pros) return threeWire ? $"pros::adi::{prosType} {n}({port3});" : $"pros::{prosType} {n}({d.port});";
                     return threeWire ? $"{vexType} {n} = {vexType}(Brain.ThreeWirePort.{(char)('A' + Mathf.Clamp(d.port - 1, 0, 7))});" : $"{vexType} {n} = {vexType}(PORT{d.port});";
                 }
-                if (d.kind == DeviceKind.Vision) {   // V2
-                    foreach (var l in VisionLines(d, used, pros ? "pros" : "vex", out _).Split('\n')) sb.AppendLine(l);
+                if (d.kind == DeviceKind.Vision || d.kind == DeviceKind.Gps || d.kind == DeviceKind.AiVision) {   // V2
+                    var text = d.kind == DeviceKind.Vision ? VisionLines(d, used, pros ? "pros" : "vex", out _) : d.kind == DeviceKind.Gps ? GpsLines(d, used, pros ? "pros" : "vex", out _) : AiVisionLines(d, used, pros ? "pros" : "vex", out _);
+                    foreach (var l in text.Split('\n')) sb.AppendLine(l);
                     continue;
                 }
                 var line = d.kind switch {
@@ -236,6 +237,8 @@ namespace Protobot.RobotCode {
         private static string SensorLine(V5Device d, HashSet<string> used, out string name) {
             name = null;
             if (d.kind == DeviceKind.Vision) return VisionLines(d, used, "py", out name);   // V2
+            if (d.kind == DeviceKind.Gps) return GpsLines(d, used, "py", out name);         // V2
+            if (d.kind == DeviceKind.AiVision) return AiVisionLines(d, used, "py", out name);   // V2
             string Smart(string cls, string fallback) {
                 var n = Name(Controls.GivenName(d.part) ?? fallback, used);
                 return $"{n} = {cls}(Ports.PORT{d.port})";
@@ -263,9 +266,79 @@ namespace Protobot.RobotCode {
                 _ => null,
             };
             if (line != null) name = line.Substring(0, line.IndexOf(' '));
-            else if (d.kind == DeviceKind.Gps || d.kind == DeviceKind.Vision)
-                line = "# " + V5Device.KindName(d.kind) + " sensor on port " + d.port + ": not simulated yet";
             return line;
+        }
+
+        /// <summary>V2: an AI Vision Sensor with the color descriptions kept on it (its card's colors), as VEXcode writes
+        /// them (ai_vision_3__Red = Colordesc(1, ...); ai_vision_3 = AiVision(Ports.PORT3, ai_vision_3__Red,
+        /// AiVision.ALL_AIOBJS)). PROS: the colors as aivision_color_s_t values for set_color.</summary>
+        internal static string AiVisionLines(V5Device d, HashSet<string> used, string language, out string name) {
+            var n = Name(Controls.GivenName(d.part) ?? (language == "vex" ? "AIVision" + d.port : "ai_vision_" + d.port), used);
+            name = n;
+            var lines = new List<string>();
+            var names = new List<string>();
+            string F(float v) => v.ToString("0.##", CultureInfo.InvariantCulture);
+            foreach (var c in AiVisionSensor.Saved(d.part).Where(c => c.HasValue).Select(c => c.Value)) {
+                var cn = n + "__" + VisionSignature.Clean(c.name);
+                for (var i = 2; used.Contains(cn); i++) cn = n + "__" + VisionSignature.Clean(c.name) + "_" + i;
+                used.Add(cn);
+                names.Add(cn);
+                var values = string.Join(", ", c.id, c.r, c.g, c.b, F(c.hue), F(c.saturation));
+                lines.Add(language switch {
+                    "pros" => $"pros::aivision_color_s_t {cn} = pros::AIVision::Color({values});",
+                    "vex" => $"aivision::colordesc {cn} = aivision::colordesc({values});",
+                    _ => $"{cn} = Colordesc({values})",
+                });
+            }
+            var args = string.Join(", ", new[] { language == "py" ? "Ports.PORT" + d.port : "PORT" + d.port }.Concat(names)
+                .Concat(new[] { language == "py" ? "AiVision.ALL_AIOBJS" : "aivision::ALL_AIOBJS" }));
+            lines.Add(language switch {
+                "pros" => $"pros::AIVision {n}({d.port});" + (names.Count > 0 ? $"   // give it its colors in initialize(): {n}.set_color({names[0]});" : ""),
+                "vex" => $"aivision {n} = aivision({args});",
+                _ => $"{n} = AiVision({args})",
+            });
+            return string.Join("\n", lines);
+        }
+
+        /// <summary>V2: a GPS Sensor with where it sits on the robot, measured from the build as VEXcode's device window
+        /// asks for it: its X/Y offset from the turning center (the middle between the left and right drive motors; x to
+        /// the right, y forward) and the way it faces from the robot's front (180: on the back facing back).</summary>
+        internal static string GpsLines(V5Device d, HashSet<string> used, string language, out string name) {
+            var n = Name(Controls.GivenName(d.part) ?? (language == "vex" ? "GPS" + d.port : "gps_" + d.port), used);
+            name = n;
+            var (ox, oy, heading) = GpsMount(d);
+            string F2(double v) => v.ToString("0.00", CultureInfo.InvariantCulture);
+            return language switch {
+                "pros" => $"pros::Gps {n}({d.port}, {F2(ox * 0.0254)}, {F2(oy * 0.0254)});   // offset in meters" +
+                          (Math.Abs(heading) > 0.5 ? $"; it faces {Math.Round(heading)}° from the robot's front: get_heading() - {Math.Round(heading)} is the robot's heading" : ""),
+                "vex" => $"gps {n} = gps(PORT{d.port}, {F2(ox * 25.4)}, {F2(oy * 25.4)}, mm, {F2(heading)}, right);",
+                _ => $"{n} = Gps(Ports.PORT{d.port}, {F2(ox * 25.4)}, {F2(oy * 25.4)}, MM, {F2(heading)}, RIGHT)",
+            };
+        }
+
+        /// <summary>Where a GPS sits on the robot: inches right and forward of the turning center, and its turn
+        /// clockwise from the robot's front (no left/right drive motors: no offset).</summary>
+        internal static (double ox, double oy, double heading) GpsMount(V5Device d) {
+            Vector3 left = Vector3.zero, right = Vector3.zero;
+            int l = 0, r = 0;
+            foreach (var motor in MotorDrive.Live()) {
+                var side = Controls.Side(motor.gameObject);
+                if (side == "L") { left += motor.transform.position; l++; }
+                else if (side == "R") { right += motor.transform.position; r++; }
+            }
+            if (l == 0 || r == 0) return (0, 0, 0);
+            var center = (left / l + right / r) / 2f;
+            var across = right / r - left / l;
+            across.y = 0f;
+            if (across.sqrMagnitude < 1e-4f) return (0, 0, 0);
+            var rightAxis = across.normalized;
+            var front = Vector3.Cross(rightAxis, Vector3.up);
+            var (o, dir) = SensorFrame.Look(d.part);
+            var at = d.part.transform.TransformPoint(o) - center;
+            var look = Vector3.ProjectOnPlane(d.part.transform.TransformDirection(dir), Vector3.up);
+            var heading = look.sqrMagnitude < 1e-4f ? 0f : Mathf.Repeat(Vector3.SignedAngle(front, look, Vector3.up), 360f);
+            if (heading > 359.5f) heading = 0f;
+            return (Math.Round(Vector3.Dot(at, rightAxis), 2), Math.Round(Vector3.Dot(at, front), 2), Math.Round(heading, 1));
         }
 
         /// <summary>V2: a Vision Sensor and the signatures kept on it (made in its Vision Utility), as VEXcode writes

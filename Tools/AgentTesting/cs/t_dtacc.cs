@@ -1,6 +1,7 @@
 // (Play mode, the 6-motor drive loaded) DriveTrain drive_for 24" then turn_for 90°; the omni hold gain and gearbox
 // friction from PlayerPrefs "t_dtacc" = "gain,friction" (empty: leave them). Read the marks with t_marks.cs
-// ("t_code_marks": A start, B after the drive, C after the turn).
+// ("t_code_marks": A start, B after the drive, C after the turn). Track 14.125" = the 6-motor drive's, as Insert
+// devices measures it (12.5" here made the turn look like 76°: the wheels turned for a narrower robot).
 var BF = System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic;
 var set = UnityEngine.PlayerPrefs.GetString("t_dtacc", "");
 var gain = typeof(Protobot.Motion.Sandbox).GetField("HoldGain", BF);
@@ -10,7 +11,7 @@ var code = @"from vex import *
 brain = Brain()
 left = MotorGroup(Motor(Ports.PORT4), Motor(Ports.PORT5), Motor(Ports.PORT6))
 right = MotorGroup(Motor(Ports.PORT1, True), Motor(Ports.PORT2, True), Motor(Ports.PORT3, True))
-dt = DriveTrain(left, right, 3.25 * 3.14159, 12.5, 10, INCHES, 60 / 36)
+dt = DriveTrain(left, right, 3.25 * 3.14159, 14.125, 10, INCHES, 60 / 36)
 dt.set_drive_velocity(50, PERCENT)
 dt.set_turn_velocity(30, PERCENT)
 dt.set_stopping(BRAKE)
@@ -31,3 +32,4 @@ Protobot.RobotCode.RobotProgram.Printed += s => { if (s.StartsWith("mark") && rb
 string err; int line;
 var ok = Protobot.RobotCode.RobotProgram.Start(code, Protobot.RobotCode.RobotProgram.Period.Program, 0, out err, out line);
 return "started " + ok + " " + err + " gain " + gain.GetValue(null) + " friction " + friction.GetValue(null);
+

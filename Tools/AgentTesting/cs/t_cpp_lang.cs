@@ -103,6 +103,8 @@ int main() {
     x /= 2;
     x *= 3;
     printf(""compound %d ternary %s\n"", x, x > 5 ? ""big"" : ""small"");
+    Gains g2 = Gains{1.5, 0.0, 0.25};
+    printf(""brace %.2f %.2f %.1f\n"", g2.kP, g2.kD, Gains{3.0, 0.0, 1.0}.kP);
     return 0;
 }
 ";

@@ -15,6 +15,9 @@ di = Distance(Ports.PORT12)
 op = Optical(Ports.PORT13)
 vis = Vision(Ports.PORT14, 50)
 vobj = vis.largest_object()
+gp = Gps(Ports.PORT15, 0, 0, MM, 180, RIGHT)
+aiv = AiVision(Ports.PORT16, AiVision.ALL_AIOBJS)
+aobj = aiv.largest_object()
 rot = Rotation(Ports.PORT11)
 bu = Bumper(brain.three_wire_port.a)
 li = Limit(brain.three_wire_port.b)
@@ -47,7 +50,7 @@ m55 = Motor55(Ports.PORT7)
 var map = new System.Collections.Generic.Dictionary<string, string> {
     { "Ports", "Ports" }, { "GearSetting", "GearSetting" }, { "Color", "col" }, { "FontType", "FontType" }, { "Screen", "brain.screen" }, { "Timer", "tm" },
     { "_ThreeWirePorts", "brain.three_wire_port" }, { "Brain", "brain" }, { "_Axis", "ctl.axis1" }, { "_Button", "ctl.buttonA" }, { "Controller", "ctl" },
-    { "Motor", "m" }, { "MotorGroup", "g" }, { "DriveTrain", "dt" }, { "Inertial", "imu" }, { "SmartDrive", "sd" }, { "Distance", "di" }, { "Optical", "op" }, { "Vision", "vis" }, { "_VisionObject", "vobj" },
+    { "Motor", "m" }, { "MotorGroup", "g" }, { "DriveTrain", "dt" }, { "Inertial", "imu" }, { "SmartDrive", "sd" }, { "Distance", "di" }, { "Optical", "op" }, { "Vision", "vis" }, { "_VisionObject", "vobj" }, { "Gps", "gp" }, { "AiVision", "aiv" }, { "_AiVisionObject", "aobj" },
     { "Rotation", "rot" }, { "Bumper", "bu" }, { "Limit", "li" }, { "DigitalIn", "din" }, { "DigitalOut", "dout" }, { "Pneumatics", "pn" }, { "Encoder", "enc" },
     { "Potentiometer", "pot" }, { "PotentiometerV2", "pot2" }, { "Line", "ln" }, { "Light", "lt" }, { "Sonar", "so" }, { "Thread", "th" }, { "Event", "ev" },
     { "Competition", "comp" }, { "DirectionType", "DirectionType" }, { "TurnType", "TurnType" }, { "VelocityUnits", "VelocityUnits" }, { "PercentUnits", "PercentUnits" }, { "RotationUnits", "RotationUnits" }, { "TimeUnits", "TimeUnits" }, { "DistanceUnits", "DistanceUnits" }, { "VoltageUnits", "VoltageUnits" }, { "CurrentUnits", "CurrentUnits" }, { "TorqueUnits", "TorqueUnits" }, { "PowerUnits", "PowerUnits" }, { "TemperatureUnits", "TemperatureUnits" }, { "BrakeType", "BrakeType" }, { "ControllerType", "ControllerType" }, { "AxisType", "AxisType" }, { "OrientationType", "OrientationType" }, { "LedStateType", "LedStateType" }, { "ObjectSizeType", "ObjectSizeType" }, { "Gyro", "gy" }, { "Motor55", "m55" }, { "_Battery", "brain.battery" },
@@ -130,7 +133,7 @@ foreach (var item in new[] { new[] { "vex.pyi", Protobot.RobotCode.ApiStub.Text,
     // Module level.
     if (prefix == "") {
         foreach (var n in top) { if (n.StartsWith("_") || helpers.Contains(n)) continue; checkedN++; if (!gl.ContainsKey(n)) missing.Add(n); }
-        var mine = new System.Collections.Generic.HashSet<string> { "brain", "ctl", "m", "m2", "g", "dt", "imu", "sd", "di", "op", "rot", "bu", "li", "din", "dout", "pn", "enc", "pot", "pot2", "ln", "lt", "so", "tm", "f", "th", "ev", "comp", "col", "mdt", "tw", "sens", "lat", "cur", "ch", "pose", "motion", "gy", "m55", "vis", "vobj" };
+        var mine = new System.Collections.Generic.HashSet<string> { "brain", "ctl", "m", "m2", "g", "dt", "imu", "sd", "di", "op", "rot", "bu", "li", "din", "dout", "pn", "enc", "pot", "pot2", "ln", "lt", "so", "tm", "f", "th", "ev", "comp", "col", "mdt", "tw", "sens", "lat", "cur", "ch", "pose", "motion", "gy", "m55", "vis", "vobj", "gp", "aiv", "aobj" };
         foreach (var k in gl.Keys) if (!k.StartsWith("_") && !top.Contains(k) && !mine.Contains(k)) extra.Add("(module) " + k);
     } else {
         var mod = gl["motion"];

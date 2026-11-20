@@ -170,6 +170,7 @@ namespace Protobot.RobotCode {
             Class("DriveTrain", a => new VexDrive(program, a, false));
             Class("SmartDrive", a => new VexDrive(program, a, true));
             Class("Inertial", a => new VexInertial(program, a));
+            Class("Gps", a => new VexGps(program, a));   // V2
             Class("Distance", a => new VexDistance(program, a));
             Class("Optical", a => new VexOptical(program, a));
             Class("Rotation", a => new VexRotation(program, a));
@@ -198,6 +199,7 @@ namespace Protobot.RobotCode {
             m.globals["Vision"] = vision;
             m.globals["Signature"] = signature;
             m.globals["Code"] = code;
+            AiVisionApi.Register(program, m);   // V2: the AI Vision Sensor
             return m;
         }
 

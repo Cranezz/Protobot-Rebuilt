@@ -496,6 +496,8 @@ namespace Protobot.Devices {
                 SolenoidDevice s => 110f + 60f * s.cylinders.Count,
                 PlainDevice => 80f,
                 VisionSensor => 330f,
+                GpsSensor => 300f,
+                AiVisionSensor => 360f,
                 _ => 140f,
             };
         }
@@ -573,6 +575,8 @@ namespace Protobot.Devices {
                 case InertialSensor s: InertialDashboard(card, s); break;
                 case SolenoidDevice s: SolenoidDashboard(card, s); break;
                 case VisionSensor s: VisionDashboard(card, s); break;   // V2
+                case GpsSensor s: GpsDashboard(card, s); break;         // V2
+                case AiVisionSensor s: AiVisionDashboard(card, s); break;   // V2
                 case PlainDevice s: Note(card, s.Note); break;
                 default: ThreeWireDashboard(card, d); break;
             }

@@ -90,6 +90,7 @@ namespace Protobot.Devices {
                     g.Disc(P(-0.3f, -0.4f), s * 0.07f, Line);
                     break;
                 case DeviceKind.Vision:
+                case DeviceKind.AiVision:
                     Box(-0.85f, -0.55f, 0.85f, 0.55f, Line);
                     g.Ring(P(0f, 0f), s * 0.2f, Theme.Accent, w, 18);
                     break;

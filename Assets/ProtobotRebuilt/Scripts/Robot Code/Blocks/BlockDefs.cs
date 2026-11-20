@@ -76,6 +76,7 @@ namespace Protobot.RobotCode.Blocks {
             ["dir"] = new[] { ("forward", "FORWARD"), ("reverse", "REVERSE") },
             ["turn"] = new[] { ("right", "RIGHT"), ("left", "LEFT") },
             ["dist"] = new[] { ("mm", "MM"), ("inches", "INCHES") },
+            ["gpsaxis"] = new[] { ("X", "x_position"), ("Y", "y_position") },   // V2
             ["pct"] = new[] { ("%", "PERCENT"), ("rpm", "RPM") },
             ["vel"] = new[] { ("%", "PERCENT"), ("rpm", "RPM"), ("dps", "DPS") },
             ["rpmdps"] = new[] { ("rpm", "RPM"), ("dps", "DPS") },
@@ -126,13 +127,14 @@ namespace Protobot.RobotCode.Blocks {
             ["line"] = new[] { "Line" },
             ["light"] = new[] { "Light" },
             ["sonar"] = new[] { "Sonar" },
+            ["gps"] = new[] { "Gps" },   // V2
         };
 
         /// <summary>What a device of that kind is called when the robot has none (the block says so).</summary>
         public static string KindName(string kind) => kind switch {
             "motor" => "motor", "drivetrain" => "drivetrain", "inertial" => "inertial sensor", "distance" => "distance sensor", "optical" => "optical sensor",
             "rotation" => "rotation sensor", "bumper" => "bumper or limit switch", "digitalout" => "pneumatics (digital out)", "encoder" => "encoder",
-            "pot" => "potentiometer", "line" => "line tracker", "light" => "light sensor", "sonar" => "range finder", _ => kind,
+            "pot" => "potentiometer", "line" => "line tracker", "light" => "light sensor", "sonar" => "range finder", "gps" => "GPS sensor", _ => kind,
         };
 
         static BlockDefs() {
@@ -249,6 +251,12 @@ namespace Protobot.RobotCode.Blocks {
             Def(se, "imu_orientation", BlockShape.Reporter, "{@inertial} orientation of {orient} in degrees", "$0.orientation($1, DEGREES)");
             Def(se, "imu_acceleration", BlockShape.Reporter, "{@inertial} acceleration of {axis3} axis in g", "$0.acceleration($1)");
             Def(se, "imu_rate", BlockShape.Reporter, "{@inertial} gyro rate of {axis3} axis in dps", "$0.gyro_rate($1)");
+            // V2: the GPS Sensor (VEXcode's GPS blocks).
+            Def(se, "gps_calibrate", BlockShape.Stack, "calibrate {@gps}", "$0.calibrate()");
+            Def(se, "gps_position", BlockShape.Reporter, "{@gps} position {gpsaxis} in {dist}", "$0.$1($2)");
+            Def(se, "gps_heading", BlockShape.Reporter, "{@gps} heading in degrees", "$0.heading(DEGREES)");
+            Def(se, "gps_rotation", BlockShape.Reporter, "{@gps} rotation in degrees", "$0.rotation(DEGREES)");
+            Def(se, "gps_quality", BlockShape.Reporter, "{@gps} quality", "$0.quality()");
             Def(se, "distance_found", BlockShape.Boolean, "{@distance} found an object?", "$0.is_object_detected()");
             Def(se, "distance_distance", BlockShape.Reporter, "{@distance} object distance in {dist}", "$0.object_distance($1)");
             Def(se, "distance_velocity", BlockShape.Reporter, "{@distance} object velocity in m/s", "$0.object_velocity()");

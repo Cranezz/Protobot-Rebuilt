@@ -343,6 +343,54 @@ namespace Protobot.Devices {
             }
         }
 
+        // V2: the GPS Sensor: a map of the field with where it is and the way it faces, its numbers.
+        private void GpsDashboard(RectTransform card, GpsSensor s) {
+            var row = TileRow(card, 120f);
+            var map = Ui.Image(row, "Map", Theme.Field, 6f);
+            map.Size(120f, 120f, 0f);
+            var shapes = ShapeGraphic.Create(map.transform);
+            var lastKey = float.NaN;
+            live.Add(() => {
+                var key = s.X * 7.1f + s.Y * 3.3f + s.Heading + s.Quality * 0.01f;
+                if (Mathf.Abs(key - lastKey) < 0.05f) return;
+                lastKey = key;
+                shapes.Clear();
+                var r = ((RectTransform)map.transform).rect;
+                var c = r.center;
+                var half = Mathf.Min(r.width, r.height) * 0.5f - 8f;
+                var scale = half / GpsSensor.FieldHalf;
+                shapes.Line(c + new Vector2(-half, -half), c + new Vector2(half, -half), Theme.TextFaint, 1.5f);
+                shapes.Line(c + new Vector2(half, -half), c + new Vector2(half, half), Theme.TextFaint, 1.5f);
+                shapes.Line(c + new Vector2(half, half), c + new Vector2(-half, half), Theme.TextFaint, 1.5f);
+                shapes.Line(c + new Vector2(-half, half), c + new Vector2(-half, -half), Theme.TextFaint, 1.5f);
+                shapes.Line(c + new Vector2(-half, 0f), c + new Vector2(half, 0f), new Color(1f, 1f, 1f, 0.08f), 1f);
+                shapes.Line(c + new Vector2(0f, -half), c + new Vector2(0f, half), new Color(1f, 1f, 1f, 0.08f), 1f);
+                if (s.Quality <= 0f) return;
+                var at = c + new Vector2(Mathf.Clamp(s.X, -GpsSensor.FieldHalf, GpsSensor.FieldHalf), Mathf.Clamp(s.Y, -GpsSensor.FieldHalf, GpsSensor.FieldHalf)) * scale;
+                var a = (90f - s.Heading) * Mathf.Deg2Rad;
+                var dir = new Vector2(Mathf.Cos(a), Mathf.Sin(a));
+                var color = s.Quality >= 100f ? Theme.Accent : Theme.Warning;
+                if (s.Seeing) {
+                    var wall = c + (new Vector2(s.X, s.Y) + dir * s.WallDistance) * scale;
+                    shapes.Line(at, wall, new Color(color.r, color.g, color.b, 0.35f), 1f);
+                }
+                shapes.Line(at, at + dir * 11f, color, 2.5f);
+                shapes.Disc(at, 4.5f, color);
+            });
+            var numbers = Ui.Rect("Numbers", row);
+            Ui.Column(numbers, 6f);
+            numbers.Size(-1, 120f, 1f);
+            var top = TileRow(numbers);
+            Tile(top, "X", () => s.Quality <= 0f ? "—" : DevicesFormat.Inches(s.X), 1f, "Across the field, from its middle: + toward the blue drivers' side (VEX's GPS coordinates).");
+            Tile(top, "Y", () => s.Quality <= 0f ? "—" : DevicesFormat.Inches(s.Y), 1f, "Along the field, from its middle: + away from the audience.");
+            var second = TileRow(numbers);
+            Tile(second, "Heading", () => F(s.Heading, "0.0") + "°", 1f, "The way its camera faces, clockwise from the far wall (0°).");
+            Tile(second, "Quality", () => F(s.Quality, "0") + "%", 1f,
+                "100: reading the field's code strip. 90: too close to the wall or just lost it (its own inertial sensor carries on). 80 to 0: lost for longer (it drifts); 0: frozen.");
+            Note(card, Protobot.Game.SkillsGame.Current != null ? "It needs a clear, level view of a wall 8\" or more away (quality 100 = reading the field's code strip)."
+                : "Outside a game the field is a 12' square round the build's origin (+X right, +Y away from you on the grid).", Theme.TextFaint, 34f);
+        }
+
         private void InertialDashboard(RectTransform card, InertialSensor s) {
             var row = TileRow(card, 70f);
             var dial = Ui.Image(row, "Dial", Theme.Field, 6f);

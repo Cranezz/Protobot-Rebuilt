@@ -153,6 +153,8 @@ namespace Protobot.Devices {
             var (origin, look, up) = Lens();
             var camera = VisionCamera.Get();
             camera.transform.SetPositionAndRotation(origin, Quaternion.LookRotation(look, up));
+            camera.fieldOfView = VerticalFov;                 // V2 (the AI Vision Sensor shares the camera)
+            camera.aspect = (float)Width / Height;
             camera.targetTexture = Picture;
             camera.cullingMask = VisionCamera.Mask;
             try { camera.Render(); }

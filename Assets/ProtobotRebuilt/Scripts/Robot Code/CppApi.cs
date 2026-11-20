@@ -130,7 +130,7 @@ namespace Protobot.RobotCode {
                 ("distance", "Distance"), ("optical", "Optical"), ("bumper", "Bumper"), ("limit", "Limit"), ("digital_out", "DigitalOut"),
                 ("digital_in", "DigitalIn"), ("pneumatics", "Pneumatics"), ("encoder", "Encoder"), ("pot", "Potentiometer"),
                 ("potV2", "PotentiometerV2"), ("line", "Line"), ("light", "Light"), ("sonar", "Sonar"), ("gyro", "Gyro"),
-                ("timer", "Timer"), ("thread", "Thread"), ("event", "Event"), ("vision", "Vision"),
+                ("timer", "Timer"), ("thread", "Thread"), ("event", "Event"), ("vision", "Vision"), ("gps", "Gps"), ("aivision", "AiVision"),
                 ("signature", "Signature"),   // V2: using signature = vision::signature; (VEXcode's robot-config)
             })
                 if (py.globals.TryGetValue(python, out var cls)) m.globals[cpp] = cls;
@@ -250,6 +250,9 @@ namespace Protobot.RobotCode {
             Class("Distance", a => new ProsSensor(program, a, "Distance"));
             Class("Optical", a => new ProsSensor(program, a, "Optical"));
             // V2: the Vision Sensor (PROS: pros::Vision, signature_from_utility, get_by_sig / get_by_size / get_by_code).
+            Class("Gps", a => new ProsGps(program, a));   // V2
+            ProsAiVision.Register(program, m);            // V2
+            m.globals["GPS"] = m.globals["Gps"];
             Class("Vision", a => new ProsVision(program, a));
             var fromUtility = new PyBuiltin("signature_from_utility", a => new VexVisionSignature(a));
             ((PyClass)m.globals["Vision"]).dict["signature_from_utility"] = fromUtility;
@@ -538,6 +541,79 @@ namespace Protobot.RobotCode {
             }
 
             public double Degrees() => Ops.ToDouble(Call(program, sensor, "position", Units["DEGREES"]));
+        }
+
+        /// <summary>V2: PROS's pros::Gps on the simulated sensor: positions and offsets in meters, heading 0-360 clockwise
+        /// (the sensor's own: PROS has no heading offset). Gps(port), (port, xOffset, yOffset), (port, xInitial, yInitial,
+        /// headingInitial), (port, xInitial, yInitial, headingInitial, xOffset, yOffset).</summary>
+        private sealed class ProsGps : VexObject {
+            public override string TypeName => "Gps";
+
+            public ProsGps(RobotProgram p, Args a) {
+                var gps = new VexGps(p, A(p, "Gps", Ops.ToLong(a.Need(0, "port"))));
+                object Mm(double meters) => meters * 1000.0;
+                void Offset(double x, double y) => Call(p, gps, "set_origin", Mm(x), Mm(y), Units["MM"]);
+                void Place(double x, double y, double h) => Call(p, gps, "set_location", Mm(x), Mm(y), Units["MM"], h, Units["DEGREES"]);
+                double N(int i) => Ops.ToDouble(a.pos[i]);
+                if (a.Count == 3) Offset(N(1), N(2));
+                else if (a.Count >= 4) {
+                    Place(N(1), N(2), N(3));
+                    if (a.Count >= 6) Offset(N(4), N(5));
+                }
+                double X() => Ops.ToDouble(Call(p, gps, "x_position", Units["MM"])) / 1000.0;
+                double Y() => Ops.ToDouble(Call(p, gps, "y_position", Units["MM"])) / 1000.0;
+                double H() => gps.Heading();
+                double O(string axis) => Ops.ToDouble(Call(p, gps, "orientation", Units[axis], Units["DEGREES"]));
+                double G(string axis) => Ops.ToDouble(Call(p, gps, "gyro_rate", Units[axis], Units["DPS"]));
+                double Acc(string axis) => Ops.ToDouble(Call(p, gps, "acceleration", Units[axis]));
+                VexStruct S(string type, params (string, object)[] fields) => new VexStruct(type, fields);
+                Method("initialize_full", a2 => {
+                    Place(a2.Number(0, "xInitial", 0), a2.Number(1, "yInitial", 0), a2.Number(2, "headingInitial", 0));
+                    Offset(a2.Number(3, "xOffset", 0), a2.Number(4, "yOffset", 0));
+                    return 1L;
+                });
+                Method("set_offset", a2 => { Offset(a2.Number(0, "xOffset", 0), a2.Number(1, "yOffset", 0)); return 1L; });
+                Method("get_offset", _ => S("gps_position_s_t", ("x", 0.0), ("y", 0.0)));
+                Method("set_position", a2 => { Place(a2.Number(0, "xInitial", 0), a2.Number(1, "yInitial", 0), a2.Number(2, "headingInitial", 0)); return 1L; });
+                Method("set_data_rate", _ => 1L);
+                Method("get_error", _ => (double)(p.Device<GpsSensor>(PortOf(gps), false, "GPS Sensor")?.ErrorInches ?? 0f) * 0.0254);
+                Method("get_status", _ => S("gps_status_s_t", ("x", X()), ("y", Y()), ("pitch", O("PITCH")), ("roll", O("ROLL")), ("yaw", O("YAW"))));
+                Add("get_position_and_orientation", Member("get_status"));
+                Method("get_position", _ => S("gps_position_s_t", ("x", X()), ("y", Y()), ("heading", H())));
+                Method("get_position_x", _ => X());
+                Method("get_position_y", _ => Y());
+                Method("get_orientation", _ => S("gps_orientation_s_t", ("pitch", O("PITCH")), ("roll", O("ROLL")), ("yaw", O("YAW"))));
+                Method("get_pitch", _ => O("PITCH"));
+                Method("get_roll", _ => O("ROLL"));
+                Method("get_yaw", _ => O("YAW"));
+                Method("get_heading", _ => H());
+                Method("get_heading_raw", _ => gps.Rotation());
+                Method("get_rotation", _ => gps.Rotation());
+                Method("set_rotation", a2 => { Call(p, gps, "set_rotation", a2.Number(0, "target", 0), Units["DEGREES"]); return 1L; });
+                Method("tare_rotation", _ => { Call(p, gps, "reset_rotation"); return 1L; });
+                Method("get_gyro_rate", _ => S("gps_gyro_s_t", ("x", G("XAXIS")), ("y", G("YAXIS")), ("z", G("ZAXIS"))));
+                Method("get_gyro_rate_x", _ => G("XAXIS"));
+                Method("get_gyro_rate_y", _ => G("YAXIS"));
+                Method("get_gyro_rate_z", _ => G("ZAXIS"));
+                Method("get_accel", _ => S("gps_accel_s_t", ("x", Acc("XAXIS")), ("y", Acc("YAXIS")), ("z", Acc("ZAXIS"))));
+                Method("get_accel_x", _ => Acc("XAXIS"));
+                Method("get_accel_y", _ => Acc("YAXIS"));
+                Method("get_accel_z", _ => Acc("ZAXIS"));
+                Method("is_installed", _ => Call(p, gps, "installed"));
+                Method("get_port", _ => (long)PortOf(gps));
+            }
+
+            private static int PortOf(VexGps g) => g.PortNumber;
+        }
+
+        /// <summary>A plain C struct (PROS's gps_position_s_t and the like): fields only.</summary>
+        private sealed class VexStruct : VexObject {
+            private readonly string type;
+            public override string TypeName => type;
+            public VexStruct(string type, (string name, object value)[] fields) {
+                this.type = type;
+                foreach (var (n, v) in fields) Field(n, v);
+            }
         }
 
         /// <summary>V2: PROS's pros::Vision on the simulated sensor. Objects are vision_object_s_t (signature, type,

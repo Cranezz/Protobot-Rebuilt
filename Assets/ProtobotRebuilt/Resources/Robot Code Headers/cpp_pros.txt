@@ -171,6 +171,96 @@ class Imu {
 };
 typedef Imu IMU;
 
+struct gps_position_s_t { double x; double y; double heading; };
+struct gps_status_s_t { double x; double y; double pitch; double roll; double yaw; };
+struct gps_orientation_s_t { double pitch; double roll; double yaw; };
+struct gps_gyro_s_t { double x; double y; double z; };
+struct gps_accel_s_t { double x; double y; double z; };
+
+/** V5 GPS Sensor: meters from the field middle: +X toward the blue drivers, +Y away from the audience; heading
+ *  0-360 clockwise from the far wall (the sensor's own way). Offsets: where it sits from the turning center. */
+class Gps {
+ public:
+  explicit Gps(std::uint8_t port);
+  explicit Gps(std::uint8_t port, double xOffset, double yOffset);
+  explicit Gps(std::uint8_t port, double xInitial, double yInitial, double headingInitial);
+  explicit Gps(std::uint8_t port, double xInitial, double yInitial, double headingInitial, double xOffset, double yOffset);
+  std::int32_t initialize_full(double xInitial, double yInitial, double headingInitial, double xOffset, double yOffset) const;
+  std::int32_t set_offset(double xOffset, double yOffset) const;
+  gps_position_s_t get_offset() const;
+  std::int32_t set_position(double xInitial, double yInitial, double headingInitial) const;
+  std::int32_t set_data_rate(std::uint32_t rate) const;
+  double get_error() const;
+  gps_status_s_t get_status() const;
+  gps_status_s_t get_position_and_orientation() const;
+  gps_position_s_t get_position() const;
+  double get_position_x() const;
+  double get_position_y() const;
+  gps_orientation_s_t get_orientation() const;
+  double get_pitch() const;
+  double get_roll() const;
+  double get_yaw() const;
+  double get_heading() const;
+  double get_heading_raw() const;
+  double get_rotation() const;
+  std::int32_t set_rotation(double target) const;
+  std::int32_t tare_rotation() const;
+  gps_gyro_s_t get_gyro_rate() const;
+  double get_gyro_rate_x() const;
+  double get_gyro_rate_y() const;
+  double get_gyro_rate_z() const;
+  gps_accel_s_t get_accel() const;
+  double get_accel_x() const;
+  double get_accel_y() const;
+  double get_accel_z() const;
+  bool is_installed() const;
+  std::uint8_t get_port() const;
+};
+typedef Gps GPS;
+
+/** V5 AI Vision Sensor, 320 x 240: get_object reads the latest picture's objects, widest first. AI classes here
+ *  (Override): 0 Red Pin, 1 Blue Pin, 2 Yellow Pin, 3 Cup. */
+enum class AivisionDetectType : std::uint8_t { color = 1, code = 2, object = 4, tag = 8 };
+enum class AivisionModeType : std::uint8_t { tags = 1, colors = 2, objects = 4, color_merge = 16, all = 7 };
+enum class AivisionTagFamily { tag_21H7 = 0, tag_16H5 = 1, tag_25H9 = 2, tag_61H11 = 3 };
+struct aivision_color_s_t { std::uint8_t id; std::uint8_t red; std::uint8_t green; std::uint8_t blue; float hue_range; float saturation_range; };
+struct aivision_code_s_t { std::uint8_t id; std::uint8_t length; std::int16_t c1; std::int16_t c2; std::int16_t c3; std::int16_t c4; std::int16_t c5; };
+struct aivision_object_color_s_t { std::uint16_t xoffset; std::uint16_t yoffset; std::uint16_t width; std::uint16_t height; std::uint16_t angle; };
+struct aivision_object_tag_s_t { std::int16_t x0; std::int16_t y0; std::int16_t x1; std::int16_t y1; std::int16_t x2; std::int16_t y2; std::int16_t x3; std::int16_t y3; };
+struct aivision_object_element_s_t { std::uint16_t xoffset; std::uint16_t yoffset; std::uint16_t width; std::uint16_t height; std::uint16_t score; };
+struct aivision_object_s_t {
+  std::uint8_t id;
+  std::uint8_t type;
+  struct { aivision_object_color_s_t color; aivision_object_tag_s_t tag; aivision_object_element_s_t element; } object;
+};
+class AIVision {
+ public:
+  using Color = aivision_color_s_t;
+  using Code = aivision_code_s_t;
+  using Object = aivision_object_s_t;
+  explicit AIVision(std::uint8_t port);
+  static bool is_type(const Object& object, AivisionDetectType type);
+  std::int32_t reset();
+  std::int32_t get_enabled_detection_types();
+  std::int32_t set_enabled_detection_types(std::uint8_t bits, std::uint8_t bitmask);
+  std::int32_t enable_detection_types(AivisionModeType types_mask);
+  std::int32_t disable_detection_types(AivisionModeType types_mask);
+  std::int32_t set_tag_family(AivisionTagFamily family, bool override = false);
+  std::int32_t set_color(const Color& color);
+  Color get_color(std::uint32_t id);
+  std::uint32_t set_code(const Code& code);
+  Code get_code(std::uint32_t id);
+  std::int32_t start_awb();
+  std::int32_t set_usb_bounding_box_overlay(bool enabled);
+  std::int32_t get_object_count();
+  Object get_object(std::uint32_t object_index);
+  std::vector<Object> get_all_objects();
+  double get_temperature();
+  std::uint8_t get_port() const;
+  bool is_installed() const;
+};
+inline AivisionModeType operator|(AivisionModeType a, AivisionModeType b) { return static_cast<AivisionModeType>(static_cast<std::uint8_t>(a) | static_cast<std::uint8_t>(b)); }
+
 class Rotation {
  public:
   /** port 1-21, negative to reverse it. */

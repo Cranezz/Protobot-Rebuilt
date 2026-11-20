@@ -9,18 +9,18 @@ var progs = new System.Collections.Generic.Dictionary<string, string>();
 var maps = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.Dictionary<string, string>>();
 progs["cpp_pros"] = "#include \"main.h\"\n" +
     "pros::Motor m(1, pros::MotorGears::blue);\npros::MotorGroup g({1, -2});\npros::Controller c(pros::E_CONTROLLER_MASTER);\npros::Imu imu(10);\n" +
-    "pros::Rotation r(11);\npros::Distance d(12);\npros::Optical o(13);\npros::Vision vis(14);\npros::adi::DigitalOut dout('A');\npros::adi::Pneumatics pn('B', false);\n" +
+    "pros::Rotation r(11);\npros::Distance d(12);\npros::Optical o(13);\npros::Vision vis(14);\npros::Gps gp(15);\npros::AIVision aiv(16);\npros::adi::DigitalOut dout('A');\npros::adi::Pneumatics pn('B', false);\n" +
     "pros::adi::DigitalIn din('C');\npros::adi::Encoder enc('E', 'F');\nvoid f() { pros::delay(10); }\npros::Task t(f);\n" +
     "void opcontrol() { pros::delay(10); }\n";
 maps["cpp_pros"] = new System.Collections.Generic.Dictionary<string, string> {
     { "pros.AbstractMotor", "m" }, { "pros.Motor", "m" }, { "pros.MotorGroup", "g" }, { "pros.Controller", "c" }, { "pros.Imu", "imu" },
-    { "pros.Rotation", "r" }, { "pros.Distance", "d" }, { "pros.Optical", "o" }, { "pros.Vision", "vis" }, { "pros.adi.DigitalOut", "dout" }, { "pros.adi.Pneumatics", "pn" },
+    { "pros.Rotation", "r" }, { "pros.Distance", "d" }, { "pros.Optical", "o" }, { "pros.Vision", "vis" }, { "pros.Gps", "gp" }, { "pros.AIVision", "aiv" }, { "pros.adi.DigitalOut", "dout" }, { "pros.adi.Pneumatics", "pn" },
     { "pros.adi.DigitalIn", "din" }, { "pros.adi.Encoder", "enc" }, { "pros.Task", "t" }, { "pros", "pros" }, { "pros.adi", "pros.adi" },
     { "pros.lcd", "pros.lcd" }, { "pros.competition", "pros.competition" },
 };
 progs["cpp_vex"] = "#include \"vex.h\"\nusing namespace vex;\n" +
     "motor m(PORT1, ratio18_1, false);\nmotor m2(PORT2);\nmotor_group g(m, m2);\ndrivetrain dt(g, g, 319, 295, 40, mm, 1);\ninertial imu(PORT10);\n" +
-    "smartdrive sd(g, g, imu, 319, 320, 40, mm, 1);\nrotation r(PORT11);\ndistance di(PORT12);\noptical o(PORT13);\nvision vis(PORT14, 50);\nbumper b(Brain.ThreeWirePort.A);\n" +
+    "smartdrive sd(g, g, imu, 319, 320, 40, mm, 1);\nrotation r(PORT11);\ndistance di(PORT12);\noptical o(PORT13);\nvision vis(PORT14, 50);\ngps gp(PORT15, 0, 0, mm, 180, right);\naivision aiv(PORT16, aivision::ALL_AIOBJS);\nbumper b(Brain.ThreeWirePort.A);\n" +
     "limit l(Brain.ThreeWirePort.B);\ndigital_out dout(Brain.ThreeWirePort.C);\ndigital_in din(Brain.ThreeWirePort.D);\npneumatics pn(Brain.ThreeWirePort.E);\n" +
     "encoder enc(Brain.ThreeWirePort.F);\npot pt(Brain.ThreeWirePort.G);\npotV2 pt2(Brain.ThreeWirePort.H);\nline ln(Brain.ThreeWirePort.A);\nlight lt(Brain.ThreeWirePort.B);\n" +
     "sonar so(Brain.ThreeWirePort.C);\ngyro gy(Brain.ThreeWirePort.D);\ntimer tm;\ncompetition comp;\nvoid f() { }\nint fi() { return 0; }\nthread th(f);\ntask tk(fi);\nevent ev(f);\n" +
@@ -29,7 +29,7 @@ maps["cpp_vex"] = new System.Collections.Generic.Dictionary<string, string> {
     { "vex", "vex" }, { "vex.color", "col" }, { "vex.triport", "Brain.ThreeWirePort" }, { "vex.brain", "Brain" }, { "vex.brain.lcd", "Brain.Screen" },
     { "vex.brain.timer_", "Brain.Timer" }, { "vex.brain.battery", "Brain.Battery" }, { "vex.controller", "Controller1" }, { "vex.controller.axis", "Controller1.Axis1" },
     { "vex.controller.button", "Controller1.ButtonA" }, { "vex.controller.lcd", "Controller1.Screen" }, { "vex.motor", "m" }, { "vex.motor_group", "g" },
-    { "vex.inertial", "imu" }, { "vex.rotation", "r" }, { "vex.distance", "di" }, { "vex.optical", "o" }, { "vex.vision", "vis" }, { "vex.vision.object", "vis.largestObject" }, { "vex.bumper", "b" }, { "vex.limit", "l" },
+    { "vex.inertial", "imu" }, { "vex.rotation", "r" }, { "vex.distance", "di" }, { "vex.optical", "o" }, { "vex.vision", "vis" }, { "vex.gps", "gp" }, { "vex.aivision", "aiv" }, { "vex.aivision.object", "aiv.largestObject" }, { "vex.vision.object", "vis.largestObject" }, { "vex.bumper", "b" }, { "vex.limit", "l" },
     { "vex.digital_out", "dout" }, { "vex.digital_in", "din" }, { "vex.pneumatics", "pn" }, { "vex.encoder", "enc" }, { "vex.pot", "pt" }, { "vex.potV2", "pt2" },
     { "vex.line", "ln" }, { "vex.light", "lt" }, { "vex.sonar", "so" }, { "vex.gyro", "gy" }, { "vex.drivetrain", "dt" }, { "vex.smartdrive", "sd" },
     { "vex.timer", "tm" }, { "vex.thread", "th" }, { "vex.task", "tk" }, { "vex.this_thread", "vex.this_thread" }, { "vex.event", "ev" }, { "vex.competition", "comp" },

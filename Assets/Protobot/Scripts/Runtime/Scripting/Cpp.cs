@@ -1691,6 +1691,12 @@ namespace Protobot.Scripting {
                     p++;
                     e = At(new CIncr { target = e, delta = tok.text == "++" ? 1 : -1 }, tok);
                 }
+                // V2: brace construction, Type{1, 2} (pros::AIVision::Color{1, 255, 0, 0, 10, 0.2}): a call with them.
+                // (Inside an expression a name is never followed by a block's brace.)
+                else if (Is("{") && (e is NameExpr || e is AttrExpr)) {
+                    var (items, kn, kv) = BraceItems();
+                    e = MakeCall(e, items, kn, kv, tok);
+                }
                 else return e;
             }
         }
