@@ -84,6 +84,23 @@ namespace Protobot.RobotCode.Blocks {
                 counts[kind] = n + 1;
                 return kind + "_" + n;
             }
+            var allGlobals = program.numbers.Concat(program.booleans).Concat(program.lists.Select(l => l.name)).Concat(program.lists2.Select(l => l.name))
+                                    .Select(Ident).Distinct().ToList();
+            // My Blocks first (VEXcode puts their functions before the events'), each a def with its inputs.
+            foreach (var hat in hats.Where(h => program.IsDefine(h))) {
+                var m = program.MyBlockOf(hat);
+                if (m == null) continue;
+                var args = m.Inputs.Select(i => Ident(i.text)).ToList();
+                body.Comment(0, hat);
+                body.Line(0, "def " + m.Function + "(" + string.Join(", ", args) + "):", hat);
+                var mine = allGlobals.Where(g => !args.Contains(g)).ToList();
+                if (mine.Count > 0) body.Line(1, "global " + string.Join(", ", mine), hat);
+                var start = body.lineBlocks.Count;
+                body.Stack(hat.next, 1);
+                if (body.lineBlocks.Count == start) body.Line(1, "pass", hat);
+                body.Line(0, "", null);
+            }
+            hats = hats.Where(h => !program.IsDefine(h)).ToList();
             foreach (var hat in hats) {
                 var f = hat.type switch {
                     "when_started" => "when_started" + (counts.TryGetValue("ws", out var n) ? n + 1 : 1),
@@ -99,9 +116,9 @@ namespace Protobot.RobotCode.Blocks {
                 };
                 if (hat.type == "when_started") counts["ws"] = counts.TryGetValue("ws", out var w) ? w + 1 : 1;
                 names[hat] = f;
+                body.Comment(0, hat);
                 body.Line(0, "def " + f + "():", hat);
-                var globals = program.numbers.Concat(program.booleans).Select(Ident).Distinct().ToList();
-                if (globals.Count > 0) body.Line(1, "global " + string.Join(", ", globals), hat);
+                if (allGlobals.Count > 0) body.Line(1, "global " + string.Join(", ", allGlobals), hat);
                 var before = body.lineBlocks.Count;
                 body.Stack(hat.next, 1);
                 if (body.lineBlocks.Count == before) body.Line(1, "pass", hat);
@@ -119,11 +136,16 @@ namespace Protobot.RobotCode.Blocks {
             var vars = program.numbers.Select(Ident).Distinct().ToList();
             var bools = program.booleans.Select(Ident).Distinct().ToList();
             var events = program.events.Select(Ident).Distinct().ToList();
-            if (vars.Count + bools.Count + events.Count > 0) {
+            if (vars.Count + bools.Count + events.Count + program.lists.Count + program.lists2.Count > 0) {
                 Line(0, "", null);
                 Line(0, "# Variables and messages", null);
                 foreach (var v in vars) Line(0, v + " = 0", null);
                 foreach (var v in bools) Line(0, v + " = False", null);
+                foreach (var l in program.lists) Line(0, Ident(l.name) + " = [" + string.Join(", ", Enumerable.Repeat("0", System.Math.Max(1, l.size))) + "]", null);
+                foreach (var l in program.lists2) {
+                    var row = "[" + string.Join(", ", Enumerable.Repeat("0", System.Math.Max(1, l.cols))) + "]";
+                    Line(0, Ident(l.name) + " = [" + string.Join(", ", Enumerable.Repeat(row, System.Math.Max(1, l.rows))) + "]", null);
+                }
                 foreach (var v in events) Line(0, v + " = Event()", null);
             }
             Line(0, "", null);
@@ -192,9 +214,16 @@ namespace Protobot.RobotCode.Blocks {
             else if (lineBlocks.Count == before) Line(indent, "pass", owner);
         }
 
+        /// <summary>A block's comment as # lines (above its Python, as VEXcode puts it).</summary>
+        private void Comment(int indent, Block b) {
+            if (string.IsNullOrWhiteSpace(b.comment)) return;
+            foreach (var line in b.comment.Replace("\r", "").Trim().Split('\n')) Line(indent, ("# " + line).TrimEnd(), b);
+        }
+
         private void Statement(Block b, int indent) {
             var def = b.Def;
             if (def == null || def.IsReporter || def.shape == BlockShape.Hat) return;
+            Comment(indent, b);
             switch (b.type) {
                 case "repeat":
                     Line(indent, "for repeat_count in range(int(" + Expr(b, 0) + ")):", b);
@@ -317,7 +346,7 @@ namespace Protobot.RobotCode.Blocks {
         }
 
         private string VarName(Block b, int slot, string kind) {
-            var list = kind == "bool" ? program.booleans : kind == "event" ? program.events : program.numbers;
+            var list = program.Names(kind);
             var value = slot < b.fields.Count ? b.fields[slot] : "";
             if (!list.Contains(value) && list.Count > 0) value = list[0];
             return Ident(value);

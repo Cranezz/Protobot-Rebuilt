@@ -65,6 +65,7 @@ namespace Protobot.RobotCode.Blocks {
             new("sensing", "Sensing", Hex("#5CB1D6")),
             new("operators", "Operators", Hex("#59C059")),
             new("variables", "Variables", Hex("#FF8C1A")),
+            new("myblocks", "My Blocks", Hex("#FF6680")),
         };
 
         public static readonly Dictionary<string, BlockDef> ById = new();
@@ -107,6 +108,7 @@ namespace Protobot.RobotCode.Blocks {
                                  ("asin", "math.degrees(math.asin(#))"), ("acos", "math.degrees(math.acos(#))"), ("atan", "math.degrees(math.atan(#))"),
                                  ("ln", "math.log(#)"), ("log", "math.log10(#)"), ("e ^", "math.exp(#)"), ("10 ^", "(10 ** (#))") },
             ["conv"] = new[] { ("text", "str(#)"), ("number", "float(#)") },
+            ["rowscol"] = new[] { ("rows", "len(#)"), ("columns", "len(#[0])") },
         };
 
         /// <summary>The device kinds the dropdowns list, and the Python classes that make them.</summary>
@@ -297,6 +299,80 @@ namespace Protobot.RobotCode.Blocks {
             Def(va, "change_var", BlockShape.Stack, "change {$num} by (1)", "$0 += $1");
             Def(va, "bool", BlockShape.Boolean, "{=bool}", "$0").hidden = true;
             Def(va, "set_bool", BlockShape.Stack, "set {$bool} to <>", "$0 = $1");
+            // Lists (VEX's Variables reference: positions start at 1); each list's "set" is made per list (RegisterSetList).
+            Def(va, "list_item", BlockShape.Reporter, "item (1) of {$list}", "$1[int($0) - 1]").hidden = true;
+            Def(va, "list_replace", BlockShape.Stack, "replace item (1) of {$list} to (1)", "$1[int($0) - 1] = $2").hidden = true;
+            Def(va, "list_length", BlockShape.Reporter, "length of {$list}", "len($0)").hidden = true;
+            Def(va, "list2_item", BlockShape.Reporter, "item (1) (1) of {$list2}", "$2[int($0) - 1][int($1) - 1]").hidden = true;
+            Def(va, "list2_replace", BlockShape.Stack, "replace item (1) (1) of {$list2} to (1)", "$2[int($0) - 1][int($1) - 1] = $3").hidden = true;
+            Def(va, "list2_length", BlockShape.Reporter, "length of {$list2} {rowscol}", "#$1($0)").hidden = true;
+
+            // ---------------------------------------------------------------- My Blocks (each one's call and define hat: RegisterMyBlock)
+            const string my = "myblocks";
+            Def(my, "arg", BlockShape.Reporter, "{=num}", "$0").hidden = true;
+            Def(my, "argbool", BlockShape.Boolean, "{=bool}", "$0").hidden = true;
+        }
+
+        /// <summary>Words that can go in a spec as a label (no slot brackets).</summary>
+        public static string Words(string text) {
+            var s = new System.Text.StringBuilder();
+            foreach (var c in text ?? "") if ("()[]{}<>▶$#%".IndexOf(c) < 0) s.Append(c);
+            return s.ToString().Trim();
+        }
+
+        /// <summary>A My Block's two kinds: the call (a stack block with its inputs) and its define hat.</summary>
+        public static void RegisterMyBlock(MyBlock m) {
+            var spec = new System.Text.StringBuilder(Words(m.name));
+            var args = new List<string>();
+            foreach (var part in m.parts) {
+                if (part.kind == "label") {
+                    var w = Words(part.text);
+                    if (w.Length > 0) spec.Append(' ').Append(w);
+                    continue;
+                }
+                spec.Append(part.kind == "boolean" ? " <>" : " (0)");
+                args.Add("$" + args.Count);
+            }
+            if (args.Count > 10) args.RemoveRange(10, args.Count - 10);   // ($0-$9: the dialog allows ten inputs)
+            var name = spec.ToString().Trim();
+            if (name.Length == 0) name = "block";
+            Register(new BlockDef { id = "call:" + m.key, category = "myblocks", shape = BlockShape.Stack, spec = name, py = m.Function + "(" + string.Join(", ", args) + ")", hidden = true });
+            Register(new BlockDef { id = "define:" + m.key, category = "myblocks", shape = BlockShape.Hat, spec = "define " + name, py = "", hidden = true });
+        }
+
+        /// <summary>A list's "set" block: a number slot per item (a 2D list's rows apart).</summary>
+        public static void RegisterSetList(ListVar l, bool twoD) {
+            var spec = new System.Text.StringBuilder("set " + Words(l.name) + " to");
+            var py = new System.Text.StringBuilder(BlockCode.Ident(l.name) + " = [");
+            var n = 0;
+            if (!twoD) {
+                for (var i = 0; i < Mathf.Clamp(l.size, 1, 10); i++) {
+                    spec.Append(" (0)");
+                    py.Append(i > 0 ? ", " : "").Append("$" + n++);
+                }
+            }
+            else {
+                for (var r = 0; r < Mathf.Clamp(l.rows, 1, 10); r++) {
+                    if (r > 0) spec.Append(" |");
+                    py.Append(r > 0 ? ", [" : "[");
+                    for (var c = 0; c < Mathf.Clamp(l.cols, 1, 10) && n < 10; c++) {
+                        spec.Append(" (0)");
+                        py.Append(c > 0 ? ", " : "").Append("$" + n++);
+                    }
+                    py.Append("]");
+                }
+            }
+            py.Append("]");
+            Register(new BlockDef { id = "setlist:" + l.name, category = "variables", shape = BlockShape.Stack, spec = spec.ToString(), py = py.ToString(), hidden = true });
+        }
+
+        /// <summary>Whether a list's items all fit in its "set" block (ten slots at most; bigger lists start at 0 and
+        /// are set item by item).</summary>
+        public static bool SetFits(ListVar l, bool twoD) => twoD ? l.rows * l.cols <= 10 && l.rows <= 10 : l.size <= 10;
+
+        private static void Register(BlockDef d) {
+            Parse(d);
+            ById[d.id] = d;
         }
 
         private static BlockDef Wait(this BlockDef d) => d.Option("and don't wait", "False", "True", false);

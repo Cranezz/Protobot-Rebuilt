@@ -4,7 +4,7 @@ namespace Protobot.RobotCode.Blocks {
     /// <summary>V2 (Blocks): starting programs made of blocks (the code window's Blocks menu), on the robot's own
     /// devices (its configuration from the build).</summary>
     public static class BlockExamples {
-        public static readonly string[] Names = { "Example: drive a square", "Example: tank drive with the controller", "Example: autonomous and driver control" };
+        public static readonly string[] Names = { "Example: drive a square", "Example: tank drive with the controller", "Example: autonomous and driver control", "Example: a rectangle with a My Block and a list" };
 
         private static Block B(string id) => Block.Make(BlockDefs.ById[id]);
 
@@ -60,6 +60,56 @@ namespace Protobot.RobotCode.Blocks {
                     hat.x = 20f;
                     hat.y = 20f;
                     p.stacks.Add(hat);
+                    break;
+                }
+                case 3: {
+                    // A My Block "drive side (inches)" (drive forward, turn right 90) used four times with lengths from a list.
+                    var m = new MyBlock { key = "side0001", name = "drive side", parts = { new MyBlockPart { kind = "number", text = "inches", id = "in000001" } } };
+                    p.myBlocks.Add(m);
+                    var sides = new ListVar { name = "sides", size = 4 };
+                    p.lists.Add(sides);
+                    p.RegisterDefs();
+                    var define = B("define:" + m.key);
+                    define.comment = "One side: drive its length, then turn the corner.";
+                    var drive = B("drive_for");
+                    drive.fields[2] = "INCHES";
+                    var arg = B("arg");
+                    arg.fields[0] = "inches";
+                    drive.inputs[1] = arg;
+                    Chain(define, drive, B("turn_for"));
+                    define.x = 20f;
+                    define.y = 410f;
+                    p.stacks.Add(define);
+
+                    var start = B("when_started");
+                    var set = B("setlist:sides");
+                    set.fields[0] = "24";
+                    set.fields[1] = "12";
+                    set.fields[2] = "24";
+                    set.fields[3] = "12";
+                    set.comment = "A 24 x 12 inch rectangle.";
+                    var counter = B("set_var");
+                    counter.fields[0] = "myVariable";
+                    counter.fields[1] = "1";
+                    var repeat = B("repeat");
+                    repeat.fields[0] = "4";
+                    var call = B("call:" + m.key);
+                    var item = B("list_item");
+                    item.fields[1] = "sides";
+                    var counterValue = B("var");
+                    counterValue.fields[0] = "myVariable";
+                    item.inputs[0] = counterValue;
+                    call.inputs[0] = item;
+                    var step = B("change_var");
+                    step.fields[0] = "myVariable";
+                    call.next = step;
+                    repeat.mouths[0] = call;
+                    Chain(start, counter, set, repeat);
+                    start.x = 20f;
+                    start.y = 20f;
+                    p.stacks.Add(start);
+                    p.notes.Add(new Note { text = "Right-click a block or the canvas to add a comment.", x = 20f, y = 320f });
+                    p.SyncMyBlocks();
                     break;
                 }
                 default: {
