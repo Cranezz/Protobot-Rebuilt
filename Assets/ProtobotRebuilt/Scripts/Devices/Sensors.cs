@@ -315,6 +315,15 @@ namespace Protobot.Devices {
 
         private bool Reversed => Controls.Reversed(part);
 
+        /// <summary>V2: the axis it measures about (its shaft hole's), in the build; a reading goes up when the shaft
+        /// turns positively about it (Insert devices works out tracking wheels' `reversed` from it).</summary>
+        internal Vector3 AxisWorld {
+            get {
+                if (!measured) Measure();
+                return part.transform.TransformDirection(axisLocal).normalized;
+            }
+        }
+
         private void Measure() {
             measured = true;
             var holes = part.GetComponentsInChildren<HoleCollider>(true);
@@ -359,7 +368,10 @@ namespace Protobot.Devices {
             return true;
         }
 
+        internal int samples;   // V2: tests count them (t_odom*.cs)
+
         public override void Sample(float dt) {
+            samples++;
             HasShaft = Raw(out var raw);
             if (!HasShaft) {
                 Rpm = Mathf.MoveTowards(Rpm, 0f, 600f * dt);

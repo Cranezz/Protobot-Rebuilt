@@ -1,0 +1,15 @@
+{config}
+vert = Rotation(Ports.PORT{vert})
+horiz = Rotation(Ports.PORT{horiz})
+wait(300, MSEC)
+vert.reset_position()
+horiz.reset_position()
+print("mark start", vert.position(DEGREES), horiz.position(DEGREES))
+for power in (20, 50, 100):
+    left_drive.spin(REVERSE, power, PERCENT)
+    right_drive.spin(REVERSE, power, PERCENT)
+    wait(1200, MSEC)
+    left_drive.stop(BRAKE)
+    right_drive.stop(BRAKE)
+    wait(600, MSEC)
+    print("mark p", power, "vert_in", vert.position(DEGREES) / 360 * 3.14159265 * 2.75, "horiz_in", horiz.position(DEGREES) / 360 * 3.14159265 * 2.75)

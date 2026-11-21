@@ -27,6 +27,7 @@ namespace Protobot.RobotCode {
         /// (motor(PORT1, ratio18_1, false), motor_group, drivetrain/smartdrive), measured as the Python one.</summary>
         public static string GenerateCpp(bool pros, bool ez = false) {
             LastDrive = null;
+            LastImu = null;
             V5Brain.Refresh(true);
             var sb = new StringBuilder();
             var used = new HashSet<string> { "controller", "brain", "Brain", "Controller1" };
@@ -69,13 +70,30 @@ namespace Protobot.RobotCode {
                 sb.AppendLine();
                 sb.AppendLine("// Sensors");
             }
+            // V2: 3-Wire Expanders holding devices (the ones past the brain's A-H)
+            if (!pros)
+                foreach (var e in devices.Where(d => d.threeWire && d.expander > 0).Select(d => d.expander).Distinct().OrderBy(e => e))
+                    sb.AppendLine($"triport Expander{e} = triport(PORT{e});");
             foreach (var d in sensors) {
-                var port3 = "'" + (char)('A' + Mathf.Clamp(d.port - 1, 0, 7)) + "'";
-                string Line(string prosType, string vexType, string fallback, bool threeWire) {
+                // V2: PROS ports on an expander are {{smart port, 'A'}}; two-wire sensors name both ports.
+                string Pros3(int count = 1) {
+                    var letters = string.Join(", ", Enumerable.Range(0, count).Select(i => "'" + Port3(d.port + i) + "'"));
+                    return d.expander > 0 ? "{{" + d.expander + ", " + letters + "}}" : letters;
+                }
+                string Line(string prosType, string vexType, string fallback, bool threeWire, int prosPorts = 1, string prosExtra = "", string vexExtra = "") {
                     var n = Name(Controls.GivenName(d.part) ?? fallback, used);
-                    if (d.kind == DeviceKind.Inertial) imuName = n;
-                    if (pros) return threeWire ? $"pros::adi::{prosType} {n}({port3});" : $"pros::{prosType} {n}({d.port});";
-                    return threeWire ? $"{vexType} {n} = {vexType}(Brain.ThreeWirePort.{(char)('A' + Mathf.Clamp(d.port - 1, 0, 7))});" : $"{vexType} {n} = {vexType}(PORT{d.port});";
+                    if (d.kind == DeviceKind.Inertial) LastImu = imuName = n;
+                    if (pros) return threeWire ? $"pros::adi::{prosType} {n}({Pros3(prosPorts)}{prosExtra});" : $"pros::{prosType} {n}({d.port});";
+                    return threeWire ? $"{vexType} {n} = {vexType}({Ref3(d, "vex")}{vexExtra});" : $"{vexType} {n} = {vexType}(PORT{d.port});";
+                }
+                string Accel() {
+                    var n = Name(Controls.GivenName(d.part) ?? "accel_" + Tag3(d), used);
+                    return string.Join("\n", Enumerable.Range(0, 3).Select(i => {
+                        var axis = i == 0 ? n : Name(n + "_" + "yz"[i - 1], used);
+                        var prosPort = d.expander > 0 ? "{{" + d.expander + ", '" + Port3(d.port + i) + "'}}" : "'" + Port3(d.port + i) + "'";
+                        return pros ? $"pros::adi::AnalogIn {axis}({prosPort});" + (i == 0 ? "   // accelerometer X (Y, Z below): get_value() 0-4095" : "")
+                                    : $"accelerometer {axis} = accelerometer({Ref3(d, "vex", i)}, true);" + (i == 0 ? "   // X (Y, Z below), in g" : "");
+                    }));
                 }
                 if (d.kind == DeviceKind.Vision || d.kind == DeviceKind.Gps || d.kind == DeviceKind.AiVision) {   // V2
                     var text = d.kind == DeviceKind.Vision ? VisionLines(d, used, pros ? "pros" : "vex", out _) : d.kind == DeviceKind.Gps ? GpsLines(d, used, pros ? "pros" : "vex", out _) : AiVisionLines(d, used, pros ? "pros" : "vex", out _);
@@ -87,9 +105,15 @@ namespace Protobot.RobotCode {
                     DeviceKind.Distance => Line("Distance", "distance", "distance_" + d.port, false),
                     DeviceKind.Optical => Line("Optical", "optical", "optical_" + d.port, false),
                     DeviceKind.Rotation => Line("Rotation", "rotation", "rotation_" + d.port, false),
-                    DeviceKind.Bumper => Line("DigitalIn", "bumper", "bumper_" + d.port, true),
-                    DeviceKind.Limit => Line("DigitalIn", "limit", "limit_" + d.port, true),
-                    DeviceKind.Encoder => Line("Encoder", "encoder", "encoder_" + d.port, true),
+                    DeviceKind.Bumper => Line("DigitalIn", "bumper", "bumper_" + Tag3(d), true),
+                    DeviceKind.Limit => Line("DigitalIn", "limit", "limit_" + Tag3(d), true),
+                    DeviceKind.Encoder => Line("Encoder", "encoder", "encoder_" + Tag3(d), true, 2, ", false"),
+                    DeviceKind.Potentiometer => Line("Potentiometer", "potV2", "pot_" + Tag3(d), true, 1, ", pros::E_ADI_POT_V2"),
+                    DeviceKind.LineTracker => Line("LineSensor", "line", "line_" + Tag3(d), true),
+                    DeviceKind.Light => Line("LightSensor", "light", "light_" + Tag3(d), true),
+                    DeviceKind.Ultrasonic => Line("Ultrasonic", "sonar", "sonar_" + Tag3(d), true, 2),
+                    DeviceKind.Gyro => Line("Gyro", "gyro", "gyro_" + Tag3(d), true),
+                    DeviceKind.Accelerometer => Accel(),
                     _ => "// " + V5Device.KindName(d.kind) + " on port " + d.port + ": not in the C++ libraries here yet",
                 };
                 sb.AppendLine(line);
@@ -100,10 +124,10 @@ namespace Protobot.RobotCode {
                 sb.AppendLine(pros ? "// Pneumatics: .set_value(true) extends, .set_value(false) retracts" : "// Pneumatics: .set(true) extends, .set(false) retracts");
             }
             foreach (var sol in solenoids) {
-                var letter = (char)('A' + Mathf.Clamp(sol.port - 1, 0, 7));
                 var given = sol.part != null ? Controls.GivenName(sol.part) : sol.own != null ? Controls.GivenName(sol.own.gameObject) : null;
-                var n = Name(given ?? "piston_" + char.ToLowerInvariant(letter), used);
-                sb.AppendLine(pros ? $"pros::adi::DigitalOut {n}('{letter}');" : $"digital_out {n} = digital_out(Brain.ThreeWirePort.{letter});");
+                var n = Name(given ?? "piston_" + Tag3(sol), used);
+                var prosPort = sol.expander > 0 ? "{{" + Ref3(sol, "pros") + "}}" : Ref3(sol, "pros");
+                sb.AppendLine(pros ? $"pros::adi::DigitalOut {n}({prosPort});" : $"digital_out {n} = digital_out({Ref3(sol, "vex")});");
             }
             if (leftMotors.Count > 0 && rightMotors.Count > 0) {
                 var (diameter, track, ratio, measured) = MeasureDrive(leftMotors, rightMotors);
@@ -139,9 +163,12 @@ namespace Protobot.RobotCode {
 
         /// <summary>The drive measured by the last Generate (examples fill their numbers in from it); null: none.</summary>
         public static (float diameter, float track, float ratio, float motorRpm, bool imu)? LastDrive;
+        /// <summary>V2: the name the last configuration gave the Inertial sensor (null: none), for the examples.</summary>
+        public static string LastImu;
 
         public static string Generate() {
             LastDrive = null;
+            LastImu = null;
             V5Brain.Refresh(true);
             var sb = new StringBuilder();
             var used = new HashSet<string> { "brain", "controller" };
@@ -181,10 +208,13 @@ namespace Protobot.RobotCode {
                 sb.AppendLine();
                 sb.AppendLine("# Sensors");
             }
+            // V2: 3-Wire Expanders holding devices (the ones past the brain's A-H)
+            foreach (var e in devices.Where(d => d.threeWire && d.expander > 0).Select(d => d.expander).Distinct().OrderBy(e => e))
+                sb.AppendLine($"expander_{e} = Triport(Ports.PORT{e})");
             foreach (var d in sensors) {
                 var line = SensorLine(d, used, out var name);
                 if (line == null) continue;
-                if (d == imu) imuName = name;
+                if (d == imu) LastImu = imuName = name;
                 sb.AppendLine(line);
             }
             var solenoids = devices.OfType<SolenoidDevice>().ToList();
@@ -194,8 +224,8 @@ namespace Protobot.RobotCode {
             }
             foreach (var s in solenoids) {
                 var given = s.part != null ? Controls.GivenName(s.part) : s.own != null ? Controls.GivenName(s.own.gameObject) : null;
-                var name = Name(given ?? "piston_" + Port3(s.port).ToLowerInvariant(), used);
-                sb.AppendLine($"{name} = DigitalOut(brain.three_wire_port.{Port3(s.port).ToLowerInvariant()})");
+                var name = Name(given ?? "piston_" + Tag3(s), used);
+                sb.AppendLine($"{name} = DigitalOut({Ref3(s, "py")})");
             }
 
             if (left.Count > 0 && right.Count > 0) {
@@ -245,7 +275,14 @@ namespace Protobot.RobotCode {
             }
             string Three(string cls, string fallback, bool twoPorts = false) {
                 var n = Name(Controls.GivenName(d.part) ?? fallback, used);
-                return $"{n} = {cls}(brain.three_wire_port.{Port3(d.port).ToLowerInvariant()})";
+                return $"{n} = {cls}({Ref3(d, "py")})";
+            }
+            string Accel() {   // V2: VEXcode makes one Accelerometer per axis lead (X, Y, Z on three ports in a row)
+                var n = Name(Controls.GivenName(d.part) ?? "accel_" + Tag3(d), used);
+                var lines = new List<string>();
+                for (var i = 0; i < 3; i++)
+                    lines.Add($"{(i == 0 ? n : Name(n + "_" + "yz"[i - 1], used))} = Accelerometer({Ref3(d, "py", i)}, True)" + (i == 0 ? "  # X; Y and Z below (g)" : ""));
+                return string.Join("\n", lines);
             }
             var line = d.kind switch {
                 DeviceKind.Inertial => Smart("Inertial", "imu"),
@@ -254,15 +291,15 @@ namespace Protobot.RobotCode {
                 DeviceKind.Rotation => Smart("Rotation", "rotation_" + d.port),
                 DeviceKind.Gps => null,
                 DeviceKind.Vision => null,
-                DeviceKind.Bumper => Three("Bumper", "bumper_" + Port3(d.port).ToLowerInvariant()),
-                DeviceKind.Limit => Three("Limit", "limit_" + Port3(d.port).ToLowerInvariant()),
-                DeviceKind.Potentiometer => Three("PotentiometerV2", "pot_" + Port3(d.port).ToLowerInvariant()),
-                DeviceKind.Encoder => Three("Encoder", "encoder_" + Port3(d.port).ToLowerInvariant()),
-                DeviceKind.LineTracker => Three("Line", "line_" + Port3(d.port).ToLowerInvariant()),
-                DeviceKind.Light => Three("Light", "light_" + Port3(d.port).ToLowerInvariant()),
-                DeviceKind.Ultrasonic => Three("Sonar", "sonar_" + Port3(d.port).ToLowerInvariant()),
-                DeviceKind.Gyro => Three("Gyro", "gyro_" + Port3(d.port).ToLowerInvariant()),
-                DeviceKind.Accelerometer => null,
+                DeviceKind.Bumper => Three("Bumper", "bumper_" + Tag3(d)),
+                DeviceKind.Limit => Three("Limit", "limit_" + Tag3(d)),
+                DeviceKind.Potentiometer => Three("PotentiometerV2", "pot_" + Tag3(d)),
+                DeviceKind.Encoder => Three("Encoder", "encoder_" + Tag3(d)),
+                DeviceKind.LineTracker => Three("Line", "line_" + Tag3(d)),
+                DeviceKind.Light => Three("Light", "light_" + Tag3(d)),
+                DeviceKind.Ultrasonic => Three("Sonar", "sonar_" + Tag3(d)),
+                DeviceKind.Gyro => Three("Gyro", "gyro_" + Tag3(d)),
+                DeviceKind.Accelerometer => Accel(),
                 _ => null,
             };
             if (line != null) name = line.Substring(0, line.IndexOf(' '));
@@ -318,6 +355,96 @@ namespace Protobot.RobotCode {
 
         /// <summary>Where a GPS sits on the robot: inches right and forward of the turning center, and its turn
         /// clockwise from the robot's front (no left/right drive motors: no offset).</summary>
+        /// <summary>V2: a tracking wheel found on the robot: a Rotation sensor or encoder whose shaft carries an
+        /// unpowered wheel. vertical: it rolls forward; offset: inches from the turning center to its side (vertical:
+        /// right +, left -) or along (horizontal: front +, back -), as LemLib and the motion module take it;
+        /// reversed: the sensor counts down going forward (or right) as mounted, so code reverses it.</summary>
+        internal struct TrackingWheelInfo {
+            public ShaftSensor sensor;
+            public bool vertical, reversed;
+            public double diameter, offset;
+        }
+
+        private static readonly double[] WheelSizes = { 2.125, 2.75, 3.25, 4.0 };
+
+        internal static List<TrackingWheelInfo> TrackingWheels() {
+            var found = new List<TrackingWheelInfo>();
+            // The robot's frame: as GpsMount (the middle of the left and right drive motors), else the build's axes.
+            Vector3 left = Vector3.zero, right = Vector3.zero;
+            int l = 0, r = 0;
+            foreach (var motor in MotorDrive.Live()) {
+                var side = Controls.Side(motor.gameObject);
+                if (side == "L") { left += motor.transform.position; l++; }
+                else if (side == "R") { right += motor.transform.position; r++; }
+            }
+            var center = l > 0 && r > 0 ? (left / l + right / r) / 2f : Vector3.zero;
+            var across = l > 0 && r > 0 ? right / r - left / l : Vector3.right;
+            across.y = 0f;
+            var rightAxis = across.sqrMagnitude > 1e-4f ? across.normalized : Vector3.right;
+            var front = Vector3.Cross(rightAxis, Vector3.up);
+            List<Rotor> rotors;
+            try { rotors = GearTrain.Current(); }
+            catch { return found; }
+            foreach (var d in V5Brain.Devices.OfType<ShaftSensor>()) {
+                if (d.kind == DeviceKind.Potentiometer || d.part == null) continue;
+                var rotor = rotors.FirstOrDefault(x => x.shaft != null && x.bearings.Any(b => b.part == d.part));
+                if (rotor == null || GearTrain.SystemOf(rotor, rotors).Motors.Any()) continue;
+                var wheel = rotor.parts.FirstOrDefault(p => {
+                    var id = p.GetComponent<SavedObject>()?.id ?? "";
+                    return id.StartsWith("OMNI") || id.StartsWith("TWHL") || id.Contains("Omni") || id.Contains("Wheel");
+                });
+                if (wheel == null || !wheel.TryGetComponent(out MeshFilter filter) || filter.sharedMesh == null) continue;
+                var axle = rotor.axis.normalized;
+                // its size: the rim's farthest point from the axle, a VEX size when it's within 0.03"
+                var mesh = filter.sharedMesh;
+                var axisLocal = wheel.transform.InverseTransformDirection(axle).normalized;
+                var most = 0f;
+                if (mesh.isReadable) foreach (var v in mesh.vertices) most = Mathf.Max(most, Vector3.ProjectOnPlane(v - mesh.bounds.center, axisLocal).sqrMagnitude);
+                double diameter = Math.Round(2f * Mathf.Sqrt(most) * wheel.transform.lossyScale.x, 3);
+                foreach (var size in WheelSizes) if (Math.Abs(size - diameter) < 0.03) diameter = size;
+                var at = wheel.transform.TransformPoint(mesh.bounds.center) - center;
+                var vertical = Mathf.Abs(Vector3.Dot(axle, front)) < 0.5f;
+                // Rolling along `way`, a wheel turns about up x way; the sensor counts up turning about its own axis.
+                var way = vertical ? front : rightAxis;
+                var counts = Vector3.Dot(Vector3.Cross(Vector3.up, way), d.AxisWorld) * (Controls.Reversed(d.part) ? -1f : 1f);
+                found.Add(new TrackingWheelInfo {
+                    sensor = d, vertical = vertical, reversed = counts < 0f, diameter = diameter,
+                    offset = Math.Round(Vector3.Dot(at, vertical ? rightAxis : front), 2),
+                });
+            }
+            return found;
+        }
+
+        /// <summary>V2: the odometry sensors for the motion module / LemLib from the robot's tracking wheels (two of
+        /// each kind at most): the lines that make them and the OdomSensors arguments, or null with none.</summary>
+        internal static (List<string> lines, string args)? TrackingLines(bool cpp, string imu) {
+            var wheels = TrackingWheels();
+            if (wheels.Count == 0) return null;
+            string F(double v) => v.ToString("0.###", CultureInfo.InvariantCulture);
+            var lines = new List<string>();
+            var args = new string[4];
+            var counts = new int[2];
+            foreach (var w in wheels.OrderBy(w => w.vertical ? 0 : 1).ThenBy(w => w.offset)) {
+                var k = w.vertical ? 0 : 1;
+                if (counts[k] >= 2) continue;
+                var n = (w.vertical ? "vertical" : "horizontal") + (counts[k] > 0 ? "2" : "");
+                var where = w.vertical ? (w.offset < 0 ? "left of" : w.offset > 0 ? "right of" : "on") : (w.offset < 0 ? "behind" : w.offset > 0 ? "ahead of" : "on");
+                var note = $"{(w.vertical ? "rolls forward" : "rolls sideways")}, {F(Math.Abs(w.offset))}\" {where} the turning center";
+                if (cpp) {
+                    lines.Add($"pros::Rotation {n}_rotation({(w.reversed ? "-" : "")}{w.sensor.port});");
+                    lines.Add($"lemlib::TrackingWheel {n}_wheel(&{n}_rotation, {F(w.diameter)}, {F(w.offset)});   // {note}");
+                    args[k * 2 + counts[k]] = "&" + n + "_wheel";
+                }
+                else {
+                    lines.Add($"{n}_wheel = TrackingWheel(Rotation(Ports.PORT{w.sensor.port}, {(w.reversed ? "True" : "False")}), {F(w.diameter)}, {F(w.offset)})   # {note}");
+                    args[k * 2 + counts[k]] = n + "_wheel";
+                }
+                counts[k]++;
+            }
+            var none = cpp ? "nullptr" : "None";
+            return (lines, string.Join(", ", args[0] ?? none, args[1] ?? none, args[2] ?? none, args[3] ?? none, imu));
+        }
+
         internal static (double ox, double oy, double heading) GpsMount(V5Device d) {
             Vector3 left = Vector3.zero, right = Vector3.zero;
             int l = 0, r = 0;
@@ -475,6 +602,21 @@ namespace Protobot.RobotCode {
 
         private static string Letter(int i) => ((char)('a' + Mathf.Clamp(i, 0, 25))).ToString();
         private static string Port3(int port) => ((char)('A' + Mathf.Clamp(port - 1, 0, 7))).ToString();
+
+        /// <summary>V2: a 3-wire device's port in a name ("a", on an expander "e5a").</summary>
+        private static string Tag3(V5Device d) => (d.expander > 0 ? "e" + d.expander : "") + Port3(d.port).ToLowerInvariant();
+
+        /// <summary>V2: a 3-wire device's port (plus `offset`) as code names it: Python brain.three_wire_port.a /
+        /// expander_5.a, VEXcode C++ Brain.ThreeWirePort.A / Expander5.A, PROS 'A' / 5, 'A' (the caller puts an
+        /// expander's in PROS's double braces: {{5, 'A'}}).</summary>
+        private static string Ref3(V5Device d, string language, int offset = 0) {
+            var letter = Port3(d.port + offset);
+            return language switch {
+                "py" => (d.expander > 0 ? "expander_" + d.expander : "brain.three_wire_port") + "." + letter.ToLowerInvariant(),
+                "vex" => (d.expander > 0 ? "Expander" + d.expander : "Brain.ThreeWirePort") + "." + letter,
+                _ => d.expander > 0 ? d.expander + ", '" + letter + "'" : "'" + letter + "'",
+            };
+        }
         private static string F(float v) => v.ToString("0.###", CultureInfo.InvariantCulture);
     }
 }

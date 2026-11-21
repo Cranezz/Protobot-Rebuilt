@@ -15,8 +15,23 @@ namespace Protobot.RobotCode {
 
     public sealed class ThreeWirePort : VexObject {
         public readonly int index;   // 1-8 = A-H
-        public ThreeWirePort(int index) => this.index = index;
+        public readonly int expander;   // V2: the 3-Wire Expander's smart port (0: the brain's own ports)
+        public ThreeWirePort(int index, int expander = 0) {
+            this.index = index;
+            this.expander = expander;
+        }
         public override string TypeName => "ThreeWirePort";
+    }
+
+    /// <summary>V2: a V5 3-Wire Expander's ports (VEXcode's Triport(Ports.PORT5) / triport(PORT5): .a-.h). Devices
+    /// past the brain's A-H go on the build's expanders, in port order (Edit > Devices… shows where).</summary>
+    internal sealed class VexTriport : VexObject {
+        public override string TypeName => "Triport";
+        public VexTriport(Args a) {
+            var (port, three) = VexModule.Port(a.Need(0, "port"), "Triport");
+            if (three) throw new PyError("TypeError", "Triport needs the expander's smart port (like Ports.PORT5)");
+            for (var i = 0; i < 8; i++) Field(((char)('a' + i)).ToString(), new ThreeWirePort(i + 1, port));
+        }
     }
 
     internal sealed class VexBrain : VexObject {
@@ -1275,6 +1290,26 @@ namespace Protobot.RobotCode {
                     });
                     Field("set_rotation", Member("set_heading"));   // V2 (this gyro's rotation is its heading)
                     Method("is_calibrating", _ => false);
+                    break;
+                case "Accelerometer":
+                    // V2: VEXcode's Accelerometer(port, high_sensitivity): one per axis (the sensor's X, Y, Z leads on
+                    // three ports in a row); acceleration() in g, 2 g range (6 g with the jumper: high_sensitivity False).
+                    Accelerometer A() => p.Device<Accelerometer>(port, three, "Accelerometer");
+                    int Axis() {
+                        var d = A();
+                        return d == null ? 0 : Mathf.Clamp(port % 100 - d.port, 0, 2);
+                    }
+                    var range = a.Bool(1, "high_sensitivity", false) ? 2.0 : 6.0;
+                    var zero = 0.0;
+                    Method("acceleration", _ => (double)(A()?.G[Axis()] ?? 0f) - zero);
+                    Method("value", _ => (long)(A()?.Value(Axis()) ?? 2048));
+                    Method("changed", _ => PyNone.Value);
+                    Method("installed", _ => A() != null);
+                    Method("calibrate", _ => {
+                        zero = A()?.G[Axis()] ?? 0f;
+                        return PyNone.Value;
+                    });
+                    _ = range;
                     break;
             }
         }

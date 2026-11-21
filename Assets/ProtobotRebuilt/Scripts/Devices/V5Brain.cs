@@ -42,8 +42,16 @@ namespace Protobot.Devices {
         /// <summary>The simulated battery, 0..1 (drains with the motors' current while simulating).</summary>
         public static float Battery { get; internal set; } = 1f;
 
+        /// <summary>The device on a port (3-wire on an expander: expander x 100 + letter, as `V5Device.CodePort`).</summary>
         public static T Get<T>(int port, bool threeWire = false) where T : V5Device =>
-            Devices.OfType<T>().FirstOrDefault(d => d.threeWire == threeWire && port >= d.port && port < d.port + d.ports);
+            Devices.OfType<T>().FirstOrDefault(d => d.threeWire == threeWire && On(d, port));
+
+        /// <summary>V2: whether a device takes this port (an encoder, range finder or accelerometer takes several).</summary>
+        public static bool On(V5Device d, int port) {
+            var expander = d.threeWire ? port / 100 : 0;
+            var letter = d.threeWire ? port % 100 : port;
+            return d.expander == expander && letter >= d.port && letter < d.port + d.ports;
+        }
 
         public static V5Device Of(GameObject part) => part == null ? null : Devices.FirstOrDefault(d => d.part == part || (d is SolenoidDevice s && s.cylinders.Any(c => c != null && c.gameObject == part)));
 
@@ -157,6 +165,7 @@ namespace Protobot.Devices {
             var wireUsed = new HashSet<int>();
             foreach (var d in found) {
                 d.port = 0;
+                d.expander = 0;
                 d.wired = false;
                 var port = d.part != null ? WirePorts.BrainPortOf(d.part) : null;
                 if (port == null) continue;
@@ -173,22 +182,55 @@ namespace Protobot.Devices {
                     }
                 }
             }
+            // V2: a device keeps the port it was given (saved with the part: "port:"), as a plugged-in device stays in
+            // its port. Free ports went by the order the parts were made, which isn't the same after a build is opened
+            // again: a saved program's Inertial and Rotation sensors swapped ports.
+            int? Kept(V5Device d) => d.part != null && int.TryParse(Dynamics.Token(d.part, "port"), out var kept) ? kept : null;
+            foreach (var d in found.Where(d => !d.threeWire && d.port == 0))
+                if (Kept(d) is int k && k >= 1 && k <= 21 && smartUsed.Add(k)) d.port = k;
             var nextSmart = 1;
             foreach (var d in found.Where(d => !d.threeWire && d.port == 0)) {
                 while (smartUsed.Contains(nextSmart)) nextSmart++;
                 d.port = nextSmart;
                 smartUsed.Add(nextSmart);
             }
-            foreach (var d in found.Where(d => d.threeWire && d.port == 0)) {
-                var p = 1;
-                while (true) {
-                    if (d.ports == 2 && p % 2 == 0) p++;
-                    if (Enumerable.Range(p, d.ports).All(q => !wireUsed.Contains(q))) break;
-                    p++;
+            // V2: 3-wire devices that don't fit on the brain's A-H go on the 3-Wire Expanders (in port order), A-H on each.
+            var expanders = found.Where(d => d.kind == DeviceKind.Expander).Select(d => d.port).OrderBy(p => p).ToList();
+            var expanderUsed = expanders.ToDictionary(e => e, _ => new HashSet<int>());
+            static int Fit(V5Device d, HashSet<int> used, int limit) {
+                for (var p = 1; p + d.ports - 1 <= limit; p++) {
+                    if (d.ports == 2 && p % 2 == 0) continue;   // pairs start on A, C, E, G
+                    if (Enumerable.Range(p, d.ports).All(q => !used.Contains(q))) return p;
                 }
-                d.port = p;
-                for (var q = p; q < p + d.ports; q++) wireUsed.Add(q);
+                return 0;
             }
+            foreach (var d in found.Where(d => d.threeWire && d.port == 0)) {   // V2: kept 3-wire ports (expander x 100 + letter)
+                if (!(Kept(d) is int k) || k % 100 < 1 || k % 100 + d.ports - 1 > 8) continue;
+                var e = k / 100;
+                var used = e == 0 ? wireUsed : expanderUsed.TryGetValue(e, out var u) ? u : null;
+                if (used == null || Enumerable.Range(k % 100, d.ports).Any(q => used.Contains(q))) continue;
+                d.port = k % 100;
+                d.expander = e;
+                for (var q = d.port; q < d.port + d.ports; q++) used.Add(q);
+            }
+            foreach (var d in found.Where(d => d.threeWire && d.port == 0)) {
+                d.expander = 0;
+                var p = Fit(d, wireUsed, 8);
+                foreach (var e in expanders) {
+                    if (p != 0) break;
+                    p = Fit(d, expanderUsed[e], 8);
+                    if (p != 0) {
+                        d.expander = e;
+                        for (var q = p; q < p + d.ports; q++) expanderUsed[e].Add(q);
+                    }
+                }
+                if (p == 0) p = Fit(d, wireUsed, 99);   // no room: past H (not on the brain)
+                d.port = p;
+                if (d.expander == 0)
+                    for (var q = p; q < p + d.ports; q++) wireUsed.Add(q);
+            }
+            foreach (var d in found)   // V2: remembered for next time
+                if (d.part != null && d.port > 0 && d.OnBrain && Kept(d) != d.CodePort) Dynamics.SetToken(d.part, "port", d.CodePort.ToString());
             devices.AddRange(found.Where(d => !d.threeWire).OrderBy(d => d.port));
             devices.AddRange(found.Where(d => d.threeWire).OrderBy(d => d.port));
             Loop.Ensure();
@@ -292,15 +334,31 @@ namespace Protobot.Devices {
         private class Loop : MonoBehaviour {
             private static Loop host;
 
+            // V2: only ever one. Copies piled up in the editor (one made in edit mode was saved into the play scene, and
+            // a script reload forgets `host`): with five of them every device was sampled five times a step, so a
+            // Rotation sensor's velocity read a fifth of its speed and the battery drained five times as fast.
             public static void Ensure() {
                 if (host != null) return;
+                host = FindAnyObjectByType<Loop>();
+                if (host != null) return;
                 host = new GameObject("V5 Brain").AddComponent<Loop>();
-                host.gameObject.hideFlags = HideFlags.HideInHierarchy;
+                host.gameObject.hideFlags = HideFlags.HideAndDontSave;
             }
 
-            private void Update() => Tick(Time.deltaTime, false);
+            private bool Duplicate() {
+                if (host == null) host = this;
+                if (host == this) return false;
+                Destroy(gameObject);
+                return true;
+            }
+
+            private void Update() {
+                if (Duplicate()) return;
+                Tick(Time.deltaTime, false);
+            }
 
             private void FixedUpdate() {
+                if (Duplicate()) return;
                 if (Sandbox.Running) Tick(Time.fixedDeltaTime, true);
             }
         }

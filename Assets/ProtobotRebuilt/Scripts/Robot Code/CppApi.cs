@@ -130,7 +130,7 @@ namespace Protobot.RobotCode {
                 ("distance", "Distance"), ("optical", "Optical"), ("bumper", "Bumper"), ("limit", "Limit"), ("digital_out", "DigitalOut"),
                 ("digital_in", "DigitalIn"), ("pneumatics", "Pneumatics"), ("encoder", "Encoder"), ("pot", "Potentiometer"),
                 ("potV2", "PotentiometerV2"), ("line", "Line"), ("light", "Light"), ("sonar", "Sonar"), ("gyro", "Gyro"),
-                ("timer", "Timer"), ("thread", "Thread"), ("event", "Event"), ("vision", "Vision"), ("gps", "Gps"), ("aivision", "AiVision"),
+                ("timer", "Timer"), ("thread", "Thread"), ("accelerometer", "Accelerometer"), ("triport", "Triport"), ("event", "Event"), ("vision", "Vision"), ("gps", "Gps"), ("aivision", "AiVision"),
                 ("signature", "Signature"),   // V2: using signature = vision::signature; (VEXcode's robot-config)
             })
                 if (py.globals.TryGetValue(python, out var cls)) m.globals[cpp] = cls;
@@ -264,6 +264,8 @@ namespace Protobot.RobotCode {
             E("vision_zero_e_t", "E_VISION_ZERO_CENTER", 1);
             E("vision_object_type_e_t", "E_VISION_OBJECT_NORMAL", 0);
             E("vision_object_type_e_t", "E_VISION_OBJECT_COLOR_CODE", 1);
+            E("adi_potentiometer_type_e", "E_ADI_POT_EDR", 0);   // V2
+            E("adi_potentiometer_type_e", "E_ADI_POT_V2", 1);
             Class("Task", a => new ProsTask(program, a));
             // (PROS 3's names)
             m.globals["Motor_Group"] = m.globals["MotorGroup"];
@@ -276,6 +278,16 @@ namespace Protobot.RobotCode {
             adi.globals["DigitalIn"] = new PyClass("DigitalIn", null) { construct = (_, a) => new ProsDigitalIn(program, a) };
             adi.globals["Button"] = adi.globals["DigitalIn"];
             adi.globals["Encoder"] = new PyClass("Encoder", null) { construct = (_, a) => new ProsEncoder(program, a) };
+            // V2: the analog 3-wire sensors (PROS 4 adi:: names and PROS 3's ADI... ones).
+            foreach (var (name, legacy, kind) in new[] {
+                         ("AnalogIn", "ADIAnalogIn", "analog"), ("Potentiometer", "ADIPotentiometer", "pot"), ("LineSensor", "ADILineSensor", "line"),
+                         ("LightSensor", "ADILightSensor", "light"), ("Ultrasonic", "ADIUltrasonic", "sonar"), ("Gyro", "ADIGyro", "gyro") }) {
+                var k = kind;
+                var cls = new PyClass(name, null) { construct = (_, a) => new ProsAnalog(program, a, k) };
+                adi.globals[name] = cls;
+                m.globals[legacy] = cls;
+            }
+            adi.globals["AnalogSensor"] = adi.globals["AnalogIn"];
             m.globals["adi"] = adi;
 
             m.globals["delay"] = new PyBuiltin("delay", a => new Suspend(a.vm.Time + Math.Max(0, a.Number(0, "milliseconds", 0)) / 1000.0));
@@ -734,17 +746,82 @@ namespace Protobot.RobotCode {
             }
         }
 
-        // ADI ports: 'A'..'H', 'a'..'h' or 1..8.
+        // ADI ports: 'A'..'H', 'a'..'h' or 1..8; V2: on a 3-Wire Expander {smart port, 'A'} (ext_adi_port_pair_t, also
+        // written {{5, 'A'}}) or, for two-wire sensors, {smart port, 'A', 'B'} (ext_adi_port_tuple_t).
         internal static ThreeWirePort Adi(object port) {
-            var n = port switch {
-                string s when s.Length == 1 => char.ToUpperInvariant(s[0]) - 'A' + 1,
-                long l => (int)l,
-                PyTuple t when t.items.Length == 2 => (int)(t.items[1] is string ts ? char.ToUpperInvariant(ts[0]) - 'A' + 1 : Ops.ToLong(t.items[1])),
-                PyList l2 when l2.items.Count == 2 => (int)(l2.items[1] is string ls ? char.ToUpperInvariant(ls[0]) - 'A' + 1 : Ops.ToLong(l2.items[1])),
-                _ => throw new PyError("TypeError", "an ADI port is 'A' to 'H' (or 1 to 8)"),
+            int Letter(object o) => o is string s && s.Length == 1 ? char.ToUpperInvariant(s[0]) - 'A' + 1 : (int)Ops.ToLong(o);
+            var items = port switch {
+                PyTuple t => t.items.ToList(),
+                PyList l => l.items.ToList(),
+                _ => null,
             };
+            while (items != null && items.Count == 1 && (items[0] is PyList || items[0] is PyTuple))
+                items = items[0] is PyList il ? il.items.ToList() : ((PyTuple)items[0]).items.ToList();
+            int n, expander = 0;
+            if (items == null) {
+                if (!(port is string) && !(port is long)) throw new PyError("TypeError", "an ADI port is 'A' to 'H' (or 1 to 8)");
+                n = Letter(port);
+            }
+            else if (items.Count >= 2) {
+                expander = (int)Ops.ToLong(items[0]);
+                n = Letter(items[1]);
+            }
+            else throw new PyError("TypeError", "an expander's ADI port is {smart port, 'A'}");
             if (n < 1 || n > 8) throw new PyError("ValueError", "an ADI port is 'A' to 'H'");
-            return new ThreeWirePort(n);
+            if (expander < 0 || expander > 21) throw new PyError("ValueError", "a 3-Wire Expander's smart port is 1 to 21");
+            return new ThreeWirePort(n, expander);
+        }
+
+        /// <summary>V2: PROS's analog 3-wire sensors: AnalogIn (any analog sensor: an accelerometer axis too), Potentiometer
+        /// (get_angle in degrees: 0-250 for the old pot, 0-333 for V2), LineSensor, LightSensor (get_value 0-4095,
+        /// calibrate, get_value_calibrated), Ultrasonic(ping, echo) (get_value in 0.1 mm: 10000 = 1 m, 0 for no echo)
+        /// and Gyro (get_value in tenths of a degree times the multiplier, reset).</summary>
+        private sealed class ProsAnalog : VexObject {
+            public override string TypeName => kind;
+            private readonly string kind;
+
+            public ProsAnalog(RobotProgram p, Args a, string kind) {
+                this.kind = kind;
+                var port = Adi(a.Need(0, "port"));
+                var code = port.expander * 100 + port.index;
+                var calibration = 0.0;
+                V5Device D() {
+                    var d = V5Brain.Devices.FirstOrDefault(x => x.threeWire && V5Brain.On(x, code));
+                    if (d == null) p.Device<V5Device>(code, true, kind == "sonar" ? "Ultrasonic" : kind == "gyro" ? "Gyro" : "Analog sensor");
+                    return d;
+                }
+                long Raw() => D() switch {
+                    LineTracker l => l.Value,
+                    LightSensor l => l.Value,
+                    ShaftSensor s when s.kind == DeviceKind.Potentiometer => s.PotValue,
+                    Accelerometer acc => acc.Value(Mathf.Clamp(port.index - acc.port, 0, 2)),
+                    YawGyro => 2048L,
+                    _ => 0L,
+                };
+                switch (kind) {
+                    case "sonar":
+                        Method("get_value", _ => {
+                            var s = D() as UltrasonicSensor;
+                            return s == null || s.Inches < 0f ? 0L : (long)Math.Round(s.Inches * 254.0);
+                        });
+                        return;
+                    case "gyro":
+                        var multiplier = a.Count > 1 ? a.Number(1, "multiplier", 1) : 1.0;
+                        var offset = 0.0;
+                        double Heading() => (D() as YawGyro)?.Heading ?? 0f;
+                        Method("get_value", _ => Math.Round((Heading() - offset) * 10.0 * multiplier));
+                        Method("reset", _ => { offset = Heading(); return 1L; });
+                        return;
+                }
+                Method("get_value", _ => Raw());
+                Method("calibrate", _ => { calibration = Raw(); return (long)calibration; });
+                Method("get_value_calibrated", _ => (long)Math.Round(Raw() - calibration));
+                Method("get_value_calibrated_HR", _ => (long)Math.Round((Raw() - calibration) * 16));
+                if (kind == "pot") {
+                    var v2 = a.Count > 1 && Ops.ToLong(a.pos[1] is PyEnum e ? (object)(long)e.value : a.pos[1]) == 1;
+                    Method("get_angle", _ => Raw() / 4095.0 * (v2 ? 333.0 : 250.0));
+                }
+            }
         }
 
         private sealed class ProsDigitalOut : VexObject {

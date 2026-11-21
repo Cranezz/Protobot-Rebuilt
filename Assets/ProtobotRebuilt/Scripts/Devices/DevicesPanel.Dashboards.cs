@@ -476,7 +476,7 @@ namespace Protobot.Devices {
         // ------------------------------------------------------------------ the 3-wire page
 
         private void ThreeWirePage() {
-            var devices = V5Brain.Devices.Where(d => d.threeWire && d.OnBrain).ToList();
+            var devices = V5Brain.Devices.Where(d => d.threeWire && d.OnBrain && d.expander == 0).ToList();
             var grid = Ui.Rect("Ports", content);
             var layout = grid.gameObject.AddComponent<GridLayoutGroup>();
             layout.cellSize = new Vector2((width - 24f - 6f - 6f) / 2f, 64f);

@@ -69,6 +69,8 @@ void wait(double time, timeUnits units);
 /** Brain.ThreeWirePort.A to .H */
 class triport {
  public:
+  /** A V5 3-Wire Expander on a smart port. */
+  triport(std::int32_t index);
   class port {};
   port A, B, C, D, E, F, G, H;
 };
@@ -474,6 +476,15 @@ class sonar {
   sonar(triport::port& port);
   double distance(distanceUnits units);
   bool foundObject();
+};
+/** One axis of the analog accelerometer, in g (X, Y and Z are three ports in a row). */
+class accelerometer {
+ public:
+  accelerometer(triport::port& port, bool high_sensitivity = false);
+  double acceleration();
+  std::int32_t value();
+  void calibrate();
+  bool installed();
 };
 class gyro {
  public:

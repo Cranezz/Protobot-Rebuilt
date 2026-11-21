@@ -245,8 +245,8 @@ namespace Protobot.RobotCode {
         internal T Device<T>(int port, bool threeWire, string what) where T : V5Device {
             var d = V5Brain.Get<T>(port, threeWire);
             if (d == null) {
-                var other = V5Brain.Devices.FirstOrDefault(x => x.threeWire == threeWire && port >= x.port && port < x.port + x.ports);
-                var name = threeWire ? "3-wire port " + (char)('A' + port - 1) : "port " + port;
+                var other = V5Brain.Devices.FirstOrDefault(x => x.threeWire == threeWire && V5Brain.On(x, port));
+                var name = threeWire ? (port > 100 ? "expander " + port / 100 + " " : "") + "3-wire port " + (char)('A' + port % 100 - 1) : "port " + port;
                 Warn(what + port + threeWire, other != null
                     ? what + " on " + name + ": that port has a " + V5Device.KindName(other.kind) + ", not a " + what + " (Edit > Devices… shows the ports)"
                     : what + " on " + name + ": nothing is plugged in there (Edit > Devices… shows the ports)");

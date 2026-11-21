@@ -9,6 +9,7 @@ namespace Protobot.Devices {
         public readonly GameObject part;
         public readonly DeviceKind kind;
         public int port;          // smart 1-21 (more: not on the brain), 3-wire 1-8 = A-H
+        public int expander;      // V2: a 3-wire device on a 3-Wire Expander: the expander's smart port (0: the brain's own A-H)
         public int ports = 1;     // 3-wire ports it takes
         public bool wired;        // a cable goes from it to this port
         public bool threeWire;
@@ -84,10 +85,14 @@ namespace Protobot.Devices {
         public virtual string Name => (part != null ? Controls.GivenName(part) : null) ?? KindName(kind);
 
         public string PortLabel => threeWire
-            ? ports > 1 ? (char)('A' + port - 1) + "-" + (char)('A' + port + ports - 2) : ((char)('A' + port - 1)).ToString()
+            ? (expander > 0 ? "Exp " + expander + " " : "") + (ports > 1 ? (char)('A' + port - 1) + "-" + (char)('A' + port + ports - 2) : ((char)('A' + port - 1)).ToString())
             : port.ToString();
 
         public bool OnBrain => threeWire ? port + ports - 1 <= 8 : port <= 21;
+
+        /// <summary>V2: the port robot code names it by: a smart port, a 3-wire letter (1-8), or on an expander
+        /// expander x 100 + letter (VexModule.Port encodes a Triport's ports the same way).</summary>
+        public int CodePort => threeWire && expander > 0 ? expander * 100 + port : port;
 
         /// <summary>The short reading shown when its card is folded ("677 mm").</summary>
         public virtual string Reading => "";

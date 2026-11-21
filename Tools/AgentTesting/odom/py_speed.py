@@ -1,0 +1,13 @@
+{config}
+vert = Rotation(Ports.PORT{vert})
+wait(300, MSEC)
+left_drive.spin(FORWARD, 50, PERCENT)
+right_drive.spin(FORWARD, 50, PERCENT)
+wait(1500, MSEC)
+a = vert.position(DEGREES)
+print("mark a", a, vert.velocity(RPM))
+wait(200, MSEC)
+b = vert.position(DEGREES)
+print("mark b", b, vert.velocity(RPM), "deg in 0.2s", b - a, "in", -(b - a) / 360 * 3.14159265 * 2.75)
+left_drive.stop(BRAKE)
+right_drive.stop(BRAKE)

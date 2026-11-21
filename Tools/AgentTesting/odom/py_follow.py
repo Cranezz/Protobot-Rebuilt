@@ -1,0 +1,20 @@
+{config}
+# Odometry with two tracking wheels and the Inertial sensor (the motion module, LemLib's names)
+from motion import *
+vert = Rotation(Ports.PORT{vert}, True)
+horiz = Rotation(Ports.PORT{horiz})
+gyro = Inertial(Ports.PORT{imu})
+odom_drive = Drivetrain(left_drive, right_drive, 14.125, Omniwheel.NEW_325, 360, 2)
+lateral = ControllerSettings(10, 0, 3, 3, 1, 100, 3, 500, 20)
+angular = ControllerSettings(2, 0, 10, 3, 1, 100, 3, 500, 0)
+vertical_wheel = TrackingWheel(vert, Omniwheel.NEW_275, {voff})
+horizontal_wheel = TrackingWheel(horiz, Omniwheel.NEW_275, {hoff})
+sensors = OdomSensors(vertical_wheel, None, horizontal_wheel, None, gyro)
+chassis = Chassis(odom_drive, lateral, angular, sensors)
+chassis.calibrate()
+chassis.set_pose(24, 24, 0)
+chassis.follow([(24, 24), (30, 36), (24, 48), (12, 54)], 10, 6000)
+for i in range(24):
+    p = chassis.get_pose()
+    print("mark f%d odom x=%.2f y=%.2f h=%.2f" % (i, p.x, p.y, p.theta))
+    wait(250, MSEC)

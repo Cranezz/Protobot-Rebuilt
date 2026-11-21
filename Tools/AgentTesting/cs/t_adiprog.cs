@@ -1,0 +1,11 @@
+var src = "#include \"main.h\"\npros::adi::AnalogIn ain('G');\npros::adi::Potentiometer pot({{7, 'A'}}, pros::E_ADI_POT_V2);\npros::adi::Ultrasonic us({{7, 'B', 'C'}});\npros::adi::Gyro gyr('H');\nvoid opcontrol() { int a = ain.get_value(); double b = pot.get_angle(); int c = us.get_value(); double d = gyr.get_value(); printf(\"ok %d %d\", a, c); }";
+var o = new System.Text.StringBuilder();
+System.Action<string> l = s => o.Append(s);
+Protobot.RobotCode.RobotProgram.Printed += l;
+string err; int line;
+var ok = Protobot.RobotCode.RobotProgram.Start(src, Protobot.RobotCode.RobotProgram.Period.Driver, 0, out err, out line);
+for (var i = 0; i < 50 && Protobot.RobotCode.RobotProgram.Current != null && Protobot.RobotCode.RobotProgram.Current.Status == "Running"; i++) Protobot.RobotCode.RobotProgram.Step(0.01f);
+Protobot.RobotCode.RobotProgram.Printed -= l;
+var st = Protobot.RobotCode.RobotProgram.Current != null ? Protobot.RobotCode.RobotProgram.Current.Status : "none";
+Protobot.RobotCode.RobotProgram.Stop(null);
+return ok + " " + err + " line " + line + " | " + st + " | " + o;

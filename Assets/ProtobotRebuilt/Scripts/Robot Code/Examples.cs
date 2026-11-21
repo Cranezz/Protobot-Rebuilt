@@ -64,11 +64,30 @@ namespace Protobot.RobotCode {
                 }
             }
             code = code.Replace("{vision}", visionName).Replace("{sig}", sigName).Replace("{gps}", gpsName);
+            // V2: the robot's own tracking wheels, measured (size, offset, reversed), in the odometry examples.
+            const string NoWheelsPy = "# Tracking wheels go here: TrackingWheel(Rotation(Ports.PORT5), Omniwheel.NEW_2, -2.5). None: the drive motors are used.\nsensors = OdomSensors(None, None, None, None, imu)";
+            const string NoWheelsCpp = "// tracking wheels (none here: the drive motors are used) and the IMU\nlemlib::OdomSensors sensors(nullptr, nullptr, nullptr, nullptr, {imu});";
+            var normalized = code.Replace("\r\n", "\n");
+            if (normalized.Contains(NoWheelsPy) || normalized.Contains(NoWheelsCpp)) {
+                (System.Collections.Generic.List<string> lines, string args)? tracking = null;
+                try { tracking = DeviceConfig.TrackingLines(normalized.Contains(NoWheelsCpp), normalized.Contains(NoWheelsCpp) ? "{imu}" : drive != null && drive.Value.imu ? DeviceConfig.LastImu ?? "imu" : "imu"); }
+                catch (System.Exception e) { UnityEngine.Debug.LogWarning("V2: tracking wheels: " + e.Message); }
+                if (tracking == null && normalized.Contains(NoWheelsPy) && drive != null && drive.Value.imu && DeviceConfig.LastImu != null)
+                    code = normalized.Replace(NoWheelsPy, NoWheelsPy.Replace(", imu)", ", " + DeviceConfig.LastImu + ")"));
+                if (tracking != null) {
+                    var t = tracking.Value;
+                    code = normalized.Contains(NoWheelsPy)
+                        ? normalized.Replace(NoWheelsPy, "# Tracking wheels (measured from the robot: wheel size, offset from the turning center; reversed so\n# forward and right count up)\n"
+                                                     + string.Join("\n", t.lines) + "\nsensors = OdomSensors(" + t.args + ")")
+                        : normalized.Replace(NoWheelsCpp, "// tracking wheels (measured from the robot: wheel size, offset from the turning center; a negative\n// port reverses a sensor so forward and right count up) and the IMU\n"
+                                                      + string.Join("\n", t.lines) + "\nlemlib::OdomSensors sensors(" + t.args + ");");
+                }
+            }
             string F(double v) => v.ToString("0.###", System.Globalization.CultureInfo.InvariantCulture);
             var wheel = drive?.diameter ?? 4f;
             var ratio = drive?.ratio ?? 1f;
             var motorRpm = drive?.motorRpm ?? 200f;
-            var imuArg = drive != null && !drive.Value.imu ? "nullptr" : "&imu";
+            var imuArg = drive != null && !drive.Value.imu ? "nullptr" : "&" + (DeviceConfig.LastImu ?? "imu");   // V2: its own name
             var wheelRpm = motorRpm / ratio;
             if (System.Math.Abs(wheelRpm - System.Math.Round(wheelRpm)) < 0.5) wheelRpm = (float)System.Math.Round(wheelRpm);
             return code.Replace("{imu}", imuArg).Replace("{track}", F(drive?.track ?? 12f)).Replace("{wheel}", F(wheel)).Replace("{wheel_rpm}", F(wheelRpm))

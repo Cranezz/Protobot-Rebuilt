@@ -186,6 +186,8 @@ namespace Protobot.RobotCode {
             Class("Light", a => new VexAnalog(program, a, "Light"));
             Class("Sonar", a => new VexAnalog(program, a, "Sonar"));
             Class("Gyro", a => new VexAnalog(program, a, "Gyro"));
+            Class("Accelerometer", a => new VexAnalog(program, a, "Accelerometer"));   // V2
+            Class("Triport", a => new VexTriport(a));   // V2: a 3-Wire Expander
             Class("Timer", _ => new VexTimer(program));
             Class("Thread", a => new VexThread(program, a));
             Class("Competition", a => program.SetCompetition(a.Need(0, "driver_control"), a.Need(1, "autonomous")));
@@ -254,7 +256,7 @@ namespace Protobot.RobotCode {
         public static (int port, bool threeWire) Port(object o, string what) => o switch {
             PyEnum e when e.type == "Ports" => (e.value, false),
             long l => ((int)l, false),
-            ThreeWirePort t => (t.index, true),
+            ThreeWirePort t => (t.expander * 100 + t.index, true),   // V2: an expander's ports: expander x 100 + letter
             _ => throw new PyError("TypeError", what + " needs a port (like Ports.PORT1 or brain.three_wire_port.a), not " + Ops.Describe(o)),
         };
     }

@@ -158,6 +158,7 @@ namespace Protobot.Motion {
         private readonly List<Train> trains = new();
         private readonly List<Slide> slides = new();
         private readonly List<Wheel> omnis = new();
+        private readonly HashSet<Rigidbody> driven = new();   // V2: bodies in a gear train
         private readonly List<Renderer> hidden = new();
         private readonly Dictionary<Renderer, Renderer> sourceOf = new();   // V2: a copy -> the build renderer it draws (replays)
 
@@ -474,6 +475,8 @@ namespace Protobot.Motion {
             MakeSlideTrucks();   // V2
             MakeElastics();   // V2
             MakeTrains(rotors);
+            driven.Clear();   // V2: the bodies a gear train turns (Omnis: a free wheel's grip is worked out apart)
+            foreach (var train in trains) foreach (var rotor in train.rotors) driven.Add(rotor.rb);
             StillChains();
             MakeSlides(cylinders);
         }
@@ -575,6 +578,14 @@ namespace Protobot.Motion {
             // Round to the part's own axes (wheels are modelled square on).
             var a = new Vector3(Mathf.Abs(axis.x), Mathf.Abs(axis.y), Mathf.Abs(axis.z));
             return a.x >= a.y && a.x >= a.z ? Vector3.right : a.y >= a.z ? Vector3.up : Vector3.forward;
+        }
+
+        // V2: a wheel's radius (its hull's rim from the axle; the world box was bigger for a wheel at an angle).
+        private static float RimRadius(Mesh hull, Vector3 axis, float scale) {
+            var most = 0f;
+            var center = hull.bounds.center;
+            foreach (var v in hull.vertices) most = Mathf.Max(most, Vector3.ProjectOnPlane(v - center, axis.normalized).sqrMagnitude);
+            return Mathf.Sqrt(most) * scale;
         }
 
         private static WheelKind KindOf(GameObject part) {
@@ -1004,7 +1015,7 @@ namespace Protobot.Motion {
                     : kind == WheelKind.Flex ? Material(1.2f) : Material(0.35f);
                 if (kind == WheelKind.Flex) FlexGrip.Register(collider);
                 body.colliders++;
-                if (kind == WheelKind.Omni) omnis.Add(new Wheel { rb = rb, collider = collider, radius = Mathf.Max(size.x, size.y, size.z) / 2f });
+                if (kind == WheelKind.Omni) omnis.Add(new Wheel { rb = rb, collider = collider, radius = RimRadius(collider.sharedMesh, WheelAxis(node), shape.transform.lossyScale.x) });
             }
 
             rb.mass = Mathf.Max(body.mass, 0.005f);
@@ -1398,7 +1409,7 @@ namespace Protobot.Motion {
             }
             if (Puppet) {   // V2: another computer simulates; motors only make their sound
                 foreach (var train in trains)
-                    foreach (var (motor, _) in train.motors) motor.Sound(0f);
+                    foreach (var (motor, _) in train.motors) if (motor != null) motor.Sound(0f);
                 return;
             }
             var typing = InputEvents.TextInput.IsTyping || InputEvents.TextInput.ShortcutsPaused || !DriveEnabled;
@@ -1407,6 +1418,7 @@ namespace Protobot.Motion {
             DriveInput? InputFor(GameObject part) => InputOf?.Invoke(RobotOf?.Invoke(part) ?? 0);
             foreach (var train in trains)
                 foreach (var (motor, _) in train.motors) {
+                    if (motor == null) continue;   // V2: a build part deleted while simulating
                     if (RobotCode.RobotProgram.Owns(motor)) continue;   // V2: the robot's program drives it
                     var side = Controls.Side(motor.gameObject);
                     var remote = InputFor(motor.gameObject);
@@ -1488,7 +1500,10 @@ namespace Protobot.Motion {
             Physics.Simulate(Time.fixedDeltaTime);
         }
 
+        internal static int steps;   // V2: physics steps run (tests compare sensor sampling with it)
+
         private void Advance() {
+            steps++;
             if (!Puppet) RobotCode.RobotProgram.Step(Time.fixedDeltaTime);   // V2 (Phase 9): robot code, before the trains turn
             foreach (var train in trains)
                 if (!train.rotors.Any(r => r.rb != null && r.rb.isKinematic)) Turn(train);   // V2: (another computer drives that robot)
@@ -1507,6 +1522,8 @@ namespace Protobot.Motion {
         // V2: a stopped V5 motor's static friction, as a share of its stall torque (back-driving one by hand takes a
         // firm push through its gears; this keeps a robot still on a level field, a hard shove still moves it).
         internal static float GearboxFriction = 0.05f;
+        // V2: below this share of its free speed a braking motor's pull fades to the gearbox's hold (tests set it).
+        internal static float BrakeBand = 0.03f;
 
         private static void Turn(Train train) {
             var dt = Time.fixedDeltaTime;
@@ -1544,7 +1561,14 @@ namespace Protobot.Motion {
             // it slowly: a robot standing still crept ~0.07"/s.
             var stopped = train.motors.Count > 0 && train.motors.All(m => Mathf.Abs(m.motor.Command) < 0.001f);
             var hold = stopped && train.motors.Any(m => Controls.Hold(m.motor.gameObject));
-            Hold(train, stopped ? (hold ? most : most * GearboxFriction) : 0f);
+            // V2: brake mode stops the motor actively (up to its full torque while it still turns, fading to the
+            // gearbox's static hold as it stops): a brake that pulled only in proportion to the speed (shorted windings
+            // alone) faded as the robot slowed, and a robot let go of mid-turn kept turning for 2 s (8-25° more).
+            var coasting = train.motors.All(m => m.motor.Coasting);
+            var turning = 0f;
+            foreach (var (motor, k) in train.motors) turning = Mathf.Max(turning, Mathf.Abs(k * speed) / Mathf.Max(FreeSpeed(motor), 1e-3f));
+            var brake = coasting ? GearboxFriction : Mathf.Clamp(turning / BrakeBand, GearboxFriction, 1f);
+            Hold(train, stopped ? (hold ? most : most * brake) : 0f);
             var next = (inertia * speed + a * dt) / (inertia + b * dt);
             // V2: hold mode (Controls.Hold): not driven, its motors stop the train where it is (up to their stall torque).
             if (hold) next = 0f;
@@ -1611,7 +1635,8 @@ namespace Protobot.Motion {
         private const float StaticSpeed = 0.3f;   // in/s
 
         private void Omnis() {
-            if (contacts.Count == 0) { held.Clear(); return; }
+            rolled.Clear();
+            if (contacts.Count == 0) { held.Clear(); FreeRollers(); return; }
             var total = bodies.Sum(b => b.mass);
             var touching = Mathf.Max(1, contacts.Select(c => c.collider).Distinct().Count());
             // V2: a wheel touching at several points shares its correction between them (each took half the slip:
@@ -1639,6 +1664,12 @@ namespace Protobot.Motion {
                 // allows). It was limited by the wheel's own spin inertia, which is tiny next to the gear train and
                 // motors it's geared to: under full power the omnis spun in place (a 24" move went 21.3").
                 var mass = 0.5f * total / touching / pointsOn[collider];
+                // V2: a wheel nothing drives (a tracking wheel) rolls with the floor through its hinge's drive (Roll),
+                // inside the physics step; the grip impulse below only handles wheels a gear train turns.
+                // (a free wheel rubbing another part of the robot isn't rolling on anything: rolled against it, it was
+                // held still and a tracking wheel stopped counting)
+                if (!driven.Contains(rb) && other != null && other.gameObject.layer == Layer) continue;
+                var free = !driven.Contains(rb) && Roll(rb, wheel.radius, point, axis, along, other, impulse);
                 var most = 1.0f * impulse;
                 held.TryGetValue(collider, out var hold);
                 holding.TryGetValue(collider, out var next);
@@ -1648,8 +1679,18 @@ namespace Protobot.Motion {
                 // (a rolling wheel's contact doesn't slip either: the wheel itself moving lets go too)
                 var moving = (rb.linearVelocity - (other != null ? other.linearVelocity : Vector3.zero)).magnitude > StaticSpeed;
                 if (moving || Mathf.Abs(slip) > StaticSpeed) slidingAlong.Add(collider);
-                rb.AddForceAtPosition(along * j, point, ForceMode.Impulse);
-                if (other != null) other.AddForceAtPosition(-along * j, point, ForceMode.Impulse);
+                if (!free) {
+                    rb.AddForceAtPosition(along * j, point, ForceMode.Impulse);
+                    if (other != null) other.AddForceAtPosition(-along * j, point, ForceMode.Impulse);
+                }
+                else {
+                    // V2: a tracking wheel's rollers resist at its own scale and don't hold: the robot-sized correction
+                    // and static hold (made for the drive wheels) shook the light pod and nudged a still robot along
+                    // (0.07" and 0.2° in 10 s).
+                    mass = rb.mass / pointsOn[collider];
+                    hold = Vector2.zero;
+                    next = Vector2.zero;
+                }
                 // V2: the rollers' own rolling resistance across the wheel (RollerResistance of the load): without it a
                 // robot on all omnis kept sliding sideways forever after a turn.
                 var across = Vector3.ProjectOnPlane(axis, normal);
@@ -1674,6 +1715,98 @@ namespace Protobot.Motion {
                     slidingAcross.Contains(collider) ? 0f : Mathf.Clamp(h.y, -RollerResistance * load, RollerResistance * load));
             }
             contacts.Clear();
+            FreeRollers();
+        }
+
+        // V2: unpowered omni wheels (tracking wheels) roll without slipping, as a sprung tracking wheel does on foam
+        // tiles: each step the wheel is given the spin that makes its contact stand still on the floor (from how the
+        // arm it turns in moves there). The grip impulse the driven wheels get was undone by the 48-sided shape
+        // bumping over the floor and by the light arm swinging (the wheel turned 3-7% short); a hinge drive held the
+        // spin but pushed the robot whenever its target was a little off (a sideways wheel crept, the robot yawed).
+        private readonly Dictionary<Rigidbody, (ConfigurableJoint joint, bool owner)> freeHinges = new();
+        private readonly HashSet<Rigidbody> rolled = new();
+
+        private (ConfigurableJoint joint, bool owner) FreeHinge(Rigidbody wheel) {
+            if (freeHinges.TryGetValue(wheel, out var found)) return found;
+            found = (null, false);
+            foreach (var j in wheel.GetComponents<ConfigurableJoint>())
+                if (j.angularXMotion == ConfigurableJointMotion.Free) found = (j, true);
+            if (found.joint == null)
+                foreach (var b in bodies)
+                    foreach (var j in b.rb.GetComponents<ConfigurableJoint>())
+                        if (j.connectedBody == wheel && j.angularXMotion == ConfigurableJointMotion.Free) found = (j, false);
+            freeHinges[wheel] = found;
+            return found;
+        }
+
+        private bool Roll(Rigidbody wheel, float radius, Vector3 point, Vector3 axis, Vector3 along, Rigidbody ground, float impulse) {
+            var (joint, owner) = FreeHinge(wheel);
+            if (joint == null) return false;
+            if (!rolled.Add(wheel)) return true;   // (once a step, from its first contact)
+            var frame = owner ? joint.connectedBody : joint.GetComponent<Rigidbody>();
+            if (frame == null) return true;
+            var axisWorld = joint.transform.TransformDirection(joint.axis).normalized;
+            var lever = Vector3.Dot(Vector3.Cross(axisWorld, point - wheel.worldCenterOfMass), along);
+            if (Mathf.Abs(lever) < 0.05f) return true;
+            // (the wheel's own radius: the contact point PhysX gives lies a little outside the wheel, and a lever
+            // measured to it made the wheel turn 3% short)
+            lever = Mathf.Sign(lever) * radius;
+            // Heavy about its axle (its own spin only): the floor's bumps under the 48-sided shape can't change its
+            // spin within a step. It turns with its arm about the other axes as before.
+            if (heavy.Add(wheel)) {
+                var spinInertia = Vector3.Dot(Vector3.Scale(Quaternion.Inverse(wheel.rotation * wheel.inertiaTensorRotation) * axisWorld,
+                                                            Quaternion.Inverse(wheel.rotation * wheel.inertiaTensorRotation) * axisWorld), wheel.inertiaTensor);
+                var other = Mathf.Max(wheel.inertiaTensor.x, wheel.inertiaTensor.y, wheel.inertiaTensor.z);
+                wheel.inertiaTensorRotation = Quaternion.FromToRotation(Vector3.right, Quaternion.Inverse(wheel.rotation) * axisWorld);
+                wheel.inertiaTensor = new Vector3(Mathf.Max(spinInertia, 1e-4f) * 1000f, other, other);
+            }
+            // The contact's speed along the roll if the wheel didn't turn in its frame, and the spin that cancels it:
+            // the wheel takes it (no force passes: a free wheel's own inertia is too small to push a robot).
+            // (at the wheel's middle plane: PhysX puts the contact anywhere across the tread, and at its edge, 1/2" to
+            // the side, a robot spinning in place moved it differently from the wheel's middle: ~1" off in two turns)
+            // V2: and straight under the axle, a radius down (where PhysX put it along the tread shifted with the way the
+            // robot drove and as the pod bobbed: driving backward read 0.5% short)
+            point = wheel.worldCenterOfMass - Vector3.Cross(along, axisWorld).normalized * radius;
+            var carried = frame.GetPointVelocity(point) - (ground != null ? ground.GetPointVelocity(point) : Vector3.zero);
+            var spin = -Vector3.Dot(carried, along) / lever;
+            if (Mathf.Abs(spin * lever) <= 400f) wheel.angularVelocity = frame.angularVelocity + axisWorld * spin;
+            return true;
+        }
+
+        private readonly HashSet<Rigidbody> heavy = new();
+
+        // A sprung wheel pressed onto foam tiles doesn't leave them, but the light wheel's 48-sided shape bumps off the
+        // floor between contacts at speed (~300 bumps a second at 60 in/s): within 1/32" of the floor it still rolls
+        // Only clear of the floor does it spin free.
+        internal static int rollingSteps, nearSteps, freeSteps;   // tests read them (t_odom*.cs)
+
+        private void FreeRollers() {
+            foreach (var wheel in omnis) {
+                var rb = wheel.rb;
+                if (rb == null || rb.isKinematic || driven.Contains(rb)) continue;
+                var (joint, _) = FreeHinge(rb);
+                if (joint == null) continue;
+                // (a sleeping body reports no contacts and isn't driven: a tracking wheel asleep at the start missed the
+                // first 7" the robot drove)
+                if (rb.IsSleeping()) rb.WakeUp();
+                if (rolled.Contains(rb)) {
+                    rollingSteps++;
+                    continue;
+                }
+                var axis = WheelAxis(wheel);
+                var center = rb.worldCenterOfMass;
+                var down = Vector3.ProjectOnPlane(Vector3.down, axis).normalized;
+                if (down.sqrMagnitude > 0.5f && Physics.Raycast(center, down, out var hit, wheel.radius + 0.04f, (1 << GroundLayer) | (1 << FieldLayer), QueryTriggerInteraction.Ignore)
+                    && hit.distance > wheel.radius - 0.1f) {
+                    var along = Vector3.Cross(axis, hit.normal);
+                    if (along.sqrMagnitude > 1e-6f) {
+                        Roll(rb, wheel.radius, hit.point, axis, along.normalized, hit.rigidbody, 0f);
+                        nearSteps++;
+                        continue;
+                    }
+                }
+                freeSteps++;
+            }
         }
 
         private Vector3 WheelAxis(Wheel wheel) {

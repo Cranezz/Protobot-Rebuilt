@@ -369,7 +369,7 @@ namespace Protobot.Devices {
             if (devicesValue == null) return;
             var devices = V5Brain.Devices;
             devicesValue.text = devices.Count(d => !d.threeWire) + " smart";
-            var used = devices.Where(d => d.threeWire && d.OnBrain).Sum(d => d.ports);
+            var used = devices.Where(d => d.threeWire && d.OnBrain && d.expander == 0).Sum(d => d.ports);
             wireValue.text = used + " of 8";
             controllerValue.text = Controls.DriveModeNames[(int)Controls.Drive];
             var b = V5Brain.Battery;

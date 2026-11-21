@@ -45,6 +45,8 @@ cur = motion.ExpoDriveCurve(3, 10, 1.019)
 ch = motion.Chassis(mdt, lat, lat, sens, cur, cur)
 pose = motion.Pose(1, 2, 3)
 gy = Gyro(brain.three_wire_port.d)
+acc = Accelerometer(brain.three_wire_port.e, True)
+tri = Triport(Ports.PORT7)
 m55 = Motor55(Ports.PORT7)
 ";
 var map = new System.Collections.Generic.Dictionary<string, string> {
@@ -53,7 +55,7 @@ var map = new System.Collections.Generic.Dictionary<string, string> {
     { "Motor", "m" }, { "MotorGroup", "g" }, { "DriveTrain", "dt" }, { "Inertial", "imu" }, { "SmartDrive", "sd" }, { "Distance", "di" }, { "Optical", "op" }, { "Vision", "vis" }, { "_VisionObject", "vobj" }, { "Gps", "gp" }, { "AiVision", "aiv" }, { "_AiVisionObject", "aobj" },
     { "Rotation", "rot" }, { "Bumper", "bu" }, { "Limit", "li" }, { "DigitalIn", "din" }, { "DigitalOut", "dout" }, { "Pneumatics", "pn" }, { "Encoder", "enc" },
     { "Potentiometer", "pot" }, { "PotentiometerV2", "pot2" }, { "Line", "ln" }, { "Light", "lt" }, { "Sonar", "so" }, { "Thread", "th" }, { "Event", "ev" },
-    { "Competition", "comp" }, { "DirectionType", "DirectionType" }, { "TurnType", "TurnType" }, { "VelocityUnits", "VelocityUnits" }, { "PercentUnits", "PercentUnits" }, { "RotationUnits", "RotationUnits" }, { "TimeUnits", "TimeUnits" }, { "DistanceUnits", "DistanceUnits" }, { "VoltageUnits", "VoltageUnits" }, { "CurrentUnits", "CurrentUnits" }, { "TorqueUnits", "TorqueUnits" }, { "PowerUnits", "PowerUnits" }, { "TemperatureUnits", "TemperatureUnits" }, { "BrakeType", "BrakeType" }, { "ControllerType", "ControllerType" }, { "AxisType", "AxisType" }, { "OrientationType", "OrientationType" }, { "LedStateType", "LedStateType" }, { "ObjectSizeType", "ObjectSizeType" }, { "Gyro", "gy" }, { "Motor55", "m55" }, { "_Battery", "brain.battery" },
+    { "Competition", "comp" }, { "DirectionType", "DirectionType" }, { "TurnType", "TurnType" }, { "VelocityUnits", "VelocityUnits" }, { "PercentUnits", "PercentUnits" }, { "RotationUnits", "RotationUnits" }, { "TimeUnits", "TimeUnits" }, { "DistanceUnits", "DistanceUnits" }, { "VoltageUnits", "VoltageUnits" }, { "CurrentUnits", "CurrentUnits" }, { "TorqueUnits", "TorqueUnits" }, { "PowerUnits", "PowerUnits" }, { "TemperatureUnits", "TemperatureUnits" }, { "BrakeType", "BrakeType" }, { "ControllerType", "ControllerType" }, { "AxisType", "AxisType" }, { "OrientationType", "OrientationType" }, { "LedStateType", "LedStateType" }, { "ObjectSizeType", "ObjectSizeType" }, { "Gyro", "gy" }, { "Accelerometer", "acc" }, { "Triport", "tri" }, { "Motor55", "m55" }, { "_Battery", "brain.battery" },
     { "motion.AngularDirection", "motion.AngularDirection" }, { "motion.DriveSide", "motion.DriveSide" }, { "motion.Omniwheel", "motion.Omniwheel" },
     { "motion.Pose", "pose" }, { "motion.Drivetrain", "mdt" }, { "motion.TrackingWheel", "tw" }, { "motion.OdomSensors", "sens" },
     { "motion.ControllerSettings", "lat" }, { "motion.ExpoDriveCurve", "cur" }, { "motion.Chassis", "ch" },
@@ -133,7 +135,7 @@ foreach (var item in new[] { new[] { "vex.pyi", Protobot.RobotCode.ApiStub.Text,
     // Module level.
     if (prefix == "") {
         foreach (var n in top) { if (n.StartsWith("_") || helpers.Contains(n)) continue; checkedN++; if (!gl.ContainsKey(n)) missing.Add(n); }
-        var mine = new System.Collections.Generic.HashSet<string> { "brain", "ctl", "m", "m2", "g", "dt", "imu", "sd", "di", "op", "rot", "bu", "li", "din", "dout", "pn", "enc", "pot", "pot2", "ln", "lt", "so", "tm", "f", "th", "ev", "comp", "col", "mdt", "tw", "sens", "lat", "cur", "ch", "pose", "motion", "gy", "m55", "vis", "vobj", "gp", "aiv", "aobj" };
+        var mine = new System.Collections.Generic.HashSet<string> { "brain", "ctl", "m", "m2", "g", "dt", "imu", "sd", "di", "op", "rot", "bu", "li", "din", "dout", "pn", "enc", "pot", "pot2", "ln", "lt", "so", "tm", "f", "th", "ev", "comp", "col", "mdt", "tw", "sens", "lat", "cur", "ch", "pose", "motion", "gy", "m55", "vis", "vobj", "gp", "aiv", "aobj", "acc", "tri" };
         foreach (var k in gl.Keys) if (!k.StartsWith("_") && !top.Contains(k) && !mine.Contains(k)) extra.Add("(module) " + k);
     } else {
         var mod = gl["motion"];

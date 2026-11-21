@@ -1,0 +1,16 @@
+{config}
+# Drive, stop, then stand still: the robot should not creep (marks every 2 s after stopping)
+wait(300, MSEC)
+left_drive.spin(FORWARD, 60, PERCENT)
+right_drive.spin(FORWARD, 60, PERCENT)
+wait(1000, MSEC)
+left_drive.spin(FORWARD, 60, PERCENT)
+right_drive.spin(REVERSE, 60, PERCENT)
+wait(500, MSEC)
+print("mark moved", left_drive.position(DEGREES), right_drive.position(DEGREES))
+left_drive.stop(BRAKE)
+right_drive.stop(BRAKE)
+wait(1000, MSEC)
+for i in range(6):
+    print("mark still", i)
+    wait(2000, MSEC)

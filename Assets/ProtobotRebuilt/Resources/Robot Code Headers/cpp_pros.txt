@@ -351,17 +351,32 @@ class Vision {
 };
 
 // ---------------------------------------------------------------- 3-wire (ADI)
+/** A port on a V5 3-Wire Expander: {smart port, 'A'}. */
+struct ext_adi_port_pair_t {
+  std::uint8_t smart_port;
+  std::uint8_t adi_port;
+};
+/** Two ports on a V5 3-Wire Expander: {smart port, 'A', 'B'}. */
+struct ext_adi_port_tuple_t {
+  std::uint8_t smart_port;
+  std::uint8_t adi_port_1;
+  std::uint8_t adi_port_2;
+};
+enum adi_potentiometer_type_e { E_ADI_POT_EDR = 0, E_ADI_POT_V2 = 1 };
+typedef adi_potentiometer_type_e adi_potentiometer_type_e_t;
 namespace adi {
-/** 'A' to 'H' (or 1 to 8). */
+/** 'A' to 'H' (or 1 to 8); on an expander {{smart port, 'A'}}. */
 class DigitalOut {
  public:
   explicit DigitalOut(std::uint8_t port, bool init_state = false);
+  explicit DigitalOut(ext_adi_port_pair_t port_pair, bool init_state = false);
   std::int32_t set_value(std::int32_t value) const;
 };
 /** A solenoid: extended = air to the cylinders on its valve. */
 class Pneumatics {
  public:
   explicit Pneumatics(std::uint8_t port, bool start_extended, bool extended_is_low = false);
+  explicit Pneumatics(ext_adi_port_pair_t port_pair, bool start_extended, bool extended_is_low = false);
   std::int32_t extend();
   std::int32_t retract();
   std::int32_t toggle();
@@ -370,6 +385,7 @@ class Pneumatics {
 class DigitalIn {
  public:
   explicit DigitalIn(std::uint8_t port);
+  explicit DigitalIn(ext_adi_port_pair_t port_pair);
   std::int32_t get_value() const;
   std::int32_t get_new_press();
 };
@@ -378,13 +394,63 @@ typedef DigitalIn Button;
 class Encoder {
  public:
   Encoder(std::uint8_t port_top, std::uint8_t port_bottom, bool reversed = false);
+  Encoder(ext_adi_port_tuple_t port_tuple, bool reversed = false);
   std::int32_t get_value() const;
+  std::int32_t reset() const;
+};
+/** Any analog 3-wire sensor (an accelerometer axis too): 0-4095. */
+class AnalogIn {
+ public:
+  explicit AnalogIn(std::uint8_t port);
+  explicit AnalogIn(ext_adi_port_pair_t port_pair);
+  std::int32_t get_value() const;
+  std::int32_t calibrate() const;
+  std::int32_t get_value_calibrated() const;
+  std::int32_t get_value_calibrated_HR() const;
+};
+typedef AnalogIn AnalogSensor;
+class LineSensor : public AnalogIn {
+ public:
+  explicit LineSensor(std::uint8_t port);
+  explicit LineSensor(ext_adi_port_pair_t port_pair);
+};
+class LightSensor : public AnalogIn {
+ public:
+  explicit LightSensor(std::uint8_t port);
+  explicit LightSensor(ext_adi_port_pair_t port_pair);
+};
+/** get_angle: degrees (0-250 for the old potentiometer, 0-333 for V2). */
+class Potentiometer : public AnalogIn {
+ public:
+  explicit Potentiometer(std::uint8_t port, adi_potentiometer_type_e_t potentiometer_type = E_ADI_POT_EDR);
+  explicit Potentiometer(ext_adi_port_pair_t port_pair, adi_potentiometer_type_e_t potentiometer_type = E_ADI_POT_EDR);
+  double get_angle() const;
+};
+/** get_value: distance in 0.1 mm (10000 = 1 m), 0 with no echo. */
+class Ultrasonic {
+ public:
+  Ultrasonic(std::uint8_t port_ping, std::uint8_t port_echo);
+  Ultrasonic(ext_adi_port_tuple_t port_tuple);
+  std::int32_t get_value() const;
+};
+/** The old yaw gyro: tenths of a degree. */
+class Gyro {
+ public:
+  explicit Gyro(std::uint8_t port, double multiplier = 1);
+  explicit Gyro(ext_adi_port_pair_t port_pair, double multiplier = 1);
+  double get_value() const;
   std::int32_t reset() const;
 };
 }  // namespace adi
 typedef adi::DigitalOut ADIDigitalOut;
 typedef adi::DigitalIn ADIDigitalIn;
 typedef adi::Encoder ADIEncoder;
+typedef adi::AnalogIn ADIAnalogIn;
+typedef adi::LineSensor ADILineSensor;
+typedef adi::LightSensor ADILightSensor;
+typedef adi::Potentiometer ADIPotentiometer;
+typedef adi::Ultrasonic ADIUltrasonic;
+typedef adi::Gyro ADIGyro;
 
 // ---------------------------------------------------------------- tasks and time
 /** Waits this many milliseconds (simulated time). */

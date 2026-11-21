@@ -957,8 +957,12 @@ namespace Protobot.RobotCode {
                     if (d < best) { best = d; closest = i; }
                 }
                 var end = path[path.Count - 1];
-                // (A path file's last speeds are 0: done when the nearest point is the last, as LemLib.)
-                if (closest == path.Count - 1 && (speeds || Dist(end, p) < 2)) {
+                // (A path file's last speeds are 0: done when the nearest point is the last, as LemLib.) V2: a list of
+                // points: done within 2" of the end or once the end is behind the robot (a fast robot that missed the
+                // end by more than 2" circled back round it, twice in a test).
+                var face = (p.theta + (forwards ? 0 : 180)) * Math.PI / 180;
+                var endAhead = (end.x - p.x) * Math.Sin(face) + (end.y - p.y) * Math.Cos(face);
+                if (closest == path.Count - 1 && (speeds || Dist(end, p) < 2 || endAhead <= 0)) {
                     finished = true;
                     return;
                 }
@@ -977,7 +981,7 @@ namespace Protobot.RobotCode {
                 var curvature = l2 > 1e-6 ? 2 * localX / l2 : 0;
                 // Slow down for tight curves and near the end (a path file: its own speed at the nearest point).
                 var speed = speeds ? Math.Min(maxSpeed, Math.Max(12, path[closest].speed))
-                    : maxSpeed * Math.Min(1, 3 / Math.Max(0.5, Math.Abs(curvature) * 40)) * Math.Min(1, Dist(end, p) / 12 + 0.3);
+                    : maxSpeed * Math.Min(1, 1.5 / Math.Max(0.5, Math.Abs(curvature) * 40)) * Math.Min(1, Dist(end, p) / 24 + 0.2);   // V2: slower into tight curves and the end (it looped round the end of a tight path)
                 var left = speed * (2 + curvature * c.TrackWidth) / 2;
                 var right = speed * (2 - curvature * c.TrackWidth) / 2;
                 var most = Math.Max(Math.Abs(left), Math.Abs(right)) / maxSpeed;
