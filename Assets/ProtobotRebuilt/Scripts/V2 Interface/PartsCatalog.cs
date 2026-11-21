@@ -350,7 +350,7 @@ namespace Protobot.Interface {
             Add(Leaf(s, "Battery clip", "BTCL"));
             Add(Group(s, "Sensors", "SNSR",
                 Group(s, "V5 sensors", "SNSR", Options1("SNSR").Where(o => Options2("SNSR", o).Contains("V5")).Select(o => Leaf(s, o + " sensor", "SNSR", o, "V5"))
-                    .Concat(Vex(s, "VXSENSORS", o => Contains(o, "GPS Sensor", "Potentiometer V2")))),
+                    .Concat(Vex(s, "VXSENSORS", o => Contains(o, "GPS Sensor", "AI Vision Sensor", "Potentiometer V2")))), // V2: AI Vision
                 Group(s, "3-wire (legacy) sensors", "VXSENSORS",
                     Options1("SNSR").Where(o => Options2("SNSR", o).Contains("Cortex")).Select(o => Leaf(s, o + " sensor (3-wire)", "SNSR", o, "Cortex"))
                         .Concat(Vex(s, "VXSENSORS", o => Contains(o, "Accelerometer", "Light Sensor", "Line Tracker V2", "Line Sensor Mounting Bar", "Optical Shaft Encoder",

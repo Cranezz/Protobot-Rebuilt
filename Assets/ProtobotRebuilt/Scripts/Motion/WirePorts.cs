@@ -92,7 +92,8 @@ namespace Protobot.Motion {
                 foreach (var h in Geometry.HoleScanner.Scan(vertices, mesh.triangles)) {
                     var a = h.size / 0.0254f;
                     var b = h.size2 / 0.0254f;
-                    if (h.through || !h.square || Mathf.Min(a, b) < 0.27f || Mathf.Min(a, b) > 0.36f || Mathf.Max(a, b) < 0.4f || Mathf.Max(a, b) > 0.5f) continue;
+                    // V2: up to 0.40" x 0.52": the AI Vision Sensor's socket is modelled with its mouth (0.394" x 0.504")
+                    if (h.through || !h.square || Mathf.Min(a, b) < 0.27f || Mathf.Min(a, b) > 0.40f || Mathf.Max(a, b) < 0.4f || Mathf.Max(a, b) > 0.52f) continue;
                     var up = h.side.sqrMagnitude > 1e-6f ? (b >= a ? h.side : Vector3.Cross(h.axis, h.side)) : Vector3.up;
                     list.Add(new WirePort { local = h.entry / 0.0254f, outLocal = -h.axis, upLocal = up.normalized, kind = WireKind.Smart, label = "Smart port" });
                 }

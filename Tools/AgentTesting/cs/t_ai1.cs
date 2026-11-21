@@ -1,5 +1,4 @@
-// (Play mode) AI Vision Sensor: there's no AI Vision model in the parts yet, so this puts the simulated device on a
-// V5 Vision Sensor part (port 20) on top of the demo robot's front, looking forward, with a red block in view; makes a
+// (Play mode) AI Vision Sensor: puts VEX's AI Vision Sensor part on top of the demo robot's front, looking forward, with a red block in view; makes a
 // color from the block (as the card's click does), takes pictures in the build and in a skills game (the field's pins
 // and cups for the AI model), and runs Python, VEXcode C++ and PROS programs against it. Needs t_loaddemo.cs first.
 if (!UnityEngine.Application.isPlaying) return "not playing";
@@ -13,16 +12,16 @@ var game = Protobot.Game.SkillsGame.Current;
 var front = game != null ? game.front : Vector3.forward;
 var at = bounds.center + front * (Vector3.Dot(bounds.extents, new Vector3(Mathf.Abs(front.x), 0f, Mathf.Abs(front.z))) - 1f);
 at.y = bounds.max.y + 2f;
-var cam = Protobot.PartsManager.GeneratePart("SNSR-Vision-V5", at, Quaternion.identity);
+var cam = Protobot.PartsManager.GeneratePart("VXSENSORS-AI Vision Sensor", at, Quaternion.identity);
 cam.name = "AiTest";
 var lk = Protobot.Devices.SensorFrame.Look(cam);
 cam.transform.rotation = Quaternion.FromToRotation(cam.transform.TransformDirection(lk.dir), (front - Vector3.up * 0.25f).normalized) * cam.transform.rotation;
 UnityEngine.Physics.SyncTransforms();
-var sensor = new Protobot.Devices.AiVisionSensor(cam);
-sensor.port = 20;
-var list = (System.Collections.Generic.List<Protobot.Devices.V5Device>)typeof(Protobot.Devices.V5Brain).GetField("devices", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic).GetValue(null);
-list.RemoveAll(d => d is Protobot.Devices.AiVisionSensor || d.port == 20 || d.part == cam);
-list.Add(sensor);
+Protobot.Devices.V5Brain.Refresh(true);
+var sensor = Protobot.Devices.V5Brain.Devices.OfType<Protobot.Devices.AiVisionSensor>().First(d => d.part == cam);
+var port = sensor.port.ToString();
+sb.AppendLine("part kind " + Protobot.Devices.V5Brain.KindOf(cam) + " port " + port + " holes " + cam.GetComponentsInChildren<Protobot.HoleCollider>().Length
+    + " wire ports " + Protobot.Motion.WirePorts.Of(cam).Count + " look " + lk.dir.normalized.ToString("F2"));
 var lens = sensor.Lens();
 // a red block 24" out, a bit to the right
 var right = Vector3.Cross(Vector3.up, lens.look).normalized;
@@ -56,7 +55,7 @@ sb.AppendLine("pieces known " + Protobot.Devices.AiVisionSensor.GamePieces().Cou
 // programs
 var py = "from vex import *\n" +
     "RED = Colordesc(1, " + red.Value.r + ", " + red.Value.g + ", " + red.Value.b + ", 10, 0.2)\n" +
-    "ai = AiVision(Ports.PORT20, RED, AiVision.ALL_AIOBJS)\n" +
+    "ai = AiVision(Ports.PORT" + port + ", RED, AiVision.ALL_AIOBJS)\n" +
     "reds = ai.take_snapshot(RED)\n" +
     "print('py red', len(reds), reds[0].centerX if reds else -1, reds[0].width if reds else -1)\n" +
     "objs = ai.take_snapshot(AiVision.ALL_AIOBJS)\n" +
@@ -64,12 +63,12 @@ var py = "from vex import *\n" +
     "print('py tags', len(ai.take_snapshot(AiVision.ALL_TAGS)))\n";
 var cpp = "#include \"vex.h\"\nusing namespace vex;\n" +
     "aivision::colordesc RED = aivision::colordesc(1, " + red.Value.r + ", " + red.Value.g + ", " + red.Value.b + ", 10, 0.2);\n" +
-    "aivision AI = aivision(PORT20, RED, aivision::ALL_AIOBJS);\n" +
+    "aivision AI = aivision(PORT" + port + ", RED, aivision::ALL_AIOBJS);\n" +
     "int main() {\n  int n = AI.takeSnapshot(RED);\n" +
     "  printf(\"cpp red %d %d %d\\n\", n, AI.objects[0].centerX, AI.objectCount);\n" +
     "  int m = AI.takeSnapshot(aivision::ALL_AIOBJS);\n  printf(\"cpp ai %d id %d\\n\", m, AI.largestObject.id);\n  return 0;\n}\n";
 var pros = "#include \"main.h\"\n" +
-    "pros::AIVision ai(20);\n" +
+    "pros::AIVision ai(" + port + ");\n" +
     "void initialize() {\n" +
     "  ai.set_color(pros::AIVision::Color(1, " + red.Value.r + ", " + red.Value.g + ", " + red.Value.b + ", 10, 0.2));\n" +
     "  ai.enable_detection_types(pros::AivisionModeType::colors | pros::AivisionModeType::objects);\n" +
@@ -87,8 +86,6 @@ Protobot.RobotCode.RobotProgram.Printed += listen;
 foreach (var program in new[] { py, cpp, pros }) {
     string err; int line;
     if (!Protobot.RobotCode.RobotProgram.Start(program, Protobot.RobotCode.RobotProgram.Period.Program, 0, out err, out line)) { output.AppendLine("ERROR " + err + " line " + line); continue; }
-    list.RemoveAll(d => d is Protobot.Devices.AiVisionSensor || d.port == 20 || d.part == cam);
-    list.Add(sensor);   // (starting a program finds the devices again: the stand-in sensor goes back on port 20)
     for (var i = 0; i < 200 && Protobot.RobotCode.RobotProgram.Current != null && Protobot.RobotCode.RobotProgram.Current.Status == "Running"; i++) Protobot.RobotCode.RobotProgram.Step(0.01f);
     output.AppendLine("[" + (Protobot.RobotCode.RobotProgram.Current != null ? Protobot.RobotCode.RobotProgram.Current.Status : "none") + "]");
     Protobot.RobotCode.RobotProgram.Stop(null);

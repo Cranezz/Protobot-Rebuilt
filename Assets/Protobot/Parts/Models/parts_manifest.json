@@ -621,6 +621,17 @@
    ]
   },
   {
+   "path": "Electronics/Sensors/V5 AI Vision Sensor",
+   "size": [
+    0.0381,
+    0.0381,
+    0.0254
+   ],
+   "triangles": 125852,
+   "bodies": 1,
+   "materials": []
+  },
+  {
    "path": "Electronics/Sensors/V5 Distance Sensor",
    "size": [
     0.050387,

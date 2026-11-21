@@ -148,7 +148,7 @@ namespace Protobot.Editor
                 case "Line Tracker - V1": return "Line Tracker";
                 case "Line Tracker - V2": return "Line Tracker V2";
             }
-            if ((m = Regex.Match(n, @"^V5 (Distance|GPS|Inertial|Optical|Rotation|Vision) Sensor$")).Success)
+            if ((m = Regex.Match(n, @"^V5 (Distance|GPS|Inertial|Optical|Rotation|Vision|AI Vision) Sensor$")).Success) // V2: AI Vision (276-8659)
                 return $"{m.Groups[1].Value} Sensor";
 
             // ---- nuts ("Keps Nut")

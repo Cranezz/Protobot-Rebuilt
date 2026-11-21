@@ -64,6 +64,11 @@ namespace Protobot.Motion {
             if (name == "Vision Sensor")
                 for (var i = 0; i < holes.Count; i++)
                     if (!(holes[i].holeType == HoleCollider.HoleType.Threaded && Size(holes[i]) > 0.158f && Size(holes[i]) < 0.172f) && !fix.remove.Contains(i)) fix.remove.Add(i);
+            // V2: the AI Vision Sensor (276-8659) too: two #8-32 inserts 1/2" apart in its back (modelled at the thread's
+            // minor diameter, 0.15"); the lens, the smart port and the USB port aren't holes.
+            if (name == "AI Vision Sensor")
+                for (var i = 0; i < holes.Count; i++)
+                    if (!(holes[i].holeType == HoleCollider.HoleType.Threaded && Size(holes[i]) > 0.14f && Size(holes[i]) < 0.172f) && !fix.remove.Contains(i)) fix.remove.Add(i);
             // Pneumatic ports: the cylinders' M5 ports (side, near each end), the reservoirs' 1/8" NPT ports; the
             // valves' small ports become threaded (their fittings thread in).
             if (id.StartsWith("PNMT-")) Ports(mesh, 0.15f, 0.25f, fix, false, 0.197f);   // V2: M5, as the fittings' studs
