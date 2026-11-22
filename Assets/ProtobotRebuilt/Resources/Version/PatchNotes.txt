@@ -1,0 +1,115 @@
+# Protobot Rebuilt V2, Beta 1.9 (build 65)
+
+- **C++ robot code:** write PROS (with LemLib or EZ-Template) or VEXcode V5 C++ and run it on the simulated robot, the
+  same code you'd download to the real one. Python and VEXcode Blocks work too.
+- **EZ-Template:** PID drive, turn and swing, exit conditions, motion chaining, odometry with pure pursuit and
+  boomerang moves, and the autonomous selector on the Brain screen. v3 and v2 names both work.
+- **LemLib:** 0.4, 0.5 and today's versions, including path files from path.jerryio.
+- **Whole projects:** Code > Project > Open a project folder loads a PROS or VEXcode project with all its files.
+  Errors name the file and line.
+- **VEXcode Blocks:** drag-and-drop blocks laid out like VEXcode's: My Blocks, lists, comments. "Show the Python" or
+  "Convert to a text program" when you're ready.
+- **Debugging:** the Monitor tab shows each thread, the line it's on and your variables. Pause (F6) and Step (F10)
+  the robot. Console colors work.
+- **VS Code:** opens your code with autocomplete for PROS, VEXcode C++, LemLib and EZ-Template.
+- **Sensors simulated:** Vision Sensor (signatures, color codes, the Vision Utility), GPS Sensor (reads the field
+  strip, with its quality), and the new AI Vision Sensor (colors, codes, and the game's pins and cups found by its AI
+  model). The AI Vision Sensor is now in the parts list with VEX's own model.
+- **Insert devices** writes the configuration for every sensor, including where the GPS is mounted.
+- **Gamepads and USB joysticks** drive the robot; the controller screen shows each button and what it does.
+- **Online matches:** each player's robot runs its own program in autonomous, then driver control.
+- **Driving:** omni wheels slide sideways like real ones, and a robot standing still no longer creeps.
+
+# Protobot Rebuilt V2, Beta 1.9 (build 50)
+
+- **Robot code** (Code in the top bar): write your robot's program in Python, VEXcode V5 Python style, and run it on the
+  simulated robot. Line numbers, colors, auto-indent, Ctrl+/ to comment, F5 to run, errors shown on their line.
+  "VS Code" opens it in your own VS Code (with autocomplete); saving there updates the app. The program is saved with
+  the build.
+- **Insert devices:** one click writes your robot's configuration at the top of the program: every motor on its port
+  with its cartridge and direction, the drive's motor groups and a drivetrain measured from your build (wheel size,
+  track width, gear ratio), sensors and pneumatics.
+- **Brain screen:** the program can print and draw on the V5 Brain's screen (rectangles, circles, lines, colors, fonts)
+  and you can tap it (autonomous selectors work). The controller's screen shows beside it, and rumble shakes it (and
+  your gamepad).
+- **Tuning graph:** the Graph tab plots the motors your program drives (speed or position against what it asked for)
+  and anything it prints as `name: number`, for tuning PID. The same code runs on the real robot.
+- **Motion library** (`from motion import *`): odometry and autonomous moves with LemLib's names: move_to_point,
+  turn_to_heading, move_to_pose (boomerang), swing turns, pure pursuit along a path, motion chaining, tracking wheels or
+  drive motors plus the Inertial sensor, and LemLib's PID settings and exit conditions.
+- **Examples** (12): competition template, tank/arcade drive, PID tuning, odometry and motions, an autonomous selector
+  on the Brain's screen, controller screen and rumble, and more. They fill in your own robot's devices.
+- **Play game:** match autonomous runs your program, then its driver control. New mode **Programming Skills**: a skills
+  run driven only by your program, with its own leaderboard (the program goes with the shared replay).
+- **Smoother:** the game screens run much faster (on an RTX 3070 Ti at 1440p, 250+ FPS while driving on the full
+  field, no frame drops). Replays no longer drop to 30 FPS.
+- **Driving feels truer:** omni wheels grip under full power (they used to spin), and robots don't spin slowly after
+  coasting to a stop.
+
+# Protobot Rebuilt V2, Beta 1.9 (build 45)
+
+- **Controller screen** (Edit > Controller…, or Devices > Controller): a picture of the V5 Controller with every stick
+  direction and button labelled, Steam style. Click one and press a key or a gamepad button to bind it. Presets for
+  tank, arcade and split arcade, what each button runs on your robot, and "Put on it" to give a button a motor or
+  cylinder. Bindings are saved with each robot ("Use as my default" for robots without their own). Gamepad sticks are
+  analog: half a push drives at about half speed.
+- **Skills replays:** every run is recorded. Watch it from the results (Watch replay), open saved ones with File > Open
+  replay…, and watch other players' best runs from the skills leaderboard.
+- **Leaderboard:** scores can only be posted by a checked run now. Report a run that breaks the rules (its replay goes
+  with your report), or appeal a decision from the Account page.
+- **Demo robot:** Sample Builds/Override Demo Robot.pbb, a legal Override robot on the 6-motor drive: drive into a lying
+  pin or cup with the intake on (I) to pick it up, K to drop it; the arm (U/J) holds where you leave it.
+- **Motors can hold:** a motor's card in Devices has Brake/Hold: Hold keeps an arm or lift where it stopped.
+- **Play game:** the default start now finds a legal spot clear of the pins and cups by the wall (bigger robots started
+  on top of them).
+- **Parts list:** families open in place again, and their kinds open as smaller rows inside them.
+- **Saw:** motors and electronics can't be cut (VEX's rules don't allow it).
+- Fixed: the build tools showing during game setup after a run.
+
+# Protobot Rebuilt V2, Beta 1.9 (build 40)
+
+- **Updating works:** updates now install and restart Protobot by themselves (before, an update could stop at 100%
+  and Protobot reopened on the old version). If you're on build 37 or 38 and the update gets stuck, download
+  **ProtobotRebuiltV2-win-Setup.exe** below once; from then on updates install on their own.
+- **A proper update screen:** "Update available" shows what's new and the download size; updating shows a progress
+  bar with the megabytes, then installs and restarts.
+- **Intro:** Protobot opens with a short animation over the field that blends into the home menu (any key or click
+  skips it).
+
+# Protobot Rebuilt V2, Beta 1.9 (build 38)
+
+- **Accounts:** Multiplayer > Account. Play as a guest, or make an account (username and password) to keep your
+  stats and scores and sign in on any computer. Making an account keeps what you did as a guest.
+- **Stats:** matches, wins, losses, ties, points and your best skills score, kept on the server.
+- **Skills leaderboard:** finish a legal Robot Skills run and it's posted, after the server checks it (robot size,
+  run length, the scoring adds up).
+- **Voice chat in online matches:** you hear only your alliance partner. Push to talk (hold T), open mic or off,
+  mute a player for yourself; no microphone needed to play.
+- **Devices panel:** the robot's motors, sensors and pneumatics laid out like the V5 Brain's screens, with working
+  sensors; resizable, in columns.
+
+# Protobot Rebuilt V2, Beta 1.9 (build 37)
+
+- Installing and updating finish straight away (Setup waited half a minute for Protobot after installing).
+- Help > Check for updates.
+
+New to Protobot? Run **ProtobotRebuiltV2-win-Setup.exe**: it installs Protobot and keeps it up to date.
+
+# Protobot Rebuilt V2, Beta 1.9 (build 36)
+
+The first release with an installer: run **ProtobotRebuiltV2-win-Setup.exe**. From now on Protobot checks for new
+versions when it starts (and from Help > Check for updates), downloads only what changed and restarts into the update.
+
+## Highlights
+- **Full-detail VEX parts:** the whole VEX-CAD library, with a parts menu that opens each family in a panel beside the list.
+- **Building:** quick fastening, parts that slide along screws and shafts, mirroring, saw, drill, bend tool, measure,
+  paint, pneumatic tubing, V5 and 3-wire wiring, rubber bands, zip ties, polycarbonate sketcher, custom part import.
+- **Motion:** motors, gears, chains, cylinders, hinges and slides that move, and a physics sandbox to drive the robot.
+- **V5 Brain devices:** a Devices panel laid out like the Brain's screens: motor dashboards (gears, revolutions,
+  velocity, power and torque), the 3-wire ports, and working sensors (distance, optical, light, line tracker, rotation,
+  encoder, potentiometer, inertial, bumper and limit switches).
+- **The game:** the 2026-27 V5RC Override field, Robot Skills and match practice with the manual's rules and scoring.
+- **Online:** host or join matches by code, 2v2 with each player driving their own robot.
+
+Protobot Rebuilt V2 continues Protobot (davegersh) and Protobot Rebuilt (BreadSoup). Not an official VEX product.
+

@@ -12,7 +12,7 @@ namespace Protobot.Game {
     /// click two points (robot, tool or field): the distance, with how far apart they are along each axis. Ctrl+Z
     /// takes back the last move. Run from SkillsGame.DrawSetup, after the field's drawings.</summary>
     public class SetupTools {
-        public enum Mode { Move, LineUp, Measure }
+        public enum Mode { Move, LineUp, Measure, Preload }
 
         public Mode mode;
         public bool toolSelected;
@@ -45,6 +45,7 @@ namespace Protobot.Game {
         public string Instructions => mode switch {
             Mode.LineUp => !first.Valid ? "Click a face or point on your robot" : "Now click a face on the alignment tool or the field to put it against (or a point to line up with)",
             Mode.Measure => !first.Valid || second.Valid ? "Click a point on the robot, the tool or the field" : "Click a second point",
+            Mode.Preload => "Click your robot where the Preload goes (it has to touch the robot). R: " + (preloadStanding ? "lay it down" : "stand it up") + ", Q/E: turn it",
             _ => "Drag the robot to slide it along the wall, drag the blue ring to turn it" + (game.tool != null ? ". Drag the tool to move it" : ""),
         };
 
@@ -83,6 +84,7 @@ namespace Protobot.Game {
                 case Mode.Move: Move(free); break;
                 case Mode.LineUp: LineUp(free); break;
                 case Mode.Measure: Measure(free); break;
+                case Mode.Preload: PlacePreload(free); break;
             }
         }
 
@@ -224,6 +226,41 @@ namespace Protobot.Game {
             var f = FeaturePicker.Pick();
             if (f.Valid && f.part != null && f.part.GetComponent<PickablePart>() != null) return f;
             return FieldFace();
+        }
+
+        // ------------------------------------------------------------------ V2: the Preload anywhere on the robot
+
+        private bool preloadStanding;
+        private float preloadTurn;
+        private const float PinRadius = 1.65f, PinHalf = 3.3f;   // (as PreloadPose's standing and lying spots)
+
+        // A real Preload goes anywhere it touches the robot (SG5): click a face of the robot and it rests on it, lying
+        // across it (Q/E turn it about the face) or standing on it (R).
+        private void PlacePreload(bool free) {
+            var keyboard = Keyboard.current;
+            if (keyboard != null && !TextInput.IsTyping) {
+                if (keyboard.rKey.wasPressedThisFrame) { preloadStanding = !preloadStanding; game.NotifyChanged(); }
+                if (keyboard.qKey.wasPressedThisFrame) preloadTurn -= 15f;
+                if (keyboard.eKey.wasPressedThisFrame) preloadTurn += 15f;
+            }
+            var hover = free ? PickRobot() : default;
+            Overlay.MouseText(Instructions, Theme.Text);
+            if (!hover.Valid || hover.kind != FeaturePicker.Kind.Face) {
+                game.ShowPreloadAt(null);
+                return;
+            }
+            var n = hover.normal.normalized;
+            var across = Vector3.ProjectOnPlane(game.field.Direction(game.heading), n);
+            if (across.sqrMagnitude < 1e-4f) across = Vector3.ProjectOnPlane(Vector3.right, n);
+            across = Quaternion.AngleAxis(preloadTurn, n) * across.normalized;
+            var pose = preloadStanding
+                ? (hover.point + n * (PinHalf + 0.02f), Quaternion.LookRotation(n, across))
+                : (hover.point + n * (PinRadius + 0.02f), Quaternion.LookRotation(across, n));
+            game.ShowPreloadAt(pose);
+            if (!MouseInput.LeftButton.wasPressedThisFrame) return;
+            game.SetCustomPreload(pose);
+            Audio.Sounds.Play(Audio.Sounds.Pop);
+            SetMode(Mode.Move);
         }
 
         // ------------------------------------------------------------------ measure

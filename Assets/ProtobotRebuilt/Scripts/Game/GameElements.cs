@@ -43,6 +43,13 @@ namespace Protobot.Game {
         private readonly HashSet<Collider> touching = new();
         private const float Stiffness = 1500f, Damping = 25f;   // a gentle detent (kg·in²/s² per radian)
 
+        /// <summary>V2: how far the bar can be lifted in its brackets (it drops back by its weight).</summary>
+        public const float Lift = 1f;
+        public float restHeight;
+
+        /// <summary>V2: down in its brackets (SC: a Toggle counts only when fully seated).</summary>
+        public bool Seated => body == null || transform.position.y - restHeight < 0.1f;
+
         public bool TouchedByRobot => touching.Count > 0;
 
         private void Start() => startAngle = Angle();
@@ -73,7 +80,7 @@ namespace Protobot.Game {
                 var spin = body != null ? Mathf.Abs(Vector3.Dot(body.angularVelocity, axis)) : 0f;
                 var angle = Angle() - startAngle;
                 var off = Mathf.Abs(Mathf.DeltaAngle(Mathf.Round(angle / 120f) * 120f, angle));
-                if (TouchedByRobot || spin > 0.5f || off > 12f) return PieceColor.Yellow;
+                if (TouchedByRobot || spin > 0.5f || off > 12f || !Seated) return PieceColor.Yellow;
                 var top = faces.OrderByDescending(f => Vector3.Dot(transform.TransformDirection(f.normal), Vector3.up)).First();
                 return top.color;
             }

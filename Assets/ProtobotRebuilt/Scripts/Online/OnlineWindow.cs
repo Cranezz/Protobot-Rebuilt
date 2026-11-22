@@ -193,6 +193,7 @@ namespace Protobot.Online {
                 if (MatchSessions.Current != null) MatchSessions.Set(MatchSessions.NameKey, OnlineServices.Name);
             });
             name.characterLimit = 24;
+            nameField = name;
             name.GetComponent<Image>().color = new Color(0f, 0f, 0f, 0.25f);
             name.Size(-1, 34f, 1f);
             Ui.Tip(name, "Your name", null, "What other players see in the server list and the lobby.");
@@ -216,11 +217,23 @@ namespace Protobot.Online {
             ViewHider.Set(this, true);
             MatchSessions.Changed += MarkDirty;
             MatchSessions.Ended += OnEnded;
+            Accounts.Changed += ShowName;
             ActionLog.Write("window", "Multiplayer screen");
             _ = OnlineServices.Start();
         }
 
+        private TMP_InputField nameField;
+
+        // V2: signing in (or making an account) changes the name to the account's: shown at once bottom left.
+        private void ShowName() {
+            if (nameField != null && !nameField.isFocused) nameField.SetTextWithoutNotify(OnlineServices.Name);
+            if (MatchSessions.Current != null) MatchSessions.Set(MatchSessions.NameKey, OnlineServices.Name);
+            if (hostOptions != null && hostOptions.name.EndsWith("'s match")) hostOptions.name = OnlineServices.Name + "'s match";
+            MarkDirty();
+        }
+
         private void OnDestroy() {
+            Accounts.Changed -= ShowName;
             MatchSessions.Changed -= MarkDirty;
             MatchSessions.Ended -= OnEnded;
             ViewHider.Set(this, false);
@@ -911,11 +924,17 @@ namespace Protobot.Online {
 
     /// <summary>A background picture drifting and breathing slowly (the Multiplayer screen, the home menu).</summary>
     public class BackgroundDrift : MonoBehaviour {
+        private Canvas canvas;
+
+        // V2: the same on screen on every canvas (in screen pixels): the home menu's and the Multiplayer screen's
+        // canvases scale differently, so the picture jumped ~16 px (a small zoom) going from one to the other.
         private void Update() {
             var t = Time.unscaledTime;
             var rect = (RectTransform)transform;
+            if (canvas == null) canvas = GetComponentInParent<Canvas>()?.rootCanvas;
+            var scale = canvas != null && canvas.scaleFactor > 0f ? canvas.scaleFactor : 1f;
             rect.localScale = Vector3.one * (1.06f + 0.025f * Mathf.Sin(t * 0.07f));
-            rect.anchoredPosition = new Vector2(Mathf.Sin(t * 0.045f) * 18f, Mathf.Cos(t * 0.05f) * 10f);
+            rect.anchoredPosition = new Vector2(Mathf.Sin(t * 0.045f) * 24f, Mathf.Cos(t * 0.05f) * 13f) / scale;
         }
     }
 

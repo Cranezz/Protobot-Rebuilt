@@ -399,6 +399,7 @@ namespace Protobot.Devices {
         public override void PowerOn() {
             started = false;
             Rpm = 0f;
+            Sample(0f);   // V2: read it now (a program reading it at once got the last run's value)
         }
 
         /// <summary>Rotation: makes where it is now 0° (kept in the sensor); encoder: the count starts again.</summary>
@@ -413,6 +414,7 @@ namespace Protobot.Devices {
         public void ToggleReversed() {
             Controls.SetReversed(part, !Reversed);
             started = false;
+            Sample(0f);
         }
 
         public bool IsReversed => Reversed;

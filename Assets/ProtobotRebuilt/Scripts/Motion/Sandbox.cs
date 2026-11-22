@@ -243,7 +243,7 @@ namespace Protobot.Motion {
             if (!Game.SkillsGame.Active && !Game.ReplayViewer.Active) SetBuildInterface(true);
             Devices.DevicesPanel.SimulationEnded();
             foreach (var motor in MotorDrive.Live()) motor.Manual = 0f;   // V2
-            foreach (var motor in MotorDrive.Live()) motor.Sound(0f);
+            foreach (var motor in MotorDrive.Live()) motor.Silence();
             FlexGrip.Clear();
             DriveEnabled = true;
             if (!Hosted) Interface.Interface.Say("Back to building: the build is as it was", true);
@@ -1409,7 +1409,7 @@ namespace Protobot.Motion {
             }
             if (Puppet) {   // V2: another computer simulates; motors only make their sound
                 foreach (var train in trains)
-                    foreach (var (motor, _) in train.motors) if (motor != null) motor.Sound(0f);
+                    foreach (var (motor, _) in train.motors) if (motor != null) motor.Silence();
                 return;
             }
             var typing = InputEvents.TextInput.IsTyping || InputEvents.TextInput.ShortcutsPaused || !DriveEnabled;
@@ -1464,7 +1464,7 @@ namespace Protobot.Motion {
                 Audio.Sounds.PlayAt(Audio.Sounds.Air, slide.rod.position, slide.loose ? 0.4f : 0.7f);
             }
             foreach (var train in trains)
-                foreach (var (motor, _) in train.motors) motor.Sound(Paused ? 0f : motor.Level);
+                foreach (var (motor, _) in train.motors) { if (Paused) motor.Silence(); else motor.Sound(motor.Level); }
             if (Paused && Keyboard.current != null && Tools.Keybinds.Pressed("StepFrame")) StepOnce();
         }
 
@@ -1512,6 +1512,58 @@ namespace Protobot.Motion {
             Omnis();
             BogieFriction();   // V2
             PullBands();   // V2
+            HoldStill();   // V2
+        }
+
+        // V2: static friction for a robot at rest. Rubber on foam tiles holds a stopped robot dead still; here the
+        // contacts' tiny leftover slip crept it (about 0.0015" a second sideways and 0.003 degrees a second round after a
+        // stop), and its tracking wheels counted it. When none of its motors is driven and every one of its bodies has
+        // been nearly still for a tenth of a second, their sliding along the floor and turning about the vertical are
+        // taken away each step; a command, a push or a hit faster than that lets go at once.
+        private const float StillSpeed = 0.15f;                 // in/s
+        private const float StillTurn = 0.3f * Mathf.Deg2Rad;  // rad/s about the vertical
+        private const int StillSteps = 24;                      // 0.1 s at 240 steps a second
+        private int stillFor;
+        internal static bool HoldStillOff;                      // tests compare with and without
+
+        /// <summary>V2: the robot is being held still (HoldStill): its free tracking wheels don't roll.</summary>
+        private bool HeldStill => !HoldStillOff && stillFor >= StillSteps;
+
+        private bool IsFreeRoller(Rigidbody rb) {
+            if (driven.Contains(rb)) return false;
+            foreach (var wheel in omnis)
+                if (wheel.rb == rb) return true;
+            return false;
+        }
+
+        private void HoldStill() {
+            if (HoldStillOff) return;
+            foreach (var train in trains)
+                foreach (var (motor, _) in train.motors)
+                    if (motor != null && Mathf.Abs(motor.Command) > 0.001f) {
+                        stillFor = 0;
+                        return;
+                    }
+            foreach (var body in bodies) {
+                var rb = body.rb;
+                if (rb == null || rb.isKinematic) continue;
+                var v = rb.linearVelocity;
+                // (a free tracking wheel's own spin shows a little turn about the vertical: only its travel counts)
+                var turn = IsFreeRoller(rb) ? 0f : rb.angularVelocity.y;
+                if (new Vector2(v.x, v.z).magnitude > StillSpeed || Mathf.Abs(turn) > StillTurn) {
+                    stillFor = 0;
+                    return;
+                }
+            }
+            if (++stillFor < StillSteps) return;
+            foreach (var body in bodies) {
+                var rb = body.rb;
+                if (rb == null || rb.isKinematic) continue;
+                var v = rb.linearVelocity;
+                rb.linearVelocity = new Vector3(0f, v.y, 0f);
+                var w = rb.angularVelocity;
+                rb.angularVelocity = new Vector3(w.x, 0f, w.z);
+            }
         }
 
         // A train turns as one: its speed (of its own turn) from its shafts' turning (what the last step did to them:
@@ -1720,9 +1772,8 @@ namespace Protobot.Motion {
 
         // V2: unpowered omni wheels (tracking wheels) roll without slipping, as a sprung tracking wheel does on foam
         // tiles: each step the wheel is given the spin that makes its contact stand still on the floor (from how the
-        // arm it turns in moves there). The grip impulse the driven wheels get was undone by the 48-sided shape
-        // bumping over the floor and by the light arm swinging (the wheel turned 3-7% short); a hinge drive held the
-        // spin but pushed the robot whenever its target was a little off (a sideways wheel crept, the robot yawed).
+        // arm it turns in moves there), held by its axle's drive. The grip impulse the driven wheels get was undone by
+        // the 48-sided shape bumping over the floor and by the light arm swinging (the wheel turned 3-7% short).
         private readonly Dictionary<Rigidbody, (ConfigurableJoint joint, bool owner)> freeHinges = new();
         private readonly HashSet<Rigidbody> rolled = new();
 
@@ -1754,26 +1805,68 @@ namespace Protobot.Motion {
             // Heavy about its axle (its own spin only): the floor's bumps under the 48-sided shape can't change its
             // spin within a step. It turns with its arm about the other axes as before.
             if (heavy.Add(wheel)) {
-                var spinInertia = Vector3.Dot(Vector3.Scale(Quaternion.Inverse(wheel.rotation * wheel.inertiaTensorRotation) * axisWorld,
-                                                            Quaternion.Inverse(wheel.rotation * wheel.inertiaTensorRotation) * axisWorld), wheel.inertiaTensor);
+                var local = Quaternion.Inverse(wheel.rotation * wheel.inertiaTensorRotation) * axisWorld;
+                var spinInertia = Vector3.Dot(Vector3.Scale(local, local), wheel.inertiaTensor);
                 var other = Mathf.Max(wheel.inertiaTensor.x, wheel.inertiaTensor.y, wheel.inertiaTensor.z);
                 wheel.inertiaTensorRotation = Quaternion.FromToRotation(Vector3.right, Quaternion.Inverse(wheel.rotation) * axisWorld);
                 wheel.inertiaTensor = new Vector3(Mathf.Max(spinInertia, 1e-4f) * 1000f, other, other);
             }
-            // The contact's speed along the roll if the wheel didn't turn in its frame, and the spin that cancels it:
-            // the wheel takes it (no force passes: a free wheel's own inertia is too small to push a robot).
-            // (at the wheel's middle plane: PhysX puts the contact anywhere across the tread, and at its edge, 1/2" to
-            // the side, a robot spinning in place moved it differently from the wheel's middle: ~1" off in two turns)
-            // V2: and straight under the axle, a radius down (where PhysX put it along the tread shifted with the way the
-            // robot drove and as the pod bobbed: driving backward read 0.5% short)
-            point = wheel.worldCenterOfMass - Vector3.Cross(along, axisWorld).normalized * radius;
-            var carried = frame.GetPointVelocity(point) - (ground != null ? ground.GetPointVelocity(point) : Vector3.zero);
-            var spin = -Vector3.Dot(carried, along) / lever;
-            if (Mathf.Abs(spin * lever) <= 400f) wheel.angularVelocity = frame.angularVelocity + axisWorld * spin;
+            // How far it should have turned in its frame: what its axle moved along the floor since the last step (a
+            // rolling wheel turns that far, over its radius) less what its frame (the pod) turned about the axle.
+            // Measured from where things actually went: reading the pod's speed at the start of each step summed to
+            // 3.5% short of the distance, and the pod's jiggles under the band, turned into spin, made a still robot's
+            // tracking sensors count ~0.5° a second. Back-and-forth jiggles cancel here.
+            var axle = wheel.worldCenterOfMass;
+            var turned = TurnIn(wheel, frame, axisWorld);
+            if (!rolledTurn.TryGetValue(wheel, out var should) || freeSince.Contains(wheel) || !rollFrom.TryGetValue(wheel, out var from)) {
+                should = turned;   // (first contact, or back on the floor: from here)
+                from = (axle, frame.rotation);
+            }
+            freeSince.Remove(wheel);
+            if (HeldStill) {
+                // V2: a robot held still: a real tracking wheel doesn't turn (here its pod settling on the band turned it
+                // about 0.015 degrees a second). It's held at the turn it has (pulled back if the contacts turn it).
+                rolledTurn[wheel] = should;
+                rollFrom[wheel] = (axle, frame.rotation);
+                var back = (float)((should - turned) / Time.fixedDeltaTime);
+                wheel.angularVelocity = frame.angularVelocity + axisWorld * back;
+                return true;
+            }
+            var moved = axle - from.axle;
+            var rolledTurns = -Vector3.Dot(moved - Vector3.Dot(moved, axisWorld) * axisWorld, along) / lever;
+            var dq = frame.rotation * Quaternion.Inverse(from.rot);
+            var frameTurn = 2f * Mathf.Atan2(dq.x * axisWorld.x + dq.y * axisWorld.y + dq.z * axisWorld.z, dq.w);
+            if (frameTurn > Mathf.PI) frameTurn -= 2f * Mathf.PI;
+            if (frameTurn < -Mathf.PI) frameTurn += 2f * Mathf.PI;
+            should += rolledTurns - frameTurn;
+            rolledTurn[wheel] = should;
+            rollFrom[wheel] = (axle, frame.rotation);
+            // It turns that difference during this step (no force passes: a free wheel's own inertia is too small to
+            // push a robot).
+            var rel = (float)((should - turned) / Time.fixedDeltaTime);
+            if (Mathf.Abs(rel * radius) <= 400f) wheel.angularVelocity = frame.angularVelocity + axisWorld * rel;
             return true;
         }
 
+        private readonly Dictionary<Rigidbody, (Vector3 axle, Quaternion rot)> rollFrom = new();
+
         private readonly HashSet<Rigidbody> heavy = new();
+        private readonly Dictionary<Rigidbody, double> rolledTurn = new();
+        private readonly Dictionary<Rigidbody, (double total, float last)> turnIn = new();
+        private readonly HashSet<Rigidbody> freeSince = new();
+
+        // A wheel's turn in its frame about its axle, radians, unwrapped.
+        private double TurnIn(Rigidbody wheel, Rigidbody frame, Vector3 axisWorld) {
+            var q = Quaternion.Inverse(frame.rotation) * wheel.rotation;
+            var axis = Quaternion.Inverse(frame.rotation) * axisWorld;
+            var twist = 2f * Mathf.Atan2(q.x * axis.x + q.y * axis.y + q.z * axis.z, q.w);
+            if (!turnIn.TryGetValue(wheel, out var t)) t = (twist, twist);
+            var step = Mathf.DeltaAngle(t.last * Mathf.Rad2Deg, twist * Mathf.Rad2Deg) * Mathf.Deg2Rad;
+            t = (t.total + step, twist);
+            turnIn[wheel] = t;
+            return t.total;
+        }
+
 
         // A sprung wheel pressed onto foam tiles doesn't leave them, but the light wheel's 48-sided shape bumps off the
         // floor between contacts at speed (~300 bumps a second at 60 in/s): within 1/32" of the floor it still rolls
@@ -1806,6 +1899,14 @@ namespace Protobot.Motion {
                     }
                 }
                 freeSteps++;
+                // Off the floor it spins down in its bearings (heavy, it kept turning for ever).
+                freeSince.Add(rb);
+                var frameBody = joint.connectedBody == rb ? joint.GetComponent<Rigidbody>() : joint.connectedBody;
+                if (frameBody != null) {
+                    var axisFree = joint.transform.TransformDirection(joint.axis).normalized;
+                    var rel = Vector3.Dot(rb.angularVelocity - frameBody.angularVelocity, axisFree);
+                    rb.angularVelocity -= axisFree * rel * 0.05f;
+                }
             }
         }
 

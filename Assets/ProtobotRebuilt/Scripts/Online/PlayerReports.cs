@@ -4,6 +4,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Text;
 using Protobot.Builds;
+using Protobot.Custom;
 using Protobot.Interface;
 using TMPro;
 using UnityEngine;
@@ -19,8 +20,12 @@ namespace Protobot.Online {
     public static class PlayerReports {
         public static readonly string[] Reasons = {
             "Cheating or a modified app", "Unfair play on purpose (pinning, ramming)", "Offensive name or behavior",
-            "Leaving or ruining matches on purpose", "Something else",
+            "Leaving or ruining matches on purpose", CustomPartsReason, "Something else",
         };
+
+        /// <summary>V2: a robot with custom parts that don't belong (huge, pointless or made to get round the rules): the
+        /// report lists them (size, triangles, weight, how many) and carries their files.</summary>
+        public const string CustomPartsReason = "Unneeded or oversized custom parts";
 
         private static readonly HashSet<string> reported = new();
 
@@ -34,9 +39,14 @@ namespace Protobot.Online {
             var details = "";
             var dialog = Dialog.Open("Report " + name, new Vector2(620f, 430f));
             Ui.Column(dialog.Body, 8f);
+            // V2: a player whose robot has custom parts starts on that reason (the most likely one from the lobby).
+            var theirs = OnlineMatch.CustomPartsOf(playerId);
+            if (theirs.Count > 0) reason = Array.IndexOf(Reasons, CustomPartsReason);
             var row = Dialog.Row(dialog.Body, "Reason", 40f, 110f);
-            Popup.Choice(row, Reasons, 0, i => reason = i, 400f);
-            Dialog.Heading(dialog.Body, "What happened? (when, and what they did)");
+            Popup.Choice(row, Reasons, reason, i => reason = i, 400f);
+            Dialog.Heading(dialog.Body, theirs.Count > 0
+                ? "What happened? (their robot has " + theirs.Count + " custom part" + (theirs.Count == 1 ? "" : "s") + ": they go with the report)"
+                : "What happened? (when, and what they did)");
             var field = Ui.Field(dialog.Body, "Details", "", v => details = v);
             field.lineType = TMP_InputField.LineType.MultiLineNewline;
             field.onValueChanged.AddListener(v => details = v);
@@ -252,6 +262,28 @@ namespace Protobot.Online {
             md.AppendLine("## What they wrote");
             md.AppendLine();
             md.AppendLine(string.IsNullOrWhiteSpace(details) ? "(nothing)" : details);
+            var custom = OnlineMatch.CustomPartsOf(playerId);
+            if (custom.Count > 0) {
+                md.AppendLine();
+                md.AppendLine("## Their robot's custom parts");
+                md.AppendLine();
+                md.AppendLine("| Part | Kind | Size (in) | Triangles | Weight | Used |");
+                md.AppendLine("|---|---|---|---|---|---|");
+                foreach (var (part, uses) in custom) {
+                    var size = "?";
+                    var triangles = 0;
+                    if (CustomParts.ReadMesh(part, out var vertices, out var tris) && vertices.Length > 0) {
+                        var b = new Bounds(vertices[0], Vector3.zero);
+                        foreach (var v in vertices) b.Encapsulate(v);
+                        size = b.size.x.ToString("0.##") + " x " + b.size.y.ToString("0.##") + " x " + b.size.z.ToString("0.##");
+                        triangles = tris.Length / 3;
+                    }
+                    md.AppendLine("| " + (part.name ?? part.key) + " (" + part.Id + ") | " + (part.kind == CustomParts.Polycarbonate ? "plastic piece" : "imported model")
+                                  + " | " + size + " | " + triangles + " | " + part.weightGrams.ToString("0") + " g | " + uses + " |");
+                }
+                md.AppendLine();
+                md.AppendLine("custom/<id>.json: each part's file (Protobot's custom part format: File > Custom parts library… > Open folder, drop it in).");
+            }
             md.AppendLine();
             md.AppendLine("match.csv: seat, kind (pos = the robot's middle in the field's frame, inches from the field's middle; check = the host's "
                           + "movement check; left), x, y. The seats are in the match's order (OnlineMatch: red Left/Bottom, blue Right/Top).");
@@ -259,6 +291,7 @@ namespace Protobot.Online {
             using (var archive = new ZipArchive(stream, ZipArchiveMode.Create, true)) {
                 Text(archive, "report.md", md.ToString());
                 Text(archive, "match.csv", string.IsNullOrEmpty(OnlineMatch.LastRecording) ? "(no match played yet)" : OnlineMatch.LastRecording);
+                foreach (var (part, _) in custom) Text(archive, "custom/" + part.Id + ".json", JsonUtility.ToJson(part));
                 if (!string.IsNullOrEmpty(ActionLog.CurrentFile) && File.Exists(ActionLog.CurrentFile)) {
                     using var from = new FileStream(ActionLog.CurrentFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
                     using var to = archive.CreateEntry("session.log").Open();

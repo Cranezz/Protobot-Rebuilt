@@ -127,29 +127,55 @@ namespace Protobot.Motion {
 
         // ------------------------------------------------------------------ sound
 
-        /// <summary>The motor's whine at a level (share of full speed).</summary>
+        /// <summary>The motor's sound at a level (share of full speed). V2: the gear whine's pitch follows the shaft's
+        /// speed (a growl when slow, the whine at full speed: Sounds.MotorLoop), and the driver's strain whine
+        /// (Sounds.MotorStrain) rises with how hard it pushes without getting there (the command past the speed).</summary>
         public void Sound(float level) {
-            level = Mathf.Abs(level);
-            if (level < 0.001f) {
+            var speed = Mathf.Abs(level);
+            var load = Mathf.Sign(Command) == Mathf.Sign(level) || speed < 0.02f ? Mathf.Clamp01(Mathf.Abs(Command) - speed) : Mathf.Clamp01(Mathf.Abs(Command - level));
+            if (speed < 0.001f && load < 0.05f) {
                 if (sound != null && sound.isPlaying) sound.Stop();
+                if (strain != null && strain.isPlaying) strain.Stop();
                 return;
             }
-            if (sound == null) {
-                sound = gameObject.AddComponent<AudioSource>();
-                sound.clip = Audio.Sounds.MotorLoop;
-                sound.loop = true;
-                sound.playOnAwake = false;
-                sound.spatialBlend = 0.6f;
-                sound.dopplerLevel = 0f;
-                sound.minDistance = 6f;
-                sound.maxDistance = 200f;
+            sound ??= MakeSource(Audio.Sounds.MotorLoop);
+            strain ??= MakeSource(Audio.Sounds.MotorStrain);
+            // The motor inside runs at 3600 rpm at full speed whatever the cartridge; more gear stages (the red one)
+            // sound a little lower and rougher, the blue one higher; the 5.5W motor is a smaller, faster motor.
+            var pitch = Kind == "11W" ? (Rpm == 100 ? 0.96f : Rpm == 600 ? 1.05f : 1f) : 1.25f;
+            if (speed >= 0.001f) {
+                if (!sound.isPlaying) sound.Play();
+                sound.pitch = pitch * Mathf.Max(0.07f, Mathf.Min(speed, 1.2f));
+                sound.volume = 0.3f * (0.3f + 0.7f * Mathf.Pow(Mathf.Min(speed, 1f), 0.6f));
             }
-            if (!sound.isPlaying) sound.Play();
-            // The motor inside always runs at 3600 rpm; the cartridges' gears whine a little differently, and the
-            // small motor is higher.
-            var pitch = Kind == "11W" ? (Rpm == 100 ? 0.94f : Rpm == 600 ? 1.1f : 1f) : 1.22f;
-            sound.pitch = pitch * (0.35f + 0.65f * Mathf.Min(level, 1.2f));
-            sound.volume = 0.32f * Mathf.Sqrt(Mathf.Min(level, 1f));
+            else if (sound.isPlaying) sound.Stop();
+            if (load >= 0.05f) {
+                if (!strain.isPlaying) strain.Play();
+                strain.pitch = pitch;
+                strain.volume = 0.12f * Mathf.Min(load, 1f);
+            }
+            else if (strain.isPlaying) strain.Stop();
+        }
+
+        private AudioSource strain;
+
+        /// <summary>V2: no sound at all (the simulation paused or stopped).</summary>
+        public void Silence() {
+            if (sound != null && sound.isPlaying) sound.Stop();
+            if (strain != null && strain.isPlaying) strain.Stop();
+        }
+
+        private AudioSource MakeSource(AudioClip clip) {
+            var source = gameObject.AddComponent<AudioSource>();
+            source.clip = clip;
+            source.loop = true;
+            source.playOnAwake = false;
+            source.spatialBlend = 0.6f;
+            source.dopplerLevel = 0f;
+            source.minDistance = 6f;
+            source.maxDistance = 200f;
+            source.timeSamples = Random.Range(0, clip.samples);   // two motors don't play in step
+            return source;
         }
 
         // ------------------------------------------------------------------ the cartridge window

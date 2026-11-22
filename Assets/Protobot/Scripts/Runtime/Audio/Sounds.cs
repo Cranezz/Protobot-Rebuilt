@@ -11,7 +11,7 @@ namespace Protobot.Audio
     {
         const int Rate = 44100;
 
-        static AudioClip air, motorLoop, saw, drill, spray, clack, tick, error, pop, pickup, release, metalHit, plasticHit, trash, freeze;
+        static AudioClip air, motorLoop, motorStrain, saw, drill, spray, clack, tick, error, pop, pickup, release, metalHit, plasticHit, trash, freeze;
 
         // ---------------------------------------------------------------- tools
 
@@ -66,14 +66,30 @@ namespace Protobot.Audio
         /// first gear stage (the motor inside turns at 3600 rpm whatever the cartridge), a little bearing noise.
         /// Played looped with the pitch following the motor's speed.
         /// </summary>
+        // V2: a V5 Smart Motor at full speed, played at a pitch that follows the shaft's speed (pitch 1 = full speed).
+        // Inside, a brushless motor runs at 3600 rpm (60 turns a second) into the cartridge's spur gears: the gear
+        // mesh (a 12-tooth pinion: 720 Hz, its harmonics) is the whine, a raspy buzz of the teeth meshing (noise beating at
+        // the mesh), the commutation (1440 Hz) a thin edge on it, and the slower gear stages (180, 360 Hz) a growl
+        // under it that's what's left at low speed. Every part repeats a whole number of times a second, so it loops.
         public static AudioClip MotorLoop => motorLoop ??= MakeLoop("Motor", 1f, (t, noise) =>
         {
             const float Tau = Mathf.PI * 2f;
-            var hum = Mathf.Sin(Tau * 120f * t) * 0.1f;
-            var whine = Mathf.Sin(Tau * 480f * t) * 0.16f + Mathf.Sin(Tau * 960f * t) * 0.08f + Mathf.Sin(Tau * 1440f * t) * 0.04f;
-            var gears = (Mathf.Repeat(720f * t, 1f) * 2f - 1f) * 0.06f;
-            var flutter = 0.85f + 0.15f * Mathf.Sin(Tau * 60f * t);
-            return (hum + whine * flutter + gears + noise.Band(0.4f, 0.1f) * 0.12f) * 0.8f;
+            var mesh = Mathf.Sin(Tau * 720f * t) * 0.17f + Mathf.Sin(Tau * 1440f * t + 0.6f) * 0.08f + Mathf.Sin(Tau * 2160f * t + 1.3f) * 0.035f;
+            var teeth = 0.5f + 0.5f * Mathf.Sin(Tau * 720f * t);
+            var rasp = noise.Band(0.55f, 0.12f) * teeth * teeth * 0.2f;
+            var growl = Mathf.Sin(Tau * 180f * t) * 0.07f + Mathf.Sin(Tau * 360f * t + 0.4f) * 0.05f + (Mathf.Repeat(180f * t, 1f) * 2f - 1f) * 0.025f;
+            var shaft = 0.88f + 0.12f * Mathf.Sin(Tau * 60f * t);   // the rotor turning, once a turn
+            return (mesh * shaft + rasp + growl) * 0.85f;
+        });
+
+        /// <summary>V2: the motor's driver straining (pushing against a load, stalled, holding): a thin high electric
+        /// whine at a fixed pitch, as V5 motors make when they push without turning; loud with the load.</summary>
+        public static AudioClip MotorStrain => motorStrain ??= MakeLoop("Motor strain", 1f, (t, noise) =>
+        {
+            const float Tau = Mathf.PI * 2f;
+            var whine = Mathf.Sin(Tau * 2900f * t) * 0.22f + Mathf.Sin(Tau * 5800f * t) * 0.06f;
+            var buzz = Mathf.Sin(Tau * 120f * t) * 0.04f;
+            return (whine * (0.9f + 0.1f * Mathf.Sin(Tau * 7f * t)) + buzz + noise.Band(0.6f, 0.3f) * 0.03f) * 0.8f;
         });
 
         // ---------------------------------------------------------------- interface

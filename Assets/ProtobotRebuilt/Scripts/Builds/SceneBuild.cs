@@ -161,6 +161,8 @@ namespace Protobot.Builds {
 
             //Parts
             List<GameObject> sceneObjs = PartsManager.FindLoadedObjects();
+            // V2: parts a game left behind (hidden while it's open: not connected to the Brain) are still the build's
+            sceneObjs.AddRange(Game.SkillsGame.LeftBehindParts.Where(p => !sceneObjs.Contains(p)));
 
             ObjectData[] newParts = new ObjectData[sceneObjs.Count];
 

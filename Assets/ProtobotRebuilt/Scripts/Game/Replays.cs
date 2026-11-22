@@ -106,13 +106,22 @@ namespace Protobot.Game {
         }
 
         /// <summary>File > Open replay…: a .pbr file (the Replays folder first).</summary>
-        public static void OpenFile() {
+        public static void OpenFile() => OpenFile(null);
+
+        /// <summary>V2: `chosen` runs once a file is picked (the home menu closes then, not on Cancel).</summary>
+        public static void OpenFile(Action chosen) {
             Directory.CreateDirectory(Folder);
             var paths = SFB.StandaloneFileBrowser.OpenFilePanel("Open a replay", Folder, Extension, false);
             InputEvents.TextInput.AfterFileWindow();
             if (paths.Length == 0 || string.IsNullOrEmpty(paths[0])) return;
+            chosen?.Invoke();
+            OpenPath(paths[0]);
+        }
+
+        /// <summary>V2: opens a replay file (one someone sent: double-clicked, or File > Open replay…).</summary>
+        public static void OpenPath(string path) {
             ReplayFile replay;
-            try { replay = FromBytes(File.ReadAllBytes(paths[0])); }
+            try { replay = FromBytes(File.ReadAllBytes(path)); }
             catch (Exception e) {
                 Interface.Interface.Say("That replay couldn't be read: " + e.Message, false);
                 return;

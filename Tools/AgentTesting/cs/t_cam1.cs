@@ -1,2 +1,1 @@
-Protobot.PivotCamera.Main.SetTransform(new UnityEngine.Vector3(12f, 3f, 2f), new UnityEngine.Vector3(60f, 0f, 0f), -24f);
-return "cam";
+Protobot.PivotCamera.Main.SetTransform(new Vector3(-2.5f, 0.8f, 5f), new Vector3(20f, 140f, 0f), -6f); return "cam";

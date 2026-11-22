@@ -33,7 +33,7 @@ namespace Protobot.Interface {
             if (shown || !Application.isPlaying) return;
             shown = true;
             var args = Environment.GetCommandLineArgs();
-            if (args.Any(a => a == "-open" || a == "-join" || a == "-host" || a == "-benchmark" || a == "-autostart" || a.StartsWith("--veloapp-"))) return;
+            if (args.Any(a => a == "-open" || a == "-join" || a == "-host" || a == "-benchmark" || a == "-autostart" || a.StartsWith("--veloapp-")) || Builds.OpenWith.File != null) return;   // V2: a file to open
             new GameObject("Intro").AddComponent<Intro>();
         }
 

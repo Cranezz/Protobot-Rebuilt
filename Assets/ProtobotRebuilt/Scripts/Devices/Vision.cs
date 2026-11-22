@@ -93,6 +93,16 @@ namespace Protobot.Devices {
         /// <summary>Keeps it taking pictures for a second (a program's snapshot, the panel's picture).</summary>
         public void Want(float seconds = 1f) => wantedUntil = Mathf.Max(wantedUntil, Time.unscaledTime + seconds);
 
+        /// <summary>V2: keeps its picture coming for a card that shows it (the Devices panel): pictures only looked at
+        /// share VisionCamera.ShownPerSecond between every sensor shown (nine open cards made nine full renders of the
+        /// field 50 times a second each), while a program's reads stay at 50 a second.</summary>
+        public void Show() {
+            shownUntil = Time.unscaledTime + 1f;
+            VisionCamera.Shown(this);
+        }
+
+        private float shownUntil;
+
         // ------------------------------------------------------------------ signatures
 
         /// <summary>The signatures kept on the sensor (the Vision Utility's), by id.</summary>
@@ -139,8 +149,12 @@ namespace Protobot.Devices {
         // ------------------------------------------------------------------ pictures
 
         public override void Sample(float dt) {
-            if (Time.unscaledTime > wantedUntil || part == null) return;
-            if (pending || Time.unscaledTime - lastRender < Interval) return;
+            if (part == null) return;
+            if (pending) return;
+            var program = Time.unscaledTime <= wantedUntil;
+            if (!program && Time.unscaledTime > shownUntil) return;
+            if (Time.unscaledTime - lastRender < (program ? Interval : VisionCamera.ShownInterval)) return;
+            if (!VisionCamera.TakeRender()) return;   // V2: a few renders a frame at most
             lastRender = Time.unscaledTime;
             Render(true);
         }
@@ -396,6 +410,40 @@ namespace Protobot.Devices {
                 var main = Camera.main != null ? Camera.main.cullingMask : ~0;
                 foreach (var l in new[] { 5, 8, 9, 10, 11, 12, 14, 15 }) main &= ~(1 << l);
                 return main | 1;
+            }
+        }
+
+        // V2: how many renders: a few a frame (more wait for the next), and the pictures only shown in cards spread
+        // over ShownPerSecond.
+        public const int MaxPerFrame = 3;
+        public const float ShownPerSecond = 24f;
+        private static int frame, rendersThisFrame;
+        private static readonly System.Collections.Generic.Dictionary<object, float> shown = new();
+
+        public static bool TakeRender() {
+            if (frame != Time.frameCount) {
+                frame = Time.frameCount;
+                rendersThisFrame = 0;
+            }
+            if (rendersThisFrame >= MaxPerFrame) return false;
+            rendersThisFrame++;
+            return true;
+        }
+
+        public static void Shown(object sensor) => shown[sensor] = Time.unscaledTime;
+
+        /// <summary>How often each shown sensor takes a picture: 10 a second for one or two, slower for more.</summary>
+        public static float ShownInterval {
+            get {
+                var now = Time.unscaledTime;
+                var count = 0;
+                foreach (var t in shown.Values) if (now - t < 0.5f) count++;
+                if (shown.Count > 32) {
+                    var old = new System.Collections.Generic.List<object>();
+                    foreach (var kv in shown) if (now - kv.Value > 2f) old.Add(kv.Key);
+                    foreach (var o in old) shown.Remove(o);
+                }
+                return Mathf.Max(0.1f, count / ShownPerSecond);
             }
         }
 

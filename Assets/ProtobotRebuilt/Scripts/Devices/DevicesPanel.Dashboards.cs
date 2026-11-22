@@ -212,7 +212,7 @@ namespace Protobot.Devices {
             open.Size(-1, 28f, 1f);
             Ui.Tip(open, "Vision Utility", null, "What it sees, larger: drag a box over an object and Set a signature (1-7), as VEXcode's Vision Utility does.");
             live.Add(() => {
-                s.Want();
+                s.Show();   // V2: shown, not read by a program
                 raw.texture = s.Picture;
                 raw.color = s.Picture != null ? Color.white : Color.black;
                 shapes.Clear();

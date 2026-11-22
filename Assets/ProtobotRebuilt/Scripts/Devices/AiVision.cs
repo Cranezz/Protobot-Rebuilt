@@ -92,6 +92,16 @@ namespace Protobot.Devices {
 
         public void Want(float seconds = 1f) => wantedUntil = Mathf.Max(wantedUntil, Time.unscaledTime + seconds);
 
+        /// <summary>V2: keeps its picture coming for a card that shows it (the Devices panel): pictures only looked at
+        /// share VisionCamera.ShownPerSecond between every sensor shown (nine open cards made nine full renders of the
+        /// field 50 times a second each), while a program's reads stay at 50 a second.</summary>
+        public void Show() {
+            shownUntil = Time.unscaledTime + 1f;
+            VisionCamera.Shown(this);
+        }
+
+        private float shownUntil;
+
         // ------------------------------------------------------------------ colors kept on the sensor
 
         public static AiColor?[] Saved(GameObject part) {
@@ -135,8 +145,12 @@ namespace Protobot.Devices {
         // ------------------------------------------------------------------ pictures
 
         public override void Sample(float dt) {
-            if (Time.unscaledTime > wantedUntil || part == null) return;
-            if (pending || Time.unscaledTime - lastRender < Interval) return;
+            if (part == null) return;
+            if (pending) return;
+            var program = Time.unscaledTime <= wantedUntil;
+            if (!program && Time.unscaledTime > shownUntil) return;
+            if (Time.unscaledTime - lastRender < (program ? Interval : VisionCamera.ShownInterval)) return;
+            if (!VisionCamera.TakeRender()) return;   // V2: a few renders a frame at most
             lastRender = Time.unscaledTime;
             Render(true);
         }

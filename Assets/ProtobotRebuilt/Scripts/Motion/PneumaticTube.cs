@@ -433,9 +433,12 @@ namespace Protobot.Motion {
             var part = hole.transform.parent.gameObject;
             var id = part.GetComponent<SavedObject>()?.id ?? "";
             if (!id.StartsWith("VXPNEUMATICS") && !ChildPartGenerator.IsFittingPart(part)) return false;
+            // V2: the cylinder's mounts carry no air: their 8-32 holes (0.17-0.19") took the tubing as ports.
+            if (id.EndsWith("-Cylinder Mount") || id.EndsWith("-Cylinder Rod Pivot") || id.EndsWith("-Piston Nut")) return false;
             var scale = hole.transform.lossyScale;
             var size = Mathf.Min(scale.x, scale.y);
-            return size > 0.145f && size < 0.19f;
+            // A push-in port: marked threaded (the ports VexHoleFixes knows), or a plain 4 mm hole (screw holes are bigger).
+            return size > 0.145f && (hole.holeType == HoleCollider.HoleType.Threaded ? size < 0.19f : size < 0.166f);
         }
 
         /// <summary>A port's tube end: its middle, the way out of it (away from the part's middle), its depth.</summary>

@@ -166,7 +166,7 @@ namespace Protobot.Game {
                     if (toggle && filter.name.StartsWith("276-9250-023")) continue;   // the bar turns: made per run
                     if (filter.name.Contains("AprilTag") || filter.sharedMesh.bounds.size.magnitude < 0.4f) continue;
                     var go = new GameObject(filter.name) { layer = Sandbox.FieldLayer };
-                    go.transform.SetParent(colliders, false);
+                    go.transform.SetParent(Column(filter.transform) ?? colliders, false);
                     go.transform.SetPositionAndRotation(filter.transform.position, filter.transform.rotation);
                     go.transform.localScale = filter.transform.lossyScale;
                     var mc = go.AddComponent<MeshCollider>();
@@ -174,6 +174,87 @@ namespace Protobot.Game {
                     mc.sharedMaterial = ElementShapes.Plastic;
                 }
             }
+        }
+
+        // ------------------------------------------------------------------ V2: the Loaders' columns go up and down
+
+        // A Loader is a clear column, open top and bottom, that the drive team raises and lowers (Figure L-1): down,
+        // the Match Loads stand inside it on the tiles; raised, a robot takes the bottom one through the opening.
+        public const float LoaderLift = 3f;
+        public const float LoaderTop = 14.4f;   // its height (Match Loads that don't fit don't go in)
+
+        private class LoaderColumn {
+            public bool red;
+            public int index;
+            public Transform holder;   // its collider (a kinematic body)
+            public Rigidbody body;
+            public readonly List<Transform> drawn = new();   // the model's column
+            public readonly List<Vector3> drawnFrom = new();
+            public Vector3 holderFrom;
+            public float lift, target;
+        }
+
+        private readonly List<LoaderColumn> columns = new();
+
+        // The column's own collider holder (276-9250-031: the clear column), null for any other mesh.
+        private Transform Column(Transform mesh) {
+            if (!mesh.name.StartsWith("276-9250-031")) return null;
+            var c = ColumnFor(mesh, true);
+            return c?.holder;
+        }
+
+        private LoaderColumn ColumnFor(Transform mesh, bool make) {
+            var red = mesh.name.Contains("Red");
+            var p = ToField(MeshBounds(mesh).center);
+            var list = red ? loaders : blueLoaders;
+            var index = list.Count == 0 ? 0 : Enumerable.Range(0, list.Count).OrderBy(i => (list[i] - p).sqrMagnitude).First();
+            var column = columns.FirstOrDefault(c => c.red == red && c.index == index);
+            if (column != null || !make) return column;
+            column = new LoaderColumn { red = red, index = index };
+            column.holder = new GameObject("Loader Column") { layer = Sandbox.FieldLayer }.transform;
+            column.holder.SetParent(colliders, false);
+            column.holderFrom = column.holder.localPosition;
+            column.body = column.holder.gameObject.AddComponent<Rigidbody>();
+            column.body.isKinematic = true;
+            foreach (var t in display.GetComponentsInChildren<Transform>(true))
+                if (t.name.StartsWith("276-9250-031") && t.name.Contains(red ? "Red" : "Blue") && (ToField(MeshBounds(t).center) - p).magnitude < 3f) {
+                    column.drawn.Add(t);
+                    column.drawnFrom.Add(t.localPosition);
+                }
+            columns.Add(column);
+            return column;
+        }
+
+        /// <summary>Raises (or lowers) a Loader's column; it moves there over a moment.</summary>
+        public void SetLoaderRaised(int index, bool red, bool raised) {
+            var c = columns.FirstOrDefault(x => x.red == red && x.index == index);
+            if (c != null) c.target = raised ? LoaderLift : 0f;
+        }
+
+        public bool LoaderRaised(int index, bool red) => columns.FirstOrDefault(x => x.red == red && x.index == index)?.target > 0f;
+
+        /// <summary>All Loaders down (a new run).</summary>
+        public void LowerLoaders() {
+            foreach (var c in columns) {
+                c.target = c.lift = 0f;
+                Place(c);
+            }
+        }
+
+        private void FixedUpdate() {
+            foreach (var c in columns) {
+                if (Mathf.Approximately(c.lift, c.target)) continue;
+                c.lift = Mathf.MoveTowards(c.lift, c.target, 12f * Time.fixedDeltaTime);
+                Place(c);
+            }
+        }
+
+        private void Place(LoaderColumn c) {
+            var world = colliders.TransformPoint(c.holderFrom + colliders.InverseTransformDirection(Vector3.up) * c.lift);
+            if (Sandbox.Running) c.body.MovePosition(world);
+            else c.holder.position = world;
+            for (var i = 0; i < c.drawn.Count; i++)
+                if (c.drawn[i] != null) c.drawn[i].position = c.drawn[i].parent.TransformPoint(c.drawnFrom[i]) + Vector3.up * c.lift;
         }
 
         // ------------------------------------------------------------------ skills layout
@@ -203,6 +284,15 @@ namespace Protobot.Game {
                 stock.Add(t.gameObject);
                 t.gameObject.SetActive(false);
             }
+        }
+
+        /// <summary>V2: the Toggles as drawn (bars and their wall brackets), for the setup's "clear of the Toggle" check.</summary>
+        public List<Renderer> ToggleRenderers() {
+            var list = new List<Renderer>();
+            foreach (var t in display.GetComponentsInChildren<Transform>(true))
+                if (t.name.StartsWith("276-9250-120") || t.name.StartsWith("276-9250-023"))
+                    list.AddRange(t.GetComponentsInChildren<Renderer>(true).Where(r => !list.Contains(r)));
+            return list;
         }
 
         /// <summary>A Match Load pin of these colors (from the stock outside the field), for its meshes.</summary>
@@ -261,6 +351,13 @@ namespace Protobot.Game {
                 if (filter != null && filter.sharedMesh != null) meshes.TryAdd(filter.sharedMesh.name, filter.sharedMesh);
                 foreach (var m in r.sharedMaterials)
                     if (m != null) materials.TryAdd(m.name.Replace(" (Instance)", ""), m);
+            }
+            // V2: the Toggles' colored faces are cubes with the field's colors (a replay found neither: gray bars).
+            var cube = Resources.GetBuiltinResource<Mesh>("Cube.fbx");
+            if (cube != null) meshes.TryAdd(cube.name, cube);
+            foreach (var color in new[] { PieceColor.Red, PieceColor.Blue, PieceColor.Yellow }) {
+                var m = FaceMaterial(color);
+                materials.TryAdd(m.name.Replace(" (Instance)", ""), m);
             }
         }
 
@@ -398,10 +495,22 @@ namespace Protobot.Game {
                     Physics.IgnoreCollision(mine, fixedOne, true);
             toggle.body = ElementShapes.Body(go, ElementShapes.ToggleMass);
             toggle.body.collisionDetectionMode = CollisionDetectionMode.Continuous;
-            var hinge = go.AddComponent<HingeJoint>();
-            hinge.axis = axis;
-            hinge.anchor = Vector3.zero;
-            hinge.autoConfigureConnectedAnchor = true;
+            // V2: it turns on its long axis and can be lifted in its brackets (the rules count it only fully seated):
+            // free to turn, up to Toggle.Lift straight up, held down by its weight.
+            var joint = go.AddComponent<ConfigurableJoint>();
+            joint.axis = axis;
+            joint.secondaryAxis = go.transform.InverseTransformDirection(Vector3.up);
+            joint.anchor = Vector3.zero;
+            joint.autoConfigureConnectedAnchor = false;
+            joint.connectedAnchor = go.transform.position + Vector3.up * (Toggle.Lift / 2f);   // limits are ±: centred half way up
+            joint.xMotion = ConfigurableJointMotion.Locked;
+            joint.yMotion = ConfigurableJointMotion.Limited;
+            joint.zMotion = ConfigurableJointMotion.Locked;
+            joint.linearLimit = new SoftJointLimit { limit = Toggle.Lift / 2f };
+            joint.angularXMotion = ConfigurableJointMotion.Free;
+            joint.angularYMotion = ConfigurableJointMotion.Locked;
+            joint.angularZMotion = ConfigurableJointMotion.Locked;
+            toggle.restHeight = go.transform.position.y;
             return toggle;
         }
 
@@ -411,7 +520,9 @@ namespace Protobot.Game {
             if (faceMaterials.TryGetValue(color, out var m) && m != null) return m;
             var name = color switch { PieceColor.Red => "Field Red", PieceColor.Blue => "Field Blue", _ => "Field Yellow" };
             var source = display.GetComponentsInChildren<Renderer>(true).SelectMany(r => r.sharedMaterials).FirstOrDefault(x => x != null && x.name == name);
-            m = source != null ? source : new Material(Shader.Find("Universal Render Pipeline/Lit"));
+            m = source != null ? source : new Material(Shader.Find("Universal Render Pipeline/Lit")) {
+                name = name, color = color switch { PieceColor.Red => new Color(0.55f, 0.08f, 0.08f), PieceColor.Blue => new Color(0.08f, 0.2f, 0.55f), _ => new Color(0.6f, 0.5f, 0.05f) },
+            };
             faceMaterials[color] = m;
             return m;
         }

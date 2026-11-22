@@ -12,6 +12,7 @@ namespace Protobot.Interface {
     // "Report an Issue" opening the bug report (with the session's log) instead of the original project's GitHub.
     public class LaunchRestyle : MonoBehaviour {
         private Transform launch, splashPanel;
+        private GameObject creditsPanel, recentBuilds;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void Make() {
@@ -91,6 +92,21 @@ namespace Protobot.Interface {
                 report.onClick = new Button.ButtonClickedEvent();
                 report.onClick.AddListener(() => Builds.CrashGuard.ReportDialog(false));
             }
+            // V2: Patch Notes shows this version's notes (the original's button opened its own project's page).
+            var notes = buttons.FirstOrDefault(b => b.name == "Patch Notes Button");
+            if (notes != null) {
+                notes.onClick = new Button.ButtonClickedEvent();
+                notes.onClick.AddListener(PatchNotes.Open);
+            }
+            // V2: the credits name this version's work and what it's made from, under the original's.
+            var credits = launch.GetComponentsInChildren<TMP_Text>(true).FirstOrDefault(t => t.name == "Credits List");
+            if (credits != null) {
+                creditsPanel = credits.transform.parent.gameObject;
+                recentBuilds = launch.GetComponentsInChildren<Transform>(true).FirstOrDefault(t => t.name == "Builds Menu")?.gameObject;
+            }
+            if (credits != null && !credits.text.Contains("Rebuilt V2"))
+                credits.text += "\n<line-height=125%>\n<line-height=100%><size=100%>Protobot Rebuilt V2:<line-height=100%>\n<size=65%>Crane | 11777C\n"
+                                + "Parts: VEX-CAD library · Field: VEX Robotics\nUnity · DOTween · Velopack";
         }
 
         private static void Restyle(Button button) {
@@ -113,6 +129,8 @@ namespace Protobot.Interface {
         private void Update() {
             // V2: the 3D view isn't drawn while the home menu covers it.
             if (splashPanel != null) Online.ViewHider.Set(this, splashPanel.gameObject.activeInHierarchy);
+            // V2: the credits are longer now: the recent builds step aside while they show.
+            if (creditsPanel != null && recentBuilds != null && recentBuilds.activeSelf == creditsPanel.activeInHierarchy) recentBuilds.SetActive(!creditsPanel.activeInHierarchy);
             if (launch == null || Time.unscaledTime < next) return;
             next = Time.unscaledTime + 0.3f;
             foreach (var button in launch.GetComponentsInChildren<Button>()) {

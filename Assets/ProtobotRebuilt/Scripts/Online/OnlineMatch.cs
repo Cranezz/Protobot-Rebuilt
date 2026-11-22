@@ -321,6 +321,24 @@ namespace Protobot.Online {
             ToHost(Msg.Robot, Pack(JsonUtility.ToJson(mine)), true);
         }
 
+        /// <summary>V2: the custom parts on a player's robot in the match (from the robot they sent) and how many of each;
+        /// empty when there's no match or they sent none.</summary>
+        public static List<(CustomPartData part, int uses)> CustomPartsOf(string playerId) {
+            var list = new List<(CustomPartData, int)>();
+            if (string.IsNullOrEmpty(playerId) || !robotsSeen.TryGetValue(playerId, out var packet) || packet?.customParts == null) return list;
+            foreach (var part in packet.customParts)
+                if (part != null) list.Add((part, packet.build?.parts?.Count(p => p.partId == part.Id) ?? 0));
+            return list;
+        }
+
+        // Every player's robot this session (by player id), kept after the match for reports.
+        private static readonly Dictionary<string, RobotPacket> robotsSeen = new();
+
+        private void Remember(RobotPacket p) {
+            var seat = plan?.seats.FirstOrDefault(s => s.robot == p.robot);
+            if (seat != null && !string.IsNullOrEmpty(seat.playerId)) robotsSeen[seat.playerId] = p;
+        }
+
         /// <summary>This computer's robot: its parts numbered in the order of its file.</summary>
         private RobotPacket MakePacket(Seat seat, bool preload) {
             var parts = PartsManager.FindLoadedObjects().Where(p => p.activeInHierarchy && !p.IsDeleted()).ToList();
@@ -416,6 +434,7 @@ namespace Protobot.Online {
                         return;
                     }
                     packets[p.robot] = p;
+                    Remember(p);
                     if (packets.Count < plan.seats.Count) return;
                     if (IsHost)   // everyone's robot to everyone
                         foreach (var each in packets.Values) ToClients(Msg.Robot, Pack(JsonUtility.ToJson(each)), true);
@@ -1411,6 +1430,7 @@ namespace Protobot.Online {
             foreach (var json in info.packets) {
                 var p = JsonUtility.FromJson<RobotPacket>(json);
                 packets[p.robot] = p;
+                Remember(p);
             }
             OnlineWindow.Close();
             OnlineLaunch.CloseLaunchWindow();

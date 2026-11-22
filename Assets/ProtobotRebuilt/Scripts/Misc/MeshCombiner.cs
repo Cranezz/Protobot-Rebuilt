@@ -26,6 +26,9 @@ namespace Protobot {
             objs.ForEach(x => {
                 if (x.TryGetComponent(out MeshFilter meshFilter))
                     meshFilters.Add(meshFilter);
+                // V2: a cylinder's rod is part of it (the moved cylinder's preview showed no rod).
+                if (x.TryGetComponent(out Motion.PneumaticCylinder cylinder) && cylinder.Rod != null && cylinder.Rod.TryGetComponent(out MeshFilter rodFilter) && rodFilter.sharedMesh != null)
+                    meshFilters.Add(rodFilter);
                 // V2: a wheel's or gear's inserts showing in its holes are part of it (the preview of a moved part too).
                 foreach (var insert in x.GetComponentsInChildren<HoleInsert>())
                     foreach (var filter in insert.GetComponentsInChildren<MeshFilter>())

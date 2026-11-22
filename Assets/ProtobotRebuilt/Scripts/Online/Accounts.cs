@@ -61,6 +61,7 @@ namespace Protobot.Online {
             if (!await OnlineServices.Start()) return OnlineServices.Problem;
             try {
                 await AuthenticationService.Instance.AddUsernamePasswordAsync(username, password);
+                OnlineServices.Name = username;   // V2: an account plays under its username (the name bottom left)
                 await SetDisplayName(OnlineServices.Name);
                 Builds.ActionLog.Write("online", "account created: " + username);
                 Changed?.Invoke();
@@ -76,8 +77,9 @@ namespace Protobot.Online {
             try {
                 if (AuthenticationService.Instance.IsSignedIn) AuthenticationService.Instance.SignOut(true);
                 await AuthenticationService.Instance.SignInWithUsernamePasswordAsync(username.Trim(), password);
-                var shown = AuthenticationService.Instance.PlayerName;
-                if (!string.IsNullOrEmpty(shown)) OnlineServices.Name = shown.Split('#')[0].Replace('_', ' ');
+                // V2: an account plays under its username (the name bottom left and "<name>'s match").
+                OnlineServices.Name = AuthenticationService.Instance.PlayerInfo?.Username ?? username.Trim();
+                await SetDisplayName(OnlineServices.Name);
                 Mine = null;
                 Builds.ActionLog.Write("online", "signed in: " + username);
                 Changed?.Invoke();

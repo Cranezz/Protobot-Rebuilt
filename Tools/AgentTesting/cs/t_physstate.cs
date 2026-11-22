@@ -1,0 +1,2 @@
+var dets = UnityEngine.Object.FindObjectsByType<Protobot.HoleDetector>(UnityEngine.FindObjectsSortMode.None);
+return "simMode " + UnityEngine.Physics.simulationMode + " timeScale " + Time.timeScale + " fixed " + Time.fixedDeltaTime + " frame " + Time.frameCount + " detectors " + dets.Length + " enabled " + dets.Count(d => d.enabled) + " trig on " + dets.Count(d => d.GetComponents<Collider>().Any(c => c.isTrigger && c.enabled)) + " sandbox " + Protobot.Motion.Sandbox.Running + " game " + (Protobot.Game.SkillsGame.Current != null);

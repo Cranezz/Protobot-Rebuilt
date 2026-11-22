@@ -89,14 +89,28 @@ namespace Protobot.Motion {
                 list = new List<WirePort>();
                 var mesh = filter.sharedMesh;
                 var vertices = mesh.vertices.Select(v => v * 0.0254f).ToList();
-                foreach (var h in Geometry.HoleScanner.Scan(vertices, mesh.triangles)) {
+                var holes = Geometry.HoleScanner.Scan(vertices, mesh.triangles);
+                foreach (var h in holes) {
                     var a = h.size / 0.0254f;
-                    var b = h.size2 / 0.0254f;
-                    // V2: up to 0.40" x 0.52": the AI Vision Sensor's socket is modelled with its mouth (0.394" x 0.504")
-                    if (h.through || !h.square || Mathf.Min(a, b) < 0.27f || Mathf.Min(a, b) > 0.40f || Mathf.Max(a, b) < 0.4f || Mathf.Max(a, b) > 0.52f) continue;
+                    var b = h.size2 > 0f ? h.size2 / 0.0254f : a;   // (a square one gives no second side)
+                    // V2: the socket's mouth as each model has it: 0.315" x 0.441" (motors, sensors), 0.315" x 0.394" (the
+                    // 5.5W motor), 0.394-0.409" x 0.504" (AI Vision, GPS, 3-Wire Expander), 0.465" square (the Inertial's
+                    // recess): the GPS's, the Expander's, the 5.5W motor's and the Inertial's weren't found, so a cable
+                    // went anywhere on them.
+                    if (h.through || !h.square || Mathf.Min(a, b) < 0.27f || Mathf.Min(a, b) > 0.48f || Mathf.Max(a, b) < 0.38f || Mathf.Max(a, b) > 0.52f) continue;
                     var up = h.side.sqrMagnitude > 1e-6f ? (b >= a ? h.side : Vector3.Cross(h.axis, h.side)) : Vector3.up;
                     list.Add(new WirePort { local = h.entry / 0.0254f, outLocal = -h.axis, upLocal = up.normalized, kind = WireKind.Smart, label = "Smart port" });
                 }
+                // The Vision Sensor's socket is seen as round (its corners are well rounded): a blind round mouth the
+                // socket's size, when there's no square one.
+                if (list.Count == 0)
+                    foreach (var h in holes) {
+                        var d = h.size / 0.0254f;
+                        if (h.through || h.square || d < 0.4f || d > 0.47f) continue;
+                        var up = Mathf.Abs(Vector3.Dot(h.axis, Vector3.forward)) < 0.9f ? Vector3.ProjectOnPlane(Vector3.forward, h.axis) : Vector3.ProjectOnPlane(Vector3.right, h.axis);
+                        list.Add(new WirePort { local = h.entry / 0.0254f, outLocal = -h.axis, upLocal = up.normalized, kind = WireKind.Smart, label = "Smart port" });
+                        break;
+                    }
                 found[filter.sharedMesh] = list;
             }
             return list.Select(p => p.On(part)).ToList();

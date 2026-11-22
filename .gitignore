@@ -77,3 +77,7 @@ __pycache__/
 /Tools/Launcher/bin/
 /Tools/Launcher/obj/
 /Tools/Launcher/out/
+
+# Unity scene backups after a crash
+Assets/_Recovery/
+Assets/_Recovery.meta

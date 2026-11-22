@@ -126,6 +126,12 @@ namespace Protobot.Game {
                 Interface.Interface.Say("Build or open a robot first: the game puts your build on the field", false);
                 return;
             }
+            // V2: the robot is the Brain and what's connected to it (the rest of the build stays behind)
+            var robot = RobotOf(parts, out var noBrain);
+            if (robot == null) {
+                Interface.Interface.Say(noBrain, false);
+                return;
+            }
 
             var go = new GameObject("Game Session");
             var game = go.AddComponent<SkillsGame>();
@@ -133,12 +139,14 @@ namespace Protobot.Game {
             game.definition = definition;
             game.mode = mode;
             try {
-                game.MeasureRobot(parts);
+                game.LeaveBehind(parts, robot);
+                game.MeasureRobot(robot);
                 game.field = GameField.Create(definition, lightField, mode != Mode.Match);
             }
             catch (Exception e) {
                 Debug.LogException(e);
                 Current = null;
+                game.RestoreLeftBehind();
                 if (game.field != null) Destroy(game.field.gameObject);
                 Destroy(go);
                 Interface.Interface.Say("The field couldn't be set up: " + e.Message, false);
@@ -161,12 +169,15 @@ namespace Protobot.Game {
             GameUi.ShowSetup(game);
             game.FrameCamera();
             Interface.Interface.Say($"{definition.Name}: {game.ModeName}. Set your start, then Start run", true);
+            if (game.LeftOutCount > 0)   // V2
+                Interface.Interface.Say($"{game.LeftOutCount} part{(game.LeftOutCount == 1 ? " isn't" : "s aren't")} connected to the Brain: left out of the game", false);
         }
 
         public void Exit() {
             Exited?.Invoke();
             if (Sandbox.Running) Sandbox.Stop();
             ResumeHoleTriggers();
+            RestoreLeftBehind();   // V2
             ClearHosting();
             if (field != null) Destroy(field.gameObject);
             if (tool != null) Destroy(tool.gameObject);
@@ -219,6 +230,7 @@ namespace Protobot.Game {
 
         private void OnDestroy() {
             ResumeHoleTriggers();
+            RestoreLeftBehind();
             ShowGrid();
             if (Current == this) {
                 ClearHosting();
@@ -400,6 +412,7 @@ namespace Protobot.Game {
 
         public void SetPreloadSpot(PreloadSpot spot) {
             preloadSpot = spot;
+            customPreload = null;   // V2
             preload = true;
             PlacePreloadGhost();
             Changed?.Invoke();
@@ -450,7 +463,8 @@ namespace Protobot.Game {
 
         private void HideGrid() {
             foreach (var r in FindObjectsByType<Renderer>(FindObjectsInactive.Include, FindObjectsSortMode.None))
-                if (r.gameObject.layer == 9 && r.enabled && (r.name.Contains("Perspective Plane") || r.name.Contains("Orthographic Plane") || r.name == "AxisPlane")) {
+                if ((r.gameObject.layer == 9 || (r is LineRenderer && r.transform.parent != null && r.transform.parent.gameObject.layer == 9) || r.name == "Red Line" || r.name == "Blue Line")
+                    && r.enabled && !r.transform.IsChildOf(transform) && (field == null || !r.transform.IsChildOf(field.transform))) {   // V2: the red/blue axis lines too (layer 2, under the grid plane)
                     r.enabled = false;
                     hiddenGrid.Add(r);
                 }
@@ -495,7 +509,8 @@ namespace Protobot.Game {
             list.Add(("Touching the Field Perimeter", local.Any(p => p.x <= -GameField.Half + 0.1f)));
             list.Add(("Not in a Load Zone", !edges.Any(GameField.InLoadZone)));
             list.Add(("Not touching a Goal", !field.goals.Any(g => Overlaps(corners, g.position, 5.95f))));
-            list.Add(("Clear of the Toggle", height < 11.5f || !local.Any(p => p.x <= -GameField.Half + 1.5f && Mathf.Abs(p.y) < ToggleHalf)));
+            if (ElementProblem != null) list.Add((ElementProblem, false));   // V2
+            list.Add(("Clear of the Toggle", !TouchesToggle()));   // V2: the parts themselves
             return list;
         }
 
@@ -575,6 +590,7 @@ namespace Protobot.Game {
             var side = Vector3.Cross(Vector3.up, f).normalized;
             var center = new Vector3(robotCenter.x, robotFloor, robotCenter.z);
             var standing = Quaternion.LookRotation(Vector3.up, f);
+            if (customPreload is (Vector3, Quaternion) placed) return placed;   // V2: the build's own Pin, or placed by hand
             return preloadSpot switch {
                 PreloadSpot.Back => (center - f * (depth / 2f + 1.65f) + Vector3.up * 3.3f, standing),
                 PreloadSpot.Left => (center - side * (width / 2f + 1.65f) + Vector3.up * 3.3f, standing),
@@ -700,11 +716,15 @@ namespace Protobot.Game {
 
         public List<string> StartNames() => LoadStarts().starts.Select(s => s.name).ToList();
 
+        /// <summary>V2: the saved start last saved or used (the panel names it).</summary>
+        public string lastStart;
+
         public void SaveStart(string name) {
             var list = LoadStarts();
             list.starts.RemoveAll(s => s.name == name);
             list.starts.Add(new Start { name = name, x = x, y = y, heading = heading });
             PlayerPrefs.SetString(StartsKey, JsonUtility.ToJson(list));
+            lastStart = name;
             Changed?.Invoke();
             Interface.Interface.Say($"Saved start \"{name}\"", true);
         }
@@ -712,6 +732,7 @@ namespace Protobot.Game {
         public void UseStart(string name) {
             var s = LoadStarts().starts.FirstOrDefault(v => v.name == name);
             if (s == null) return;
+            lastStart = name;
             SetPose(s.x, s.y, s.heading);
             Interface.Interface.Say($"Start \"{name}\": X {Number(s.x)}, Y {Number(s.y)}, {Number(s.heading)}°", true);
         }
@@ -731,6 +752,10 @@ namespace Protobot.Game {
             if (online && !onlineMayStart) return;   // V2: the host starts an online match
             if (Sandbox.Running) Sandbox.Stop();
             field.ShowOriginals();
+            if (ElementProblem != null) {   // V2: one Preload at most
+                Interface.Interface.Say(ElementProblem, false);
+                return;
+            }
             if (!Legal) Interface.Interface.Say("Not a legal start (see the checklist): running it as practice", false);
             if (tool != null) tool.gameObject.SetActive(false);
             if (preloadGhost != null) preloadGhost.gameObject.SetActive(false);
@@ -741,12 +766,13 @@ namespace Protobot.Game {
                 matchLoads["Cup"] = 7;
             }
             else {
-                // V2: a match (Figure FO-2): each Alliance Station has 12 alliance/yellow Pins, 1 yellow/yellow Pin and
-                // 10 Cups, through its own Loaders.
-                matchLoads[PreloadColors] = 12;
+                // V2: a match (manual v2.1, Figure FO-2 / SG5): each Alliance has 10 alliance/yellow Pins and 10 Cups
+                // as Match Loads (one of its 11 Pins is the Preload), and 1 of the 2 yellow/yellow Pins, through its own Loaders.
+                matchLoads[PreloadColors] = 10;
                 if (field.StockPin("Neutral-Neutral") != null) matchLoads["Neutral-Neutral"] = 1;
                 matchLoads["Cup"] = 10;
             }
+            field.LowerLoaders();   // V2: every run starts with the Loaders down
             Sandbox.Hosted = true;
             Sandbox.FloorHeight = robotFloor;
             Sandbox.DriveEnabled = false;
@@ -856,6 +882,14 @@ namespace Protobot.Game {
                 Interface.Interface.Say("No " + LoadName(kind) + " left", false);
                 return;
             }
+            if (InAutonomous) {   // V2: a match's Match Loads go in during the Driver Controlled Period only
+                Interface.Interface.Say("Match Loads go in during the Driver Controlled Period", false);
+                return;
+            }
+            if (onlineDrop == null && !LoaderHasRoom(kind, Red, loader)) {
+                Interface.Interface.Say("The Loader is full: a robot has to take a Match Load out of its bottom first (raise the Loader)", false);
+                return;
+            }
             if (onlineDrop != null) {   // V2: online, the host drops it (into this player's Alliance's Loader)
                 if (onlineDrop(kind)) {
                     matchLoads[kind] = left - 1;
@@ -864,11 +898,53 @@ namespace Protobot.Game {
                 }
                 return;
             }
-            SpawnMatchLoad(kind, Red, loader);
+            if (SpawnMatchLoad(kind, Red, loader) == null) return;
             matchLoads[kind] = left - 1;
             Audio.Sounds.Play(Audio.Sounds.Tick);
             Interface.Interface.Say($"Match Load: {LoadName(kind)} into the {(loader == 0 ? "first" : "second")} {(Red ? "red" : "blue")} Loader ({left - 1} left)", true);
             Changed?.Invoke();
+        }
+
+        /// <summary>V2: whether the chosen Loader is up (a robot can take the bottom Match Load).</summary>
+        public bool LoaderUp => field != null && field.LoaderRaised(loader, Red);
+
+        /// <summary>V2: raises or lowers this Alliance's chosen Loader (the drive team does it by hand).</summary>
+        public void ToggleLoader() {
+            if (field == null) return;
+            field.SetLoaderRaised(loader, Red, !LoaderUp);
+            Audio.Sounds.Play(Audio.Sounds.Tick);
+            Changed?.Invoke();
+        }
+
+        // V2: the top of the Match Loads already in a Loader (inches above the tiles).
+        private float LoaderFill(bool red, int loaderIndex) {
+            if (Sandbox.Instance == null) return 0f;
+            var at = field.LoaderDrop(loaderIndex, red);
+            var floor = field.HeightOf(at) - 15.5f;
+            var top = 0f;
+            foreach (var body in Sandbox.Instance.Root.GetComponentsInChildren<Rigidbody>())
+                if (body.gameObject.layer == Sandbox.ElementLayer && Vector2.Distance(field.ToField(body.position), field.ToField(at)) < 2.6f) {
+                    var b = BodyBounds(body);
+                    top = Mathf.Max(top, field.HeightOf(new Vector3(b.center.x, b.max.y, b.center.z)) - floor);
+                }
+            return top;
+        }
+
+        /// <summary>V2: whether a Match Load of this kind still fits in the Loader's column (the manual gives no number:
+        /// what the column holds goes in; one whose middle would be above its top would fall out).</summary>
+        public bool LoaderHasRoom(string kind, bool red, int loaderIndex) =>
+            LoaderFill(red, loaderIndex) + (kind == "Cup" ? CupStep - CupHeight / 2f : PinStep - PinHeight / 2f)
+            <= GameField.LoaderTop + (field.LoaderRaised(loaderIndex, red) ? GameField.LoaderLift : 0f) + 0.5f;
+
+        // A standing Pin is 6.6" tall and one on another nests to ~5" higher (measured in the Loader); a Cup 6.4".
+        private const float PinHeight = 6.6f, CupHeight = 6.4f, PinStep = 5f, CupStep = 4f;
+
+        private static Bounds BodyBounds(Rigidbody body) {
+            var cs = body.GetComponentsInChildren<Collider>();
+            if (cs.Length == 0) return new Bounds(body.position, Vector3.zero);
+            var b = cs[0].bounds;
+            foreach (var c in cs) b.Encapsulate(c.bounds);
+            return b;
         }
 
         /// <summary>V2: a Match Load of a kind into an Alliance's Loader (on top of what's in it); the piece made.</summary>
@@ -877,11 +953,8 @@ namespace Protobot.Game {
             // Into the Loader, on top of whatever is already in it (a drive team feeds it from above).
             var at = field.LoaderDrop(loaderIndex, red);
             var floor = field.HeightOf(at) - 15.5f;
-            var stack = 0f;
-            foreach (var body in root.GetComponentsInChildren<Rigidbody>())
-                if (body.gameObject.layer == Sandbox.ElementLayer && Vector2.Distance(field.ToField(body.position), field.ToField(at)) < 2.6f)
-                    stack = Mathf.Max(stack, field.HeightOf(body.position) + 3.3f);
-            at = field.ToWorld(field.ToField(at), floor + Mathf.Max(stack, 0f) + 3.6f);
+            if (!LoaderHasRoom(kind, red, loaderIndex)) return null;   // V2: it doesn't fit in the column
+            at = field.ToWorld(field.ToField(at), floor + LoaderFill(red, loaderIndex) + (kind == "Cup" ? CupHeight : PinHeight) / 2f + 0.3f);
             var up = Quaternion.LookRotation(Vector3.up, field.transform.forward);
             if (kind == "Cup") {
                 var stock = field.StockCup();

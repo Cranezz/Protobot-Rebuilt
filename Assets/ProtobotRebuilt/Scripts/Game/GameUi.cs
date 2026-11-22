@@ -122,9 +122,18 @@ namespace Protobot.Game {
                 if (close != null) close.onClick.Invoke();
                 Online.OnlineWindow.Open();
             });
+            // V2: replays (yours, or a .pbr file someone sent) from the home menu.
+            var replay = Object.Instantiate(open.gameObject, open.transform.parent);
+            replay.name = "Replay Button";
+            ((RectTransform)replay.transform).anchoredPosition = ((RectTransform)open.transform).anchoredPosition + new Vector2(0f, -75f);
+            var replayLabel = replay.GetComponentInChildren<TextMeshProUGUI>(true);
+            if (replayLabel != null) replayLabel.text = "Watch a replay";
+            var replayButton = replay.GetComponent<Button>();
+            replayButton.onClick = new Button.ButtonClickedEvent();
+            replayButton.onClick.AddListener(() => Replays.OpenFile(() => { if (close != null) close.onClick.Invoke(); }));
             // The recent builds list moves down to make room (it has space left at the bottom).
-            if (open.transform.parent.parent.Find("Builds Menu") is RectTransform recent) recent.anchoredPosition += new Vector2(0f, -25f);
-            var y = -125f;
+            if (open.transform.parent.parent.Find("Builds Menu") is RectTransform recent) recent.anchoredPosition += new Vector2(0f, -60f);
+            var y = ((RectTransform)open.transform).anchoredPosition.y - 100f;   // V2: under Watch a replay
             foreach (var name in new[] { "Report Bugs Button", "Patch Notes Button", "Credits" }) {
                 var other = open.transform.parent.Find(name) as RectTransform;
                 if (other == null) continue;
@@ -242,12 +251,24 @@ namespace Protobot.Game {
                 game.Changed -= MarkDirty;
                 game.Changed += MarkDirty;
                 // Rebuilt after every change (the wheel over a value changes it a step at a time): keep the scroll.
-                var scrolled = content != null && content.childCount > 0 ? ((RectTransform)content.GetChild(0)).anchoredPosition.y : 0f;
+                var oldColumn = content != null ? content.Find("Frame/Column") as RectTransform : null;
+                var scrolled = oldColumn != null ? oldColumn.anchoredPosition.y : 0f;
                 if (content != null) Destroy(content.gameObject);
                 var rect = (RectTransform)transform;
-                var frame = Ui.Rect("Frame", rect).Fill(1, 1, 1, 1);
+                // V2: the scrolling column above, and Start run / Exit in a footer that's always there (scrolling down
+                // to Start run was awkward: the wheel over a row changes its value instead).
+                var holder = Ui.Rect("Holder", rect).Fill(1, 1, 1, 1);
+                content = holder;
+                var frame = Ui.Rect("Frame", holder).Fill(1, 1, 1, 1);
+                frame.offsetMin = new Vector2(0f, 62f);
                 frame.gameObject.AddComponent<RectMask2D>();
-                content = frame;
+                var footer = Ui.Rect("Footer", holder);
+                footer.anchorMin = new Vector2(0f, 0f);
+                footer.anchorMax = new Vector2(1f, 0f);
+                footer.pivot = new Vector2(0.5f, 0f);
+                footer.sizeDelta = new Vector2(0f, 62f);
+                footer.anchoredPosition = Vector2.zero;
+                Ui.Column(footer, 0f, new RectOffset(16, 16, 8, 8));
                 var column = Ui.Rect("Column", frame);
                 column.anchorMin = new Vector2(0f, 1f);
                 column.anchorMax = new Vector2(1f, 1f);
@@ -270,7 +291,7 @@ namespace Protobot.Game {
                 // The robot.
                 Dialog.Heading(column, "Robot");
                 var fits = game.depth <= 18.02f && game.width <= 18.02f && game.height <= 18.02f;
-                var size = Ui.Text(column, "Size", $"{game.buildName} · {SkillsGame.Number(game.depth)} × {SkillsGame.Number(game.width)} × {SkillsGame.Number(game.height)}\"", Theme.FontSmall, fits ? Theme.TextDim : Theme.Danger);
+                var size = Ui.Text(column, "Size", $"{game.buildName} · length {SkillsGame.Number(game.depth)}\" · width {SkillsGame.Number(game.width)}\" · height {SkillsGame.Number(game.height)}\"", Theme.FontSmall, fits ? Theme.TextDim : Theme.Danger);
                 size.Size(-1, 20f);
                 var frontRow = Row(column, "Front", 34f);
                 foreach (var name in SkillsGame.FrontNames) {
@@ -367,7 +388,11 @@ namespace Protobot.Game {
                 var names = game.StartNames();
                 if (names.Count > 0) {
                     var useRow = Row(column, "Use", 34f);
-                    Popup.Choice(useRow, names.ToArray(), -1, i => game.UseStart(names[i]), 200f);
+                    // V2: a button naming the start in use (a choice with nothing picked showed blank)
+                    var current = names.IndexOf(game.lastStart);
+                    var use = Ui.Button(useRow, "Use", current >= 0 ? game.lastStart + "  …" : $"Use a saved start ({names.Count})…",
+                        () => Popup.Open((RectTransform)useRow, names.ToArray(), current, i => game.UseStart(names[i])), current >= 0, 6f, Theme.FontSmall);
+                    use.Size(200f, 30f);
                     var del = Ui.Button(useRow, "Delete", "Delete…", () => Popup.Open((RectTransform)useRow, names.ToArray(), -1, i => game.DeleteStart(names[i])), false, 6f, Theme.FontSmall);
                     del.Size(-1, 30f);
                 }
@@ -386,10 +411,21 @@ namespace Protobot.Game {
                 if (game.preload) {
                     var spotRow = Row(column, "Where", 34f);
                     foreach (SkillsGame.PreloadSpot spot in System.Enum.GetValues(typeof(SkillsGame.PreloadSpot))) {
-                        var b = Ui.Button(spotRow, spot.ToString(), spot == SkillsGame.PreloadSpot.Top ? "On top" : spot.ToString(), () => game.SetPreloadSpot(spot), game.preloadSpot == spot, 6f, Theme.FontSmall - 1f);
+                        var b = Ui.Button(spotRow, spot.ToString(), spot == SkillsGame.PreloadSpot.Top ? "On top" : spot.ToString(), () => game.SetPreloadSpot(spot), game.preloadSpot == spot && game.customPreload == null, 6f, Theme.FontSmall - 1f);
                         b.Size(-1, 28f);
                     }
                     Ui.Tip(spotRow, "Preload", null, "SG5: one Pin of your Alliance's color, touching your robot (the dashed yellow outline) and nothing else.");
+                    // V2: anywhere on the robot, as in a real match (or where the build's own Pin is).
+                    var placeRow = Row(column, "Place", 34f);
+                    var placing = setupTools != null && setupTools.mode == SetupTools.Mode.Preload;
+                    var place = Ui.Button(placeRow, "Place on robot", placing ? "Click the robot…" : game.customPreload != null ? "Placed on the robot: move it" : "Place on the robot…",
+                        () => setupTools?.SetMode(placing ? SetupTools.Mode.Move : SetupTools.Mode.Preload), placing || game.customPreload != null, 6f, Theme.FontSmall - 1f);
+                    place.Size(-1, 28f);
+                    Ui.Tip(placeRow, "Place the Preload", null, "Click a face of your robot: the Pin rests on it, touching the robot (lying across it; R stands it up, Q/E turn it). A Pin saved on your robot in the build is used where it is.");
+                }
+                if (game.ElementProblem != null) {   // V2: game elements saved in the build
+                    var warn = Ui.Text(column, "Element problem", game.ElementProblem, Theme.FontSmall - 1f, Theme.Warning);
+                    warn.Size(-1, 44f);
                 }
 
                 // V2: the alignment tool from a build file or a saved group; it appears beside the robot.
@@ -436,8 +472,7 @@ namespace Protobot.Game {
                     line.Size(-1, 22f, 1f);
                 }
 
-                var buttons = Row(column, "Buttons", 46f);
-                buttons.GetComponent<HorizontalLayoutGroup>().padding = new RectOffset(0, 0, 10, 0);
+                var buttons = Row(footer, "Buttons", 46f);
                 if (game.online) {   // V2: an online match: Ready (the host starts once everyone is), or leave
                     if (game.onlineLocked) {
                         var wait = Ui.Text(buttons, "Waiting", "Ready: waiting for the other players…", Theme.FontBody, Theme.Success, Theme.Medium);
@@ -521,7 +556,7 @@ namespace Protobot.Game {
             public SkillsGame game;
             private TextMeshProUGUI clock, scoreText, details, countdown, loadsTitle, label;
             private readonly System.Collections.Generic.Dictionary<string, TextMeshProUGUI> loadLabels = new();
-            private Button loaderButton;
+            private Button loaderButton, raiseButton;
 
             public void Build() {
                 var card = Ui.Panel(transform, "Score Card", Theme.Panel, 12f).rectTransform;
@@ -538,7 +573,7 @@ namespace Protobot.Game {
 
                 // Match Loads.
                 var loads = Ui.Panel(transform, "Match Loads", Theme.Panel, 12f).rectTransform;
-                loads.Place(new Vector2(0f, 0f), new Vector2(0f, 0f), new Vector2(14f, 14f), new Vector2(300f, 82f + 38f * game.matchLoads.Count));
+                loads.Place(new Vector2(0f, 0f), new Vector2(0f, 0f), new Vector2(14f, 14f), new Vector2(300f, 118f + 38f * game.matchLoads.Count));
                 var column = Ui.Rect("Column", loads).Fill(14, 12, 14, 12);
                 Ui.Column(column, 6f);
                 loadsTitle = Ui.Text(column, "Title", "Match Loads (" + (game.Red ? "red" : "blue") + " Loaders)", Theme.FontBody, Theme.Text, Theme.Medium);
@@ -554,6 +589,11 @@ namespace Protobot.Game {
                 loaderButton.Size(-1, 30f);
                 var loaderText = Ui.Text(loaderButton.transform, "Text", "", Theme.FontSmall, Theme.TextDim, null, TextAlignmentOptions.Center);
                 loaderText.rectTransform.Fill();
+                // V2: the drive team raises the Loader so a robot can take the bottom Match Load out.
+                raiseButton = Ui.Button(column, "Raise", null, game.ToggleLoader, false, 6f, Theme.FontSmall);
+                raiseButton.Size(-1, 30f);
+                var raiseText = Ui.Text(raiseButton.transform, "Text", "", Theme.FontSmall, Theme.Text, Theme.Medium, TextAlignmentOptions.Center);
+                raiseText.rectTransform.Fill();
 
                 // End / back.
                 if (game.online) {   // V2: an online match runs to its end; leaving leaves the robot switched off
@@ -593,6 +633,7 @@ namespace Protobot.Game {
                     text.text = $"{char.ToUpper(SkillsGame.LoadName(kind)[0])}{SkillsGame.LoadName(kind).Substring(1)}  ({left} left)";
                 }
                 loaderButton.GetComponentInChildren<TextMeshProUGUI>().text = "Into the " + (game.loader == 0 ? "first" : "second") + (game.Red ? " red" : " blue") + " Loader (click to switch)";
+                raiseButton.GetComponentInChildren<TextMeshProUGUI>().text = game.LoaderUp ? "Lower the Loader" : "Raise the Loader (a robot takes the bottom one)";
             }
 
             private void Update() {

@@ -68,7 +68,7 @@ namespace Protobot.Devices {
             Note(card, colors.Any(c => c.HasValue) ? (s.programSet ? "The running program set its own colors." : "Insert devices writes these as Colordesc lines.")
                 : "No colors yet: click an object of a clear color in the picture to keep its color (as the AI Vision Utility does).", Theme.TextFaint, 30f);
             live.Add(() => {
-                s.Want();
+                s.Show();   // V2: shown, not read by a program
                 raw.texture = s.Picture;
                 raw.color = s.Picture != null ? Color.white : Color.black;
                 shapes.Clear();

@@ -1,3 +1,4 @@
+using System.Linq;
 using System;
 using Protobot.InputEvents;
 using TMPro;
@@ -47,8 +48,21 @@ namespace Protobot.Interface {
             dialog.Footer.anchoredPosition = new Vector2(0f, 16f);
             dialog.Footer.sizeDelta = new Vector2(-40f, 36f);
             Ui.Row(dialog.Footer, 10f, null, TextAnchor.MiddleRight);
+            OverHomeMenu(root);
             OpenCount++;
             return dialog;
+        }
+
+        // V2: a window opened from the home menu (Report a bug) was drawn under it: the home menu's canvas is above the
+        // interface's. While it's showing, the window gets a canvas of its own just above it.
+        private static void OverHomeMenu(RectTransform root) {
+            var launch = GameObject.Find("Launch Canvas");
+            if (launch == null || !launch.TryGetComponent(out Canvas home) || !home.enabled) return;
+            if (!launch.GetComponentsInChildren<Transform>().Any(t => t.name == "Splash Screen")) return;   // not open
+            var canvas = root.gameObject.AddComponent<Canvas>();
+            canvas.overrideSorting = true;
+            canvas.sortingOrder = home.sortingOrder + 1;
+            root.gameObject.AddComponent<GraphicRaycaster>();
         }
 
         public void Close() {

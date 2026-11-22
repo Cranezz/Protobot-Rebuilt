@@ -11,6 +11,7 @@ s=$(grep -a -n "Requested through public api\|Reloading assemblies" "$L" | tail 
 if tail -n +$s "$L" | grep -a -q "error CS"; then tail -n +$s "$L" | grep -a "error CS" | sort -u | head; exit 1; fi
 echo "compiled"
 fi
+python -I umcp.py cs cs/t_playunfocused.cs >/dev/null 2>&1
 sleep 8
 for k in 1 2 3; do
   python -I umcp.py cs cs/play.cs >/dev/null 2>&1

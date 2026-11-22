@@ -6,7 +6,12 @@ var options = new UnityEditor.BuildPlayerOptions {
   target = UnityEditor.BuildTarget.StandaloneWindows64,
   options = UnityEditor.BuildOptions.None
 };
-var report = UnityEditor.BuildPipeline.BuildPlayer(options);
+// Easy Performant Outline asks "check models?" before every build (a modal dialog): answer Skip without the window.
+var hadPref = UnityEditor.EditorPrefs.HasKey("Never ask about models check");
+UnityEditor.EditorPrefs.SetBool("Never ask about models check", true);
+UnityEditor.Build.Reporting.BuildReport report;
+try { report = UnityEditor.BuildPipeline.BuildPlayer(options); }
+finally { if (!hadPref) UnityEditor.EditorPrefs.DeleteKey("Never ask about models check"); }
 var sum = report.summary;
 System.IO.File.WriteAllText(@"C:/Dev/ProtobotRebuiltV2/ProtobotRebuiltV2/Tools/AgentTesting/build_result.txt", sum.result + " " + sum.totalSize + " bytes, " + sum.totalTime + ", errors " + sum.totalErrors);
 return sum.result + " " + sum.totalErrors;

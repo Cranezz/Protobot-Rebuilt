@@ -297,6 +297,13 @@ namespace Protobot.Motion {
 
         // The thread is marked (like a hole) while the mouse is on the cylinder, so it can be found.
         private void Update() {
+            // V2: the rod is drawn as part of the cylinder: on its layer, so it hides with it while the cylinder is
+            // dragged or deleted (it stayed where the cylinder had been).
+            if (rod != null && rod.gameObject.layer != gameObject.layer) {
+                var was = rod.gameObject.layer;
+                foreach (var t in rod.GetComponentsInChildren<Transform>(true))
+                    if (t.gameObject.layer == was) t.gameObject.layer = gameObject.layer;   // its thread too
+            }
             if (threadMark == null) return;
             var show = false;
             var camera = Camera.main;
