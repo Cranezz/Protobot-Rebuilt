@@ -1,0 +1,1 @@
+UnityEditor.PlayerSettings.companyName = "Protobot"; UnityEditor.AssetDatabase.SaveAssets(); return "company " + UnityEditor.PlayerSettings.companyName + ", data " + UnityEngine.Application.persistentDataPath;

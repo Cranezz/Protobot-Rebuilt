@@ -35,6 +35,15 @@ namespace Protobot.Game {
         private static bool IsFieldPart(string id) => id.StartsWith("OVFL") || id.StartsWith("OVLD") || id.StartsWith("OVTO") || id.StartsWith("PUBA")
                                                       || id.StartsWith("LGOL") || id.StartsWith("CGOL") || id.StartsWith("LOAD") || id.StartsWith("FELD") || id.StartsWith("SAKE");
 
+        /// <summary>V2: whether the open build can play (has parts and a Brain), without opening a game: the online
+        /// lobby checks the robot each player brings. Null when it can, else why not.</summary>
+        public static string RobotProblem() {
+            var parts = FindObjectsByType<SavedObject>(FindObjectsSortMode.None).Where(s => s.gameObject.activeInHierarchy && !s.gameObject.IsDeleted()).ToList();
+            if (parts.Count == 0) return "Open your robot's build first";
+            RobotOf(parts, out var problem);
+            return problem;
+        }
+
         public static bool IsBrain(SavedObject s) => s.id == "BRAN" || s.id.StartsWith("BRAN-") || (s.id.Contains("Brain") && !s.id.Contains("Mount") && !s.id.StartsWith("SNSR"));
 
         /// <summary>The parts that play: the Brain's connected group. Null (and why) when there's no Brain.</summary>

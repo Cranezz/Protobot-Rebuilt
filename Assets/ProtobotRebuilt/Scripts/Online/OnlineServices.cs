@@ -16,9 +16,11 @@ namespace Protobot.Online {
 
         private static Task<bool> starting;
 
-        /// <summary>The name shown to other players (kept on this computer).</summary>
+        /// <summary>The name shown to other players (kept on this computer). V2: a player under 13 gets a made-up one
+        /// (<see cref="KidName"/>) and can't type their own, so nothing personal (a real name) is shown or stored.</summary>
         public static string Name {
             get {
+                if (AgeCheck.AgeGiven && AgeCheck.Under13) return KidName;
                 var name = PlayerPrefs.GetString("V2.Online.Name", "");
                 if (string.IsNullOrWhiteSpace(name)) {
                     name = "Player " + UnityEngine.Random.Range(1000, 10000);
@@ -27,9 +29,44 @@ namespace Protobot.Online {
                 return name;
             }
             set {
+                // (kept for a player under 13 too: it's shown from when they turn 13)
                 value = Clean(value);
-                if (value.Length > 0) PlayerPrefs.SetString("V2.Online.Name", value);
+                if (value.Length > 0 && NameFilter.Allowed(value)) PlayerPrefs.SetString("V2.Online.Name", value);
             }
+        }
+
+        // V2: friendly words for the names of players under 13 ("Speedy Gear 42").
+        private static readonly string[] KidFirst = {
+            "Speedy", "Clever", "Brave", "Mighty", "Swift", "Lucky", "Sunny", "Turbo", "Rapid", "Bright", "Bold", "Steady", "Zippy",
+            "Shiny", "Quick", "Jolly", "Super", "Cosmic", "Electric", "Golden", "Silver", "Rocket", "Happy", "Nimble", "Daring",
+        };
+        private static readonly string[] KidSecond = {
+            "Gear", "Sprocket", "Robot", "Axle", "Piston", "Motor", "Wheel", "Bolt", "Spacer", "Chassis", "Pulley", "Rover",
+            "Gadget", "Builder", "Engineer", "Sensor", "Bracket", "Rivet", "Sparky", "Circuit", "Pinion", "Shaft", "Tread",
+        };
+
+        /// <summary>The made-up name of a player under 13 (picked once, kept on this computer; <see cref="NewKidName"/>
+        /// picks another).</summary>
+        public static string KidName {
+            get {
+                var name = PlayerPrefs.GetString("V2.Online.KidName", "");
+                if (string.IsNullOrEmpty(name)) name = NewKidName();
+                return name;
+            }
+        }
+
+        public static string NewKidName() {
+            var name = KidFirst[UnityEngine.Random.Range(0, KidFirst.Length)] + " " + KidSecond[UnityEngine.Random.Range(0, KidSecond.Length)]
+                       + " " + UnityEngine.Random.Range(10, 100);
+            PlayerPrefs.SetString("V2.Online.KidName", name);
+            return name;
+        }
+
+        /// <summary>V2: a build's name as other players see it (in the lobby, on the leaderboard): through the name filter,
+        /// and just "Robot" for a player under 13 (a file name can be a real name).</summary>
+        public static string Shared(string buildName) {
+            if (string.IsNullOrEmpty(buildName)) return buildName ?? "";
+            return AgeCheck.Under13 ? "Robot" : NameFilter.Shown(Clean(buildName), "Robot");
         }
 
         public static string Clean(string name) {
@@ -65,6 +102,9 @@ namespace Protobot.Online {
                 }
                 if (!AuthenticationService.Instance.IsSignedIn) await AuthenticationService.Instance.SignInAnonymouslyAsync();
                 Builds.ActionLog.Write("online", "signed in as " + AuthenticationService.Instance.PlayerId + " (" + Name + ")");
+                // V2: a saved account sign-in: its birth month (voice chat under 13).
+                if (!Accounts.IsGuest) _ = Accounts.LoadBirth();
+                _ = Badges.Claim();   // V2: this player's badges (and the beta tester badge earned on this computer)
                 return true;
             }
             catch (Exception e) {
@@ -92,6 +132,9 @@ namespace Protobot.Online {
         /// <summary>A sentence for the player from a services error.</summary>
         public static string Explain(Exception e) {
             var text = e.Message ?? "";
+            // V2: a match whose host connection is gone (the host left, or the match was restarted).
+            if (text.IndexOf("allocation", StringComparison.OrdinalIgnoreCase) >= 0)
+                return "That match's connection has closed (the host may have left). Ask for a new invite code, or host your own.";
             if (e is RequestFailedException failed && (failed.ErrorCode == CommonErrorCodes.TransportError || failed.ErrorCode == CommonErrorCodes.Timeout))
                 return "Couldn't reach the online services: check your internet connection.";
             if (text.Contains("network") || text.Contains("Network") || text.Contains("resolve host")) return "Couldn't reach the online services: check your internet connection.";

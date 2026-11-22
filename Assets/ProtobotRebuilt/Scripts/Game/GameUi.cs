@@ -132,9 +132,26 @@ namespace Protobot.Game {
             replayButton.onClick = new Button.ButtonClickedEvent();
             replayButton.onClick.AddListener(() => Replays.OpenFile(() => { if (close != null) close.onClick.Invoke(); }));
             // The recent builds list moves down to make room (it has space left at the bottom).
-            if (open.transform.parent.parent.Find("Builds Menu") is RectTransform recent) recent.anchoredPosition += new Vector2(0f, -60f);
+            // (V2: 20 more for Join the Discord)
+            if (open.transform.parent.parent.Find("Builds Menu") is RectTransform recent) recent.anchoredPosition += new Vector2(0f, -80f);
             var y = ((RectTransform)open.transform).anchoredPosition.y - 100f;   // V2: under Watch a replay
-            foreach (var name in new[] { "Report Bugs Button", "Patch Notes Button", "Credits" }) {
+            // V2: the official Discord server, with the other small links.
+            var notesButton = open.transform.parent.Find("Patch Notes Button");
+            if (notesButton != null && open.transform.parent.Find("Discord Button") == null) {
+                var discord = Object.Instantiate(notesButton.gameObject, open.transform.parent);
+                discord.name = "Discord Button";
+                var discordLabel = discord.GetComponentInChildren<TextMeshProUGUI>(true);
+                if (discordLabel != null) discordLabel.text = "Join the Discord";
+                if (discord.transform.Find("Icon") is Transform discordIcon && discordIcon.TryGetComponent(out Image discordImage)
+                    && multiplayer.transform.Find("Icon") is Transform peopleIcon && peopleIcon.TryGetComponent(out Image peopleImage)) {
+                    discordImage.sprite = peopleImage.sprite;
+                    discordImage.color = peopleImage.color;
+                }
+                var discordButton = discord.GetComponent<Button>();
+                discordButton.onClick = new Button.ButtonClickedEvent();
+                discordButton.onClick.AddListener(() => Application.OpenURL(Interface.LegalDocs.DiscordUrl));
+            }
+            foreach (var name in new[] { "Report Bugs Button", "Patch Notes Button", "Discord Button", "Credits" }) {
                 var other = open.transform.parent.Find(name) as RectTransform;
                 if (other == null) continue;
                 other.anchoredPosition = new Vector2(other.anchoredPosition.x, y);

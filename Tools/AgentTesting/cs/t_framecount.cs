@@ -1,0 +1,1 @@
+return "frame " + UnityEngine.Time.frameCount + " t " + UnityEngine.Time.realtimeSinceStartup.ToString("0") + " signed " + Protobot.Online.OnlineServices.SignedIn + " id " + (Protobot.Online.OnlineServices.SignedIn ? Unity.Services.Authentication.AuthenticationService.Instance.Profile : "-") + " paused " + UnityEditor.EditorApplication.isPaused;

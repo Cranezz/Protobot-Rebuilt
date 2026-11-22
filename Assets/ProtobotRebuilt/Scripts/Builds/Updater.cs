@@ -20,8 +20,9 @@ namespace Protobot.Builds {
         public const string RepoUrl = "https://github.com/Cranezz/Protobot-Rebuilt";
         public const string ReleasesUrl = RepoUrl + "/releases/latest";
 
-        /// <summary>The version Velopack releases carry: 1.9.&lt;build&gt; (semantic versioning).</summary>
-        public static string ReleaseVersion => BuildInfo.Beta + "." + BuildInfo.Build;
+        /// <summary>The version Velopack releases carry (semantic versioning): 2.0.0-beta.1.&lt;build&gt; (1.9.&lt;build&gt; before
+        /// v2.0 Beta 1).</summary>
+        public static string ReleaseVersion => BuildInfo.PackageVersion(BuildInfo.Build);
 
         private static bool checking;
 
@@ -152,11 +153,11 @@ namespace Protobot.Builds {
         }
 
         private static void Offer(UpdateManager manager, UpdateInfo info) {
-            var version = info.TargetFullRelease.Version.ToString();
+            var version = BuildInfo.Readable(info.TargetFullRelease.Version.ToString());   // V2: "v2.0 Beta 1 (build 71)"
             var dialog = Dialog.Open("Update available", new Vector2(560f, 470f));
             var head = Ui.Text(dialog.Body, "Head", "Protobot " + version + " is ready", Theme.FontTitle + 4f, Theme.Text, Theme.Medium);
             head.Size(-1, 34f);
-            var sub = Ui.Text(dialog.Body, "Sub", "You have " + ReleaseVersion + ".  Download: " + Megabytes(DownloadBytes(info)) + ".  Protobot restarts when it's done: save your build first.",
+            var sub = Ui.Text(dialog.Body, "Sub", "You have " + BuildInfo.Label + ".  Download: " + Megabytes(DownloadBytes(info)) + ".  Protobot restarts when it's done: save your build first.",
                 Theme.FontSmall, Theme.TextDim);
             sub.textWrappingMode = TextWrappingModes.Normal;
             sub.Size(-1, 40f);
@@ -235,7 +236,7 @@ namespace Protobot.Builds {
                     w.raycastTarget = false;
                     w.rectTransform.Place(new Vector2(0.5f, 1f), new Vector2(0.5f, 0.5f), new Vector2(40f, -62f), new Vector2(46f * word.width / word.height, 46f));
                 }
-                var title = Ui.Text(card, "Title", "Updating to " + info.TargetFullRelease.Version, Theme.FontTitle + 2f, Theme.Text, Theme.Medium, TextAlignmentOptions.Center);
+                var title = Ui.Text(card, "Title", "Updating to " + BuildInfo.Readable(info.TargetFullRelease.Version.ToString()), Theme.FontTitle + 2f, Theme.Text, Theme.Medium, TextAlignmentOptions.Center);
                 title.rectTransform.Place(new Vector2(0.5f, 1f), new Vector2(0.5f, 0.5f), new Vector2(0f, -122f), new Vector2(560f, 30f));
                 var track = Ui.Image(card, "Track", Theme.Field, 6f);
                 track.rectTransform.Place(new Vector2(0.5f, 1f), new Vector2(0.5f, 0.5f), new Vector2(0f, -170f), new Vector2(520f, 14f));

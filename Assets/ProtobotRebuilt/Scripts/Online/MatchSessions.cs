@@ -11,9 +11,11 @@ using UnityEngine;
 namespace Protobot.Online {
     /// <summary>A match in the server list (what the lobby service knows about it).</summary>
     public class MatchInfo {
-        public string id, name, host, game, mode;
+        public string id, name, host, game, mode, hostBadges;
         public int players, max, build;
         public bool password;
+        /// <summary>V2: a match is being played in it right now (the server list shows "In game").</summary>
+        public bool playing;
         public bool SameVersion => build == BuildInfo.Build;
     }
 
@@ -26,10 +28,17 @@ namespace Protobot.Online {
         // Session property keys (indexed ones can be filtered and sorted in the server list).
         public const string AutonKey = "auton";   // V2 (Phase 9): "1" = matches have the 0:15 autonomous period
         public const string GameKey = "game", ModeKey = "mode", BuildKey = "build", VersionKey = "version", HostKey = "hostname";
+        /// <summary>V2: "ingame" while the host's match is being played (the server list's In game badge).</summary>
+        public const string StateKey = "state";
         // Player property keys.
         public const string NameKey = "name", TeamKey = "team", ReadyKey = "ready", RobotKey = "robot";
+        /// <summary>V2: "0" when this player can't hear voice chat (under 13, or voice chat off): a crossed-out speaker
+        /// shows by their name so teammates know to tell them things another way.</summary>
+        public const string VoiceKey = "voice";
         /// <summary>V2: the player this player votes to kick ("" none).</summary>
         public const string KickKey = "kick";
+        /// <summary>V2: a player's badges ("beta,..."), shown beside their name (Badges); the host's are on the match too.</summary>
+        public const string BadgesKey = "badges", HostBadgesKey = "hostbadges";
 
         public static readonly string[] Modes = { "2v2 match", "1v1 match", "Skills race" };
         public static readonly int[] ModePlayers = { 4, 2, 8 };
@@ -62,6 +71,9 @@ namespace Protobot.Online {
             };
             manager.OnClientDisconnectCallback += Disconnected;
             manager.RunInBackground = true;
+            // V2: the whole app keeps running when its window isn't in front during online play (alt-tabbing froze a
+            // player's robot and their connection for everyone).
+            Application.runInBackground = true;
             return manager;
         }
 
@@ -85,11 +97,17 @@ namespace Protobot.Online {
             players.Remove(clientId);
             var session = Current;
             if (session == null || !session.IsHost || session.Players.All(p => p.Id != playerId)) return;
+            // V2: the same player already back on a new connection (their app restarted quickly): keep them.
+            if (players.ContainsValue(playerId)) return;
             ActionLog.Write("online", "connection lost: " + playerId);
             _ = RemoveQuietly(session, playerId);
         }
 
         private static async Task RemoveQuietly(ISession session, string playerId) {
+            // V2: a few seconds' grace first, and not if they've connected again meanwhile (a dropped connection is noticed
+            // ~10 s late, after a quick rejoin: that player was removed from the lobby while they were back in it).
+            await Task.Delay(4000);
+            if (players.ContainsValue(playerId) || Current != session) return;
             try { await session.AsHost().RemovePlayerAsync(playerId); }
             catch (Exception e) { Debug.LogWarning("[Online] Removing a disconnected player: " + e.Message); }
         }
@@ -107,8 +125,12 @@ namespace Protobot.Online {
         }
 
         public static async Task<string> Host(HostOptions o) {
+            if (!AgeCheck.Ready) return AgeCheck.NotReady;
             if (!await OnlineServices.Start()) return OnlineServices.Problem;
             if (!string.IsNullOrEmpty(o.password) && (o.password.Length < 8 || o.password.Length > 64)) return "A password needs 8 to 64 characters (or leave it empty).";
+            // V2: match names are seen by everyone: no offensive words, and a player under 13 can't type one.
+            if (AgeCheck.Under13) o.name = "";
+            if (!NameFilter.Allowed(o.name)) return "That match name isn't allowed: choose another.";
             await Leave(null);
             SayWhoIAm();
             try {
@@ -125,6 +147,7 @@ namespace Protobot.Online {
                         [BuildKey] = new(BuildInfo.Build.ToString(), VisibilityPropertyOptions.Public, PropertyIndex.Number1),
                         [VersionKey] = new(BuildInfo.Display, VisibilityPropertyOptions.Public),
                         [AutonKey] = new(o.autonomous ? "1" : "0", VisibilityPropertyOptions.Public),
+                        [HostBadgesKey] = new(Badges.Text, VisibilityPropertyOptions.Public),
                     },
                     PlayerProperties = MyProperties(0),
                 }.WithRelayNetwork();
@@ -141,6 +164,7 @@ namespace Protobot.Online {
 
         /// <summary>Joins by invite code (or by the server list's id); null when it worked, else what went wrong.</summary>
         public static async Task<string> Join(string codeOrId, bool byId, string password, int attempt = 0) {
+            if (!AgeCheck.Ready) return AgeCheck.NotReady;
             if (!await OnlineServices.Start()) return OnlineServices.Problem;
             await Leave(null);
             SayWhoIAm();
@@ -186,6 +210,8 @@ namespace Protobot.Online {
             }
             catch (Exception e) {
                 Debug.LogWarning("[Online] Couldn't join: " + e);
+                // V2: don't stay half in a match that couldn't connect ("not able to join allocation").
+                if (Current != null) await Leave(null);
                 var text = e.Message ?? "";
                 if (text.IndexOf("password", StringComparison.OrdinalIgnoreCase) >= 0 || e is SessionException s && s.Error == SessionError.Forbidden)
                     return string.IsNullOrEmpty(password) ? "This match has a password." : "Wrong password.";
@@ -286,14 +312,16 @@ namespace Protobot.Online {
                 });
                 var list = results.Sessions.Select(s => new MatchInfo {
                     id = s.Id,
-                    name = s.Name,
-                    host = Prop(s.Properties, HostKey),
+                    name = NameFilter.Shown(s.Name, "Match"),   // V2: names other players chose go through the filter
+                    host = NameFilter.Shown(Prop(s.Properties, HostKey)),
+                    hostBadges = Prop(s.Properties, HostBadgesKey),
                     game = Prop(s.Properties, GameKey),
                     mode = Prop(s.Properties, ModeKey),
                     players = s.MaxPlayers - s.AvailableSlots,
                     max = s.MaxPlayers,
                     password = s.HasPassword,
                     build = Build(s.Properties),
+                    playing = Prop(s.Properties, StateKey) == "ingame",
                 }).OrderByDescending(m => m.SameVersion).ToList();
                 return (list, null);
             }
@@ -316,15 +344,27 @@ namespace Protobot.Online {
             [ReadyKey] = new("0"),
             [RobotKey] = new(RobotName()),
             [KickKey] = new(""),
+            [BadgesKey] = new(Badges.Text),
+            [VoiceKey] = new(Voice.CanHear ? "1" : "0"),
         };
 
         public static string RobotName() {
             var manager = UnityEngine.Object.FindAnyObjectByType<BuildsManager>();
-            return manager != null && !string.IsNullOrEmpty(manager.buildPath) ? System.IO.Path.GetFileNameWithoutExtension(manager.buildPath) : "";
+            var name = manager != null && !string.IsNullOrEmpty(manager.buildPath) ? System.IO.Path.GetFileNameWithoutExtension(manager.buildPath) : "";
+            // V2: only a build that can play counts (it has a Brain); an unsaved one is "Unsaved build".
+            if (Game.SkillsGame.RobotProblem() != null) return "";
+            return OnlineServices.Shared(string.IsNullOrEmpty(name) ? "Unsaved build" : name);
         }
 
-        public static string Get(IReadOnlyPlayer player, string key) =>
-            player?.Properties != null && player.Properties.TryGetValue(key, out var p) ? p.Value : "";
+        public static string Get(IReadOnlyPlayer player, string key) {
+            var value = player?.Properties != null && player.Properties.TryGetValue(key, out var p) ? p.Value : "";
+            // V2: names other players chose go through the filter (a name from an older or modified app).
+            if (key == NameKey || key == RobotKey) value = NameFilter.Shown(value, key == NameKey ? "Player" : "Robot");
+            return value;
+        }
+
+        /// <summary>V2: whether a player can hear voice chat (an older app that doesn't say counts as yes).</summary>
+        public static bool CanHear(IReadOnlyPlayer player) => Get(player, VoiceKey) != "0";
 
         /// <summary>Changes one of this player's choices (alliance, ready, robot) for everyone in the match.</summary>
         public static async void Set(string key, string value) {
@@ -332,12 +372,31 @@ namespace Protobot.Online {
             if (session?.CurrentPlayer == null) return;
             session.CurrentPlayer.SetProperty(key, new PlayerProperty(value));
             Notify();
-            try { await session.SaveCurrentPlayerDataAsync(); }
-            catch (Exception e) {
-                Debug.LogWarning("[Online] Saving player data: " + e.Message);
-                Interface.Interface.Say("Couldn't update the match: " + OnlineServices.Explain(e), false);
+            // V2: one save at a time; changes made meanwhile go in the next one, put back first (a save's answer from the
+            // server brings back the values it was sent with: the robot cleared but Ready stayed on).
+            unsaved[key] = value;
+            if (saving) {
+                saveAgain = true;
+                return;
             }
+            saving = true;
+            try {
+                do {
+                    saveAgain = false;
+                    foreach (var change in unsaved) session.CurrentPlayer.SetProperty(change.Key, new PlayerProperty(change.Value));
+                    unsaved.Clear();
+                    try { await session.SaveCurrentPlayerDataAsync(); }
+                    catch (Exception e) {
+                        Debug.LogWarning("[Online] Saving player data: " + e.Message);
+                        Interface.Interface.Say("Couldn't update the match: " + OnlineServices.Explain(e), false);
+                    }
+                } while (saveAgain && Current == session);
+            }
+            finally { saving = false; }
         }
+
+        private static bool saving, saveAgain;
+        private static readonly Dictionary<string, string> unsaved = new();
 
         public static bool IsHost => Current != null && Current.IsHost;
 
@@ -377,6 +436,15 @@ namespace Protobot.Online {
             banned.Add(playerId);
             try { await Current.AsHost().RemovePlayerAsync(playerId); }
             catch (Exception e) { Interface.Interface.Say("Couldn't remove them: " + OnlineServices.Explain(e), false); }
+        }
+
+        /// <summary>V2: tells the server list a match is being played (or not any more).</summary>
+        public static async void SetPlaying(bool playing) {
+            if (!IsHost) return;
+            var host = Current.AsHost();
+            host.SetProperty(StateKey, new SessionProperty(playing ? "ingame" : "", VisibilityPropertyOptions.Public));
+            try { await host.SavePropertiesAsync(); }
+            catch (Exception e) { Debug.LogWarning("[Online] Match state: " + e.Message); }
         }
 
         /// <summary>Closes the match to new players (when it starts) or opens it again.</summary>

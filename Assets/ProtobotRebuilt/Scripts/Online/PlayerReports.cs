@@ -12,7 +12,7 @@ using UnityEngine;
 namespace Protobot.Online {
     /// <summary>
     /// V2: reporting a player (the lobby's player rows, the match's Players window). The report goes to the developer's
-    /// Discord channel (BugReport.Webhook) as a zip: report.md (who, why, what they wrote, the match and version),
+    /// Discord channel (BugReport.Send, through the server) as a zip: report.md (who, why, what they wrote, the match and version),
     /// match.csv (where every robot was 5 times a second, the host's movement checks, who left: OnlineMatch.LastRecording)
     /// and the reporter's session log. Without a webhook it's saved in Logs/Reports to send by hand. One report per
     /// player per session.
@@ -192,8 +192,8 @@ namespace Protobot.Online {
                     }
                     if (!string.IsNullOrEmpty(ActionLog.CurrentFile) && File.Exists(ActionLog.CurrentFile)) {
                         using var from = new FileStream(ActionLog.CurrentFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-                        using var log2 = archive.CreateEntry("session.log").Open();
-                        from.CopyTo(log2);
+                        using var reader = new StreamReader(from);
+                        Text(archive, "session.log", BugReport.Scrub(reader.ReadToEnd()));   // V2: without the computer's user name
                     }
                 }
                 zip = stream.ToArray();
@@ -203,11 +203,11 @@ namespace Protobot.Online {
                 return;
             }
             var fileName = kind + " " + DateTime.Now.ToString("yyyy-MM-dd HH-mm-ss") + ".zip";
-            if (string.IsNullOrEmpty(BugReport.Webhook) || CrashGuard.Instance == null) {
+            if (!BugReport.CanSend || CrashGuard.Instance == null) {
                 Save(zip, fileName);
                 return;
             }
-            CrashGuard.Instance.StartCoroutine(BugReport.Post(content, zip, fileName, ok => {
+            CrashGuard.Instance.StartCoroutine(BugReport.Post(content, zip, fileName, kind == "Appeal" ? "appeal" : "report", ok => {
                 if (ok) Interface.Interface.Announce("Sent. Thank you: the moderators will look at it.");
                 else {
                     Interface.Interface.Say("Couldn't send it: it's saved, its folder is open", false);
@@ -230,11 +230,11 @@ namespace Protobot.Online {
             var content = "**Player report** · " + reason + "\n> Reported: " + name + " (`" + playerId + "`)\n> By: " + OnlineServices.Name
                           + " (`" + OnlineServices.PlayerId + "`) · " + BuildInfo.Display + (session != null ? " · match `" + session.Id + "`" : "");
             var fileName = "Player report " + DateTime.Now.ToString("yyyy-MM-dd HH-mm-ss") + ".zip";
-            if (string.IsNullOrEmpty(BugReport.Webhook) || CrashGuard.Instance == null) {
+            if (!BugReport.CanSend || CrashGuard.Instance == null) {
                 Save(zip, fileName);
                 return;
             }
-            CrashGuard.Instance.StartCoroutine(BugReport.Post(content, zip, fileName, ok => {
+            CrashGuard.Instance.StartCoroutine(BugReport.Post(content, zip, fileName, "report", ok => {
                 if (ok) Interface.Interface.Announce("Sent your report. Thank you: the moderators will look at it.");
                 else {
                     Interface.Interface.Say("Couldn't send the report: it's saved, its folder is open", false);
@@ -294,8 +294,8 @@ namespace Protobot.Online {
                 foreach (var (part, _) in custom) Text(archive, "custom/" + part.Id + ".json", JsonUtility.ToJson(part));
                 if (!string.IsNullOrEmpty(ActionLog.CurrentFile) && File.Exists(ActionLog.CurrentFile)) {
                     using var from = new FileStream(ActionLog.CurrentFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-                    using var to = archive.CreateEntry("session.log").Open();
-                    from.CopyTo(to);
+                    using var reader = new StreamReader(from);
+                    Text(archive, "session.log", BugReport.Scrub(reader.ReadToEnd()));   // V2: without the computer's user name
                 }
             }
             return stream.ToArray();

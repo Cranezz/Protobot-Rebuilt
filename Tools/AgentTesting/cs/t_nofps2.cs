@@ -1,0 +1,1 @@
+int n = 0; foreach (var t in UnityEngine.Object.FindObjectsByType<TMPro.TMP_Text>(UnityEngine.FindObjectsSortMode.None)) if (t.text.Contains("FPS") || t.text.Contains("a frame")) { t.gameObject.SetActive(false); n++; } return "hid " + n;

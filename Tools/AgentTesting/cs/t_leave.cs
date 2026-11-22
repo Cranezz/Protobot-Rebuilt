@@ -1,2 +1,1 @@
-var t = Protobot.Online.MatchSessions.Leave(null);
-return "leaving";
+_ = Protobot.Online.MatchSessions.Leave(null); return "leaving";

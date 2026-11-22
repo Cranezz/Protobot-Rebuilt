@@ -42,7 +42,7 @@ namespace Protobot.Interface {
         }
 
         // The notes' markdown, as TMP rich text: "# heading", "- item", **bold**, `code`.
-        private static string Rich(string markdown) {
+        internal static string Rich(string markdown) {   // V2: the Terms and Privacy Policy use it too (LegalDocs)
             var lines = markdown.Replace("\r", "").Split('\n');
             var sb = new System.Text.StringBuilder();
             var first = true;

@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using Protobot.Interface;
 using TMPro;
 using UnityEngine;
@@ -19,22 +21,14 @@ namespace Protobot.Builds {
     //   build.pbb         the build as it is now (opens in Protobot)
     //   saved.pbb         the build's file as last saved, if it has one
     //   screenshot.png    the screen when Report a bug was opened
-    // Sent to the developer's Discord channel through a webhook when Webhook is set (an attachment up to 10 MB;
+    // Sent to the developer's Discord channel through the server (Send: Cloud Code "SendReport") (an attachment up to 10 MB;
     // a bigger one goes without the builds), else saved and its folder opened to send by hand.
     public static class BugReport {
-        /// <summary>A Discord webhook (Server Settings > Integrations > Webhooks > New Webhook > Copy Webhook URL) the
-        /// reports are sent to; empty: they're saved only. Kept out of the source in Resources/Secrets/BugWebhook.txt
-        /// (git-ignored, so a public repository doesn't show it; it's still built into the app).</summary>
-        public static string Webhook {
-            get {
-                if (webhook == null) {
-                    var file = Resources.Load<TextAsset>("Secrets/BugWebhook");
-                    webhook = file != null ? file.text.Trim() : "";
-                }
-                return webhook;
-            }
-        }
-        private static string webhook;
+        /// <summary>V2: reports go to the developer's Discord channel through the server (Cloud Code "SendReport", which
+        /// holds the webhook and limits how many each player sends), never straight from the app: a webhook built into
+        /// the app could be pulled out of it and used by anyone. The zip goes up as a Cloud Save file of the player's own,
+        /// which the script attaches and then deletes. False when this copy has no online services (it's saved only).</summary>
+        public static bool CanSend => !string.IsNullOrEmpty(Application.cloudProjectId);
 
         public static string Folder => Path.Combine(CrashGuard.LogFolder, "Reports");
         private static byte[] screenshot;
@@ -63,17 +57,20 @@ namespace Protobot.Builds {
             var withPicture = screenshot != null;
             ToolOptions.Switch((RectTransform)dialog.Body, "Include my build (so it can be opened and tried)", true, v => withBuild = v);
             if (screenshot != null) ToolOptions.Switch((RectTransform)dialog.Body, "Include a picture of the screen", true, v => withPicture = v);
-            var note = Ui.Text(dialog.Body, "Note", "Also in the report: what you did this session (every step, click and key, step by step), the errors, "
-                                                   + BuildInfo.Display + " and your computer's OS and graphics card. Nothing else, and nothing is sent until you press Send.",
+            // V2: exactly what goes in it (the logs have the computer's user name taken out).
+            var note = Ui.Text(dialog.Body, "Note", "Also in the report: what you did this session (each step, click and key; not what you type in text boxes), "
+                                                   + "the errors and the app's log (with your computer's user name taken out), " + BuildInfo.Display
+                                                   + ", and your computer's OS, processor, memory and graphics card. Please don't write your name, email or other "
+                                                   + "personal details in it. Nothing is sent until you press Send.",
                                Theme.FontSmall, Theme.TextDim);
             note.textWrappingMode = TextWrappingModes.Normal;
-            note.Size(-1, 52f);
+            note.Size(-1, 70f);
             var folder = Ui.Button(dialog.Footer, "Folder", "Open reports folder", () => {
                 Directory.CreateDirectory(Folder);
                 Application.OpenURL("file:///" + Folder.Replace('\\', '/'));
             }, false, 6f);
             folder.Size(170f, 34f);
-            var send = Ui.Button(dialog.Footer, "Send", string.IsNullOrEmpty(Webhook) ? "Save report" : "Send", () => {
+            var send = Ui.Button(dialog.Footer, "Send", !CanSend ? "Save report" : "Send", () => {
                 if (string.IsNullOrWhiteSpace(what)) {
                     Interface.Interface.Say("Say what happened first (a sentence is enough)", false);
                     return;
@@ -81,7 +78,7 @@ namespace Protobot.Builds {
                 dialog.Close();
                 var zip = Make(what, withBuild, withPicture);
                 if (zip == null) return;
-                if (!string.IsNullOrEmpty(Webhook) && CrashGuard.Instance != null) CrashGuard.Instance.StartCoroutine(Upload(zip, what));
+                if (CanSend) Upload(zip, what);
                 else Saved(zip);
             }, true, 6f);
             send.Size(130f, 34f);
@@ -96,10 +93,10 @@ namespace Protobot.Builds {
                 var path = Path.Combine(Folder, "Bug report " + DateTime.Now.ToString("yyyy-MM-dd HH-mm-ss") + ".zip");
                 using (var zip = ZipFile.Open(path, ZipArchiveMode.Create)) {
                     Text(zip, "report.md", Summary(what));
-                    Copy(zip, ActionLog.CurrentFile, "session.log");
-                    Copy(zip, ActionLog.PreviousFile, "previous.log");
-                    Copy(zip, Path.Combine(CrashGuard.LogFolder, "bugs.log"), "bugs.log");
-                    if (!Application.isEditor) Copy(zip, Application.consoleLogPath, "player.log");
+                    Copy(zip, ActionLog.CurrentFile, "session.log", true);
+                    Copy(zip, ActionLog.PreviousFile, "previous.log", true);
+                    Copy(zip, Path.Combine(CrashGuard.LogFolder, "bugs.log"), "bugs.log", true);
+                    if (!Application.isEditor) Copy(zip, Application.consoleLogPath, "player.log", true);
                     if (withBuild) {
                         var data = SceneBuild.ToBuildData();
                         if (data?.parts != null && data.parts.Length > 0) {
@@ -148,15 +145,41 @@ namespace Protobot.Builds {
             w.Write(text);
         }
 
-        private static void Copy(ZipArchive zip, string file, string name) {
+        private static void Copy(ZipArchive zip, string file, string name, bool scrub = false) {
             if (string.IsNullOrEmpty(file) || !File.Exists(file)) return;
             try {
                 // (the log may be open for writing: read it shared)
                 using var from = new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                if (scrub) {
+                    using var reader = new StreamReader(from);
+                    Text(zip, name, Scrub(reader.ReadToEnd()));
+                    return;
+                }
                 using var to = zip.CreateEntry(name).Open();
                 from.CopyTo(to);
             }
             catch (Exception) { }
+        }
+
+        /// <summary>V2: a log with the computer's user name and computer name taken out (they're in every file path:
+        /// C:/Users/<name>/...), which is often a real name.</summary>
+        public static string Scrub(string text) {
+            if (string.IsNullOrEmpty(text)) return text;
+            try {
+                var home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+                if (!string.IsNullOrEmpty(home)) {
+                    text = Regex.Replace(text, Regex.Escape(home), "%USERPROFILE%", RegexOptions.IgnoreCase);
+                    text = Regex.Replace(text, Regex.Escape(home.Replace('\\', '/')), "%USERPROFILE%", RegexOptions.IgnoreCase);
+                }
+                var user = Environment.UserName;
+                if (!string.IsNullOrEmpty(user))
+                    text = Regex.Replace(text, @"([\\/]Users[\\/])" + Regex.Escape(user) + @"(?=[\\/]|\b)", "$1<user>", RegexOptions.IgnoreCase);
+                var machine = Environment.MachineName;
+                if (!string.IsNullOrEmpty(machine) && machine.Length >= 3)
+                    text = Regex.Replace(text, @"\b" + Regex.Escape(machine) + @"\b", "<computer>", RegexOptions.IgnoreCase);
+            }
+            catch (Exception) { }
+            return text;
         }
 
         private static void Saved(string zip) {
@@ -164,49 +187,74 @@ namespace Protobot.Builds {
             Interface.Interface.Announce("Saved your bug report: " + Path.GetFileName(zip) + " (its folder is open: send that file to the developer)");
         }
 
-        private static IEnumerator Upload(string zip, string what) {
-            var bytes = File.ReadAllBytes(zip);
-            var name = Path.GetFileName(zip);
-            if (bytes.Length > 9_500_000) {
-                // Too big for Discord: again without the builds and picture.
-                var light = Make(what + "\n\n(sent without the build: the full report is " + bytes.Length / 1_000_000 + " MB, saved on their computer)", false, false);
-                if (light != null) bytes = File.ReadAllBytes(light);
+        private static async void Upload(string zip, string what) {
+            try {
+                var bytes = File.ReadAllBytes(zip);
+                var name = Path.GetFileName(zip);
+                if (bytes.Length > MaxFile) {
+                    // Too big for Discord: again without the builds and picture.
+                    var light = Make(what + "\n\n(sent without the build: the full report is " + bytes.Length / 1_000_000 + " MB, saved on their computer)", false, false);
+                    if (light != null) bytes = File.ReadAllBytes(light);
+                }
+                var title = (what ?? "").Split('\n')[0];
+                if (title.Length > 150) title = title.Substring(0, 150) + "…";
+                var content = "**Bug report** · " + BuildInfo.Display + " · " + SystemInfo.operatingSystem + "\n> " + title.Replace("\"", "'");
+                var problem = await Send("bug", content, bytes, name);
+                if (problem == null) Interface.Interface.Announce("Sent your bug report. Thank you!");
+                else {
+                    Interface.Interface.Say("Couldn't send the report (" + problem + "): it's saved, its folder is open", false);
+                    Saved(zip);
+                }
             }
-            var title = (what ?? "").Split('\n')[0];
-            if (title.Length > 150) title = title.Substring(0, 150) + "…";
-            var content = "**Bug report** · " + BuildInfo.Display + " · " + SystemInfo.operatingSystem + "\n> " + title.Replace("\"", "'");
-            var payload = "{\"content\":" + Json(content) + "}";
-            var form = new List<IMultipartFormSection> {
-                new MultipartFormDataSection("payload_json", payload),
-                new MultipartFormFileSection("files[0]", bytes, name, "application/zip"),
-            };
-            using var request = UnityWebRequest.Post(Webhook, form);
-            request.timeout = 60;
-            yield return request.SendWebRequest();
-            if (request.result == UnityWebRequest.Result.Success) Interface.Interface.Announce("Sent your bug report. Thank you!");
-            else {
-                Debug.LogWarning("[BugReport] Couldn't send: " + request.error);
-                Interface.Interface.Say("Couldn't send the report (" + request.error + "): it's saved, its folder is open", false);
+            catch (Exception e) {
+                Debug.LogWarning("[BugReport] " + e.Message);
                 Saved(zip);
             }
         }
 
-        /// <summary>V2: a message with a file to the developer's Discord channel (player reports use it too); done(true)
-        /// when it went.</summary>
-        public static IEnumerator Post(string content, byte[] file, string fileName, Action<bool> done) {
-            if (string.IsNullOrEmpty(Webhook)) {
-                done?.Invoke(false);
-                yield break;
+        /// <summary>Discord takes files up to 10 MB.</summary>
+        public const int MaxFile = 9_500_000;
+
+        /// <summary>V2: a message with a file to the developer's Discord channel, through the server (player reports use it
+        /// too). Null when it went, else why not.</summary>
+        public static async Task<string> Send(string kind, string content, byte[] file, string fileName) {
+            if (!CanSend) return "this copy has no online services";
+            if (file != null && file.Length > MaxFile) return "the report is too big (" + file.Length / 1_000_000 + " MB)";
+            if (!await Online.OnlineServices.Start()) return Online.OnlineServices.Problem;
+            string key = null;
+            try {
+                if (file != null) {
+                    key = "report-" + DateTime.UtcNow.ToString("yyyyMMdd-HHmmss") + "-" + UnityEngine.Random.Range(1000, 10000);
+                    await Unity.Services.CloudSave.CloudSaveService.Instance.Files.Player.SaveAsync(key, file);
+                }
+                var json = await Unity.Services.CloudCode.CloudCodeService.Instance.CallEndpointAsync("SendReport", new Dictionary<string, object> {
+                    { "kind", kind }, { "content", content ?? "" }, { "file", key ?? "" }, { "fileName", fileName ?? "report.zip" },
+                    { "build", BuildInfo.Build },
+                });
+                var result = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
+                if (result != null && result.TryGetValue("sent", out var sent) && sent is bool ok && ok) return null;
+                return result != null && result.TryGetValue("reason", out var why) ? why?.ToString() : "the server didn't take it";
             }
-            var form = new List<IMultipartFormSection> {
-                new MultipartFormDataSection("payload_json", "{\"content\":" + Json(content) + "}"),
-                new MultipartFormFileSection("files[0]", file, fileName, "application/zip"),
-            };
-            using var request = UnityWebRequest.Post(Webhook, form);
-            request.timeout = 60;
-            yield return request.SendWebRequest();
-            if (request.result != UnityWebRequest.Result.Success) Debug.LogWarning("[BugReport] Couldn't send: " + request.error);
-            done?.Invoke(request.result == UnityWebRequest.Result.Success);
+            catch (Exception e) {
+                Debug.LogWarning("[BugReport] Couldn't send: " + e.Message);
+                if (key != null) {
+                    try { await Unity.Services.CloudSave.CloudSaveService.Instance.Files.Player.DeleteAsync(key); }
+                    catch (Exception) { }
+                }
+                return Online.OnlineServices.Explain(e);
+            }
+        }
+
+        /// <summary>The same as <see cref="Send"/>, for coroutine callers: done(true) when it went.</summary>
+        public static IEnumerator Post(string content, byte[] file, string fileName, Action<bool> done) => Post(content, file, fileName, "report", done);
+
+        /// <summary>V2: <paramref name="kind"/> picks the staff channel ("report": player reports, "appeal": appeals).</summary>
+        public static IEnumerator Post(string content, byte[] file, string fileName, string kind, Action<bool> done) {
+            var task = Send(kind, content, file, fileName);
+            while (!task.IsCompleted) yield return null;
+            var ok = !task.IsFaulted && task.Result == null;
+            if (!ok) Debug.LogWarning("[BugReport] Couldn't send: " + (task.IsFaulted ? task.Exception?.Message : task.Result));
+            done?.Invoke(ok);
         }
 
         private static string Json(string s) {

@@ -1088,6 +1088,8 @@ namespace Protobot.Game {
                     return;
                 }
                 if (!SkillsRun || online || !Legal) return;
+                // V2: only once the player has answered the online age question and agreed to the terms (Multiplayer).
+                if (!Online.AgeCheck.Ready) return;
                 if (mode == Mode.Programming && !ranCode) return;   // no program: nothing to post
                 var items = score.items.Select(i => (i.kind, i.points)).ToList();
                 var replay = Replays.Last;

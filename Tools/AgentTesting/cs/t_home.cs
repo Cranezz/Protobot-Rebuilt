@@ -1,0 +1,1 @@
+var b = Resources.FindObjectsOfTypeAll<UnityEngine.UI.Button>().FirstOrDefault(x => x.name == "Splash Screen Button" && x.gameObject.scene.IsValid()); if (b != null) b.onClick.Invoke(); return "home " + (b != null);

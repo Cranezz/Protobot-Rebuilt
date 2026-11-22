@@ -1,0 +1,1 @@
+var m = typeof(Protobot.Online.MatchSessions).GetMethod("RemoveQuietly", System.Reflection.BindingFlags.NonPublic|System.Reflection.BindingFlags.Static); return m != null ? "has RemoveQuietly" : "missing";

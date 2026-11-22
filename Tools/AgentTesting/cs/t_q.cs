@@ -1,0 +1,1 @@
+var t = System.Type.GetType("Protobot.EditorTools.LeaderboardModeration, Assembly-CSharp-Editor"); var s = ""; foreach (var m in t.GetMethods()) if (m.Name == "SetWebhook") s += m.ToString() + " | "; return s;

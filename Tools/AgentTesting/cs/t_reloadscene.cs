@@ -1,0 +1,1 @@
+var sc = UnityEditor.SceneManagement.EditorSceneManager.GetActiveScene(); var dirty = sc.isDirty; UnityEditor.SceneManagement.EditorSceneManager.OpenScene(sc.path, UnityEditor.SceneManagement.OpenSceneMode.Single); return "was dirty " + dirty + ", reloaded " + sc.path;

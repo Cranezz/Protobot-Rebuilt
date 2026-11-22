@@ -19,13 +19,20 @@ namespace Protobot.Online {
         private const string ModeKey = "V2.Voice.Mode";
 
         public static Mode Current {
-            get => (Mode)Mathf.Clamp(PlayerPrefs.GetInt(ModeKey, (int)Mode.PushToTalk), 0, 2);
+            get => AgeCheck.Under13 ? Mode.Off : (Mode)Mathf.Clamp(PlayerPrefs.GetInt(ModeKey, (int)Mode.PushToTalk), 0, 2);
             set {
+                if (AgeCheck.Under13) return;   // V2 (COPPA): voice chat stays off under 13
                 PlayerPrefs.SetInt(ModeKey, (int)value);
                 if (value == Mode.Off) Leave();
                 else if (channel == null && lastSession != null) _ = JoinAlliance(lastSession, lastRed);
+                // V2: teammates see whether this player can hear voice chat (a crossed-out speaker by the name).
+                if (MatchSessions.Current != null) MatchSessions.Set(MatchSessions.VoiceKey, CanHear ? "1" : "0");
             }
         }
+
+        /// <summary>V2: whether this player hears voice chat. Players under 13 never do (COPPA: their voice is never sent
+        /// and they don't hear strangers); a player can also switch it off.</summary>
+        public static bool CanHear => !AgeCheck.Under13 && Current != Mode.Off;
 
         public static string Problem { get; private set; }
         private static string channel, lastSession;
@@ -40,7 +47,7 @@ namespace Protobot.Online {
             lastSession = sessionId;
             lastRed = red;
             Show();
-            if (Current == Mode.Off || string.IsNullOrEmpty(sessionId)) return;
+            if (AgeCheck.Under13 || Current == Mode.Off || string.IsNullOrEmpty(sessionId)) return;
             if (!await OnlineServices.Start()) {
                 Problem = OnlineServices.Problem;
                 return;
@@ -101,7 +108,29 @@ namespace Protobot.Online {
 
         // The panel: the mode (click to change), the mic state, and a row per other player (talking light, mute).
         private class Panel : MonoBehaviour {
-            private RectTransform rows;
+            private RectTransform rows, deaf;
+            private string deafShown;
+
+            // V2: alliance partners who can't hear voice chat (under 13, or voice chat off), with the crossed-out speaker.
+            private void ShowDeaf() {
+                var session = MatchSessions.Current;
+                var mine = session?.CurrentPlayer;
+                var team = mine != null ? MatchSessions.Get(mine, MatchSessions.TeamKey) : "";
+                var names = session == null ? new List<string>()
+                    : session.Players.Where(p => p.Id != mine?.Id && MatchSessions.Get(p, MatchSessions.TeamKey) == team && !MatchSessions.CanHear(p))
+                        .Select(p => MatchSessions.Get(p, MatchSessions.NameKey)).ToList();
+                var signature = string.Join(",", names);
+                if (signature == deafShown) return;
+                deafShown = signature;
+                for (var i = deaf.childCount - 1; i >= 0; i--) Destroy(deaf.GetChild(i).gameObject);
+                foreach (var who in names) {
+                    var row = Ui.Rect(who, deaf);
+                    Ui.Row(row, 6f);
+                    row.Size(-1, 22f);
+                    OnlineWindow.CantHearIcon(row, who + " can't hear voice chat", 18f, Theme.TextDim);
+                    Ui.Text(row, "Name", who + " can't hear voice chat", Theme.FontSmall - 1f, Theme.TextDim).Size(-1, 20f, 1f);
+                }
+            }
             private TextMeshProUGUI modeLabel, state;
             private string shown;
             private bool micOpen;
@@ -118,22 +147,33 @@ namespace Protobot.Online {
                 Ui.Row(top, 6f);
                 top.Size(-1, 26f);
                 Ui.Text(top, "Title", "Voice", Theme.FontSmall, Theme.TextDim, Theme.Medium).Size(42f, 24f);
-                var mode = Ui.Button(top, "Mode", ModeNames[(int)Current], null, false, 5f, Theme.FontSmall);
+                var mode = Ui.Button(top, "Mode", AgeCheck.Under13 ? "Off (under 13)" : ModeNames[(int)Current], null, false, 5f, Theme.FontSmall);
                 mode.Size(-1, 24f, 1f);
+                mode.interactable = !AgeCheck.Under13;
                 modeLabel = mode.GetComponentInChildren<TextMeshProUGUI>();
                 mode.onClick.AddListener(() => {
+                    if (AgeCheck.Under13) return;
                     Current = (Mode)(((int)Current + 1) % 3);
                     modeLabel.text = ModeNames[(int)Current];
                     Audio.Sounds.Play(Audio.Sounds.Tick);
                 });
-                Ui.Tip(mode, "Voice chat", null, "Push to talk (hold " + Tools.Keybinds.MainKey("VoiceTalk") + "), open mic, or off. You hear only your alliance partner.");
+                Ui.Tip(mode, "Voice chat", null, AgeCheck.Under13
+                    ? "Voice chat is off for players under 13: you don't hear others and they don't hear you. A crossed-out speaker by your name tells your partner."
+                    : "Push to talk (hold " + Tools.Keybinds.MainKey("VoiceTalk") + "), open mic, or off. You hear only your alliance partner.");
                 state = Ui.Text(rect, "State", "", Theme.FontSmall - 1f, Theme.TextFaint);
                 state.Size(-1, 18f);
+                deaf = Ui.Rect("Can't hear", rect);
+                Ui.Column(deaf, 2f);
                 rows = Ui.Rect("Players", rect);
                 Ui.Column(rows, 2f);
             }
 
             private void Update() {
+                ShowDeaf();
+                if (AgeCheck.Under13) {
+                    state.text = "You don't hear voice chat (under 13)";
+                    return;
+                }
                 if (!initialized || channel == null) {
                     state.text = Problem ?? (Current == Mode.Off ? "Off" : "Connecting…");
                     return;
@@ -174,7 +214,7 @@ namespace Protobot.Online {
                 var light = Ui.Image(row, "Light", Theme.Field, 0f);
                 light.sprite = Theme.Circle;
                 light.Size(10f, 10f);
-                Ui.Text(row, "Name", string.IsNullOrEmpty(p.DisplayName) ? "Player" : p.DisplayName, Theme.FontSmall, Theme.Text).Size(-1, 22f, 1f);
+                Ui.Text(row, "Name", string.IsNullOrEmpty(p.DisplayName) ? "Player" : NameFilter.Shown(p.DisplayName), Theme.FontSmall, Theme.Text).Size(-1, 22f, 1f);
                 var mute = Ui.Button(row, "Mute", p.IsMuted ? "Unmute" : "Mute", () => {
                     try {
                         if (p.IsMuted) p.UnmutePlayerLocally();

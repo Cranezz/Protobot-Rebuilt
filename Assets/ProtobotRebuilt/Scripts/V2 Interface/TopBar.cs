@@ -241,6 +241,10 @@ namespace Protobot.Interface {
             new Item { label = "Open bug log folder", action = () => Application.OpenURL("file:///" + Builds.CrashGuard.LogFolder.Replace('\\', '/')) },
             new Item { label = "Check for updates…", action = () => _ = Builds.Updater.Check(true) },   // V2
             new Item { label = "Patch notes", action = PatchNotes.Open },   // V2: this version's notes
+            new Item { label = "Privacy Policy", action = () => LegalDocs.Open(LegalDocs.Doc.Privacy) },   // V2
+            new Item { label = "Terms of Use", action = () => LegalDocs.Open(LegalDocs.Doc.Terms) },   // V2
+            new Item { label = "Credits and licenses", action = () => LegalDocs.Open(LegalDocs.Doc.Credits) },   // V2
+            new Item { label = "Join the Protobot Discord", action = () => Application.OpenURL(LegalDocs.DiscordUrl) },   // V2
             new Item { label = "Official website", action = () => Press(OldButton("Help Menu/Website Button")) },
         };
 

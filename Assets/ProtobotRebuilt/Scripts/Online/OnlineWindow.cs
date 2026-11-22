@@ -21,6 +21,8 @@ namespace Protobot.Online {
         public static void Open() {
             if (screen == null) screen = OnlineScreen.Create();
             screen.Show(MatchSessions.Current != null ? OnlineScreen.Page.Lobby : OnlineScreen.Page.Servers);
+            // V2: the age question and the terms, the first time (closing it goes back to the menu).
+            AgeCheck.Ensure(() => { if (screen != null) screen.Refresh(true); }, () => { if (screen != null) screen.BackToMenu(); });
         }
 
         public static void OpenLobby() => Open();
@@ -29,6 +31,14 @@ namespace Protobot.Online {
         public static void OpenLeaderboard() {
             if (screen == null) screen = OnlineScreen.Create();
             screen.Show(OnlineScreen.Page.Leaderboard);
+            AgeCheck.Ensure(() => { if (screen != null) screen.Refresh(true); }, () => { if (screen != null) screen.BackToMenu(); });
+        }
+
+        /// <summary>V2: the Profile page (the home menu's profile card).</summary>
+        public static void OpenProfile() {
+            if (screen == null) screen = OnlineScreen.Create();
+            screen.Show(OnlineScreen.Page.Account);
+            AgeCheck.Ensure(() => { if (screen != null) screen.Refresh(true); }, () => { if (screen != null) screen.BackToMenu(); });
         }
 
         public static void Close() {
@@ -62,6 +72,20 @@ namespace Protobot.Online {
                 edge.effectDistance = new Vector2(1f, -1f);
             }
             return dialog;
+        }
+
+        /// <summary>V2: a crossed-out speaker by a player's name: they can't hear voice chat (under 13, or voice chat off),
+        /// so teammates know to tell them things another way.</summary>
+        public static RectTransform CantHearIcon(Transform parent, string tip, float size = 22f, Color? color = null) {
+            var holder = Ui.Image(parent, "Can't hear", new Color(0f, 0f, 0f, 0f), 0f);
+            holder.Size(size, size);
+            var rect = Ui.Rect("Icon", holder.transform).Fill();
+            rect.gameObject.AddComponent<CanvasRenderer>();
+            var icon = rect.gameObject.AddComponent<CantHearGraphic>();
+            icon.raycastTarget = false;
+            icon.color = color ?? new Color(1f, 1f, 1f, 0.75f);
+            Ui.Tip(holder, "Can't hear voice chat", null, tip + ": tell them things another way (the lobby, or in person).");
+            return holder.rectTransform;
         }
 
         // ------------------------------------------------------------------ small windows
@@ -197,8 +221,26 @@ namespace Protobot.Online {
             name.GetComponent<Image>().color = new Color(0f, 0f, 0f, 0.25f);
             name.Size(-1, 34f, 1f);
             Ui.Tip(name, "Your name", null, "What other players see in the server list and the lobby.");
+            name.onEndEdit.AddListener(v => {
+                // V2: names with offensive words aren't taken.
+                if (!AgeCheck.Under13 && !string.IsNullOrWhiteSpace(v) && !NameFilter.Allowed(v)) {
+                    Interface.Interface.Say("That name isn't allowed: choose another", false);
+                    name.SetTextWithoutNotify(OnlineServices.Name);
+                }
+            });
+            // V2 (COPPA): players under 13 get a made-up name; this picks another.
+            rerollButton = Ui.Button(you, "New name", "New", () => {
+                OnlineServices.NewKidName();
+                name.SetTextWithoutNotify(OnlineServices.Name);
+                if (MatchSessions.Current != null) MatchSessions.Set(MatchSessions.NameKey, OnlineServices.Name);
+                Audio.Sounds.Play(Audio.Sounds.Tick);
+            }, false, 6f, Theme.FontSmall);
+            rerollButton.Size(50f, 30f);
+            Ui.Tip(rerollButton, "New name", null, "Players under 13 get a made-up name, so nothing personal is shown. Click for another.");
+            name.interactable = !AgeCheck.Under13;
+            rerollButton.gameObject.SetActive(AgeCheck.AgeGiven && AgeCheck.Under13);
             status = Ui.Text(you, "State", "", Theme.FontSmall, new Color(1f, 1f, 1f, 0.6f), null, TextAlignmentOptions.MidlineRight);
-            status.Size(70f, 34f);
+            status.Size(54f, 34f);
             var version = Ui.Text(root, "Version", BuildInfo.Display, Theme.FontSmall, new Color(1f, 1f, 1f, 0.55f), null, TextAlignmentOptions.BottomRight);
             version.rectTransform.anchorMin = version.rectTransform.anchorMax = new Vector2(1f, 0f);
             version.rectTransform.pivot = new Vector2(1f, 0f);
@@ -218,11 +260,14 @@ namespace Protobot.Online {
             MatchSessions.Changed += MarkDirty;
             MatchSessions.Ended += OnEnded;
             Accounts.Changed += ShowName;
+            Badges.Changed += MarkDirty;   // V2: badges loaded or earned
+            AgeCheck.Changed += AgeChanged;
             ActionLog.Write("window", "Multiplayer screen");
             _ = OnlineServices.Start();
         }
 
         private TMP_InputField nameField;
+        private Button rerollButton;
 
         // V2: signing in (or making an account) changes the name to the account's: shown at once bottom left.
         private void ShowName() {
@@ -234,6 +279,8 @@ namespace Protobot.Online {
 
         private void OnDestroy() {
             Accounts.Changed -= ShowName;
+            Badges.Changed -= MarkDirty;
+            AgeCheck.Changed -= AgeChanged;
             MatchSessions.Changed -= MarkDirty;
             MatchSessions.Ended -= OnEnded;
             ViewHider.Set(this, false);
@@ -259,6 +306,7 @@ namespace Protobot.Online {
 
         private void Update() {
             var t = Time.unscaledTime;
+            WatchRobot();
             if (status != null) {
                 var online = OnlineServices.SignedIn;
                 status.text = online ? "Online" : OnlineServices.Problem.Length > 0 ? "Offline" : "…";
@@ -299,7 +347,59 @@ namespace Protobot.Online {
                 : "Needs 3 players or more (with two, leave the match, or the host can remove them).");
         }
 
-        private void BackToMenu() {
+        // V2: the age answer came in or changed (an account's birthday): the name, voice and account page follow.
+        private void AgeChanged() {
+            if (MatchSessions.Current != null) {
+                MatchSessions.Set(MatchSessions.NameKey, OnlineServices.Name);
+                MatchSessions.Set(MatchSessions.VoiceKey, Voice.CanHear ? "1" : "0");
+            }
+            Refresh(false);
+            MarkDirty();
+        }
+
+        /// <summary>V2: rebuilds the screen after the age question (the name field and the account page change).</summary>
+        public void Refresh(bool all) {
+            if (nameField != null) {
+                nameField.SetTextWithoutNotify(OnlineServices.Name);
+                nameField.interactable = !AgeCheck.Under13;
+                if (rerollButton != null) rerollButton.gameObject.SetActive(AgeCheck.AgeGiven && AgeCheck.Under13);
+            }
+            if (all) Rebuild();
+        }
+
+        // V2: open a build in the lobby; the robot check below follows whatever build is open.
+        private void ChooseRobot() {
+            var manager = FindAnyObjectByType<BuildsManager>();
+            if (manager == null) return;
+            if (MatchSessions.Get(MatchSessions.Current?.CurrentPlayer, MatchSessions.ReadyKey) == "1") MatchSessions.Set(MatchSessions.ReadyKey, "0");
+            manager.OpenBuild();
+            robotSignature = null;
+        }
+
+        private string robotSignature;
+        private float robotCheckAt;
+
+        // V2: while in a lobby, the robot shown to the others is the build that's open now (checked when it changes):
+        // a build that can't play clears it, and takes back Ready.
+        private void WatchRobot() {
+            var session = MatchSessions.Current;
+            if (session?.CurrentPlayer == null || OnlineMatch.Current != null || Time.unscaledTime < robotCheckAt) return;
+            robotCheckAt = Time.unscaledTime + 0.5f;
+            var manager = FindAnyObjectByType<BuildsManager>();
+            var count = FindObjectsByType<SavedObject>(FindObjectsSortMode.None).Length;
+            var signature = (manager != null ? manager.buildPath : "") + "|" + count;
+            if (signature == robotSignature) return;
+            robotSignature = signature;
+            var name = MatchSessions.RobotName();
+            var shown = MatchSessions.Get(session.CurrentPlayer, MatchSessions.RobotKey);
+            if (name != shown) MatchSessions.Set(MatchSessions.RobotKey, name);
+            if (string.IsNullOrEmpty(name) && MatchSessions.Get(session.CurrentPlayer, MatchSessions.ReadyKey) == "1") MatchSessions.Set(MatchSessions.ReadyKey, "0");
+            if (string.IsNullOrEmpty(name) && count > 0 && !string.IsNullOrEmpty(shown)) Interface.Interface.Say(Game.SkillsGame.RobotProblem(), false);
+        }
+
+        public void BackToMenu() {
+            // V2: leaving the Multiplayer screen leaves the lobby too (a match being played closes the screen itself).
+            if (MatchSessions.Current != null && OnlineMatch.Current == null) _ = MatchSessions.Leave(null);
             Close();
             var splash = Resources.FindObjectsOfTypeAll<Button>().FirstOrDefault(b => b.name == "Splash Screen Button" && b.gameObject.scene.IsValid());
             if (splash != null) splash.onClick.Invoke();
@@ -325,7 +425,7 @@ namespace Protobot.Online {
                 board = null;
                 Show(Page.Leaderboard);
             });
-            NavButton("Account", page == Page.Account, () => {
+            NavButton("Profile", page == Page.Account, () => {   // V2: was Account
                 stats = null;
                 Show(Page.Account);
             });
@@ -455,7 +555,7 @@ namespace Protobot.Online {
 
             var columns = Row(22f);
             ColumnTitle(columns, "Match", -1f, 1f);
-            ColumnTitle(columns, "Host", 160f);
+            ColumnTitle(columns, "Host", 260f);   // V2: room for the host's badges
             ColumnTitle(columns, "Mode", 120f);
             ColumnTitle(columns, "Players", 70f);
             ColumnTitle(columns, "", 150f);
@@ -492,12 +592,30 @@ namespace Protobot.Online {
             var same = match.SameVersion;
             var name = Ui.Text(row, "Name", match.name, Theme.FontBody + 1f, same ? Color.white : new Color(1f, 1f, 1f, 0.45f), Theme.Medium);
             name.Size(-1, 40f, 1f);
+            // V2: a match being played right now: a green "In game" badge (players join when it ends).
+            if (match.playing) {
+                var badge = Ui.Image(row, "In game", new Color(0.19f, 0.64f, 0.42f, 0.9f), 6f);
+                Ui.Row(badge.rectTransform, 5f, new RectOffset(8, 10, 2, 2));
+                badge.rectTransform.Size(86f, 24f);
+                var play = Ui.Rect("Icon", badge.transform);
+                play.Size(10f, 12f);
+                play.gameObject.AddComponent<CanvasRenderer>();
+                play.gameObject.AddComponent<PlayIconGraphic>().raycastTarget = false;
+                Ui.Text(badge.transform, "Label", "In game", 12f, Color.white, Theme.Medium).Size(-1, 20f, 1f);
+                Ui.Tip(badge, "In game", null, "A match is being played. You can join when it's over and the players are back in the lobby.");
+            }
             if (match.password) {
                 var locked = Ui.Text(row, "Password", "Password", 12f, Theme.Warning, Theme.Medium, TextAlignmentOptions.Center);
                 locked.Size(70f, 40f);
                 Ui.Tip(locked, "Password", null, "The host set a password: you'll be asked for it when you join.");
             }
-            Ui.Text(row, "Host", match.host, Theme.FontSmall, new Color(1f, 1f, 1f, 0.7f)).Size(160f, 40f);
+            // V2: the host's badges beside their name.
+            var hostCell = Ui.Rect("Host", row);
+            hostCell.Size(260f, 40f, 0f);
+            Ui.Row(hostCell, 6f, null, TextAnchor.MiddleLeft);
+            var hostName = Ui.Text(hostCell, "Name", match.host, Theme.FontSmall, new Color(1f, 1f, 1f, 0.7f));
+            hostName.Size(-1, 40f, 1f);
+            Badges.Beside(hostName, match.hostBadges);
             Ui.Text(row, "Mode", match.mode, Theme.FontSmall, new Color(1f, 1f, 1f, 0.7f)).Size(120f, 40f);
             Ui.Text(row, "Players", match.players + "/" + match.max, Theme.FontSmall, new Color(1f, 1f, 1f, 0.85f), Theme.Medium, TextAlignmentOptions.Center).Size(70f, 40f);
             if (same) {
@@ -659,7 +777,8 @@ namespace Protobot.Online {
 
         private Accounts.Stats stats;
         private bool statsLoading;
-        private string accountUser = "", accountPassword = "", accountProblem;
+        private string accountUser = "", accountPassword = "", accountProblem, accountYear = "";
+        private int accountMonth = -1;
         private bool accountBusy;
 
         private async void LoadStats() {
@@ -690,9 +809,46 @@ namespace Protobot.Online {
 
         private void Account() {
             var guest = Accounts.IsGuest;
-            Heading("Account", guest
-                ? "You're playing as a guest (kept on this computer). Make an account to keep your stats and scores and sign in anywhere."
-                : "Signed in as " + Accounts.Username + ". Your stats and skills scores go with your account.");
+            var child = AgeCheck.Under13;
+            Heading("Profile", guest
+                ? "You're playing as a guest (kept on this computer). Make an account to keep your stats, scores and badges and sign in anywhere."
+                : "Signed in as " + Accounts.Username + ". Your stats, skills scores and badges go with your account.");
+            // V2: who you are: a round initial, your name, guest or account, your badges.
+            var who = Row(64f);
+            var circle = Ui.Image(who, "Picture", Theme.Accent, 0f);
+            circle.sprite = Theme.Circle;
+            circle.Size(56f, 56f, 0f);
+            var me = OnlineServices.Name;
+            var initial = Ui.Text(circle.transform, "Initial", me.Length > 0 ? char.ToUpperInvariant(me.Trim()[0]).ToString() : "?", 26f, Color.white, Theme.Bold, TextAlignmentOptions.Center);
+            initial.rectTransform.Fill();
+            var whoText = Ui.Rect("Who", who);
+            whoText.Size(-1, 60f, 1f);
+            Ui.Column(whoText, 2f);
+            var nameLine = Ui.Rect("Name line", whoText);
+            nameLine.Size(-1, 32f);
+            Ui.Row(nameLine, 8f, null, TextAnchor.MiddleLeft);
+            var myName = Ui.Text(nameLine, "Name", me, 24f, Color.white, Theme.Medium);
+            myName.Size(-1, 32f, 1f);
+            Badges.Beside(myName, Badges.Text);
+            Ui.Text(whoText, "Status", guest ? "Guest on this computer" : "Account · " + Accounts.Username, Theme.FontSmall, new Color(1f, 1f, 1f, 0.6f)).Size(-1, 22f);
+            // V2: a player under 13 (children's privacy law): what that means here.
+            if (child) {
+                var note = Ui.Text(content, "Under 13", Accounts.UnderThirteen, Theme.FontSmall, new Color(1f, 1f, 1f, 0.6f));
+                note.textWrappingMode = TextWrappingModes.Normal;
+                note.Size(-1, 36f);
+            }
+            // V2: this player's badges.
+            // (they're beside your name above; this row only says how to earn the beta one)
+            if (Badges.BetaOpen && !Badges.Mine.Contains(Badges.Beta)) {
+                var badgeRow = Row(30f);
+                Ui.Text(badgeRow, "Label", "Badges", Theme.FontBody, new Color(1f, 1f, 1f, 0.7f)).Size(140f, 30f);
+                {
+                    var left = Mathf.Max(0f, Badges.BetaSeconds - Badges.BetaPlayed);
+                    Ui.Text(badgeRow, "Beta", Badges.BetaEarnedHere ? (guest ? "Beta tester: earned! Make an account below to claim it." : "Beta tester: earned, adding it to your account…")
+                        : "Beta tester: play for " + Mathf.CeilToInt(left / 60f) + " more minute" + (left > 60f ? "s" : "") + " during the beta",
+                        Theme.FontSmall, new Color(1f, 1f, 1f, 0.6f)).Size(-1, 30f, 1f);
+                }
+            }
             if (stats == null && !statsLoading) LoadStats();
             var s = stats ?? new Accounts.Stats();
             var grid = Row(70f);
@@ -718,9 +874,22 @@ namespace Protobot.Online {
                 pass.ForceLabelUpdate();
                 pass.characterLimit = 30;
                 pass.Size(320f, 40f);
+                // V2: the birthday is required (children's privacy law); see AgeCheck.
+                var birthRow = Row(44f);
+                Ui.Text(birthRow, "Label", "Birthday", Theme.FontBody, new Color(1f, 1f, 1f, 0.7f)).Size(140f, 40f);
+                AgeCheck.Picker(birthRow, (m, y) => {
+                    accountMonth = m;
+                    accountYear = y;
+                }, 40f, accountMonth, accountYear).Size(360f, 40f);
+                var whyRow = Row(40f);
+                Ui.Rect("Indent", whyRow).Size(140f, 10f);
+                var why = Ui.Text(whyRow, "Why", "Required by law: " + AgeCheck.Why.Substring(AgeCheck.Why.IndexOf("players under 13", StringComparison.Ordinal)),
+                                  Theme.FontSmall, new Color(1f, 1f, 1f, 0.5f));
+                why.textWrappingMode = TextWrappingModes.Normal;
+                why.Size(-1, 40f, 1f);
                 var buttons = Row(44f);
                 Ui.Rect("Indent", buttons).Size(140f, 40f);
-                var create = Ui.Button(buttons, "Create", accountBusy ? "Working…" : "Create account", () => AccountAction(() => Accounts.CreateAccount(accountUser.Trim(), accountPassword)), true, 8f);
+                var create = Ui.Button(buttons, "Create", accountBusy ? "Working…" : "Create account", () => AccountAction(() => Accounts.CreateAccount(accountUser.Trim(), accountPassword, accountMonth, accountYear)), true, 8f);
                 create.Size(170f, 40f);
                 create.interactable = !accountBusy;
                 Ui.Tip(create, "Create account", null, "Makes this guest an account: your stats and scores so far stay.");
@@ -729,12 +898,28 @@ namespace Protobot.Online {
                 signIn.Size(140f, 40f);
                 signIn.interactable = !accountBusy;
                 Ui.Tip(signIn, "Sign in", null, "Signs in to an account you made before (on any computer).");
-                var rules = Ui.Text(content, "Rules", "Username: 3-20 letters, digits and . - @ _ . Password: 8-30 characters with an upper case letter, a lower case letter, a digit and a symbol.",
+                var rules = Ui.Text(content, "Rules", "Username: 3-20 letters, digits and . - _ (not your real name or email). Password: 8-30 characters with an upper case letter, a lower case letter, a digit and a symbol. Signing in doesn't need the birthday.",
                     Theme.FontSmall, new Color(1f, 1f, 1f, 0.5f));
                 rules.textWrappingMode = TextWrappingModes.Normal;
                 rules.Size(-1, 40f);
             }
-            else {
+            else if (!guest) {
+                // V2: an account made before birthdays were asked: it needs one (once; it can't be changed after).
+                if (Accounts.Birth == "") {
+                    var birthRow = Row(44f);
+                    Ui.Text(birthRow, "Label", "Add your birthday", Theme.FontBody, new Color(1f, 1f, 1f, 0.7f)).Size(160f, 40f);
+                    AgeCheck.Picker(birthRow, (m, y) => {
+                        accountMonth = m;
+                        accountYear = y;
+                    }, 40f, accountMonth, accountYear).Size(360f, 40f);
+                    var save = Ui.Button(birthRow, "Save birthday", "Save", () => AccountAction(() => Accounts.SaveBirth(accountMonth, accountYear)), true, 8f);
+                    save.Size(100f, 40f);
+                    save.interactable = !accountBusy;
+                    var why = Ui.Text(content, "Why", "Required by law: " + AgeCheck.Why.Substring(AgeCheck.Why.IndexOf("players under 13", StringComparison.Ordinal)),
+                                      Theme.FontSmall, new Color(1f, 1f, 1f, 0.5f));
+                    why.textWrappingMode = TextWrappingModes.Normal;
+                    why.Size(-1, 40f);
+                }
                 var buttons = Row(44f);
                 var signOut = Ui.Button(buttons, "Sign out", "Sign out", () => AccountAction(async () => {
                     await Accounts.SignOut();
@@ -754,6 +939,40 @@ namespace Protobot.Online {
             appeal.targetGraphic.color = new Color(1f, 1f, 1f, 0.08f);
             appeal.Size(260f, 34f);
             Ui.Tip(appeal, "Appeal", null, "If a run of yours was taken off the leaderboard or you were warned, and you think it was a mistake.");
+
+            // V2: your data: read the policy and terms, or delete everything kept online about you.
+            var dataRow = Row(40f);
+            var privacy = Ui.Button(dataRow, "Privacy", "Privacy Policy", () => LegalDocs.Open(LegalDocs.Doc.Privacy), false, 8f, Theme.FontSmall);
+            privacy.targetGraphic.color = new Color(1f, 1f, 1f, 0.08f);
+            privacy.Size(150f, 34f);
+            var terms = Ui.Button(dataRow, "Terms", "Terms of Use", () => LegalDocs.Open(LegalDocs.Doc.Terms), false, 8f, Theme.FontSmall);
+            terms.targetGraphic.color = new Color(1f, 1f, 1f, 0.08f);
+            terms.Size(150f, 34f);
+            var delete = Ui.Button(dataRow, "Delete", "Delete my online data…", () => DeleteDialog(guest), false, 8f, Theme.FontSmall);
+            delete.targetGraphic.color = new Color(0.9f, 0.3f, 0.3f, 0.3f);
+            delete.Size(220f, 34f);
+            delete.interactable = !accountBusy && MatchSessions.Current == null;
+            Ui.Tip(delete, "Delete my online data", null, "Deletes your " + (guest ? "guest player" : "account") + " and everything kept online for it: "
+                                                          + "stats, leaderboard scores and shared replays. It can't be undone.");
+        }
+
+        // V2: deleting the player and their online data (GDPR / CCPA: a way to have it erased).
+        private void DeleteDialog(bool guest) {
+            var dialog = OnlineWindow.GlassDialog("Delete my online data", new Vector2(520f, 280f));
+            Ui.Column(dialog.Body, 8f);
+            var text = Ui.Text(dialog.Body, "Text", "This deletes your " + (guest ? "guest player" : "account \"" + Accounts.Username + "\"")
+                                                    + " and everything kept online for it: your stats, your skills leaderboard scores and your shared replays. "
+                                                    + "Reports you sent stay with the moderators until they're dealt with.\n\nIt can't be undone. Your builds and files on this computer aren't touched.",
+                               Theme.FontBody, Theme.Text);
+            text.textWrappingMode = TextWrappingModes.Normal;
+            text.Size(-1, 150f);
+            Ui.Button(dialog.Footer, "Cancel", "Cancel", dialog.Close, true, 6f).Size(-1, 34f);
+            var go = Ui.Button(dialog.Footer, "Delete", "Delete everything", () => {
+                dialog.Close();
+                AccountAction(Accounts.DeleteEverything);
+            }, false, 6f);
+            go.targetGraphic.color = new Color(0.85f, 0.25f, 0.25f, 0.9f);
+            go.Size(-1, 34f);
         }
 
         // ---- hosting
@@ -826,7 +1045,7 @@ namespace Protobot.Online {
             var session = MatchSessions.Current;
             var props = session.Properties;
             string Prop(string key) => props != null && props.TryGetValue(key, out var p) ? p.Value : "";
-            Heading(session.Name, Prop(MatchSessions.GameKey) + " · " + Prop(MatchSessions.ModeKey) + (Prop(MatchSessions.AutonKey) == "1" ? " · autonomous" : "") + " · " + session.PlayerCount + "/" + session.MaxPlayers + " players"
+            Heading(NameFilter.Shown(session.Name, "Match"), Prop(MatchSessions.GameKey) + " · " + Prop(MatchSessions.ModeKey) + (Prop(MatchSessions.AutonKey) == "1" ? " · autonomous" : "") + " · " + session.PlayerCount + "/" + session.MaxPlayers + " players"
                                   + (session.HasPassword ? " · password" : "") + (session.IsPrivate ? " · invite only" : ""));
 
             // The invite code, big, with Copy.
@@ -854,7 +1073,7 @@ namespace Protobot.Online {
             foreach (var player in session.Players) {
                 var team = MatchSessions.Get(player, MatchSessions.TeamKey);
                 var ready = MatchSessions.Get(player, MatchSessions.ReadyKey) == "1";
-                if (!ready || team == "") everyoneReady = false;
+                if (!ready || team == "" || string.IsNullOrEmpty(MatchSessions.Get(player, MatchSessions.RobotKey))) everyoneReady = false;
                 var row = Ui.Image(list, "Player", player.Id == me ? new Color(1f, 1f, 1f, 0.1f) : OnlineWindow.GlassRow, 8f).rectTransform;
                 Ui.Row(row, 12f, new RectOffset(14, 10, 2, 2));
                 row.Size(-1, 46f);
@@ -864,6 +1083,9 @@ namespace Protobot.Online {
                 if (string.IsNullOrEmpty(who)) who = "Player";
                 var name = Ui.Text(row, "Name", who + (player.Id == session.Host ? "  · host" : "") + (player.Id == me ? "  · you" : ""), Theme.FontBody + 1f, Color.white, Theme.Medium);
                 name.Size(-1, 40f, 1f);
+                Badges.Beside(name, MatchSessions.Get(player, MatchSessions.BadgesKey));   // V2
+                if (!MatchSessions.CanHear(player))   // just before the name
+                    OnlineWindow.CantHearIcon(row, player.Id == me ? "You can't hear voice chat" : who + " can't hear voice chat").SetSiblingIndex(name.transform.GetSiblingIndex());
                 var robot = MatchSessions.Get(player, MatchSessions.RobotKey);
                 Ui.Text(row, "Robot", string.IsNullOrEmpty(robot) ? "no robot yet" : robot, Theme.FontSmall, new Color(1f, 1f, 1f, string.IsNullOrEmpty(robot) ? 0.4f : 0.7f)).Size(200f, 40f);
                 Ui.Text(row, "Ready", ready ? "Ready" : "Not ready", Theme.FontSmall, ready ? Theme.Success : new Color(1f, 1f, 1f, 0.45f), Theme.Medium, TextAlignmentOptions.Center).Size(80f, 40f);
@@ -890,20 +1112,23 @@ namespace Protobot.Online {
             ToolOptions.Segmented(choices, new[] { "Red", "Blue" }, myTeam == "red" ? 0 : myTeam == "blue" ? 1 : -1,
                 i => MatchSessions.Set(MatchSessions.TeamKey, i == 0 ? "red" : "blue"), 90f);
             Fixed(choices, 200f);
-            var robotName = MatchSessions.RobotName();
-            var use = Ui.Button(choices, "Robot", string.IsNullOrEmpty(robotName) ? "Open your robot first" : "Robot: " + robotName, () => {
-                var name = MatchSessions.RobotName();
-                if (string.IsNullOrEmpty(name)) Interface.Interface.Say("Save or open your robot's build, then pick it here", false);
-                else MatchSessions.Set(MatchSessions.RobotKey, name);
-            }, false, 8f, Theme.FontSmall);
-            use.targetGraphic.color = new Color(1f, 1f, 1f, 0.08f);
+            // V2: choose the robot right here (a build file); the build that's open is the robot you bring.
+            var myRobot = MatchSessions.Get(mine, MatchSessions.RobotKey);
+            var use = Ui.Button(choices, "Robot", string.IsNullOrEmpty(myRobot) ? "Choose robot…" : "Robot: " + myRobot + "  (change)", ChooseRobot,
+                string.IsNullOrEmpty(myRobot), 8f, Theme.FontSmall);
+            if (!string.IsNullOrEmpty(myRobot)) use.targetGraphic.color = new Color(1f, 1f, 1f, 0.08f);
             use.Size(-1, 34f);
-            Ui.Tip(use, "Your robot", null, "The build open in Protobot is the robot you bring to the match. Open another build, then click here to switch.");
+            Ui.Tip(use, "Your robot", null, "Open the build of the robot you're bringing. It needs a V5 Brain: on the field the robot is the Brain "
+                                            + "and everything connected to it.");
             var space = Ui.Rect("Space", choices);
             space.Size(-1, 10f, 1f);
             var readyButton = Ui.Button(choices, "Ready", myReady ? "Not ready" : "Ready", () => {
                 if (!myReady && myTeam == "") {
                     Interface.Interface.Say("Pick an alliance first", false);
+                    return;
+                }
+                if (!myReady && string.IsNullOrEmpty(MatchSessions.RobotName())) {
+                    Interface.Interface.Say(Game.SkillsGame.RobotProblem() ?? "Choose your robot first", false);
                     return;
                 }
                 MatchSessions.Set(MatchSessions.ReadyKey, myReady ? "0" : "1");
@@ -917,7 +1142,7 @@ namespace Protobot.Online {
                 }, true, 8f);
                 start.Size(150f, 40f);
                 start.interactable = everyoneReady;
-                Ui.Tip(start, "Start match", null, everyoneReady ? "Everyone is ready." : "Waiting until every player has an alliance and is ready (2 players at least).");
+                Ui.Tip(start, "Start match", null, everyoneReady ? "Everyone is ready." : "Waiting until every player has an alliance, a robot and is ready (2 players at least).");
             }
         }
     }
@@ -1054,6 +1279,57 @@ namespace Protobot.Online {
             texture.SetPixels32(pixels);
             texture.Apply(false, true);
             return shade = texture;
+        }
+    }
+}
+
+namespace Protobot.Online {
+    /// <summary>V2: the crossed-out speaker drawn in its rect (see OnlineWindow.CantHearIcon).</summary>
+    public class CantHearGraphic : MaskableGraphic {
+        protected override void OnPopulateMesh(VertexHelper vh) {
+            vh.Clear();
+            var r = rectTransform.rect;
+            var s = Mathf.Min(r.width, r.height);
+            var o = r.center - new Vector2(s, s) * 0.5f;
+            Vector2 P(float x, float y) => o + new Vector2(x, y) * s;
+            void Tri(Vector2 a, Vector2 b, Vector2 c, Color32 col) {
+                var i = vh.currentVertCount;
+                vh.AddVert(a, col, Vector2.zero);
+                vh.AddVert(b, col, Vector2.zero);
+                vh.AddVert(c, col, Vector2.zero);
+                vh.AddTriangle(i, i + 1, i + 2);
+            }
+            void Quad(Vector2 a, Vector2 b, Vector2 c, Vector2 d, Color32 col) {
+                Tri(a, b, c, col);
+                Tri(a, c, d, col);
+            }
+            void Line(Vector2 a, Vector2 b, float w, Color32 col) {
+                var n = (b - a).normalized;
+                var side = new Vector2(-n.y, n.x) * (w * s * 0.5f);
+                Quad(a - side, a + side, b + side, b - side, col);
+            }
+            Color32 c = color;
+            // The speaker: a box and its cone.
+            Quad(P(0.14f, 0.38f), P(0.14f, 0.62f), P(0.3f, 0.62f), P(0.3f, 0.38f), c);
+            Quad(P(0.3f, 0.38f), P(0.3f, 0.62f), P(0.54f, 0.84f), P(0.54f, 0.16f), c);
+            // The slash, in the warning red, with a dark edge so it reads on any background.
+            Line(P(0.1f, 0.1f), P(0.9f, 0.9f), 0.17f, new Color32(20, 20, 24, 200));
+            Line(P(0.1f, 0.1f), P(0.9f, 0.9f), 0.1f, new Color32(235, 80, 70, 255));
+        }
+    }
+}
+
+namespace Protobot.Online {
+    /// <summary>V2: a small play triangle (the server list's In game badge).</summary>
+    public class PlayIconGraphic : UnityEngine.UI.MaskableGraphic {
+        protected override void OnPopulateMesh(UnityEngine.UI.VertexHelper vh) {
+            vh.Clear();
+            var r = rectTransform.rect;
+            UnityEngine.Color32 c = UnityEngine.Color.white;
+            vh.AddVert(new UnityEngine.Vector3(r.xMin, r.yMin), c, UnityEngine.Vector2.zero);
+            vh.AddVert(new UnityEngine.Vector3(r.xMin, r.yMax), c, UnityEngine.Vector2.zero);
+            vh.AddVert(new UnityEngine.Vector3(r.xMax, r.center.y), c, UnityEngine.Vector2.zero);
+            vh.AddTriangle(0, 1, 2);
         }
     }
 }

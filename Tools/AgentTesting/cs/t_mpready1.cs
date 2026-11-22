@@ -1,0 +1,1 @@
+var s=UnityEngine.Object.FindAnyObjectByType<Protobot.Online.OnlineScreen>(); var b=s.GetComponentsInChildren<UnityEngine.UI.Button>(true).FirstOrDefault(x=>x.name=="Ready"); b.onClick.Invoke(); return "pressed once";

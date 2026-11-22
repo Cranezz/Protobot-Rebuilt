@@ -11,7 +11,7 @@ namespace Protobot.Audio
     {
         const int Rate = 44100;
 
-        static AudioClip air, motorLoop, motorStrain, saw, drill, spray, clack, tick, error, pop, pickup, release, metalHit, plasticHit, trash, freeze;
+        static AudioClip air, motorLoop, motorStrain, fanfare, saw, drill, spray, clack, tick, error, pop, pickup, release, metalHit, plasticHit, trash, freeze;
 
         // ---------------------------------------------------------------- tools
 
@@ -93,6 +93,20 @@ namespace Protobot.Audio
         });
 
         // ---------------------------------------------------------------- interface
+
+        /// <summary>V2: a badge earned: three bright rising notes and a held chord (C, E, G, then C-E-G-C).</summary>
+        public static AudioClip Fanfare => fanfare ??= Make("Fanfare", 1.1f, (t, noise) =>
+        {
+            float Note(float f, float start, float length) {
+                var local = t - start;
+                if (local < 0f || local > length) return 0f;
+                var envelope = Mathf.Clamp01(local / 0.008f) * Mathf.Exp(-local * (length > 0.3f ? 3.2f : 9f));
+                return (Mathf.Sin(local * Mathf.PI * 2f * f) + 0.3f * Mathf.Sin(local * Mathf.PI * 4f * f) + 0.12f * Mathf.Sin(local * Mathf.PI * 6f * f)) * envelope;
+            }
+            var v = Note(523.25f, 0f, 0.16f) + Note(659.25f, 0.11f, 0.16f) + Note(783.99f, 0.22f, 0.16f)
+                    + 0.6f * (Note(523.25f, 0.34f, 0.76f) + Note(659.25f, 0.34f, 0.76f) + Note(783.99f, 0.34f, 0.76f) + Note(1046.5f, 0.34f, 0.76f));
+            return v * 0.22f;
+        });
 
         /// <summary>A small click for settings changing (angle steps, flipping a side, a menu button).</summary>
         public static AudioClip Tick => tick ??= Make("Tick", 0.035f, (t, noise) =>

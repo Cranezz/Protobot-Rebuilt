@@ -37,8 +37,17 @@ The plan for what's next is in [Docs/Roadmap.md](Docs/Roadmap.md).
 
 - **davegersh:** the original Protobot.
 - **BreadSoup:** Protobot Rebuilt (1.3.7), which this version builds on.
-- **VEX Robotics:** the VEX-CAD part models and the Override field model. Not an official VEX product.
-- **Third-party:** DOTween, Easy Performant Outline, RestClient and StandaloneFileBrowser (in `Assets/ThirdParty`).
+- **VEX-CAD and VEX Robotics:** the part models (the VEX-CAD library) and the Override field model (VEX's CAD).
+- **Third-party:** DOTween, RestClient and StandaloneFileBrowser (in `Assets/ThirdParty`), Velopack, Newtonsoft.Json.
+  Full list: [CREDITS.md](CREDITS.md).
+
+Protobot is a fan-made tool. It is not affiliated with, sponsored by or endorsed by VEX Robotics, Innovation First or
+the REC Foundation. VEX, VEX Robotics and V5 are trademarks of Innovation First, Inc.
+
+## Privacy and terms
+
+- [Privacy Policy](PRIVACY.md): what the app keeps and sends, players under 13, deleting your data.
+- [Terms of Use](TERMS.md): the rules for online play.
 
 ## License
 

@@ -234,6 +234,9 @@ namespace Protobot.Online {
                 var team = MatchSessions.Get(player, MatchSessions.TeamKey);
                 var red = team == "red";
                 if (team != "red" && team != "blue") return "Every player needs an alliance.";
+                // V2: every player brings a robot that can play (chosen in the lobby) and is ready.
+                if (string.IsNullOrEmpty(MatchSessions.Get(player, MatchSessions.RobotKey))) return "Waiting for " + MatchSessions.Get(player, MatchSessions.NameKey) + " to choose a robot.";
+                if (MatchSessions.Get(player, MatchSessions.ReadyKey) != "1") return "Waiting for " + MatchSessions.Get(player, MatchSessions.NameKey) + " to be ready.";
                 var n = red ? reds++ : blues++;
                 if (n >= 2) return "An alliance has at most two robots.";
                 // SG1: red starts in the Left or Bottom Quadrant, blue in the Right or Top.
@@ -250,6 +253,7 @@ namespace Protobot.Online {
             ToClients(Msg.Plan, data, true);
             Dispatch(NetworkManager.ServerClientId, Msg.Plan, data);
             Builds.ActionLog.Write("online", "match started with " + newPlan.seats.Count + " robots");
+            MatchSessions.SetPlaying(true);   // V2: "In game" in the server list
             return null;
         }
 
@@ -263,6 +267,12 @@ namespace Protobot.Online {
                 return;
             }
             me = seat.robot;
+            // V2: the robot must be able to play before anything closes (a player was left in build mode mid-match).
+            var robotProblem = SkillsGame.RobotProblem();
+            if (robotProblem != null) {
+                ToHost(Msg.Robot, Pack(JsonUtility.ToJson(new RobotPacket { robot = me, name = seat.name, problem = seat.name + "'s robot can't play: " + robotProblem })), true);
+                return;
+            }
             OnlineWindow.Close();
             OnlineLaunch.CloseLaunchWindow();
             Dialog.CloseAll();
@@ -276,7 +286,8 @@ namespace Protobot.Online {
             SkillsGame.Open(games.Length > 0 ? games[0] : null, light, SkillsGame.Mode.Match);
             game = SkillsGame.Current;
             if (game == null) {
-                ToHost(Msg.Robot, Pack(JsonUtility.ToJson(new RobotPacket { robot = me, name = seat.name, problem = seat.name + " has no robot open." })), true);
+                ToHost(Msg.Robot, Pack(JsonUtility.ToJson(new RobotPacket { robot = me, name = seat.name, problem = seat.name + "'s robot couldn't be put on the field." })), true);
+                if (MatchSessions.Current != null) OnlineWindow.Open();   // V2: back to the lobby, not build mode
                 return;
             }
             game.online = true;
@@ -624,6 +635,19 @@ namespace Protobot.Online {
                 return true;
             };
             if (TestDrive != 0f) Sandbox.TestSticks = () => (new Vector2(0f, TestDrive), new Vector2(0f, TestDrive));   // (testing)
+            // V2 (trailer footage): "-demodrive 0.7" drives curving loops round the field (split arcade: left stick forward,
+            // right stick turn), each seat on its own phase, backing up a moment every 7 s so walls don't stop it.
+            if (DemoDrive != 0f) {
+                var phase = me * 1.7f;
+                var t0 = Time.time;
+                Sandbox.TestSticks = () => {
+                    var t = Time.time - t0;
+                    var backing = (t + phase) % 7f > 6.1f;
+                    var forward = backing ? -0.6f : DemoDrive * (0.8f + 0.2f * Mathf.Sin(t * 0.37f + phase));
+                    var turn = backing ? 0.5f : 0.5f * Mathf.Sin(t * 0.6f + phase);
+                    return (new Vector2(0f, forward), new Vector2(turn, 0f));
+                };
+            }
             game.onlineMayStart = true;
             game.StartRun();
             game.onlineMayStart = false;
@@ -774,6 +798,16 @@ namespace Protobot.Online {
 
         /// <summary>Testing: "-testdrive 0.5" drives this computer's robot forward at that power once driving starts.</summary>
         private static readonly float TestDrive = TestDrivePower();
+
+        private static readonly float DemoDrive = Argument("-demodrive");
+
+        private static float Argument(string name) {
+            var args = Environment.GetCommandLineArgs();
+            for (var i = 0; i + 1 < args.Length; i++)
+                if (args[i] == name && float.TryParse(args[i + 1], System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var v))
+                    return Mathf.Clamp(v, -1f, 1f);
+            return 0f;
+        }
 
         private static float TestDrivePower() {
             var args = Environment.GetCommandLineArgs();
@@ -1260,6 +1294,12 @@ namespace Protobot.Online {
                             + (!here || match.departed.Contains(seat.robot) ? "  · left (robot switched off)" : "");
                 var name = Ui.Text(row, "Name", label, Theme.FontBody, Theme.Text, Theme.Medium);
                 name.Size(-1, 40f, 1f);
+                // V2: a crossed-out speaker when they can't hear voice chat (under 13, or voice chat off).
+                var player = session?.Players.FirstOrDefault(p => p.Id == seat.playerId);
+                if (player != null) Badges.Beside(name, MatchSessions.Get(player, MatchSessions.BadgesKey));   // V2: badges
+                if (player != null && !MatchSessions.CanHear(player))   // just before the name
+                    OnlineWindow.CantHearIcon(row, seat.robot == match.me ? "You can't hear voice chat" : seat.name + " can't hear voice chat", 22f, Theme.TextDim)
+                        .SetSiblingIndex(name.transform.GetSiblingIndex());
                 if (seat.robot != match.me && here) OnlineScreen.PlayerButtons(row, seat.playerId, seat.name);
             }
             var close = Ui.Button(dialog.Footer, "Close", "Close", dialog.Close, true, 6f);
@@ -1573,15 +1613,20 @@ namespace Protobot.Online {
             leaving = true;
             if (game != null && SkillsGame.Current == game) game.Exit();
             Cleanup();
-            if (MatchSessions.Current != null) OnlineWindow.Open();
+            // V2: back in the lobby, not ready (so a fixed robot is checked again before the next start).
+            if (MatchSessions.Current != null) {
+                MatchSessions.Set(MatchSessions.ReadyKey, "0");
+                OnlineWindow.Open();
+            }
         }
 
         private void Cleanup() {
+            if (IsHost) MatchSessions.SetPlaying(false);   // V2
             Highlights.Clear("holding");
             Voice.Leave(true);   // V2
             if (NetworkManager.Singleton != null) NetworkManager.Singleton.OnClientConnectedCallback -= OnClientConnected;
             if (ping != null) Destroy(ping.gameObject);
-            if (TestDrive != 0f) Sandbox.TestSticks = null;
+            if (TestDrive != 0f || DemoDrive != 0f) Sandbox.TestSticks = null;
             Sandbox.RobotOf = null;
             Sandbox.InputOf = null;
             Sandbox.LocalRobot = 0;

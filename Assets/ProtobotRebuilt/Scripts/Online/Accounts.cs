@@ -33,18 +33,64 @@ namespace Protobot.Online {
         }
 
         public static Stats Mine { get; private set; }
+
+        /// <summary>V2 (COPPA): what a player under 13 is told on the Account page.</summary>
+        public const string UnderThirteen = "You're under 13, so you play without voice chat and under a made-up name until you turn 13. "
+                                            + "Your username is only for signing in: nobody else sees it.";
         public static event Action Changed;
 
         /// <summary>The account's username, or null for a guest.</summary>
         public static string Username => OnlineServices.SignedIn ? AuthenticationService.Instance.PlayerInfo?.Username : null;
         public static bool IsGuest => string.IsNullOrEmpty(Username);
 
-        // Usernames: 3-20 letters, digits and . - @ _ ; passwords: 8-30 with an upper and lower case letter, a digit and a
-        // symbol (Unity's rules, checked here first so the message is plain).
+        // Usernames: 3-20 letters, digits and . - _ ; passwords: 8-30 with an upper and lower case letter, a digit and a
+        // symbol (Unity's rules, checked here first so the message is plain). V2: no @ in new usernames, so an email address
+        // (personal information) can't be one; older usernames with @ still sign in.
         public static string CheckUsername(string name) {
             if (string.IsNullOrEmpty(name) || name.Length < 3 || name.Length > 20) return "A username is 3 to 20 characters";
-            if (name.Any(c => !(char.IsLetterOrDigit(c) || c == '.' || c == '-' || c == '@' || c == '_'))) return "A username uses letters, digits and . - @ _ only";
+            if (name.Contains("@")) return "A username can't be an email address";
+            if (!NameFilter.Allowed(name)) return "That username isn't allowed: choose another";
+            if (name.Any(c => !(char.IsLetterOrDigit(c) || c == '.' || c == '-' || c == '_'))) return "A username uses letters, digits and . - _ only";
             return null;
+        }
+
+        /// <summary>V2: the account's birth month and year, "YYYY-MM" (null for a guest, "" when the account has none yet:
+        /// accounts made before Build 70). Kept in the account's protected data by Cloud Code "Birth"; see AgeCheck.</summary>
+        public static string Birth { get; private set; }
+
+        /// <summary>V2: reads the account's birth month (signing in, starting with a saved sign-in).</summary>
+        public static async Task LoadBirth() {
+            if (IsGuest) {
+                Birth = null;
+                return;
+            }
+            try {
+                var json = await CloudCodeService.Instance.CallEndpointAsync("Birth", new Dictionary<string, object>());
+                var result = JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
+                Birth = result != null && result.TryGetValue("birth", out var b) ? b?.ToString() ?? "" : "";
+            }
+            catch (Exception e) {
+                Debug.LogWarning("[Online] birth: " + e.Message);
+            }
+            AgeCheck.AccountChanged();
+            Changed?.Invoke();
+        }
+
+        /// <summary>V2: keeps the birth month (0-11) and year on the account (only once: it can't be changed after).
+        /// Null when it's kept, else why not.</summary>
+        public static async Task<string> SaveBirth(int month, string year) {
+            var wrong = AgeCheck.Check(month, year);
+            if (wrong != null) return wrong;
+            try {
+                var json = await CloudCodeService.Instance.CallEndpointAsync("Birth", new Dictionary<string, object> { { "month", month + 1 }, { "year", int.Parse(year) } });
+                var result = JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
+                Birth = result != null && result.TryGetValue("birth", out var b) ? b?.ToString() ?? "" : "";
+                AgeCheck.AccountChanged();
+                Changed?.Invoke();
+                if (string.IsNullOrEmpty(Birth)) return result != null && result.TryGetValue("reason", out var why) ? "Couldn't keep your birthday: " + why : "Couldn't keep your birthday";
+                return null;
+            }
+            catch (Exception e) { return "Couldn't keep your birthday: " + Explain(e); }
         }
 
         public static string CheckPassword(string password) {
@@ -54,18 +100,22 @@ namespace Protobot.Online {
             return null;
         }
 
-        /// <summary>Turns the guest into an account (same player: its stats and scores stay).</summary>
-        public static async Task<string> CreateAccount(string username, string password) {
-            var problem = CheckUsername(username) ?? CheckPassword(password);
-            if (problem != null) return problem;
+        /// <summary>Turns the guest into an account (same player: its stats and scores stay). V2: the birth month (0-11)
+        /// and year are required (children's privacy law) and kept on the account. A player under 13 can have one: they
+        /// still play without voice chat and under their made-up name (the username is only for signing in).</summary>
+        public static async Task<string> CreateAccount(string username, string password, int birthMonth, string birthYear) {
+            var problem = CheckUsername(username) ?? CheckPassword(password) ?? AgeCheck.Check(birthMonth, birthYear);
+            if (problem != null) return problem == AgeCheck.Check(birthMonth, birthYear) ? "Your birthday: " + char.ToLower(problem[0]) + problem.Substring(1) : problem;
             if (!await OnlineServices.Start()) return OnlineServices.Problem;
             try {
                 await AuthenticationService.Instance.AddUsernamePasswordAsync(username, password);
-                OnlineServices.Name = username;   // V2: an account plays under its username (the name bottom left)
+                OnlineServices.Name = username;   // V2: an account plays under its username (the name bottom left), from 13
+                var birth = await SaveBirth(birthMonth, birthYear);
                 await SetDisplayName(OnlineServices.Name);
                 Builds.ActionLog.Write("online", "account created: " + username);
+                _ = Badges.Claim();   // V2: the beta badge waits for an account
                 Changed?.Invoke();
-                return null;
+                return birth == null ? null : "Your account was made, but: " + birth + ". Add it on this page.";
             }
             catch (Exception e) { return Explain(e); }
         }
@@ -79,9 +129,12 @@ namespace Protobot.Online {
                 await AuthenticationService.Instance.SignInWithUsernamePasswordAsync(username.Trim(), password);
                 // V2: an account plays under its username (the name bottom left and "<name>'s match").
                 OnlineServices.Name = AuthenticationService.Instance.PlayerInfo?.Username ?? username.Trim();
+                await LoadBirth();
                 await SetDisplayName(OnlineServices.Name);
                 Mine = null;
                 Builds.ActionLog.Write("online", "signed in: " + username);
+                Badges.Forget();   // V2: the account's own badges (and the beta badge earned here)
+                _ = Badges.Claim();
                 Changed?.Invoke();
                 return null;
             }
@@ -92,12 +145,53 @@ namespace Protobot.Online {
             }
         }
 
+        /// <summary>V2: deletes this player and everything kept online for it (Cloud Code "DeleteMyData": leaderboard
+        /// scores, stats, shared replays, report files; then the player itself), and starts a new guest. Null when it
+        /// worked, else what went wrong.</summary>
+        public static async Task<string> DeleteEverything() {
+            if (!await OnlineServices.Start()) return OnlineServices.Problem;
+            if (MatchSessions.Current != null) return "Leave the match first.";
+            try {
+                var json = await CloudCodeService.Instance.CallEndpointAsync("DeleteMyData", new Dictionary<string, object>());
+                var result = JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
+                if (result == null || !(result.TryGetValue("deleted", out var d) && d is bool deleted && deleted)) {
+                    Debug.LogWarning("[Online] delete: " + json);
+                    return "Couldn't delete everything (try again in a minute; your player wasn't deleted, so nothing is lost).";
+                }
+                await AuthenticationService.Instance.DeleteAccountAsync();
+                Builds.ActionLog.Write("online", "deleted my online data");
+                Mine = null;
+                Birth = null;
+                PlayerPrefs.DeleteKey("V2.Online.Name");
+                PlayerPrefs.DeleteKey("V2.Online.KidName");
+                try {
+                    if (AuthenticationService.Instance.IsSignedIn) AuthenticationService.Instance.SignOut(true);
+                    else AuthenticationService.Instance.ClearSessionToken();
+                    await AuthenticationService.Instance.SignInAnonymouslyAsync();
+                }
+                catch (Exception e) { Debug.LogWarning("[Online] new guest: " + e.Message); }
+                Badges.Forget();
+                _ = Badges.Claim();
+                Changed?.Invoke();
+                Interface.Interface.Announce("Your online data was deleted");
+                return null;
+            }
+            catch (Exception e) {
+                Debug.LogWarning("[Online] delete: " + e);
+                return "Couldn't delete everything: " + Explain(e) + " Try again, or ask on the project's GitHub page.";
+            }
+        }
+
         /// <summary>Signs out and starts a new guest on this computer.</summary>
         public static async Task SignOut() {
             if (!OnlineServices.SignedIn) return;
             AuthenticationService.Instance.SignOut(true);
             Mine = null;
+            Birth = null;
+            AgeCheck.AccountChanged();
             try { await AuthenticationService.Instance.SignInAnonymouslyAsync(); } catch (Exception e) { Debug.LogWarning("[Online] " + e.Message); }
+            Badges.Forget();
+            _ = Badges.Claim();
             Changed?.Invoke();
         }
 
@@ -144,7 +238,7 @@ namespace Protobot.Online {
                 { "footprint", new[] { footprint.x, footprint.y, footprint.z } },
                 { "seconds", seconds },
                 { "build", Builds.BuildInfo.Build },
-                { "robot", robot },
+                { "robot", OnlineServices.Shared(robot) },
                 { "kind", programming ? "programming" : "driving" },
             };
             try {
@@ -169,6 +263,7 @@ namespace Protobot.Online {
         /// <summary>Keeps this run's replay as the player's best (only when it's what the leaderboard has for them).</summary>
         public static async Task SaveReplay(Game.ReplayFile replay, bool programming = false) {
             if (!OnlineServices.SignedIn || replay == null) return;
+            if (AgeCheck.Under13) return;   // V2 (COPPA): an under-13 player's runs aren't kept online (only the score)
             try {
                 var mine = await LeaderboardsService.Instance.GetPlayerScoreAsync(Board(programming));
                 if (mine == null || (int)Math.Round(mine.Score) != replay.score) return;   // not the best: the best's replay stays
@@ -205,7 +300,10 @@ namespace Protobot.Online {
             try {
                 var page = await LeaderboardsService.Instance.GetScoresAsync(Board(programming), new GetScoresOptions { Limit = count });
                 var me = OnlineServices.PlayerId;
-                var top = page.Results.Select(e => ToEntry(e, me)).ToList();
+                // V2: players who deleted their data are left out at once (the moderators' tool removes their scores).
+                var hidden = await Hidden();
+                var top = page.Results.Where(e => !hidden.Contains(e.PlayerId)).Select(e => ToEntry(e, me)).ToList();
+                for (var i = 0; i < top.Count; i++) top[i].rank = i + 1;
                 Entry mine = top.FirstOrDefault(e => e.mine);
                 if (mine == null)
                     try { mine = ToEntry(await LeaderboardsService.Instance.GetPlayerScoreAsync(Board(programming)), me); }
@@ -218,9 +316,27 @@ namespace Protobot.Online {
             }
         }
 
+        private static HashSet<string> hiddenPlayers;
+        private static float hiddenAt = -999f;
+
+        /// <summary>V2: the players who deleted their online data (Cloud Save custom data "leaderboard", key "hidden",
+        /// written by Cloud Code "DeleteMyData"); read at most once a minute.</summary>
+        private static async Task<HashSet<string>> Hidden() {
+            if (hiddenPlayers != null && Time.realtimeSinceStartup - hiddenAt < 60f) return hiddenPlayers;
+            var set = new HashSet<string>();
+            try {
+                var items = await Unity.Services.CloudSave.CloudSaveService.Instance.Data.Custom.LoadAsync("leaderboard", new HashSet<string> { "hidden" });
+                if (items.TryGetValue("hidden", out var item)) foreach (var id in item.Value.GetAs<List<string>>() ?? new List<string>()) set.Add(id);
+            }
+            catch (Exception e) { Debug.Log("[Online] hidden players: " + e.Message); }
+            hiddenPlayers = set;
+            hiddenAt = Time.realtimeSinceStartup;
+            return set;
+        }
+
         private static Entry ToEntry(Unity.Services.Leaderboards.Models.LeaderboardEntry e, string me) => new() {
             rank = e.Rank + 1,
-            name = (e.PlayerName ?? "Player").Split('#')[0].Replace('_', ' '),
+            name = NameFilter.Shown((e.PlayerName ?? "Player").Split('#')[0].Replace('_', ' ')),   // V2: through the name filter
             playerId = e.PlayerId,
             score = (int)Math.Round(e.Score),
             when = e.UpdatedTime,

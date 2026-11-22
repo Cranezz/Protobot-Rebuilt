@@ -34,6 +34,7 @@ namespace Protobot.Interface {
         private void Apply() {
             var splash = launch.GetComponentsInChildren<Transform>(true).FirstOrDefault(t => t.name == "Splash Screen");
             splashPanel = splash;
+            if (splash != null) Online.ProfileCard.Make(splash.gameObject);   // V2: your profile, bottom left
             // V2: the Multiplayer screen's look: a blurred, slowly drifting picture of the field behind, and the window
             // itself see-through (smoky glass with a light edge); its layout, picture and logo stay as they were.
             var tint = launch.Find("Background Tint");
@@ -106,7 +107,8 @@ namespace Protobot.Interface {
             }
             if (credits != null && !credits.text.Contains("Rebuilt V2"))
                 credits.text += "\n<line-height=125%>\n<line-height=100%><size=100%>Protobot Rebuilt V2:<line-height=100%>\n<size=65%>Crane | 11777C\n"
-                                + "Parts: VEX-CAD library · Field: VEX Robotics\nUnity · DOTween · Velopack";
+                                + "Parts: VEX-CAD library · Field: VEX Robotics\nUnity · DOTween · Velopack\n"
+                                + "<size=55%>Not affiliated with or endorsed by VEX Robotics or the REC Foundation. VEX and V5 are trademarks of Innovation First, Inc.";
         }
 
         private static void Restyle(Button button) {

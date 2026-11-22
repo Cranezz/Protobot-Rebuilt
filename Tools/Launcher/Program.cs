@@ -22,6 +22,8 @@ static class Program {
         }
         catch (Exception) { }
         try { RegisterFiles(); } catch (Exception) { }   // installs from before 1.9.67 had no hook for it
+        try { MoveData(); } catch (Exception) { }
+        if (args.Contains("--move-data-only")) return;   // (testing)
         var dir = AppDomain.CurrentDomain.BaseDirectory;
         var game = Path.Combine(dir, "ProtobotRebuiltV2.exe");
         var start = new ProcessStartInfo(game, string.Join(" ", args.Select(Quote))) { UseShellExecute = false, WorkingDirectory = dir };
@@ -75,4 +77,84 @@ static class Program {
 
     [DllImport("shell32.dll")]
     static extern void SHChangeNotify(int eventId, uint flags, IntPtr item1, IntPtr item2);
+
+    // ------------------------------------------------------------------ v2.0 Beta 1: "Cranez" -> "Protobot"
+
+    // Unity keeps an app's data (custom parts library, autosaves, replays, logs) in AppData\LocalLow\<company>\<product>
+    // and its settings in HKCU\Software\<company>\<product>. The company was "Cranez" (the developer's name) until v2.0
+    // Beta 1 and is "Protobot" now, so the first start of the new version moves both before the player starts: nothing
+    // is lost. Both already there (an old version ran after the move): the old one's files and settings fill in only
+    // what's missing and it's left as it is.
+    const string OldCompany = "Cranez", NewCompany = "Protobot", ProductName = "ProtobotRebuiltV2";
+
+    static void MoveData() {
+        if (Process.GetProcessesByName(ProductName).Length > 0) return;   // Protobot is running: next time
+        MoveSettings();
+        MoveFolder();
+    }
+
+    static void MoveSettings() {
+        var from = $@"Software\{OldCompany}\{ProductName}";
+        var to = $@"Software\{NewCompany}\{ProductName}";
+        using var old = Registry.CurrentUser.OpenSubKey(from);
+        if (old == null) return;
+        using var existing = Registry.CurrentUser.OpenSubKey(to);
+        var fresh = existing == null || existing.ValueCount == 0;
+        using (var target = Registry.CurrentUser.CreateSubKey(to)) CopyKey(old, target, overwrite: false);
+        if (!fresh) return;
+        old.Close();
+        Registry.CurrentUser.DeleteSubKeyTree(from, false);
+        using var company = Registry.CurrentUser.OpenSubKey($@"Software\{OldCompany}");
+        if (company != null && company.SubKeyCount == 0 && company.ValueCount == 0) {
+            company.Close();
+            Registry.CurrentUser.DeleteSubKey($@"Software\{OldCompany}", false);
+        }
+    }
+
+    static void CopyKey(RegistryKey from, RegistryKey to, bool overwrite) {
+        foreach (var name in from.GetValueNames()) {
+            if (!overwrite && to.GetValue(name) != null) continue;
+            to.SetValue(name, from.GetValue(name, null, RegistryValueOptions.DoNotExpandEnvironmentNames), from.GetValueKind(name));
+        }
+        foreach (var sub in from.GetSubKeyNames()) {
+            using var a = from.OpenSubKey(sub);
+            using var b = to.CreateSubKey(sub);
+            if (a != null) CopyKey(a, b, overwrite);
+        }
+    }
+
+    static void MoveFolder() {
+        var low = LocalLow();
+        if (string.IsNullOrEmpty(low)) return;
+        var from = Path.Combine(low, OldCompany, ProductName);
+        var to = Path.Combine(low, NewCompany, ProductName);
+        if (!Directory.Exists(from)) return;
+        if (!Directory.Exists(to)) {
+            Directory.CreateDirectory(Path.Combine(low, NewCompany));
+            Directory.Move(from, to);
+            try { if (!Directory.EnumerateFileSystemEntries(Path.Combine(low, OldCompany)).Any()) Directory.Delete(Path.Combine(low, OldCompany)); }
+            catch (Exception) { }
+            return;
+        }
+        foreach (var file in Directory.EnumerateFiles(from, "*", SearchOption.AllDirectories)) {
+            var target = Path.Combine(to, file.Substring(from.Length).TrimStart('\\', '/'));
+            if (File.Exists(target)) continue;
+            Directory.CreateDirectory(Path.GetDirectoryName(target));
+            try { File.Copy(file, target); } catch (Exception) { }
+        }
+    }
+
+    // AppData\LocalLow (no Environment.SpecialFolder for it).
+    static string LocalLow() {
+        var id = new Guid("A520A1A4-1780-4FF6-BD18-167343C5AF16");
+        if (SHGetKnownFolderPath(ref id, 0, IntPtr.Zero, out var path) == 0) {
+            var result = Marshal.PtrToStringUni(path);
+            Marshal.FreeCoTaskMem(path);
+            return result;
+        }
+        return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "AppData", "LocalLow");
+    }
+
+    [DllImport("shell32.dll")]
+    static extern int SHGetKnownFolderPath(ref Guid id, uint flags, IntPtr token, out IntPtr path);
 }

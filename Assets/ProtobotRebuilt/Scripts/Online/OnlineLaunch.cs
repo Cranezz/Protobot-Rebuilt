@@ -13,6 +13,8 @@ namespace Protobot.Online {
     public static class OnlineLaunch {
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void Begin() {
+            // V2: copies started from the command line (testing, several on one computer) run even when not in front.
+            Application.runInBackground = true;
             var open = Argument("-open");
             var code = Argument("-join");
             var host = Argument("-host");
