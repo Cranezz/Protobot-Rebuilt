@@ -15,6 +15,7 @@ namespace Protobot.RobotCode {
             ("GPS: drive to points", "Drives to points on the field by the GPS Sensor (in a game: File > Play game)", Gps),
             ("PID tuning (graph)", "Your own PID loop: open the Graph tab and tune kP, kI, kD", Pid),
             ("Odometry and motions (LemLib style)", "move_to_point, turn_to_heading, move_to_pose and pure pursuit, with odometry", Odometry),
+            ("Odometry: 4 points and back", "Drives to four points with their own headings, stops 2 s at each, writes down how close it got, then comes home", FourPoints),
             ("Autonomous selector (touch screen)", "Tap a button on the Brain's screen to pick the autonomous", Selector),
             ("Controller screen and rumble", "Prints on the controller and rumbles when A is pressed", ControllerScreen),
             ("C++: PROS + LemLib", "A PROS project's main.cpp with LemLib odometry and motions (as LemLib's example)", ProsLemLib),
@@ -385,6 +386,99 @@ print(""pose:"", chassis.get_pose())
 chassis.follow([(24, 36), (12, 48), (0, 48)], 10, 4000)
 chassis.move_to_point(0, 0, 4000, forwards=False, wait=True)
 print(""back at"", chassis.get_pose())
+";
+
+        // V2: drives to four points with headings as precisely as odometry allows (tested on the odometry sample build:
+        // within 0.1-0.5" and 0.3 degrees of each goal).
+        private const string FourPoints = @"# Odometry: four points, each with its own heading, then back to (0, 0) facing 0.
+# The robot stops 2 s at each and writes down where it is against the goal (here and on
+# the Brain's screen). x, y in inches; heading in degrees, clockwise from forward.
+#
+# How it gets close: a turn in place always moves a robot a little (it never turns exactly
+# about its tracking center), and move_to_point stops steering in its last 7.5"" (as
+# LemLib's). So each goal is reached along its own heading: first a spot LEAD_IN inches
+# short of it, lined up; there the robot aims at the goal and drives straight in, so the
+# last turn is tiny. If it still misses by more than TOLERANCE it backs up and tries again,
+# aiming that much the other way (a robot misses the same way each time).
+from vex import *
+from motion import *
+import math
+
+# {devices}
+left_drive = MotorGroup(Motor(Ports.PORT1, GearSetting.RATIO_6_1, True), Motor(Ports.PORT2, GearSetting.RATIO_6_1, True))
+right_drive = MotorGroup(Motor(Ports.PORT3, GearSetting.RATIO_6_1, False), Motor(Ports.PORT4, GearSetting.RATIO_6_1, False))
+imu = Inertial(Ports.PORT10)
+# {/devices}
+brain = Brain()
+
+# Track width (in), wheel diameter (in), wheel rpm, horizontal drift (2 with omnis all round, 8 with traction wheels)
+odom_drive = Drivetrain(left_drive, right_drive, {track}, {wheel}, {wheel_rpm}, 2)
+# kP, kI, kD, anti windup, small error, small error timeout (ms), large error, large error timeout (ms), slew
+# (tight exits: each stop settles within 1/4"" and half a degree)
+lateral = ControllerSettings(10, 0, 3, 3, 0.25, 250, 1, 1000, 20)
+angular = ControllerSettings(2, 0, 10, 3, 0.5, 250, 1, 1000, 0)
+# Tracking wheels go here: TrackingWheel(Rotation(Ports.PORT5), Omniwheel.NEW_2, -2.5). None: the drive motors are used.
+sensors = OdomSensors(None, None, None, None, imu)
+chassis = Chassis(odom_drive, lateral, angular, sensors)
+
+chassis.calibrate()           # the Inertial sensor calibrates (about 2 s)
+chassis.set_pose(0, 0, 0)
+
+LEAD_IN = 14      # inches: where the robot lines up with a goal's heading
+TOLERANCE = 0.3   # inches: close enough
+TRIES = 3
+
+goals = [(""P1"", 24, 24, 90), (""P2"", 48, 0, 180), (""P3"", 24, -24, -90), (""P4"", -12, 12, 45), (""HOME"", 0, 0, 0)]
+
+
+def angle_diff(a, b):
+    return (a - b + 180) % 360 - 180
+
+
+def drive_to(x, y):
+    p = chassis.get_pose()
+    if math.hypot(x - p.x, y - p.y) < TOLERANCE:
+        return
+    chassis.turn_to_point(x, y, 2000, wait=True)
+    chassis.move_to_point(x, y, 4000, wait=True)
+    chassis.move_to_point(x, y, 1500, max_speed=40, wait=True)   # slow final approach
+
+
+def go(x, y, h):
+    # the lead-in spot: LEAD_IN inches back from the goal along its heading
+    sx = x - LEAD_IN * math.sin(math.radians(h))
+    sy = y - LEAD_IN * math.cos(math.radians(h))
+    drive_to(sx, sy)
+    ax, ay = x, y   # where it aims: the goal, moved against the last try's miss
+    for attempt in range(TRIES):
+        chassis.turn_to_point(ax, ay, 2000, wait=True)
+        chassis.move_to_point(ax, ay, 3000, wait=True)
+        chassis.move_to_point(ax, ay, 1500, max_speed=40, wait=True)
+        chassis.turn_to_heading(h, 1500, wait=True)
+        p = chassis.get_pose()
+        if math.hypot(p.x - x, p.y - y) <= TOLERANCE or attempt == TRIES - 1:
+            return attempt + 1
+        ax -= p.x - x
+        ay -= p.y - y
+        chassis.move_to_point(sx, sy, 3000, forwards=False, wait=True)   # back up along the heading
+    return TRIES
+
+
+brain.screen.clear_screen()
+brain.screen.set_cursor(1, 1)
+brain.screen.print(""goal       odom         off"")
+brain.screen.next_row()
+for name, x, y, h in goals:
+    tries = go(x, y, h)
+    p = chassis.get_pose()
+    off = math.hypot(p.x - x, p.y - y)
+    turn = angle_diff(p.theta, h)
+    print(""%-4s goal (%.1f, %.1f) %d deg   at (%.2f, %.2f) %.2f deg   off %.2f in, %.2f deg, %d tries""
+          % (name, x, y, h, p.x, p.y, p.theta % 360, off, turn, tries))
+    brain.screen.print(""%-4s (%.2f, %.2f)  %.2f in %.1f deg"" % (name, p.x, p.y, off, turn))
+    brain.screen.next_row()
+    wait(2, SECONDS)
+print(""done"")
 ";
 
         private const string Selector = @"# Autonomous selector: tap a button on the Brain's screen before the match

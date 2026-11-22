@@ -7,6 +7,7 @@ namespace Protobot.Scripting {
     public static class SelfTest {
         private static readonly (string name, string code, string expected)[] Cases = {
             ("arith", "print(7 // 2, -7 // 2, 7 % 3, -7 % 3, 2 ** 10, 7 / 2, 1 + 2.5, 10 - 3 * 2)", "3 -4 1 2 1024 3.5 3.5 4\n"),
+            ("brackets", "def f(a, b):\n    return a + b\nfor i in range(2):\n    print('v',\n          f(i, 1))\n    print('next')\nx = [1,\n     2]\nprint(x)", "v 1\nnext\nv 2\nnext\n[1, 2]\n"),   // V2: lines that start inside brackets
             ("floats", "print(0.1 + 0.2, 1.0, 3 * 1.5, 1e20, 2.5e-5, round(2.5), round(3.14159, 2))", "0.30000000000000004 1.0 4.5 1e+20 2.5e-05 2 3.14\n"),
             ("strings", "s = 'Hello'\nprint(s.upper(), s[1:3], s[-1], len(s), s * 2, 'l' in s, s.replace('l', 'L'))", "HELLO el o 5 HelloHello True HeLLo\n"),
             ("fstring", "x = 3.14159\nn = 7\nprint(f'x={x:.2f} n={n:03d} {n*2} {\"q\"!r} {x=}')", "x=3.14 n=007 14 'q' x=3.14159\n"),

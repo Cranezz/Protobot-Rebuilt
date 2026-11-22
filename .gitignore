@@ -81,3 +81,5 @@ __pycache__/
 # Unity scene backups after a crash
 Assets/_Recovery/
 Assets/_Recovery.meta
+
+Tools/AgentTesting/status*.txt

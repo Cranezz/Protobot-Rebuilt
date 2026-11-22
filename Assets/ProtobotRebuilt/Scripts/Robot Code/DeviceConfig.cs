@@ -355,8 +355,54 @@ namespace Protobot.RobotCode {
 
         /// <summary>Where a GPS sits on the robot: inches right and forward of the turning center, and its turn
         /// clockwise from the robot's front (no left/right drive motors: no offset).</summary>
+        /// <summary>V2: the robot's turning center and axes: the middle of the left and right drive wheels (the wheels on
+        /// the gear trains of the L and R drive motors; a robot turns about its wheels, and on a geared drive the motors
+        /// can sit inches away: the 6-motor drive's are 1.5" ahead of its wheels, so odometry measured from them moved
+        /// an inch in every turn), else the middle of the left and right drive motors. rightAxis: left to right, front:
+        /// forward, both level. False without left and right drive motors (center zero, the build's axes).</summary>
+        internal static bool DriveFrame(List<Rotor> rotors, out Vector3 center, out Vector3 rightAxis, out Vector3 front) {
+            Vector3 left = Vector3.zero, right = Vector3.zero;
+            int l = 0, r = 0;
+            foreach (var motor in MotorDrive.Live()) {
+                var side = Controls.Side(motor.gameObject);
+                if (side == "L") { left += motor.transform.position; l++; }
+                else if (side == "R") { right += motor.transform.position; r++; }
+            }
+            center = Vector3.zero;
+            rightAxis = Vector3.right;
+            front = Vector3.forward;
+            if (l == 0 || r == 0) return false;
+            var across = right / r - left / l;
+            across.y = 0f;
+            if (across.sqrMagnitude < 1e-4f) return false;
+            rightAxis = across.normalized;
+            front = Vector3.Cross(rightAxis, Vector3.up);
+            center = (left / l + right / r) / 2f;
+            if (rotors == null) return true;
+            Vector3 wl = Vector3.zero, wr = Vector3.zero;
+            int nl = 0, nr = 0;
+            var seen = new HashSet<GameObject>();
+            foreach (var rotor in rotors) {
+                if (!rotor.motors.Any()) continue;
+                var system = GearTrain.SystemOf(rotor, rotors);
+                var sides = system.Motors.Select(m => Controls.Side(m.gameObject)).Distinct().ToList();
+                if (sides.Count != 1 || sides[0] != "L" && sides[0] != "R") continue;
+                foreach (var sysRotor in system.rotors)
+                    foreach (var part in sysRotor.parts) {
+                        if (part == null || !seen.Add(part)) continue;
+                        var id = part.GetComponent<SavedObject>()?.id ?? "";
+                        if (!(id.StartsWith("OMNI") || id.StartsWith("TWHL") || id.StartsWith("WHL") || id.Contains("Omni") || id.Contains("Wheel"))) continue;
+                        var at = part.TryGetComponent(out MeshFilter f) && f.sharedMesh != null ? part.transform.TransformPoint(f.sharedMesh.bounds.center) : part.transform.position;
+                        if (sides[0] == "L") { wl += at; nl++; }
+                        else { wr += at; nr++; }
+                    }
+            }
+            if (nl > 0 && nr > 0) center = (wl / nl + wr / nr) / 2f;
+            return true;
+        }
+
         /// <summary>V2: a tracking wheel found on the robot: a Rotation sensor or encoder whose shaft carries an
-        /// unpowered wheel. vertical: it rolls forward; offset: inches from the turning center to its side (vertical:
+        /// unpowered wheel. vertical: it rolls forward; offset: inches from the turning center (DriveFrame) to its side (vertical:
         /// right +, left -) or along (horizontal: front +, back -), as LemLib and the motion module take it;
         /// reversed: the sensor counts down going forward (or right) as mounted, so code reverses it.</summary>
         internal struct TrackingWheelInfo {
@@ -369,22 +415,11 @@ namespace Protobot.RobotCode {
 
         internal static List<TrackingWheelInfo> TrackingWheels() {
             var found = new List<TrackingWheelInfo>();
-            // The robot's frame: as GpsMount (the middle of the left and right drive motors), else the build's axes.
-            Vector3 left = Vector3.zero, right = Vector3.zero;
-            int l = 0, r = 0;
-            foreach (var motor in MotorDrive.Live()) {
-                var side = Controls.Side(motor.gameObject);
-                if (side == "L") { left += motor.transform.position; l++; }
-                else if (side == "R") { right += motor.transform.position; r++; }
-            }
-            var center = l > 0 && r > 0 ? (left / l + right / r) / 2f : Vector3.zero;
-            var across = l > 0 && r > 0 ? right / r - left / l : Vector3.right;
-            across.y = 0f;
-            var rightAxis = across.sqrMagnitude > 1e-4f ? across.normalized : Vector3.right;
-            var front = Vector3.Cross(rightAxis, Vector3.up);
+            // The robot's frame: its turning center (DriveFrame), else the build's axes.
             List<Rotor> rotors;
             try { rotors = GearTrain.Current(); }
             catch { return found; }
+            DriveFrame(rotors, out var center, out var rightAxis, out var front);
             foreach (var d in V5Brain.Devices.OfType<ShaftSensor>()) {
                 if (d.kind == DeviceKind.Potentiometer || d.part == null) continue;
                 var rotor = rotors.FirstOrDefault(x => x.shaft != null && x.bearings.Any(b => b.part == d.part));
@@ -446,20 +481,10 @@ namespace Protobot.RobotCode {
         }
 
         internal static (double ox, double oy, double heading) GpsMount(V5Device d) {
-            Vector3 left = Vector3.zero, right = Vector3.zero;
-            int l = 0, r = 0;
-            foreach (var motor in MotorDrive.Live()) {
-                var side = Controls.Side(motor.gameObject);
-                if (side == "L") { left += motor.transform.position; l++; }
-                else if (side == "R") { right += motor.transform.position; r++; }
-            }
-            if (l == 0 || r == 0) return (0, 0, 0);
-            var center = (left / l + right / r) / 2f;
-            var across = right / r - left / l;
-            across.y = 0f;
-            if (across.sqrMagnitude < 1e-4f) return (0, 0, 0);
-            var rightAxis = across.normalized;
-            var front = Vector3.Cross(rightAxis, Vector3.up);
+            List<Rotor> rotors = null;
+            try { rotors = GearTrain.Current(); }
+            catch { }
+            if (!DriveFrame(rotors, out var center, out var rightAxis, out var front)) return (0, 0, 0);
             var (o, dir) = SensorFrame.Look(d.part);
             var at = d.part.transform.TransformPoint(o) - center;
             var look = Vector3.ProjectOnPlane(d.part.transform.TransformDirection(dir), Vector3.up);

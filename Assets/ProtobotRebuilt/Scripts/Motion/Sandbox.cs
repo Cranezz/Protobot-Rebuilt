@@ -1232,8 +1232,12 @@ namespace Protobot.Motion {
                 joint.angularYMotion = joint.angularZMotion = ConfigurableJointMotion.Locked;
                 joint.enableCollision = false;
                 joint.enablePreprocessing = false;
+                // V2: the axle in each body as built (Roll keeps a free wheel square to it)
+                if (collinear) hingeAxle[(owner.rb, other.rb)] = (Quaternion.Inverse(owner.rb.rotation) * axis, Quaternion.Inverse(other.rb.rotation) * axis);
             }
         }
+
+        private readonly Dictionary<(Rigidbody, Rigidbody), (Vector3 inA, Vector3 inB)> hingeAxle = new();
 
         private static float FreeSpeed(MotorDrive motor) => motor.Rpm * Mathf.PI * 2f / 60f;
 
@@ -1810,6 +1814,35 @@ namespace Protobot.Motion {
                 var other = Mathf.Max(wheel.inertiaTensor.x, wheel.inertiaTensor.y, wheel.inertiaTensor.z);
                 wheel.inertiaTensorRotation = Quaternion.FromToRotation(Vector3.right, Quaternion.Inverse(wheel.rotation) * axisWorld);
                 wheel.inertiaTensor = new Vector3(Mathf.Max(spinInertia, 1e-4f) * 1000f, other, other);
+                // (as built when the hinge was made: at its first contact the wheel had already leaned)
+                if (hingeAxle.TryGetValue((wheel, frame), out var wf)) axleIn[wheel] = (wf.inB, wf.inA);
+                else if (hingeAxle.TryGetValue((frame, wheel), out var fw)) axleIn[wheel] = (fw.inA, fw.inB);
+                else axleIn[wheel] = (Quaternion.Inverse(frame.rotation) * axisWorld, Quaternion.Inverse(wheel.rotation) * axisWorld);
+                // (a light pod holding a cantilevered wheel is a hard case for the solver: more iterations keep the
+                // bearing square)
+                if (frame.mass < 0.25f) {
+                    wheel.solverIterations = frame.solverIterations = 60;
+                    wheel.solverVelocityIterations = frame.solverVelocityIterations = 20;
+                }
+            }
+            // V2: the wheel stays square in its bearing. A cantilevered wheel pressed on the floor twisted its bearing's
+            // joint ~2 degrees (the wheel leaned and toed in its Rotation sensor), and setting its turn from the pod's
+            // every step left that lean in: here its axle is turned back onto the pod's each step, and it spins about it.
+            // Only a wheel hung on a light pod (a tracking wheel in its sensor): drive wheels on the chassis are left to
+            // their joints (straightening them against the chassis tore a robot apart).
+            var straighten = Vector3.zero;
+            if (!StraightenOff && frame.mass < 0.25f && !driven.Contains(wheel) && axleIn.TryGetValue(wheel, out var ax)) {
+                var podAxle = (frame.rotation * ax.inFrame).normalized;
+                var wheelAxle = (wheel.rotation * ax.inWheel).normalized;
+                if (Vector3.Dot(podAxle, axisWorld) < 0f) podAxle = -podAxle;
+                if (Vector3.Dot(wheelAxle, podAxle) < 0f) wheelAxle = -wheelAxle;
+                var cross = Vector3.Cross(wheelAxle, podAxle);
+                var sin = cross.magnitude;
+                // the whole lean back each step; more than 8 degrees isn't a lean
+                if (sin > 1e-6f && sin < 0.14f) {
+                    straighten = cross / sin * (Mathf.Asin(sin) / Time.fixedDeltaTime);
+                    axisWorld = podAxle;
+                }
             }
             // How far it should have turned in its frame: what its axle moved along the floor since the last step (a
             // rolling wheel turns that far, over its radius) less what its frame (the pod) turned about the axle.
@@ -1829,7 +1862,7 @@ namespace Protobot.Motion {
                 rolledTurn[wheel] = should;
                 rollFrom[wheel] = (axle, frame.rotation);
                 var back = (float)((should - turned) / Time.fixedDeltaTime);
-                wheel.angularVelocity = frame.angularVelocity + axisWorld * back;
+                wheel.angularVelocity = frame.angularVelocity + axisWorld * back + straighten;
                 return true;
             }
             var moved = axle - from.axle;
@@ -1844,13 +1877,15 @@ namespace Protobot.Motion {
             // It turns that difference during this step (no force passes: a free wheel's own inertia is too small to
             // push a robot).
             var rel = (float)((should - turned) / Time.fixedDeltaTime);
-            if (Mathf.Abs(rel * radius) <= 400f) wheel.angularVelocity = frame.angularVelocity + axisWorld * rel;
+            if (Mathf.Abs(rel * radius) <= 400f) wheel.angularVelocity = frame.angularVelocity + axisWorld * rel + straighten;
             return true;
         }
 
         private readonly Dictionary<Rigidbody, (Vector3 axle, Quaternion rot)> rollFrom = new();
 
         private readonly HashSet<Rigidbody> heavy = new();
+        private readonly Dictionary<Rigidbody, (Vector3 inFrame, Vector3 inWheel)> axleIn = new();
+        internal static bool StraightenOff;   // tests: leave free wheels to their joints   // a free wheel's axle in its pod and in itself
         private readonly Dictionary<Rigidbody, double> rolledTurn = new();
         private readonly Dictionary<Rigidbody, (double total, float last)> turnIn = new();
         private readonly HashSet<Rigidbody> freeSince = new();

@@ -146,18 +146,34 @@ namespace Protobot.Motion {
             if (speed >= 0.001f) {
                 if (!sound.isPlaying) sound.Play();
                 sound.pitch = pitch * Mathf.Max(0.07f, Mathf.Min(speed, 1.2f));
-                sound.volume = 0.3f * (0.3f + 0.7f * Mathf.Pow(Mathf.Min(speed, 1f), 0.6f));
+                // V2: quiet, as V5 motors are (the user: "pretty quiet in real life"); several running share it (power
+                // adds as the square root: six motors sound about 2.4x one, not 6x)
+                sound.volume = Loudness * 0.07f * (0.3f + 0.7f * Mathf.Pow(Mathf.Min(speed, 1f), 0.6f));
             }
             else if (sound.isPlaying) sound.Stop();
             if (load >= 0.05f) {
                 if (!strain.isPlaying) strain.Play();
                 strain.pitch = pitch;
-                strain.volume = 0.12f * Mathf.Min(load, 1f);
+                strain.volume = Loudness * 0.03f * Mathf.Min(load, 1f);
             }
             else if (strain.isPlaying) strain.Stop();
         }
 
         private AudioSource strain;
+
+        // V2: each motor's share of the sound: 1 / sqrt(motors making sound), counted once a frame.
+        private static int soundFrame = -1;
+        private static float loudness = 1f;
+        private static float Loudness {
+            get {
+                if (soundFrame == Time.frameCount) return loudness;
+                soundFrame = Time.frameCount;
+                var playing = 0;
+                foreach (var motor in All) if (motor != null && motor.sound != null && motor.sound.isPlaying) playing++;
+                loudness = 1f / Mathf.Sqrt(Mathf.Max(1, playing));
+                return loudness;
+            }
+        }
 
         /// <summary>V2: no sound at all (the simulation paused or stopped).</summary>
         public void Silence() {

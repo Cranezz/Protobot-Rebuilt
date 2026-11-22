@@ -48,6 +48,10 @@ namespace Protobot.Scripting {
         private List<Token> Run() {
             var atLineStart = true;
             while (pos < src.Length) {
+                // V2: a line that starts inside brackets has no indentation; without this, closing the bracket at the
+                // end of it made its line end look like a blank line and the statement's newline was lost
+                // (a print(...) continued onto a second line, then wait(1): "expected the end of the line but found 'wait'").
+                if (atLineStart && depth > 0) atLineStart = false;
                 if (atLineStart && depth == 0) {
                     atLineStart = false;
                     // Measure the indentation; blank and comment-only lines don't count.

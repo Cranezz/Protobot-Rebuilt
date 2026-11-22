@@ -16,6 +16,12 @@ System.Func<string, Vector3> WheelAt = name => {
     return UnityEngine.Object.FindObjectsByType<Protobot.SavedObject>(UnityEngine.FindObjectsSortMode.None).Where(o => o.id == "OMNI-V2-2.75in")
         .Select(o => o.transform.position).OrderBy(p => (p - s0.transform.position).sqrMagnitude).First(); };
 var vw = WheelAt("Vertical tracking"); var hw = WheelAt("Horizontal tracking");
+// {voffc}/{hoffc}: from the turning center (the drive wheels' middle, as Insert devices measures), and the truth there too
+var driveWheels = UnityEngine.Object.FindObjectsByType<Protobot.SavedObject>(UnityEngine.FindObjectsSortMode.None).Where(o => o.id.StartsWith("OMNI") && !o.id.Contains("2.75")).Select(o => o.transform.position).ToList();
+var turnCenter = Vector3.zero; foreach (var w0 in driveWheels) turnCenter += w0; if (driveWheels.Count > 0) turnCenter /= driveWheels.Count;
+var fromCenter = text.Contains("{voffc}") || text.StartsWith("# truth: center");
+var inv0 = System.Globalization.CultureInfo.InvariantCulture;
+text = text.Replace("{voffc}", (vw.x - turnCenter.x).ToString("0.###", inv0)).Replace("{hoffc}", (hw.z - turnCenter.z).ToString("0.###", inv0));
 var inv = System.Globalization.CultureInfo.InvariantCulture;
 text = text.Replace("{voffabs}", Mathf.Abs(vw.x).ToString("0.###", inv)).Replace("{hoffabs}", Mathf.Abs(hw.z).ToString("0.###", inv))
     .Replace("{voff}", vw.x.ToString("0.###", inv)).Replace("{hoff}", hw.z.ToString("0.###", inv));
@@ -28,7 +34,7 @@ var period = text.StartsWith("// period: autonomous") ? Protobot.RobotCode.Robot
 Protobot.RobotCode.CodeStore.Set(code);
 Protobot.Motion.Sandbox.Stop(); Protobot.Motion.Sandbox.Begin();
 var frame = UnityEngine.Object.FindObjectsByType<Protobot.SavedObject>(UnityEngine.FindObjectsSortMode.None).Where(s => s.id == "CCHL-1x2-23").OrderBy(s => s.transform.position.z).Skip(1).First().gameObject;
-var origin = new Vector3(0f, frame.transform.position.y, 0f);
+var origin = fromCenter ? new Vector3(turnCenter.x, frame.transform.position.y, turnCenter.z) : new Vector3(0f, frame.transform.position.y, 0f);
 var local = frame.transform.InverseTransformPoint(origin);
 var fwdLocal = frame.transform.InverseTransformDirection(Vector3.forward);
 var start = Protobot.Devices.Pose.Point(frame, local);

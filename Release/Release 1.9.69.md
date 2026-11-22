@@ -1,9 +1,21 @@
-# Protobot Rebuilt V2, Beta 1.9 (build 67)
+# Protobot Rebuilt V2, Beta 1.9 (build 69)
 
 - **Odometry robot:** a new sample build with tracking-wheel pods (a Rotation sensor as the arm, a rubber band holding
   the wheel down) and an Inertial sensor. Unpowered tracking wheels now roll true (within 0.1-0.3% of the real
   distance), and tracking wheels no longer count up while the robot stands still (before a run or after a stop). A Rotation
   sensor read the moment a program starts gives its real angle (it gave the last run's).
+- **New example, "Odometry: 4 points and back":** drives to four points, each with its own heading, stops 2 s at
+  each and writes down how close it got (in the output and on the Brain's screen), then comes home. On the odometry
+  sample robot the four points come out within about 1/4" and a fifth of a degree (home, after a minute and a
+  half of driving, within about 2/3": odometry drifts a little over time, as on a real robot). It lines up with each goal's heading before driving
+  in, and tries again if it misses, aiming to make up for the miss.
+- **Tracking wheels stay upright:** they leaned about 1.5 degrees in their Rotation sensors while driving; now they
+  sit square, as built.
+- **Insert devices measures from the middle of the drive wheels:** tracking wheel and GPS offsets were measured
+  from the drive motors, which can sit inches from the wheels on a geared drive.
+- **Quieter motors:** V5 motors are quiet, and now they sound it. Several running motors no longer add up to a roar.
+- **Python fix:** a line that continued inside brackets (a long print(...) over two lines) could break the line
+  after it ("expected the end of the line").
 - **Robots stop where you let go:** brake mode really brakes, so a robot doesn't keep turning after the sticks go.
 - **Every sensor wired:** 3-Wire Expanders, Accelerometers and every 3-wire sensor work in Python, VEXcode C++ and
   PROS. Devices keep their ports when you reopen a build.
