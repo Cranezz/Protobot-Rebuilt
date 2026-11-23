@@ -101,6 +101,9 @@ namespace Protobot {
 
         /// <Summary> Destroys all loaded parts in the current scene </Summary>
         public static void DestroyLoadedObjects() {
+            // V2 (build 73): a build opened while the simulation runs: stop it first (it went on stepping the old robot's
+            // destroyed motors and threw an error every physics step: a player's bug report).
+            if (Motion.Sandbox.Running) Motion.Sandbox.Stop();
             // V2: switched off first: Destroy waits for the frame's end, and a build opened in the same frame (the same
             // build again, or parts in the same places) had its screws find these holes, then sort destroyed ones.
             foreach (var obj in FindLoadedObjects()) {

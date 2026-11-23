@@ -326,7 +326,7 @@ namespace Protobot.Tools {
             var hole = HoverHole();
             if (hole != null && hole.IsEmpty && !Motion.WirePorts.IsBrain(hole.transform.parent != null ? hole.transform.parent.gameObject : null)) return null;
             var ray = MouseRay();
-            foreach (var kind in new[] { Motion.WireKind.Smart, Motion.WireKind.ThreeWire }) {
+            foreach (var kind in new[] { Motion.WireKind.ThreeWire }) {   // V2 (build 73): no Smart Cables to place
                 var port = Motion.WirePorts.Under(ray, kind);
                 if (port == null) continue;
                 return port;

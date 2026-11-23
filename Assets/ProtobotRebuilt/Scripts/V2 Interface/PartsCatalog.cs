@@ -338,9 +338,9 @@ namespace Protobot.Interface {
         private static void Electronics() {
             const string s = "Electronics";
             // V2: cables, routed from port to port.
+            // (build 73: V5 Smart Cables were taken out: cosmetic, and placing them lagged; builds that have some keep
+            // them. Devices take the next free port and keep it.)
             Add(Group(s, "Wiring", "MOTR",
-                new CatalogNode { section = s, name = "V5 Smart Cable", action = "wire:V5", iconType = "MOTR",
-                                  tip = "Brain to a motor or V5 sensor: click a port, put points where the cable runs, click the port it goes to. Or point at a port and press E." },
                 new CatalogNode { section = s, name = "3-wire cable", action = "wire:3W", iconType = "MOTR",
                                   tip = "A brain 3-wire port (A-H) to a sensor, switch or solenoid: click a port, put points where it runs, click where it goes." }));
             Add(Group(s, "Motors", "MOTR", Each(s, "MOTR", o => o + " motor")));
