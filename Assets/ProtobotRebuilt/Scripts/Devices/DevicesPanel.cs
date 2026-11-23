@@ -590,7 +590,22 @@ namespace Protobot.Devices {
             text.rectTransform.Fill();
             if (!d.wired) text.color = Color.Lerp(text.color, Theme.TextFaint, 0.45f);
             Ui.Tip(badge, d.threeWire ? "3-wire port " + d.PortLabel : "Smart port " + d.PortLabel, null,
-                !d.OnBrain ? "No free port on the brain." : d.wired ? "Wired to this port." : "Not wired: on this port as if plugged in (wire it to the brain to pick another).");
+                !d.OnBrain ? "No free port on the brain: click to choose one." : d.wired ? "Wired to this port with a cable."
+                : "Click to choose its port (a device already there swaps with it).");
+            // V2 (build 74): click the port to choose another (Smart Cables were taken out in build 73).
+            if (d.part == null || d.wired) return;
+            badge.raycastTarget = true;
+            var button = badge.gameObject.AddComponent<Button>();
+            button.targetGraphic = badge;
+            button.onClick.AddListener(() => {
+                var choices = V5Brain.PortChoices(d);
+                var at = Mathf.Max(0, choices.FindIndex(c => c.port == d.CodePort));
+                Popup.Open(badge.rectTransform, choices.Select(c => c.label).ToArray(), at, i => {
+                    var problem = V5Brain.SetPort(d, choices[i].port);
+                    if (problem != null) Interface.Interface.Say(problem, false);
+                    else Audio.Sounds.Play(Audio.Sounds.Tick);
+                });
+            });
         }
 
         private void ManualButtons(RectTransform row, MotorDevice m) {

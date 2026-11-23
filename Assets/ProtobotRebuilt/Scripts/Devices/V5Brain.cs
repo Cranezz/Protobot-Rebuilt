@@ -151,7 +151,9 @@ namespace Protobot.Devices {
             var parts = Object.FindObjectsByType<SavedObject>(FindObjectsSortMode.InstanceID)
                         .Where(s => s != null && !s.gameObject.IsDeleted() && s.gameObject.activeInHierarchy && Mine(s.gameObject)).Select(s => s.gameObject).ToList();
             // Motors in the order they were added (their numbers as before), then everything else in build order.
-            var motors = MotorDrive.Live().Select(m => m.gameObject).Where(Mine).ToList();
+            // (only live ones: a build opened this frame still has the old one's motors, switched off until the frame
+            // ends; counted, they took the ports and the new motors' kept ports were overwritten)
+            var motors = MotorDrive.Live().Select(m => m.gameObject).Where(m => m.activeInHierarchy && Mine(m)).ToList();
             foreach (var part in motors.Concat(parts.Where(p => !motors.Contains(p)))) {
                 var kind = KindOf(part);
                 if (kind == null || kind == DeviceKind.Solenoid) continue;
@@ -234,6 +236,61 @@ namespace Protobot.Devices {
             devices.AddRange(found.Where(d => !d.threeWire).OrderBy(d => d.port));
             devices.AddRange(found.Where(d => d.threeWire).OrderBy(d => d.port));
             Loop.Ensure();
+        }
+
+        // ------------------------------------------------------------------ V2 (build 74): choosing a port
+
+        /// <summary>The ports a device can be put on, as (code port, label): smart 1-21; 3-wire A-H on the brain and on
+        /// each 3-Wire Expander (pairs start on A, C, E, G). The label says who's on it now.</summary>
+        public static List<(int port, string label)> PortChoices(V5Device d) {
+            var list = new List<(int, string)>();
+            string Who(int code) {
+                var on = Devices.FirstOrDefault(o => o != d && o.threeWire == d.threeWire && Covers(o, code, d.ports));
+                return on == null ? "" : "  ·  " + on.Name + (on.wired ? " (cable)" : "");
+            }
+            if (!d.threeWire) {
+                for (var p = 1; p <= 21; p++) list.Add((p, "Port " + p + Who(p)));
+                return list;
+            }
+            var places = new List<int> { 0 };
+            places.AddRange(Devices.Where(o => o.kind == DeviceKind.Expander).Select(o => o.port).OrderBy(p => p));
+            foreach (var e in places)
+                for (var p = 1; p + d.ports - 1 <= 8; p++) {
+                    if (d.ports == 2 && p % 2 == 0) continue;
+                    var name = d.ports > 1 ? (char)('A' + p - 1) + "-" + (char)('A' + p + d.ports - 2) : ((char)('A' + p - 1)).ToString();
+                    var code = e * 100 + p;
+                    list.Add((code, (e > 0 ? "Expander " + e + " " : "") + name + Who(code)));
+                }
+            return list;
+        }
+
+        // Whether a device takes any of `size` ports from code port `code` (3-wire: expander x 100 + letter).
+        private static bool Covers(V5Device o, int code, int size) {
+            if (!o.threeWire) return o.port == code;
+            if (o.expander != code / 100) return false;
+            var start = code % 100;
+            return o.port < start + size && start < o.port + o.ports;
+        }
+
+        /// <summary>Puts a device on a port (kept with its part, as a plugged-in device stays in its port). A device on
+        /// the port already is moved to this one's old port (same size) or to the next free one. Null when it worked,
+        /// else why not (a Smart Cable from an older build decides its devices' ports).</summary>
+        public static string SetPort(V5Device d, int code) {
+            if (d?.part == null) return "This one can't be moved to another port";
+            if (d.wired) return "It's on a cable to port " + d.PortLabel + ": delete the cable to choose its port here";
+            if (code == d.CodePort) return null;
+            var others = Devices.Where(o => o != d && o.threeWire == d.threeWire && Covers(o, code, d.ports)).ToList();
+            var cabled = others.FirstOrDefault(o => o.wired);
+            if (cabled != null) return (d.threeWire ? "That port" : "Port " + code) + " has a cable to " + cabled.Name + ": delete the cable first";
+            var old = d.CodePort;
+            foreach (var o in others) {
+                if (o.part == null) continue;
+                // The same size: they swap. Otherwise it finds a free port again.
+                Dynamics.SetToken(o.part, "port", o.ports == d.ports && d.OnBrain ? old.ToString() : null);
+            }
+            Dynamics.SetToken(d.part, "port", code.ToString());
+            Refresh(true);
+            return null;
         }
 
         // Solenoids: each valve part, with the cylinders its tubing reaches (through fittings and tees); a cylinder no
