@@ -8,6 +8,14 @@ urgent bugs, releases a bug-fix build and closes the issues.
 Proto Bot reads the channels (it needs the **Message Content** intent: Discord Developer Portal > Proto Bot > Bot >
 Privileged Gateway Intents). The GitHub token is git's own sign-in (`git credential fill`), never printed.
 
+## The watcher (fixes start as soon as a report arrives)
+`watch.py` runs in the background (`pythonw -I Tools/Bugs/watch.py`, no window; log in Bug Reports/watch.log). Every
+minute it asks Discord, without using Claude, whether anything new is in #app-bug-reports or the #bugs forum; when there
+is, it waits 2 minutes (more may come) and runs `claude -p` with `fix_prompt.md` (this routine, unattended, permission
+mode bypassPermissions) in the project folder. One run at a time, at most 6 a day, a failed run waits 30 minutes; each
+run's output in Bug Reports/runs/. Needs the `claude` command signed in once (`claude`, then /login). `--status` and
+`--once` check by hand.
+
 ## Privacy (the repository is public)
 - Reports stay on this computer: `C:/Dev/ProtobotRebuiltV2/Bug Reports/Inbox/<date> <app|discord> <id>/` (message.txt,
   meta.json, the zip unpacked: report.md, session.log, build.pbb, screenshot.jpg...). Never commit them.
