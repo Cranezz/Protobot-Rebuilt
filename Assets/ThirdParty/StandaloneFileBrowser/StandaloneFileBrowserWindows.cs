@@ -21,6 +21,47 @@ namespace SFB {
         [DllImport("user32.dll")]
         private static extern IntPtr GetActiveWindow();
 
+        // V2: in full screen the dialog opened behind the game window (the window is topmost and the dialog,
+        // owned by it, was not): a helper thread finds the dialog while ShowDialog blocks and puts it on top.
+        private delegate bool EnumWindowsProc(IntPtr hWnd, IntPtr lParam);
+        [DllImport("user32.dll")] private static extern bool EnumWindows(EnumWindowsProc proc, IntPtr lParam);
+        [DllImport("user32.dll")] private static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint pid);
+        [DllImport("user32.dll")] private static extern bool IsWindowVisible(IntPtr hWnd);
+        [DllImport("user32.dll", CharSet = CharSet.Unicode)] private static extern int GetClassName(IntPtr hWnd, System.Text.StringBuilder text, int max);
+        [DllImport("user32.dll")] private static extern bool SetWindowPos(IntPtr hWnd, IntPtr after, int x, int y, int cx, int cy, uint flags);
+        [DllImport("user32.dll")] private static extern bool SetForegroundWindow(IntPtr hWnd);
+
+        static void BringDialogToFront(object stop) {
+            var flag = (bool[])stop;
+            var mine = (uint)System.Diagnostics.Process.GetCurrentProcess().Id;
+            var done = new System.Collections.Generic.HashSet<IntPtr>();
+            for (int i = 0; i < 100 && !flag[0]; i++) {
+                EnumWindows((hWnd, l) => {
+                    uint pid;
+                    GetWindowThreadProcessId(hWnd, out pid);
+                    if (pid != mine || !IsWindowVisible(hWnd) || done.Contains(hWnd))
+                        return true;
+                    var name = new System.Text.StringBuilder(64);
+                    GetClassName(hWnd, name, 64);
+                    if (name.ToString() == "#32770") { // a standard dialog of this app
+                        done.Add(hWnd);
+                        SetWindowPos(hWnd, new IntPtr(-1), 0, 0, 0, 0, 0x0001 | 0x0002 | 0x0040); // TOPMOST, no move/size, show
+                        SetForegroundWindow(hWnd);
+                    }
+                    return true;
+                }, IntPtr.Zero);
+                System.Threading.Thread.Sleep(50);
+            }
+        }
+
+        static DialogResult ShowOnTop(CommonDialog fd) {
+            var stop = new bool[1];
+            var t = new System.Threading.Thread(BringDialogToFront) { IsBackground = true };
+            t.Start(stop);
+            try { return fd.ShowDialog(new WindowWrapper(GetActiveWindow())); }
+            finally { stop[0] = true; }
+        }
+
         public string[] OpenFilePanel(string title, string directory, ExtensionFilter[] extensions, bool multiselect) {
             var fd = new VistaOpenFileDialog();
             fd.Title = title;
@@ -35,7 +76,7 @@ namespace SFB {
             if (!string.IsNullOrEmpty(directory)) {
                 fd.FileName = GetDirectoryPath(directory);
             }
-            var res = fd.ShowDialog(new WindowWrapper(GetActiveWindow()));
+            var res = ShowOnTop(fd);
             var filenames = res == DialogResult.OK ? fd.FileNames : new string[0];
             fd.Dispose();
             return filenames;
@@ -51,7 +92,7 @@ namespace SFB {
             if (!string.IsNullOrEmpty(directory)) {
                 fd.SelectedPath = GetDirectoryPath(directory);
             }
-            var res = fd.ShowDialog(new WindowWrapper(GetActiveWindow()));
+            var res = ShowOnTop(fd);
             var filenames = res == DialogResult.OK ? new []{ fd.SelectedPath } : new string[0];
             fd.Dispose();
             return filenames;
@@ -87,7 +128,7 @@ namespace SFB {
                 fd.Filter = string.Empty;
                 fd.AddExtension = false;
             }
-            var res = fd.ShowDialog(new WindowWrapper(GetActiveWindow()));
+            var res = ShowOnTop(fd);
             var filename = res == DialogResult.OK ? fd.FileName : "";
             fd.Dispose();
             return filename;
