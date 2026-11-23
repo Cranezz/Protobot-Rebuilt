@@ -5,10 +5,12 @@ Every minute it asks Discord (through Proto Bot, a few cheap REST calls, no Clau
 #bugs forum has something newer than what bugs.py has filed. When it does, it waits WAIT seconds (reports often come
 in twos and threes), then runs
 
-    claude -p <Tools/Bugs/fix_prompt.md> --permission-mode bypassPermissions
-
-in the project folder, one run at a time, and writes what it did to C:/Dev/ProtobotRebuiltV2/Bug Reports/runs/<time>.log.
-The run itself (fix_prompt.md -> Tools/Bugs/README.md) files the reports, fixes P0-P2 bugs and releases the fix.
+three kinds of Claude Code run in the project folder (prompts in Tools/Bugs/prompts, each with rules.md first):
+  1. triage (haiku, medium): files the new reports (bugs.py) and plans the fixes: for each open P0-P2 bug the cheapest
+     model and effort that will fix it (haiku/low for a one-line fix ... opus/xhigh for an unclear crash);
+  2. a fix run per bug with that model and effort (one more try on opus/high when a cheaper model couldn't);
+  3. release (sonnet, low) when anything was fixed: the bug-fix build, GitHub, the one-line #releases post, closing.
+One run at a time; what each did (and cost) goes to C:/Dev/ProtobotRebuiltV2/Bug Reports/runs/<time>.log.
 
 Limits so it can't run away: at most MAX_RUNS_PER_DAY runs a day, and after a failed run it waits 30 minutes.
 
@@ -96,25 +98,97 @@ def signed_in():
         return False
 
 
+# ------------------------------------------------------------------ the runs: triage, fixes, release
+
+SCHEMAS = {
+    "triage": {"type": "object", "properties": {
+        "plan": {"type": "array", "items": {"type": "object", "properties": {
+            "issue": {"type": "integer"}, "title": {"type": "string"}, "priority": {"type": "string"},
+            "model": {"type": "string", "enum": ["haiku", "sonnet", "opus"]},
+            "effort": {"type": "string", "enum": ["low", "medium", "high", "xhigh"]}, "why": {"type": "string"}},
+            "required": ["issue", "model", "effort"]}},
+        "filed": {"type": "array", "items": {"type": "string"}}, "note": {"type": "string"}}, "required": ["plan"]},
+    "fix": {"type": "object", "properties": {"fixed": {"type": "boolean"}, "summary": {"type": "string"},
+                                             "note": {"type": "string"}}, "required": ["fixed"]},
+    "release": {"type": "object", "properties": {"released": {"type": "boolean"}, "build": {"type": "integer"},
+                                                 "note": {"type": "string"}}, "required": ["released"]},
+}
+TRIAGE = ("haiku", "medium")    # reading and filing reports: the cheapest model
+RELEASE = ("sonnet", "low")     # building and publishing: steps written down
+ESCALATE = ("opus", "high")     # a fix a cheaper model couldn't do gets one more try
+NL = chr(10)
+
+
+def prompt(name, **fill):
+    text = open(os.path.join(HERE, "prompts", "rules.md"), encoding="utf-8").read() + NL + NL
+    text += open(os.path.join(HERE, "prompts", name + ".md"), encoding="utf-8").read()
+    for k, v in fill.items():
+        text = text.replace("{" + k + "}", str(v))
+    return text
+
+
+def claude(stage, text, model, effort, out):
+    """One Claude Code run in the project folder; its structured answer (a dict) or None."""
+    out.write(NL + f"## {stage}: {model}, effort {effort}" + NL)
+    out.flush()
+    flags = subprocess.CREATE_NO_WINDOW if os.name == "nt" else 0
+    try:
+        p = subprocess.run([CLAUDE, "-p", text, "--model", model, "--effort", effort, "--permission-mode", "bypassPermissions",
+                            "--output-format", "json", "--json-schema", json.dumps(SCHEMAS[stage.split()[0]])],
+                           cwd=PROJECT, capture_output=True, text=True, encoding="utf-8", errors="replace",
+                           stdin=subprocess.DEVNULL, timeout=RUN_LIMIT, creationflags=flags)
+    except subprocess.TimeoutExpired:
+        out.write("timed out" + NL)
+        return None
+    answer = None
+    try:
+        whole = json.loads(p.stdout)
+        answer = whole.get("structured_output")
+        if answer is None and isinstance(whole.get("result"), str):
+            r = whole["result"]
+            answer = json.loads(r[r.index("{"):r.rindex("}") + 1])
+        out.write(f"cost ${whole.get('total_cost_usd', 0):.2f}, {whole.get('num_turns', '?')} turns" + NL)
+    except Exception:
+        out.write("couldn't read the answer: " + (p.stdout or "")[-1500:] + (p.stderr or "")[-800:] + NL)
+    out.write(json.dumps(answer, indent=1) + NL)
+    out.flush()
+    return answer
+
+
 def fix_run(reason):
     os.makedirs(RUNS, exist_ok=True)
     name = datetime.datetime.now().strftime("%Y-%m-%d %H%M%S") + ".log"
-    path = os.path.join(RUNS, name)
-    prompt = open(os.path.join(HERE, "fix_prompt.md"), encoding="utf-8").read()
-    log(f"starting a fix run ({reason}) -> runs/{name}")
-    flags = subprocess.CREATE_NO_WINDOW if os.name == "nt" else 0
-    with open(path, "w", encoding="utf-8") as out:
-        out.write(f"# Fix run, {reason}\n\n")
-        out.flush()
-        try:
-            p = subprocess.run([CLAUDE, "-p", prompt, "--permission-mode", "bypassPermissions"], cwd=PROJECT,
-                               stdout=out, stderr=subprocess.STDOUT, stdin=subprocess.DEVNULL, timeout=RUN_LIMIT,
-                               creationflags=flags)
-            code = p.returncode
-        except subprocess.TimeoutExpired:
-            code = "timeout"
-    log(f"fix run finished: {code}")
-    return code == 0
+    log(f"starting ({reason}) -> runs/{name}")
+    with open(os.path.join(RUNS, name), "w", encoding="utf-8") as out:
+        out.write(f"# Bug run, {reason}" + NL)
+        plan = claude("triage", prompt("triage"), *TRIAGE, out)
+        if plan is None:
+            log("triage failed")
+            return False
+        for line in plan.get("filed", []):
+            log("filed: " + line)
+        fixes = []
+        for item in plan.get("plan", [])[:5]:
+            n, title = item["issue"], item.get("title", "")
+            model, effort = item.get("model", "sonnet"), item.get("effort", "medium")
+            log(f"fixing #{n} with {model} ({effort}): {item.get('why', '')}")
+            result = claude("fix #%d" % n, prompt("fix", issue=n, title=title), model, effort, out)
+            if (result is None or not result.get("fixed")) and (model, effort) != ESCALATE and model != "opus":
+                log(f"#{n} not fixed by {model}: trying {ESCALATE[0]} ({ESCALATE[1]})")
+                result = claude("fix #%d" % n, prompt("fix", issue=n, title=title), *ESCALATE, out)
+            if result and result.get("fixed"):
+                fixes.append((n, result.get("summary") or title))
+                log(f"#{n} fixed")
+            else:
+                log(f"#{n} left open: " + ((result or {}).get("note") or "no answer")[:200])
+        if fixes:
+            lines = NL.join(f"- #{n}: {s}" for n, s in fixes)
+            done = claude("release", prompt("release", fixes=lines), *RELEASE, out)
+            log("release: " + (f"build {done.get('build')}" if done and done.get("released") else "FAILED " + ((done or {}).get("note") or "")[:200]))
+        if plan.get("note"):
+            log("note: " + plan["note"][:300])
+    log("run finished")
+    return True
 
 
 def check_once():

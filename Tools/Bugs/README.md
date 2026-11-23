@@ -9,12 +9,20 @@ Proto Bot reads the channels (it needs the **Message Content** intent: Discord D
 Privileged Gateway Intents). The GitHub token is git's own sign-in (`git credential fill`), never printed.
 
 ## The watcher (fixes start as soon as a report arrives)
-`watch.py` runs in the background (`pythonw -I Tools/Bugs/watch.py`, no window; log in Bug Reports/watch.log). Every
-minute it asks Discord, without using Claude, whether anything new is in #app-bug-reports or the #bugs forum; when there
-is, it waits 2 minutes (more may come) and runs `claude -p` with `fix_prompt.md` (this routine, unattended, permission
-mode bypassPermissions) in the project folder. One run at a time, at most 6 a day, a failed run waits 30 minutes; each
-run's output in Bug Reports/runs/. Needs the `claude` command signed in once (`claude`, then /login). `--status` and
-`--once` check by hand.
+`watch.py` runs in the background (started at Windows logon by "Protobot bug watcher.lnk" in the Startup folder; log in
+Bug Reports/watch.log). Every minute it asks Discord, without using Claude, whether anything new is in #app-bug-reports
+or the #bugs forum; when there is, it waits 2 minutes (more may come), then runs Claude Code (`claude -p`, unattended,
+bypassPermissions) in stages, each on the cheapest model that does it well (prompts in `prompts/`, `rules.md` first):
+1. **triage** (haiku, medium): files the reports and plans the fixes, choosing a model and effort per bug: haiku/low for
+   a one-place fix the stack points at, sonnet/medium for an ordinary bug, sonnet/high when it must be reproduced in
+   Unity, opus/high for physics, multiplayer, performance, robot code or an unclear cause, opus/xhigh for an unclear P0;
+2. **fix** (one run per bug, at most 5, with the chosen model): reproduce, fix, play-test, commit (no push); a fix a
+   cheaper model couldn't do gets one more try on opus/high;
+3. **release** (sonnet, low), when anything was fixed: notes, build, push, GitHub release, one-line #releases post,
+   `bugs.py fixed`.
+One run at a time, at most 6 a day, a failed run waits 30 minutes; each run's stages, answers and cost in
+Bug Reports/runs/. Needs the `claude` command signed in once (`claude`, then /login). `--status` and `--once` check by
+hand.
 
 ## Privacy (the repository is public)
 - Reports stay on this computer: `C:/Dev/ProtobotRebuiltV2/Bug Reports/Inbox/<date> <app|discord> <id>/` (message.txt,
