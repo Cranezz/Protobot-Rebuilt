@@ -2,9 +2,10 @@
 Pings and is published to servers following the channel.
 
     python -I Tools/Discord/post_release.py 70 [--no-ping] [--video FILE.mp4]
+    python -I Tools/Discord/post_release.py 73 --short      a bug-fix build: one line, no ping, the notes on GitHub
 
-Only for big releases (new features, a new beta): bug-fix builds still go to GitHub Releases (that's how Protobot
-updates itself) but aren't posted, so the channel stays short. Reads the build's notes from Release/ ("Release v2.0
+Big releases (new features, a new beta) get the headlines post with an Update Pings mention; bug-fix builds get a
+one-line message (the owner's rule: the full notes are on the GitHub release), so the channel stays short. Reads the build's notes from Release/ ("Release v2.0
 Beta 1 (build 70).md", or "Release 1.9.N.md" from before). Running it again for the same build edits the post."""
 import glob
 import os
@@ -65,6 +66,11 @@ def main():
     if more > 0:
         body += f"\n…and {more} more."
     url = f"{C.REPO}/releases/tag/{tag_for(label, build)}"
+    if "--short" in sys.argv:
+        # One line: what it is (the notes' first bold line, "Bug fixes."), and where the full notes are.
+        what = summary.rstrip(".") if summary and len(summary) < 80 else "Bug fixes"
+        ping = False
+        short_text = f"🛠️ **Protobot {label}**: {what}. It updates itself; full notes: <{url}>"
     embed = {
         "title": f"🆕 Protobot {label}",
         "url": url,
@@ -77,6 +83,8 @@ def main():
     role = state["roles"]["ping_updates"]
     message = {"content": (f"<@&{role}> " if ping else "") + f"**Protobot {label}** is out!", "embeds": [embed],
                "allowed_mentions": {"parse": [], "roles": [role] if ping else []}}
+    if "--short" in sys.argv:
+        message = {"content": short_text, "embeds": [], "allowed_mentions": {"parse": []}}
     posted = state.setdefault("releases", {})
     mid = posted.get(str(build))
     if mid and call("GET", f"/channels/{channel}/messages/{mid}", ok404=True):

@@ -43,10 +43,11 @@ Privileged Gateway Intents). The GitHub token is git's own sign-in (`git credent
    "Bug fixes:" bullets, one per issue, no personal details), build and release as in CLAUDE.md / AGENT_HANDOFF.md
    ("Build and release routine"): `bash Tools/AgentTesting/release_build.sh`, delete the
    BurstDebugInformation folder, copy the notes into the build folder as "Release notes.md", `vpk pack` (version
-   2.0.0-beta.1.N), `vpk upload github --tag v2.0.0-beta.1.N --releaseName "v2.0 Beta 1 (build N)"`. Bug-fix builds are
-   **not** posted in #releases (the owner's rule). Revert the font atlases, commit (no co-author line), push
+   2.0.0-beta.1.N), `vpk upload github --tag v2.0.0-beta.1.N --releaseName "v2.0 Beta 1 (build N)"`, then a one-line
+   post in #releases: `python -I Tools/Discord/post_release.py N --short` (the owner's rule: bug fixes get one line, the
+   full notes are on GitHub; no ping). Revert the font atlases, commit (no co-author line), push
    `git push origin v2-classic-protobot:main`, then `bugs.py fixed ISSUE --build N` for each fixed issue (closes it and
    tells the forum thread).
-5. Never: post in Discord channels other than the bug threads the script answers in, change the server, publish a
+5. Never: post in Discord channels other than the bug threads the script answers in and the one-line #releases post, change the server, publish a
    feature release, push the backup/* branches, bring the Unity window to the front (the owner is using the computer),
    or delete reports.

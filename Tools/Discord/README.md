@@ -14,9 +14,10 @@ Private files live outside the repository in `C:/Dev/ProtobotRebuiltV2/Discord`:
   rules / FAQ / download / staff messages, the tutorial guides and the pinned forum guides. Edit text here.
 - `setup_server.py`: applies it. `python -I Tools/Discord/setup_server.py [steps]` (steps: settings roles channels
   community automod messages guides tutorials welcome onboarding webhooks invite check).
-- `post_release.py <build> [--no-ping]`: a short post (headlines + link) for a **big** release in #releases (Update Pings
-  mention, published to following servers). Bug-fix builds aren't posted (the owner's rule: keep #releases short). Run it
-  right after `vpk upload github`. The bot may mention roles only in #releases and #announcements (a channel overwrite).
+- `post_release.py <build> [--no-ping] [--video FILE]`: a short post (headlines + link) for a **big** release in
+  #releases (Update Pings mention, published to following servers). `post_release.py <build> --short`: a bug-fix build,
+  one line, no ping (the owner's rule: the full notes are on the GitHub release). Run it right after `vpk upload github`.
+  The bot may mention roles only in #releases and #announcements (a channel overwrite).
 - `discord_api.py`: the small REST client (no gateway, no commands: there is nothing in Discord to talk to the bot with).
 
 ## Permissions
