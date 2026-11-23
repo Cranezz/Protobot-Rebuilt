@@ -1,10 +1,10 @@
 # Privacy Policy
 
-Protobot Rebuilt V2 ("Protobot") is a free, open-source robot building program made by a volunteer developer (GitHub user Cranezz). This policy says what Protobot keeps, what it sends, who sees it and how to have it deleted. Effective 22 November 2026.
+Protobot Rebuilt V2 ("Protobot") is a free, open-source robot building program made by a volunteer developer (GitHub user Cranezz). This policy says what Protobot keeps, what it sends, who sees it and how to have it deleted. Effective 22 November 2026 (updated: usage time, see below).
 
 # The short version
 
-- Building, simulating, robot code and offline games happen on your computer. Nothing about them is sent anywhere.
+- Building, simulating, robot code and offline games happen on your computer. Your builds and code aren't sent anywhere. Once you've agreed to these terms, Protobot sends how long it's used and on which parts of the app (see "Usage time").
 - Going online (Multiplayer, the skills leaderboard) uses Unity Gaming Services. Unity keeps a player id, the name you play under, your stats and scores, and, if you make an account, its username and your birth month and year.
 - Passwords go straight to Unity's sign-in service. Unity stores them hashed (scrambled one way): nobody can read them, not the developer and not other players.
 - Players under 13 can play online and make an account, but without voice chat and under a made-up name.
@@ -26,6 +26,7 @@ These are kept in your user folder (AppData) and never leave it unless you send 
 - **Your name in matches:** the name you choose (players under 13 get a made-up one, like "Speedy Gear 42"). Others in the server list, the lobby and the match see it, and your robot's name (just "Robot" for players under 13).
 - **Matches:** your robot (its build and custom parts) and its moves go to the other players in that match while it's played, through Unity's relay. They're not kept afterward, except in a report (below).
 - **Stats and leaderboard:** matches won, lost and tied, points and skills scores. The leaderboard shows your name, score and robot name to everyone.
+- **Usage time (after you agree to these terms):** while Protobot is open and being used, once a minute it sends how many seconds were spent on each part of the app (the home menu, building, simulating, games, multiplayer, robot code, sketching, replays), with your player id, the name you play under and whether it's an account. Unity keeps your total, the time per part and per day (the last 60 days), and when you were first and last online. Only the developer sees it, to learn how Protobot is used and what to improve, and to show the number of players online on the home menu (just a number). It's never shown to other players, sold or used for advertising, and Delete my online data deletes it.
 - **Badges:** badges your account has earned (like Beta tester, for playing 10 minutes during the beta: Protobot counts the time on your computer and the badge is claimed with an account). Other players see them beside your name in the server list and lobbies.
 - **Shared replays:** your best skills run on the leaderboard, so others can watch it. It holds your robot and its program. Players under 13 don't share replays.
 - **Voice chat (13 and older):** in online matches you can talk to your alliance partner through Unity's Vivox service. Voice is sent live and isn't recorded or kept by Protobot. You can switch it off. Players under 13 don't hear voice chat and aren't heard; a crossed-out speaker by their name tells their teammates.
@@ -50,7 +51,7 @@ They can still play matches, keep stats and appear on the skills leaderboard und
 
 # Deleting your data
 
-- **In Protobot:** the Profile page (click your name at the bottom left of the home menu, or Multiplayer > Profile): Delete my online data deletes your player or account, your stats, badges, birth month and year, shared replays and leaderboard scores (the scores disappear at once and are removed for good by the developer within 30 days).
+- **In Protobot:** the Profile page (click your name at the bottom left of the home menu, or Multiplayer > Profile): Delete my online data deletes your player or account, your stats, badges, usage time, birth month and year, shared replays and leaderboard scores (the scores disappear at once and are removed for good by the developer within 30 days).
 - **On your computer:** uninstall Protobot and delete its data folder (Help > Open bug log folder opens its Logs folder; delete the folder above it).
 - **Anything else** (a report you sent): ask the developer (below).
 

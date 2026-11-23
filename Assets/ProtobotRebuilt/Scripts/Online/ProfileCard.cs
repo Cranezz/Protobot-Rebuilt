@@ -21,6 +21,11 @@ namespace Protobot.Online {
         private TextMeshProUGUI initial, title, subtitle;
         private RectTransform badges;
         private string shown;
+        private TextMeshProUGUI online;
+        private RectTransform onlineRow;
+
+        /// <summary>The home menu is showing (Presence counts that time as "Home menu").</summary>
+        public static bool HomeShown { get; private set; }
 
         /// <summary>Made by LaunchRestyle with the home menu's window (shown while it is).</summary>
         public static void Make(GameObject splashPanel) {
@@ -67,12 +72,34 @@ namespace Protobot.Online {
             subtitle = Ui.Text(column, "Status", "", Theme.FontSmall - 1f, new Color(1f, 1f, 1f, 0.6f));
             subtitle.Size(-1, 18f);
             Ui.Tip(back, "Profile", null, "Sign in or make an account, and see your stats and badges.");
+            // V2 (build 75): how many players are online now, just above the card.
+            onlineRow = Ui.Rect("Online", root);
+            onlineRow.anchorMin = onlineRow.anchorMax = new Vector2(0f, 1f);
+            onlineRow.pivot = new Vector2(0f, 0f);
+            onlineRow.anchoredPosition = new Vector2(6f, 6f);
+            onlineRow.sizeDelta = new Vector2(320f, 22f);
+            Ui.Row(onlineRow, 7f, null, TextAnchor.MiddleLeft);
+            var dot = Ui.Image(onlineRow, "Dot", Theme.Success, 0f);
+            dot.sprite = Theme.Circle;
+            dot.Size(9f, 9f, 0f);
+            online = Ui.Text(onlineRow, "Count", "", Theme.FontSmall, new Color(1f, 1f, 1f, 0.75f));
+            online.Size(-1, 22f, 1f);
+            Presence.Changed += ShowOnline;
+            ShowOnline();
             Accounts.Changed += Refresh;
             Badges.Changed += Refresh;
             Refresh();
         }
 
+        private void ShowOnline() {
+            if (online == null) return;
+            var n = Presence.Online;
+            onlineRow.gameObject.SetActive(n >= 0);
+            online.text = n == 1 ? "1 player online" : n.ToString("N0") + " players online";
+        }
+
         private void OnDestroy() {
+            Presence.Changed -= ShowOnline;
             Accounts.Changed -= Refresh;
             Badges.Changed -= Refresh;
         }
@@ -112,7 +139,9 @@ namespace Protobot.Online {
         private void Update() {
             // Shown with the home menu's window only (not over Credits' recent builds... nor anything else).
             var show = splash != null && splash.activeInHierarchy && !OnlineWindow.IsOpen;
+            HomeShown = splash != null && splash.activeInHierarchy;
             if (card.gameObject.activeSelf != show) card.gameObject.SetActive(show);
+            if (onlineRow != null) onlineRow.gameObject.SetActive(show && Presence.Online >= 0);
             if (show && Time.unscaledTime > next) {
                 next = Time.unscaledTime + 1f;
                 Refresh();   // (a name changed elsewhere)

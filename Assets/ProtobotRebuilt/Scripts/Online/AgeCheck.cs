@@ -15,7 +15,7 @@ namespace Protobot.Online {
     public static class AgeCheck {
         private const string BirthKey = "V2.Birth", TermsKey = "V2.TermsAgreed";
         /// <summary>Raise when the Terms or Privacy Policy change in a way players must agree to again.</summary>
-        public const int TermsVersion = 1;
+        public const int TermsVersion = 2;   // V2 (build 75): the Privacy Policy now covers usage time (Presence)
         public const string Why = "Children's privacy law (the US COPPA rule) asks us to know if you're under 13: players under 13 play online "
                                   + "without voice chat. Only the month and year are kept (not the day), so voice chat switches on by itself "
                                   + "when you turn 13. It can't be changed later, so check it.";

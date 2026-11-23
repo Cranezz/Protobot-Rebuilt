@@ -1,0 +1,21 @@
+fileFormatVersion: 2
+guid: b40fa25d47cf4ef29c5d0d50ab4ac710
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects: {}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: fbc33bd6a5704c0881dc7a9ead54089b, type: 3}
+  Parameters:
+  - Name: areas
+    ParameterType: 4
+    Required: 0
+  - Name: name
+    ParameterType: 0
+    Required: 0
+  - Name: account
+    ParameterType: 0
+    Required: 0
+  Source: 0

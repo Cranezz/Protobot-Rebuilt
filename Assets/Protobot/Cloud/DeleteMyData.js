@@ -19,6 +19,16 @@ module.exports = async ({ context, logger }) => {
   };
 
   await attempt("protected", () => data.deleteProtectedItems(projectId, playerId));
+  // V2 (build 75): their usage time and last-seen (private custom data "usage" / "presence", key = player id); if the
+  // delete call isn't there, the entries are emptied instead.
+  for (const id of ["usage", "presence"])
+    await attempt(id, async () => {
+      try { await data.deletePrivateCustomItem(playerId, projectId, id); }
+      catch (e) {
+        if (e.response && e.response.status === 404) return;
+        await data.setPrivateCustomItem(projectId, id, { key: playerId, value: { deleted: true } });
+      }
+    });
   await attempt("public", () => data.deletePublicItems(projectId, playerId));
   await attempt("default", () => data.deleteItems(projectId, playerId));
   await attempt("files", async () => {
