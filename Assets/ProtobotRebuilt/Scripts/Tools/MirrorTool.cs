@@ -10,7 +10,8 @@ namespace Protobot.Tools {
     // sits on each side of the part along its own axes, like the transform gizmo's handles. Click one and the part
     // (with everything that moves with it: its screwed-together group; Shift: the part alone) is copied to that side,
     // mirrored through the plane of its outside face, so the copy touches it. Hold and drag the icon outward to put
-    // the copy further away (the gap snaps to the transform tool's move step; Shift free). One undo step.
+    // the copy further away (the gap snaps to the transform tool's move step, and the mirror plane onto the build's centre line when it's
+    // near it; Shift free). One undo step.
     // Real parts can't be turned inside out, so each copy is the part turned to look like its mirror image: flipped
     // through the plane of its own that it is symmetric about (found from its mesh), which makes a proper turn. A part
     // with no such plane (a left gusset) gets the closest turn, and the message says so. A copy landing on the same
@@ -67,7 +68,28 @@ namespace Protobot.Tools {
 
         private List<GameObject> Targets(bool alone) {
             if (alone) return new List<GameObject> { part };
-            return part.GetConnectedObjects(true, true).Where(o => o != null && o.GetComponent<SavedObject>() != null && Live(o)).Distinct().ToList();
+            var group = part.GetConnectedObjects(true, true).Where(o => o != null && o.GetComponent<SavedObject>() != null && Live(o)).Distinct().ToList();
+            return WithShafts(group);
+        }
+
+        /// <summary>V2: shafts aren't screwed into a group (they turn in it), so a drive side mirrored without them lost
+        /// its motor shafts and the gears and spacers on them: every shaft through the parts goes too, with what's on it.</summary>
+        public static List<GameObject> WithShafts(List<GameObject> parts) {
+            var set = new HashSet<GameObject>(parts);
+            var grew = true;
+            while (grew) {
+                grew = false;
+                foreach (var shaft in FindObjectsByType<Shaft>(FindObjectsSortMode.None)) {
+                    if (shaft == null || !Live(shaft.gameObject) || set.Contains(shaft.gameObject) || shaft.holeDetector == null) continue;
+                    var on = shaft.holeDetector.holes.Where(h => h != null && h.holeData != null && h.holeData.part != null)
+                        .Select(h => h.holeData.part.gameObject).Where(o => o.GetComponent<SavedObject>() != null && Live(o)).Distinct().ToList();
+                    if (!on.Any(set.Contains)) continue;
+                    set.Add(shaft.gameObject);
+                    foreach (var o in on) set.Add(o);
+                    grew = true;
+                }
+            }
+            return parts.Concat(set.Where(o => !parts.Contains(o))).ToList();
         }
 
         private static bool Live(GameObject p) =>
@@ -108,6 +130,41 @@ namespace Protobot.Tools {
             var denominator = a * c - b * b;
             if (Mathf.Abs(denominator) < 1e-6f) return 0f;
             return (b * e - c * d) / denominator;
+        }
+
+        /// <summary>V2 (tutorial videos): where the icon of the side facing most toward a world direction is on screen
+        /// (pixels), or null when the tool isn't showing.</summary>
+        public static Vector2? IconToward(Vector3 world, float gap = 0f) {
+            var tool = FindAnyObjectByType<MirrorTool>();
+            var camera = Overlay.ViewCamera;
+            if (tool == null || tool.part == null || camera == null) return null;
+            var box = tool.LocalBounds(tool.Targets(false));
+            var perPixel = PerPixel(camera, tool.part.transform.TransformPoint(box.center));
+            var best = -1;
+            var bestDot = -2f;
+            for (var k = 0; k < 6; k++) {
+                var dot = Vector3.Dot(tool.Side(box, k).direction, world.normalized);
+                if (dot > bestDot) { bestDot = dot; best = k; }
+            }
+            var (direction, face) = tool.Side(box, best);
+            var at = camera.WorldToScreenPoint(face + direction * (gap / 2f + 26f * perPixel));
+            return new Vector2(at.x, at.y);
+        }
+
+        /// <summary>V2 (tutorial videos): the gap that puts the mirror plane of the side facing a world direction on
+        /// the build's centre line (0 when the tool isn't showing).</summary>
+        public static float CentreGap(Vector3 world) {
+            var tool = FindAnyObjectByType<MirrorTool>();
+            if (tool == null || tool.part == null) return 0f;
+            var box = tool.LocalBounds(tool.Targets(false));
+            var best = 0;
+            var bestDot = -2f;
+            for (var k = 0; k < 6; k++) {
+                var dot = Vector3.Dot(tool.Side(box, k).direction, world.normalized);
+                if (dot > bestDot) { bestDot = dot; best = k; }
+            }
+            var (direction, face) = tool.Side(box, best);
+            return Mathf.Max(0f, -2f * Vector3.Dot(face, direction));
         }
 
         private (Vector3 direction, Vector3 face) Side(Bounds box, int k) {
@@ -168,8 +225,19 @@ namespace Protobot.Tools {
                 if (Vector2.Distance(mouse, pressAt) > 4f) {
                     var raw = Mathf.Max(0f, (AlongLine(camera, face, direction) - dragStart) * 2f);
                     var step = TransformGizmo.MoveStep;
-                    gap = (keyboard != null && keyboard.shiftKey.isPressed) || step <= 0f ? raw : Mathf.Round(raw / step) * step;
-                    Overlay.MouseText("gap " + Inch.Format(gap), Theme.Accent, null, true);
+                    var shift = keyboard != null && keyboard.shiftKey.isPressed;
+                    gap = shift || step <= 0f ? raw : Mathf.Round(raw / step) * step;
+                    // V2: near the build's centre line (the world plane through the origin square to a world axis), the
+                    // mirror plane goes on it: a robot's two sides come out exactly symmetric about its middle.
+                    var centre = false;
+                    if (!shift && Mathf.Max(Mathf.Abs(direction.x), Mathf.Max(Mathf.Abs(direction.y), Mathf.Abs(direction.z))) > 0.999f) {
+                        var onCentre = raw - 2f * Vector3.Dot(face + direction * (raw / 2f), direction);
+                        if (onCentre >= 0f && Mathf.Abs(onCentre - raw) < Mathf.Max(step, 0.25f)) {
+                            gap = onCentre;
+                            centre = true;
+                        }
+                    }
+                    Overlay.MouseText("gap " + Inch.Format(gap) + (centre ? " · on the centre line" : ""), Theme.Accent, null, true);
                 }
                 if (!MouseInput.LeftButton.isPressed) {
                     dragging = -1;

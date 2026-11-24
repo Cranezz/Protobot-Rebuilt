@@ -1,0 +1,59 @@
+# Tutorial 10: robot code. PRE=cs/t_v9scene.cs (the Override demo robot).
+do partsreset 2
+do camera 0 0 0 30 25 40
+frame 0 0.8
+move 980,620 0.01
+wait 1.0
+
+# 1 Intro
+line 1
+frame 8 0.8 yaw:80 pitch:25
+waitline
+
+# 2 Code window, Examples
+line 2
+click ui:Top Bar/Bar/Right/Code 0.9
+wait 2.2
+click text:Examples 0.8
+wait 1.2
+move text:Autonomous square 0.8
+wait 0.6
+click
+waitline
+
+# 3 Filled in
+line 3
+wait 1.0
+move here +0,120 1.2
+wait 2.0
+move here +0,120 1.0
+waitline
+
+# 4 Run
+line 4
+click text:Run 0.9
+wait 1.2
+click ui:Top Bar/Bar/Right/Code 0.8
+wait 0.8
+click ui:Minimize 0.7
+move 1300,700 0.8
+waitline
+wait 4.0
+
+# 5 Output
+line 5
+click ui:Top Bar/Bar/Right/Code 0.9
+wait 1.0
+move text:Output 0.8
+wait 1.2
+move text:Brain screen 0.6
+wait 1.0
+move text:Graph 0.5
+wait 1.0
+move text:Monitor 0.5
+waitline
+
+# 6 Outro
+line 6
+waitline
+wait 1.0

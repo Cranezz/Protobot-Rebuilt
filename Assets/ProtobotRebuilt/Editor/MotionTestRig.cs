@@ -11,8 +11,14 @@ namespace Protobot.EditorTools {
         private static GameObject Part(string id, Vector3 position, Quaternion rotation) {
             var part = PartsManager.GeneratePart(id, position, rotation);
             made.Add(part);
+            if (Tag != null) Tags[part] = Tag;
             return part;
         }
+
+        /// <summary>V2 (tutorial videos): when set, every part made is listed in <see cref="Tags"/> under it (the
+        /// stages a demo reveals).</summary>
+        public static string Tag;
+        public static readonly Dictionary<GameObject, string> Tags = new();
 
         // Local z along forward, local x along xDirection.
         private static Quaternion Frame(Vector3 forward, Vector3 xDirection) => Quaternion.LookRotation(forward, Vector3.Cross(forward, xDirection));
@@ -265,6 +271,156 @@ namespace Protobot.EditorTools {
                         Nut(at - up * 0.0625f, up);
                     }
             }
+            return made.GetRange(start, made.Count - start);
+        }
+
+        /// <summary>
+        /// V2 (tutorial 2, the developer's team's drivetrain from their photos): six motors on 3.25" omnis, an inner and an
+        /// outer 31-hole 1x2 C-channel per side 2" apart, one gear line between them from back to front: wheel 60T, motor
+        /// 36T, wheel, motor, idler 36T (on a screw), motor, wheel (z -5.5, -3.5, -1.5, 0.5, 2, 3.5, 5.5: the two wheels
+        /// close together at the back and one at the front, as the photos). Motors 600 rpm: 360 rpm at the wheels.
+        /// Standoffs tie each side's rails at both ends; three 23-hole C-channels across the inner rails' top flanges.
+        /// Parts are tagged (Tags) by the stage the video shows them in (the video builds the left side, then mirrors it):
+        /// rail1 (the left inner rail), lframe (its outer rail and standoffs), w1screw / w1parts / w1wheel / w1bolts (the
+        /// back wheel: its axle screw, the nuts, spacers and gear on it, the wheel, the bolts holding the gear to the
+        /// wheel), w2parts / w2wheel / w2group (the next wheel: its wheel, and its gear and bolts: pasted with it, never revealed), lwheels (the front wheel), m1motor, lmotors (the left
+        /// motors, their gears, the idler), rside (the whole right side: made by the mirror), bars, bar1screw, bar1nut,
+        /// barscrews.
+        /// </summary>
+        public static List<GameObject> TutorialDrive(Vector3 origin) {
+            var start = made.Count;
+            Tags.Clear();
+            const float A = 5.75f, WebOut = 0.0555f, WebIn = 0.007f, Gap = 2.05f, Axle = 1.625f, H = Axle + 0.25f;
+            float[] wheels = { -5.5f, -1.5f, 5.5f };
+            float[] motors = { -3.5f, 0.5f, 3.5f };
+            const float Idler = 2f;
+            var up = Vector3.up;
+            foreach (var s in new[] { -1f, 1f }) {
+                var left = s < 0f;
+                var o = Vector3.right * s;
+                Vector3 At(float x, float y, float z) => origin + new Vector3(x * s, y, z);
+                var xi = A + WebOut;
+                var B = xi + Gap + 0.055f;
+                var turn = Quaternion.LookRotation(o, up);
+                var rest = left ? null : "rside";
+                Tag = left ? "rail1" : rest;
+                Part("CCHL-1x2-31", At(A, H, 0f), Quaternion.LookRotation(o, up));
+                Tag = rest ?? "lframe";
+                Part("CCHL-1x2-31", At(B, H, 0f), Quaternion.LookRotation(-o, up));
+                foreach (var z in new[] { -7.5f, 7.5f }) {
+                    Part("SNDF-2.00in", At(xi + Gap / 2f, Axle, z), turn);
+                    Screw(At(B + WebIn, Axle, z), o, "1/4in");
+                    Screw(At(A - WebIn, Axle, z), -o, "1/4in");
+                }
+                foreach (var z in wheels) {
+                    // the left wheels in the order the video makes them: w1 (back), w2, then the front one
+                    var w = !left ? 0 : z == wheels[0] ? 1 : z == wheels[1] ? 2 : 3;
+                    var parts = rest ?? (w == 1 ? "w1parts" : w == 2 ? "w2parts" : "lwheels");
+                    Tag = parts;
+                    Nut(At(xi, Axle, z), -o);
+                    Part("SPCR-Nylon-1/8in", At(xi + 0.2035f, Axle, z), turn);
+                    if (w == 2) Tag = "w2group";   // the second wheel is pasted with its gear and bolts
+                    var gear = Part("GEAR-High Strength-60T", At(xi + 0.516f, Axle, z), turn);
+                    Tag = rest ?? (w == 1 ? "w1wheel" : w == 2 ? "w2wheel" : "lwheels");
+                    Part("OMNI-V2-3.25in", At(xi + 1.255f, Axle, z), turn);
+                    Tag = parts;
+                    Part("SPCR-Nylon-1/8in", At(xi + 1.8065f, Axle, z), turn);
+                    Nut(At(xi + Gap, Axle, z), o);
+                    Tag = rest ?? (w == 1 ? "w1screw" : parts);
+                    Screw(At(B + WebIn, Axle, z), o, "2.50in");
+                    Tag = parts;
+                    Part("NUT-Lock", At(A - WebIn, Axle, z), Quaternion.LookRotation(o));
+                    Tag = rest ?? (w == 1 ? "w1bolts" : w == 2 ? "w2group" : "lwheels");
+                    foreach (var side in new[] { 1f, -1f }) {
+                        var offset = gear.transform.rotation * new Vector3(side, 0f, 0f);
+                        Screw(At(xi + 0.266f, Axle, z) + offset, -o, "1.75in");
+                        Nut(At(xi + 1.744f, Axle, z) + offset, -o);
+                    }
+                }
+                foreach (var z in motors) {
+                    var first = left && z == motors[0];
+                    Tag = rest ?? (first ? "m1motor" : "lmotors");
+                    Motor(At(A - WebIn, Axle, z), o, Vector3.back);
+                    Tag = rest ?? "lmotors";
+                    foreach (var dz in new[] { 0.5f, 1.0f }) Screw(At(xi, Axle, z - dz), o);
+                    Part("SHFT-Normal-3", At(A + 1.1f, Axle, z), turn);
+                    Part("SPCR-Nylon-1/4in", At(xi + 0.133f, Axle, z), turn);
+                    Part("GEAR-High Strength-36T", At(xi + 0.516f, Axle, z), turn);
+                    Part("SPCR-Nylon-1/2in", At(xi + 1.016f, Axle, z), turn);
+                    Part("SPCR-Nylon-1/2in", At(xi + 1.516f, Axle, z), turn);
+                    Part("SPCR-Nylon-1/4in", At(xi + 1.891f, Axle, z), turn);
+                    Part("BRNG-Normal", At(B + WebIn + 0.143f, Axle, z), turn);
+                    foreach (var dz in new[] { -0.5f, 0.5f }) {
+                        Screw(At(B + WebIn + 0.28f, Axle, z + dz), o, "3/8in");
+                        Nut(At(xi + Gap, Axle, z + dz), o);
+                    }
+                }
+                // The idler between the middle and front motors: a 36T spinning on a screw, like the wheels.
+                Tag = rest ?? "lmotors";
+                Nut(At(xi, Axle, Idler), -o);
+                Part("SPCR-Nylon-1/8in", At(xi + 0.2035f, Axle, Idler), turn);
+                Part("GEAR-High Strength-36T", At(xi + 0.516f, Axle, Idler), turn);
+                Part("SPCR-Nylon-1/2in", At(xi + 1.016f, Axle, Idler), turn);
+                Part("SPCR-Nylon-1/2in", At(xi + 1.516f, Axle, Idler), turn);
+                Part("SPCR-Nylon-1/8in", At(xi + 1.8065f, Axle, Idler), turn);
+                Nut(At(xi + Gap, Axle, Idler), o);
+                Screw(At(B + WebIn, Axle, Idler), o, "2.50in");
+                Part("NUT-Lock", At(A - WebIn, Axle, Idler), Quaternion.LookRotation(o));
+            }
+            const float Top = H + 0.5f;
+            var firstBar = true;
+            foreach (var z in new[] { -7.25f, -1.25f, 4.75f }) {
+                Tag = "bars";
+                Part("CCHL-1x2-23", origin + new Vector3(0f, Top + 0.055f, z), Frame(Vector3.down, Vector3.right));
+                foreach (var s in new[] { -1f, 1f })
+                    foreach (var dz in new[] { -0.25f, 0.25f }) {
+                        Tag = firstBar ? "bar1screw" : "barscrews";
+                        var at = origin + new Vector3((A - 0.25f) * s, Top, z + dz);
+                        Screw(at + up * (0.0625f + 0.007f), up);
+                        Tag = firstBar ? "bar1nut" : "barscrews";
+                        firstBar = false;
+                        Nut(at - up * 0.0625f, up);
+                    }
+            }
+            Tag = null;
+            return made.GetRange(start, made.Count - start);
+        }
+
+        /// <summary>
+        /// V2 (tutorial 5): what holds the polycarbonate corner pieces of the developer's team's drivetrain (their photos)
+        /// over each end of <see cref="TutorialDrive"/>: black 7/8" nylon spacers standing on the rails' top flanges (the
+        /// piece clears the cross bars and sits level with the wheels' tops), five a corner, kept off the cross bars, and
+        /// a screw down through each (piece, spacer, flange) with a nut under the flange. Tags: spbl (the back left
+        /// corner's spacers), sprest (the other corners'), cscrews (every screw and nut). The pieces themselves are
+        /// sketched in the video. <paramref name="plateTop"/>: the pieces' top face (where the screw heads sit).
+        /// </summary>
+        public static List<GameObject> TutorialCorners(float plateTop) {
+            var start = made.Count;
+            const float RailTop = 2.374f, Spacer = 0.875f, Inner = 5.492f, Outer = 8.168f;
+            var spots = new List<(float x, float z)> { (Outer, 7f), (Outer, 5f), (Outer, 3.5f), (Inner, 6.5f), (Inner, 3.5f) };
+            const string Id = "VXSPACERS-7/8\" Nylon Spacer (5/16\" OD)";
+            // The spacer's hole runs up, its own x along the robot's x (a sketch on its top lines up with the robot).
+            var probe = PartsManager.GeneratePart(Id, Vector3.one * 500f, Quaternion.identity);
+            var hole = probe.GetComponentsInChildren<HoleCollider>(true).OrderBy(h => h.transform.localPosition.sqrMagnitude).First().transform;
+            var axisLocal = hole.localRotation * Vector3.forward;
+            var holeLocal = hole.localPosition;
+            var rightLocal = Vector3.ProjectOnPlane(Vector3.right, axisLocal).sqrMagnitude > 0.5f ? Vector3.ProjectOnPlane(Vector3.right, axisLocal).normalized : Vector3.ProjectOnPlane(Vector3.forward, axisLocal).normalized;
+            Object.DestroyImmediate(probe);
+            var turn = Quaternion.LookRotation(Vector3.right, Vector3.up) * Quaternion.Inverse(Quaternion.LookRotation(rightLocal, axisLocal));
+            foreach (var sx in new[] { -1f, 1f })
+                foreach (var sz in new[] { -1f, 1f })
+                    foreach (var (x, z) in spots) {
+                        var at = new Vector3(x * sx, RailTop, z * sz);
+                        Tag = sx < 0f && sz < 0f ? "spbl" : "sprest";
+                        var middle = at + Vector3.up * (Spacer / 2f);
+                        var spacer = Part(Id, middle - turn * holeLocal, turn);
+                        if (spacer.TryGetComponent(out Renderer renderer))
+                            foreach (var m in renderer.materials) m.color = new Color(0.06f, 0.06f, 0.065f);
+                        Tag = "cscrews";
+                        Screw(new Vector3(at.x, plateTop + 0.007f, at.z), Vector3.up, "1.25in");
+                        Nut(at - Vector3.up * 0.0625f, Vector3.up);
+                    }
+            Tag = null;
             return made.GetRange(start, made.Count - start);
         }
 

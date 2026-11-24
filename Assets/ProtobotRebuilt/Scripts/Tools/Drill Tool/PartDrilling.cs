@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using Protobot.Geometry;
@@ -23,7 +23,7 @@ namespace Protobot.Tools {
         private const string CrossPrefix = "xdrill:";
 
         /// <summary>Parts a hole can be drilled across (through the side), for a screw: standoffs and HS shafts.</summary>
-        public static bool CanCrossDrill(GameObject part) => PartBend.IsBendable(part) && !PartBend.IsLink(part);
+        public static bool CanCrossDrill(GameObject part) => PartBend.IsBendable(part) && !PartBend.IsLink(part) && !PartBend.IsPlate(part);   // V2: plates bend, but their holes are drilled as holes
 
         /// <summary>Where a hole across the part goes for a click on its side: on its middle line (1/16" steps from
         /// its end unless free), straight through along the face's normal. In the straight part's frame (its own
@@ -33,7 +33,7 @@ namespace Protobot.Tools {
             var bends = PartBend.SavedBends(part);
             var (axisIndex, low, length, middle) = PartBend.Frame(part, PartBend.Straight(part));
             along = PartBend.Along(part, point, bends);
-            if (!free) along = Mathf.Round(along * 16f) / 16f;
+            if (!free) along = Mathf.Abs(along - length / 2f) < 0.25f ? length / 2f : Mathf.Round(along * 16f) / 16f;   // V2: the middle catches
             along = Mathf.Clamp(along, diameter / 2f + 0.03f, length - diameter / 2f - 0.03f);
             var (_, turn) = PartBend.CenterAt(part, along, bends);
             var local = Quaternion.Inverse(turn) * (Quaternion.Inverse(part.transform.rotation) * normal);
@@ -77,14 +77,14 @@ namespace Protobot.Tools {
             const float margin = 0.003f;
             var info = new HoleInfo {
                 found = true,
-                center = Unscale(center + axis * (half + margin)),
+                center = center + axis * (half + margin),
                 normal = axis,
                 thickness = 2f * (half + margin),
                 holeRadius = diameter / 2f,
                 round = true,
             };
             var straight = PartBend.Straight(part);
-            var drilled = HoleDrilling.Drill(straight, info, diameter / 2f, null, HoleDrilling.DrillSegments, null);
+            var drilled = DrillInInches(straight, scale, info, diameter / 2f, false);
             if (drilled == null) return false;
             var bent = PartBend.HasStraight(part);
             if (bent) PartBend.SetStraight(part, drilled);
@@ -98,7 +98,7 @@ namespace Protobot.Tools {
             hole.transform.SetParent(part.transform, false);
             hole.transform.localPosition = Unscale(center);
             hole.transform.localRotation = Quaternion.LookRotation(axis);
-            hole.transform.localScale = new Vector3(diameter, diameter, 2f * half);
+            hole.transform.localScale = HoleScale(hole.transform.localRotation, scale, new Vector3(diameter, diameter, 2f * half));
             var marker = hole.AddComponent<DrilledHole>();
             marker.straightPosition = hole.transform.localPosition;
             marker.straightRotation = hole.transform.localRotation;
@@ -126,6 +126,155 @@ namespace Protobot.Tools {
             center = new Vector3(f[0], f[1], f[2]);
             axis = new Vector3(f[3], f[4], f[5]);
             diameter = f[6];
+            return true;
+        }
+
+        // ------------------------------------------------------------------ V2: holes into the end of a shaft
+
+        private const string EndPrefix = "edrill:";
+
+        /// <summary>The depth of a hole drilled into a shaft's or standoff's end: what teams drill to tap it for a screw.</summary>
+        public const float EndDepth = 0.5f;
+
+        /// <summary>A click on the end of a standoff or HS shaft: a hole straight into its middle, along its length.
+        /// In the straight part's frame: the end face's middle and the way out of the part; how deep the hole goes.</summary>
+        public static bool EndSpot(GameObject part, Vector3 point, Vector3 normal, float diameter, out Vector3 center, out Vector3 outward, out float depth) {
+            center = outward = Vector3.zero;
+            depth = 0f;
+            if (!CanCrossDrill(part)) return false;
+            var straight = PartBend.Straight(part);
+            var (axisIndex, low, length, middle) = PartBend.Frame(part, straight);
+            var bends = PartBend.SavedBends(part);
+            // Which end: the one whose face the click's normal points out of (the ends turn with the bends).
+            var (_, lowTurn) = PartBend.CenterAt(part, 0f, bends);
+            var (_, highTurn) = PartBend.CenterAt(part, length, bends);
+            var unit = Vector3.zero;
+            unit[axisIndex] = 1f;
+            var localNormal = Quaternion.Inverse(part.transform.rotation) * normal;
+            var lowDot = Vector3.Dot(lowTurn * -unit, localNormal);
+            var highDot = Vector3.Dot(highTurn * unit, localNormal);
+            // On an end face, or on the rounded edge round it (a shaft's ends are rounded off: a click near the middle
+            // of the end often lands on it).
+            var along = PartBend.Along(part, point, bends);
+            var nearLow = along < 0.125f && lowDot > 0.3f;
+            var nearHigh = along > length - 0.125f && highDot > 0.3f;
+            if (Mathf.Max(lowDot, highDot) < 0.9f && !nearLow && !nearHigh) return false;   // not an end
+            var high = nearHigh || (!nearLow && highDot > lowDot);
+            center = middle;
+            center[axisIndex] = high ? low + length : low;
+            outward = high ? unit : -unit;
+            depth = Mathf.Min(EndDepth, length / 2f);
+            // the hole must have material round it
+            var axisAcross = Vector3.zero;
+            axisAcross[(axisIndex + 1) % 3] = 1f;
+            var half = HalfWidth(part, middle, axisAcross, axisIndex);
+            return half > diameter / 2f + 0.02f;
+        }
+
+        /// <summary>Drills a blind round hole into the part's end (made in the straight part, so bends carry it),
+        /// threaded when the bit is a tap drill's size (8-32: up to 9/64"), so a screw goes into it.</summary>
+        public static bool EndDrill(GameObject part, Vector3 center, Vector3 outward, float diameter, float depth) {
+            var scale = part.transform.localScale;
+            Vector3 Unscale(Vector3 v) => new(v.x / (scale.x == 0f ? 1f : scale.x), v.y / (scale.y == 0f ? 1f : scale.y), v.z / (scale.z == 0f ? 1f : scale.z));
+            const float margin = 0.003f;
+            var info = new HoleInfo {
+                found = true,
+                center = center + outward * margin,
+                normal = outward,
+                thickness = depth + margin,
+                holeRadius = diameter / 2f,
+                round = true,
+            };
+            var straight = PartBend.Straight(part);
+            var drilled = DrillInInches(straight, scale, info, diameter / 2f, true);
+            if (drilled == null) return false;
+            var bent = PartBend.HasStraight(part);
+            if (bent) PartBend.SetStraight(part, drilled);
+            else {
+                part.GetComponent<MeshFilter>().sharedMesh = drilled;
+                if (part.TryGetComponent(out MeshCollider meshCollider)) meshCollider.sharedMesh = drilled;
+            }
+            var round = HoleShapes.instance.GetShapeMesh("circle");
+            var hole = new GameObject("Drilled Hole", typeof(MeshCollider)) { tag = "HoleCollider", layer = HoleCollider.HOLE_COLLISIONS_LAYER };
+            hole.GetComponent<MeshCollider>().sharedMesh = round;
+            hole.transform.SetParent(part.transform, false);
+            hole.transform.localPosition = Unscale(center - outward * (depth / 2f));
+            hole.transform.localRotation = Quaternion.LookRotation(outward);
+            hole.transform.localScale = HoleScale(hole.transform.localRotation, scale, new Vector3(diameter, diameter, depth));
+            var marker = hole.AddComponent<DrilledHole>();
+            marker.straightPosition = hole.transform.localPosition;
+            marker.straightRotation = hole.transform.localRotation;
+            var collider = hole.AddComponent<HoleCollider>();
+            collider.holeType = Tapped(diameter) ? HoleCollider.HoleType.Threaded : HoleCollider.HoleType.Normal;
+            collider.Refresh();
+            if (bent) PartBend.Show(part, PartBend.SavedBends(part));
+            return true;
+        }
+
+        /// <summary>V2: a hole cut in inches in a part stretched by its scale (a generated shaft is its 1" model made
+        /// 6" long by its scale): the mesh is drilled at its real size, then put back in its own units. Drilled in the
+        /// mesh's units, a round hole across a 6" shaft came out six times longer along it (a slot).</summary>
+        private static Mesh DrillInInches(Mesh straight, Vector3 scale, HoleInfo info, float radius, bool closed) {
+            var uniform = Mathf.Approximately(scale.x, 1f) && Mathf.Approximately(scale.y, 1f) && Mathf.Approximately(scale.z, 1f);
+            if (uniform) return HoleDrilling.Drill(straight, info, radius, null, HoleDrilling.DrillSegments, null, closed);
+            Vector3 Div(Vector3 v) => new(v.x / (scale.x == 0f ? 1f : scale.x), v.y / (scale.y == 0f ? 1f : scale.y), v.z / (scale.z == 0f ? 1f : scale.z));
+            var inches = Object.Instantiate(straight);
+            var vertices = inches.vertices;
+            var normals = inches.normals;
+            for (var i = 0; i < vertices.Length; i++) {
+                vertices[i] = Vector3.Scale(vertices[i], scale);
+                if (i < normals.Length) normals[i] = Div(normals[i]).normalized;
+            }
+            inches.vertices = vertices;
+            if (normals.Length == vertices.Length) inches.normals = normals;
+            var drilled = HoleDrilling.Drill(inches, info, radius, null, HoleDrilling.DrillSegments, null, closed);
+            Object.Destroy(inches);
+            if (drilled == null) return null;
+            vertices = drilled.vertices;
+            normals = drilled.normals;
+            for (var i = 0; i < vertices.Length; i++) {
+                vertices[i] = Div(vertices[i]);
+                if (i < normals.Length) normals[i] = Vector3.Scale(normals[i], scale).normalized;
+            }
+            drilled.vertices = vertices;
+            if (normals.Length == vertices.Length) drilled.normals = normals;
+            drilled.RecalculateBounds();
+            return drilled;
+        }
+
+        /// <summary>V2: a hole collider's local scale for a size in inches, on a part stretched by its scale.</summary>
+        private static Vector3 HoleScale(Quaternion localRotation, Vector3 partScale, Vector3 inches) {
+            var result = Vector3.zero;
+            for (var i = 0; i < 3; i++) {
+                var axis = Vector3.zero;
+                axis[i] = 1f;
+                var stretch = Vector3.Scale(localRotation * axis, partScale).magnitude;
+                result[i] = inches[i] / Mathf.Max(1e-5f, stretch);
+            }
+            return result;
+        }
+
+        /// <summary>A bit small enough to tap the hole for an 8-32 screw (the #29 tap drill is 0.136").</summary>
+        public static bool Tapped(float diameter) => diameter <= 9f / 64f + 0.0005f;
+
+        public static void RecordEnd(SavedObject saved, Vector3 center, Vector3 outward, float diameter, float depth) {
+            string F(float f) => f.ToString("0.#####", CultureInfo.InvariantCulture);
+            saved.state += EndPrefix + string.Join(",", F(center.x), F(center.y), F(center.z), F(outward.x), F(outward.y), F(outward.z), F(diameter), F(depth)) + ";";
+        }
+
+        private static bool TryParseEnd(string entry, out Vector3 center, out Vector3 outward, out float diameter, out float depth) {
+            center = outward = Vector3.zero;
+            diameter = depth = 0f;
+            if (entry == null || !entry.StartsWith(EndPrefix)) return false;
+            var v = entry.Substring(EndPrefix.Length).Split(',');
+            if (v.Length != 8) return false;
+            var f = new float[8];
+            for (var i = 0; i < 8; i++)
+                if (!float.TryParse(v[i], NumberStyles.Float, CultureInfo.InvariantCulture, out f[i])) return false;
+            center = new Vector3(f[0], f[1], f[2]);
+            outward = new Vector3(f[3], f[4], f[5]);
+            diameter = f[6];
+            depth = f[7];
             return true;
         }
 
@@ -182,7 +331,16 @@ namespace Protobot.Tools {
             var holeData = hole.GetComponent<HoleCollider>().holeData;
             holeData.shape = holeCollider.sharedMesh;
             holeData.size = new Vector2(diameter, diameter);
+            RefreshFaces(holeData);
             return true;
+        }
+
+        /// <summary>V2: the hole faces showing this hole (hovered, selected: their outline) take its new shape and size
+        /// (a drilled hole kept showing its old square face while it was selected).</summary>
+        public static void RefreshFaces(HoleData hole) {
+            if (hole == null) return;
+            foreach (var face in Object.FindObjectsByType<HoleFace>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+                if (face.hole == hole) face.Set(face);
         }
 
         // V2: the mesh's triangles around a hole, for finding the wall it's in.
@@ -318,6 +476,10 @@ namespace Protobot.Tools {
                     CrossDrill(part, crossCenter, crossAxis, crossDiameter);
                     continue;
                 }
+                if (TryParseEnd(entry, out var endCenter, out var endOut, out var endDiameter, out var endDepth)) {   // V2: into an end
+                    EndDrill(part, endCenter, endOut, endDiameter, endDepth);
+                    continue;
+                }
                 if (PartCutting.TryParse(entry, out var point, out var normal)) {
                     if (PartCutting.Cut(part, point, normal) && part.TryGetComponent(out Parts_List.PartName partName)
                         && !partName.name.EndsWith("(cut)"))
@@ -381,6 +543,7 @@ namespace Protobot.Tools {
                 var data = holeCollider.GetComponent<HoleCollider>().holeData;
                 data.shape = shape;
                 data.size = new Vector2(scale.x, scale.y);
+                PartDrilling.RefreshFaces(data);
             }
         }
     }

@@ -1,0 +1,58 @@
+# Tutorial 4: Measure and Mirror. PRE=cs/t_v4scene.cs (a C-channel with a cross channel bolted on its end).
+do partsreset 2
+do camera 0 0 0 210 40 20
+frame 0 0.9
+move 980,620 0.01
+wait 1.0
+
+# 1 Intro
+line 1
+frame 8 0.9 yaw:240 pitch:38
+waitline
+
+# 2 Measure
+line 2
+key 6
+wait 1.2
+move world:0.25,1.09,3.0 0.9
+wait 0.8
+click
+wait 0.8
+move world:4.25,1.09,3.0 1.0
+wait 0.6
+click
+waitline
+
+# 3 The distance
+line 3
+wait 3.0
+move world:4.25,1.09,3.0 0.6
+drag left world:4.25,1.09,3.5 1.2
+wait 1.0
+move 980,700 0.8
+waitline
+key Esc
+key Esc
+
+# 4 Mirror
+line 4
+wait 0.6
+click world:-0.03,0.5,-2.0 0.9
+wait 1.4
+key M
+waitline
+
+# 5 Drag for a gap
+line 5
+move mirror:-1,0,0 0.9
+wait 0.8
+drag left mirror:-1,0,0,9 2.2
+wait 0.8
+frame 1.2 0.9
+waitline
+
+# 6 Outro
+line 6
+frame 8 0.9 yaw:180 pitch:35
+waitline
+wait 0.8

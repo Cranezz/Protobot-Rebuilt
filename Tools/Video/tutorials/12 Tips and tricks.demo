@@ -1,0 +1,97 @@
+# Tutorial 12: tips and tricks. PRE=cs/t_v12scene.cs (a standing 60T gear, two standoffs on a plate, a license plate).
+do partsreset 2
+do camera 0 0 0 -40 35 30
+frame 0 0.85 yaw:-40 pitch:35
+move 1330,190 0.01
+wait 1.0
+
+# 1 Intro
+line 1
+frame 5 0.85 yaw:-70 pitch:30
+waitline
+
+# 2 Chamfer gear teeth
+line 2
+frame 1.0 0.7 yaw:-70 pitch:22 on:GEAR
+key 4
+wait 0.6
+click part:GEAR 0.8
+wait 0.8
+click ui:Tool Options/Panel/Content/Chamfer 0.7
+wait 1.0
+move ui:Tool Options/Panel/Content/Choice 0.6
+scroll 2 0.6
+wait 0.8
+click ui:Tool Options/Panel/Content/Apply 0.7
+wait 1.0
+move 1330,190 0.6
+frame 1.0 0.8 yaw:-35 pitch:12 on:GEAR
+waitline
+
+# 3 Take teeth off
+line 3
+frame 0.8 0.7 yaw:-80 pitch:10 on:GEAR
+click part:GEAR 0.7
+wait 0.6
+click ui:Tool Options/Panel/Content/Chamfer 0.6
+wait 0.6
+click text:Take off teeth 0.6
+wait 0.6
+click world:-3.75,2.583,-0.13 0.7
+wait 0.3
+click world:-3.75,2.59,0 0.4
+wait 0.3
+click world:-3.75,2.583,0.13 0.4
+wait 0.6
+click ui:Tool Options/Panel/Content/Apply 0.7
+wait 1.0
+move 1330,190 0.5
+key Esc
+wait 0.2
+key Esc
+do deselect
+waitline
+
+# 4 A rubber band round two posts
+line 4
+frame 1.0 0.75 yaw:-30 pitch:35 on:SNDF,PLTE
+click text:Motion 0.7
+wait 0.3
+click text:Rubber bands 0.5
+wait 0.3
+click text:VEX 0.5
+wait 0.3
+click ui:Tiles/#32 synthetic 0.6
+wait 0.4
+click world:4,1.7,-2 0.9
+wait 0.4
+move world:4,1.7,0.5 0.8
+wait 0.4
+click world:4,1.7,2 0.6
+wait 0.8
+key Esc
+move 1330,190 0.5
+waitline
+
+# 5 License plate team number
+line 5
+frame 1.0 0.7 yaw:40 pitch:55 on:VXMISCELLANEOUS
+rclick part:VXMISCELLANEOUS-Red License Plate 0.8
+wait 0.5
+move here +62,8 0.5
+wait 0.3
+click
+wait 0.6
+click ui:Number 0.5
+type 1234A
+wait 0.5
+click text:Done 0.7
+wait 0.6
+move 1330,190 0.5
+waitline
+
+# 6 Outro
+line 6
+frame 7 0.85 yaw:100 pitch:30
+waitline
+wait 0.8

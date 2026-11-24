@@ -636,7 +636,9 @@ namespace Protobot.Polycarb {
             // V2: the grid snaps only when switched on or while Ctrl is held (points always catch).
             var ctrlHeld = keyboard != null && (keyboard.ctrlKey.isPressed || keyboard.leftCommandKey.isPressed);
             var snap = SnapAt(ToSketch(canvasMouse), (gridSnap || ctrlHeld) && !inPlace || ctrlHeld);
-            if (inside && !panning) {
+            // V2: not while a window or menu is open over the drawing (choosing a plastic picked or dropped the area
+            // under the swatch clicked).
+            if (inside && !panning && !Popup.IsOpen && Dialog.OpenCount == 0) {
                 if (stage == Stage.Sketch) HandleMouse(mouse, snap, canvasMouse);
                 else HandlePieceMouse(mouse, canvasMouse);
             }

@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using Protobot.Interface;
@@ -7,8 +7,8 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 namespace Protobot.Tools {
-    // V2: the Bend tool (key 7): bends high strength shafts and standoffs as teams do, and the rubber link in its
-    // rubber. Hover the part: a ring shows where the bend goes (1/16" steps from its end, Shift free); click to put
+    // V2: the Bend tool (key 7): bends high strength shafts, standoffs and plates as teams do (a plate across its
+    // length, about its thin side: the green ring only flips it), and the rubber link in its rubber. Hover the part: a ring shows where the bend goes (1/16" steps from its end, Shift free); click to put
     // it there (a part already selected starts at its middle). Then two rotation rings sit on the bend: the blue one
     // turns the end (the bend's angle, 5° steps, up to 180°), the green one round the part sets which way it bends (15°
     // steps; Shift free on both), and the yellow ring on the part slides the bend along it. "Aim at a point" bends it
@@ -68,6 +68,9 @@ namespace Protobot.Tools {
         private Mesh Straight => PartBend.Straight(part);
         private float Length => PartBend.Frame(part, Straight).length;
         private float Thickness => PartBend.Thickness(part, Straight);
+        private bool Plate => PartBend.IsPlate(part);
+        // V2: how big the rings are drawn: a plate's span its width (its thickness is a 1/32" sheet).
+        private float RingSize => Plate ? PartBend.Width(part, Straight) / 2f : Thickness;
         private float Radius => Mathf.Max(0.05f, Thickness * radiusScale);
         private float Limit => Link ? LinkAngleLimit : AngleLimit;
 
@@ -88,7 +91,7 @@ namespace Protobot.Tools {
         private void Begin(GameObject target, Vector3? at) {
             part = target;
             angle = 0f;
-            toward = 0f;
+            toward = PartBend.IsPlate(part) ? PartBend.PlateToward(part) : 0f;   // V2: a plate bends about its thin side
             aiming = false;
             var saved = PartBend.SavedBends(part);
             start = Link ? PartBend.LinkRubber(part).start
@@ -315,13 +318,13 @@ namespace Protobot.Tools {
             var camera = Overlay.ViewCamera;
             if (camera == null || MouseInput.overUI || !MouseInput.withinScreen) return;
             if (!Physics.Raycast(camera.ScreenPointToRay(MouseInput.Position), out var hit, Mathf.Infinity, LayerMask.GetMask("Default"))) {
-                if (MouseInput.LeftButton.wasPressedThisFrame) Interface.Interface.Say("Click an HS shaft, a standoff or a rubber link", false);
+                if (MouseInput.LeftButton.wasPressedThisFrame) Interface.Interface.Say("Click an HS shaft, a standoff, a plate or a rubber link", false);
                 return;
             }
             var target = FeaturePicker.PartOf(hit.collider.gameObject);
             if (!PartBend.IsBendable(target)) {
                 if (MouseInput.LeftButton.wasPressedThisFrame)
-                    Interface.Interface.Say("Only high strength shafts, standoffs and the rubber link bend", false);
+                    Interface.Interface.Say("Only high strength shafts, standoffs, plates and the rubber link bend", false);
                 return;
             }
             var previous = part;
@@ -333,7 +336,7 @@ namespace Protobot.Tools {
             var along = part.transform.rotation * (turn * PartBend.AlongLocal(part));
             part = previous;
             Overlay.Begin();
-            Overlay.WorldCircle(center, along, ThicknessOf(target) * 0.75f + 0.02f, LocationColor, 2.5f);
+            Overlay.WorldCircle(center, along, (PartBend.IsPlate(target) ? PartBend.Width(target, PartBend.Straight(target)) / 2f : ThicknessOf(target)) * 0.75f + 0.02f, LocationColor, 2.5f);
             Overlay.MouseText(PartBend.IsLink(target) ? "Bend the rubber link" : "Bend here: " + Inch.Format(s) + " from the end", Color.white);
             if (MouseInput.LeftButton.wasPressedThisFrame) Begin(target, hit.point);
         }
@@ -379,7 +382,7 @@ namespace Protobot.Tools {
             var towardWorld = rotation * (turn * towardLocal);
             var about = rotation * (turn * aboutLocal);
             var perPixel = MirrorTool.PerPixel(camera, center);
-            var thickness = Thickness;
+            var thickness = RingSize;
             var angleRadius = Mathf.Max(thickness * 2.4f, 78f * perPixel);
             var directionRadius = Mathf.Max(thickness * 1.6f, 48f * perPixel);
             var locationRadius = thickness * 0.75f + 3f * perPixel;
@@ -396,7 +399,7 @@ namespace Protobot.Tools {
             if (Overlay.ToScreen(center + pointing * angleRadius, out var pointAt)) Overlay.Disc(pointAt, 6f, AngleColor);
             Overlay.Line(center, center + pointing * angleRadius, new Color(AngleColor.r, AngleColor.g, AngleColor.b, 0.6f), 1.5f);
             if (Overlay.ToScreen(center, out var centerAt))
-                Overlay.Text(centerAt + new Vector2(0f, -40f), Mathf.Abs(angle).ToString("0.#", CultureInfo.InvariantCulture) + "° toward " + toward.ToString("0", CultureInfo.InvariantCulture) + "°"
+                Overlay.Text(centerAt + new Vector2(0f, -40f), Mathf.Abs(angle).ToString("0.#", CultureInfo.InvariantCulture) + "°" + (Plate ? "" : " toward " + toward.ToString("0", CultureInfo.InvariantCulture) + "°")
                     + (Link ? "" : " · " + Inch.Format(start) + " from the end"), Theme.Text);
 
             if (dragging == Ring.None) {
@@ -416,7 +419,7 @@ namespace Protobot.Tools {
                     Try(angleLine, Ring.Angle);
                 }
                 if (hovered != Ring.None) {
-                    var tip = hovered == Ring.Angle ? "Drag: bend angle (5° steps, Shift free)" : hovered == Ring.Direction ? "Drag: which way it bends (15° steps, Shift free)" : "Drag: where it bends (1/16\" steps, Shift free)";
+                    var tip = hovered == Ring.Angle ? "Drag: bend angle (5° steps, Shift free)" : hovered == Ring.Direction ? (Plate ? "Drag: bend it the other way" : "Drag: which way it bends (15° steps, Shift free)") : "Drag: where it bends (1/16\" steps, Shift free)";
                     Overlay.MouseText(tip, Color.white);
                     if (MouseInput.LeftButton.wasPressedThisFrame) StartDrag(hovered, center, hovered == Ring.Angle ? about : along);
                 }
@@ -453,9 +456,9 @@ namespace Protobot.Tools {
             var now = MouseAngle(camera, dragCenter, dragAxis);
             dragSwept += Mathf.DeltaAngle(lastMouseAngle, now);
             lastMouseAngle = now;
-            var step = dragging == Ring.Angle ? 5f : 15f;
+            var step = dragging == Ring.Angle ? 5f : Plate ? 180f : 15f;   // V2: a plate bends one way or the other
             var raw = dragFrom + dragSwept;
-            var value = Shift ? Mathf.Round(raw * 2f) / 2f : Mathf.Round(raw / step) * step;
+            var value = Shift && !(Plate && dragging == Ring.Direction) ? Mathf.Round(raw * 2f) / 2f : Mathf.Round(raw / step) * step;
             if (dragging == Ring.Angle) {
                 value = Mathf.Clamp(value, -Limit, Limit);
                 if (Mathf.Abs(value - angle) > 1e-3f) {
@@ -511,7 +514,7 @@ namespace Protobot.Tools {
         private static void BuildOptions(RectTransform bar) {
             var tool = active;
             if (tool == null || tool.part == null) {
-                ToolOptions.Note(bar, "Click an HS shaft, a standoff or a rubber link where it should bend");
+                ToolOptions.Note(bar, "Click an HS shaft, a standoff, a plate or a rubber link where it should bend");
                 Ui.Hint(bar, "Shift", "free placing");
                 return;
             }
@@ -562,7 +565,7 @@ namespace Protobot.Tools {
             }, Theme.FontBody, TextAlignmentOptions.Center);
             towardField.Size(56f, 30f);
             towardField.gameObject.AddComponent<WheelStep>().step = d => {
-                tool.toward = Mathf.Repeat(tool.toward + d * 15f, 360f);
+                tool.toward = Mathf.Repeat(tool.toward + d * (tool.Plate ? 180f : 15f), 360f);
                 tool.Preview();
                 ToolOptions.Rebuild();
             };

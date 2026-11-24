@@ -1,0 +1,15 @@
+# Tutorial 1: Getting started. One narration line per row (number, then the words); tutorial_voice.py makes
+# Video/tutorials/01-getting-started/voice/NN.mp3 from each in the Protobot Narrator voice.
+1 Welcome to Protobot! In this video, we'll get you started: finding your way around, adding parts, moving the camera, and screwing parts together.
+2 This is the home menu. From here, you can start a new build, open one you've saved, play a game on this season's field, or jump into multiplayer. Let's create a new build.
+3 Along the top are the menus, undo and redo, and buttons to simulate your robot, write code for it, and play a game. Your tools are down the left side, and on the right is the parts list.
+4 To add a part, pick a category, like Structure, and open a family, like C-channels. Then click the part you want. You can also search for any part at the top.
+5 The part follows your mouse. Hold Control and scroll to change how many holes long it is, then click to place it. You can keep clicking to place more, so press Escape when you're done.
+6 Now let's connect the two channels. Pick the Move tool, click a hole on one channel, then click the hole where you want it to go. Protobot lines them up, hole to hole.
+7 Now let's take a closer look. Hold the right mouse button and drag to orbit. Hold the middle button, your scroll wheel, and drag to pan. And scroll to zoom in and out.
+8 To fasten the channels together, point at a hole and press C. Protobot puts in a screw that's just long enough, with a nut on the other side.
+9 To move parts around, use the Transform tool. Click a part, then drag an arrow to slide it, or a ring to turn it. It moves in the steps set at the top.
+10 Made a mistake? Control Z undoes it, and Control Y brings it back.
+11 If the camera feels too fast or too slow, click the gear in the top right corner. Under Preferences, Camera, you can set how quickly it orbits, pans, and zooms.
+12 When you're done, save your build from the File menu, or press Control S. You can also turn on Autosave in Settings.
+13 That's the basics! In the next video, we'll start building a real robot. See you there.

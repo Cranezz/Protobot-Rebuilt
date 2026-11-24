@@ -1,5 +1,6 @@
 """Call a Unity MCP tool over the local HTTP bridge: python umcp.py <tool> <args.json file or inline json>"""
 import json, sys, urllib.request, os
+sys.stdout.reconfigure(errors="replace")  # (a label with a character the console code page lacks crashed the print)
 
 URL = "http://127.0.0.1:8080/mcp"
 STATE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "umcp_session.txt")

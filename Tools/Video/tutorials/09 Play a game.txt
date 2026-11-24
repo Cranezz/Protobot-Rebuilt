@@ -1,0 +1,7 @@
+# Tutorial 9: playing Robot Skills on the Override field.
+1 Play game puts your robot on this season's field, V5RC Override, and scores it by the game's rules. Your robot just needs a Brain.
+2 Click Play game at the top. Choose the mode: Driving Skills, Programming Skills, or Match practice, and how detailed the field is. Then set up the field.
+3 Your robot starts against the wall, as the rules say. Drag it to slide along the wall, or turn it with the ring. The checklist shows whether your start is legal, and your controls are on the right.
+4 Click Start run. After the countdown, drive.
+5 Pins and cups score in the Goals. Stack them, goal, pin, cup, pin, and every color you can see counts. Ending in the middle of the field is worth eight more.
+6 When time runs out, or you end the run, the score is counted up piece by piece, and your best is kept. Watch the replay, or run it again. Next, we'll write code for the robot.

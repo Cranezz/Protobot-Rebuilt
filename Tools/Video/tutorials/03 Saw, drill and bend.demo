@@ -1,0 +1,116 @@
+# Tutorial 3: saw, drill, bend. PRE=cs/t_v3scene.cs (a C-channel, a plate and a high strength shaft).
+do partsreset 2
+do camera 0 0 0 30 38 30
+frame 0 1.1
+move 980,620 0.01
+wait 1.0
+
+# 1 Intro
+line 1
+frame 8 1.1 yaw:60 pitch:38
+waitline
+
+# 2 The saw
+line 2
+frame 0.8 1.0 yaw:30 pitch:35 on:CCHL
+key 4
+wait 1.0
+click part:CCHL 0.9
+waitline
+
+# 3 Type the distance
+line 3
+wait 1.4
+move ui:Tool Options/Panel/Content/Distance 0.8
+wait 1.0
+click
+wait 0.5
+type 5
+wait 0.6
+submit
+waitline
+
+# 4 Cut
+line 4
+key Enter
+wait 1.5
+move 980,640 0.8
+waitline
+
+# 5 The drill
+line 5
+frame 0.8 1.7 yaw:35 pitch:50 on:PLTE
+key 5
+wait 0.8
+move ui:Tool Options/Panel/Content/Choice 0.7
+wait 0.6
+scroll 8 1.6
+wait 0.8
+move world:0,0.05,-4.25 0.9
+wait 1.0
+click
+wait 1.2
+move here +80,60 0.6
+waitline
+
+# 6 Across a high strength shaft, in the middle
+line 6
+frame 0.8 0.9 yaw:25 pitch:55 on:SHFT
+move ui:Tool Options/Panel/Content/Choice 0.7
+wait 0.3
+scroll -13 1.8
+wait 0.5
+move world:0.3,0.25,4 0.8
+wait 0.4
+move world:0,0.25,4 0.5
+wait 1.0
+click
+wait 0.8
+move here +90,70 0.5
+waitline
+
+# 7 Into the end of the shaft
+line 7
+frame 1.0 0.9 yaw:-75 pitch:18 on:SHFT
+wait 0.3
+move ui:Tool Options/Panel/Content/Choice 0.6
+scroll -2 0.5
+move world:3,0.125,4 0.8
+wait 1.4
+click
+wait 0.8
+move here +110,90 0.5
+wait 0.6
+key Esc
+waitline
+
+# 8 Bend a plate
+line 8
+frame 0.8 1.0 yaw:20 pitch:40 on:PLTE
+key 7
+wait 1.0
+click part:PLTE 0.9
+waitline
+
+# 9 Angle and Bend
+line 9
+click ui:Tool Options/Panel/Content/Bend Angle 0.7
+type 90
+submit
+wait 0.6
+click ui:Tool Options/Panel/Content/Apply Bend 0.7
+wait 0.4
+move here +60,300 0.7
+wait 0.6
+key Esc
+wait 0.2
+key Esc
+do deselect
+frame 1.0 1.0 yaw:50 pitch:30 on:PLTE
+waitline
+
+# 10 Outro
+line 10
+frame 8 1.1 yaw:-40 pitch:35
+waitline
+wait 0.8

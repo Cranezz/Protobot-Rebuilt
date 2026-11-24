@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using Protobot.Interface;
 using Protobot.StateSystems;
@@ -58,6 +58,7 @@ namespace Protobot.Tools {
             };
             Ui.Tip(choice, "Drill bit", "Wheel", "1/16\" to 1/2\" by 64ths, then to 1\" by 16ths. Scroll over it to step through the sizes.");
             Ui.Hint(bar, "Click", "a hole to drill it");
+            Ui.Hint(bar, "Click", "a shaft's side: a hole across", "its end", "a hole into it");   // V2
         }
 
         private void OnDisable() {
@@ -127,6 +128,7 @@ namespace Protobot.Tools {
             var keyboard = UnityEngine.InputSystem.Keyboard.current;
             var free = keyboard != null && keyboard.shiftKey.isPressed;
             var diameter = Diameter;
+            if (IntoEnd(part, hit.point, hit.normal, diameter)) return true;   // V2: the end: a hole into its middle
             if (!PartDrilling.CrossSpot(part, hit.point, hit.normal, diameter, free, out var center, out var axis, out var width, out var along)) {
                 if (preview != null) preview.SetActive(false);
                 return false;
@@ -141,7 +143,9 @@ namespace Protobot.Tools {
             preview.transform.SetPositionAndRotation(world, Quaternion.LookRotation(worldAxis) * Quaternion.Euler(90f, 0f, 0f));
             preview.transform.localScale = new Vector3(diameter, width / 2f + 0.02f, diameter);
             Interface.Overlay.Begin();
-            Interface.Overlay.MouseText(Inch.Format(diameter) + " hole across, " + Inch.Format(along) + " from the end (Shift: free)", Color.white);
+            var (_, _, partLength, _) = PartBend.Frame(part, PartBend.Straight(part));
+            var atMiddle = Mathf.Abs(along - partLength / 2f) < 0.001f;
+            Interface.Overlay.MouseText(Inch.Format(diameter) + " hole across, " + (atMiddle ? "in the middle" : Inch.Format(along) + " from the end") + " (Shift: free)", Color.white);
             if (MouseInput.LeftButton.wasPressedThisFrame) {
                 if (diameter > width - 0.04f) {
                     feedback.Show("A " + Inch.Format(diameter) + " hole is too big for this part: pick a smaller bit (11/64\" fits a screw)", FeedbackDisplay.DisplayType.alert);
@@ -156,6 +160,48 @@ namespace Protobot.Tools {
                 StateSystem.AddElement(before);
                 StateSystem.AddState(new State(new List<IElement> { new DrillElement(part) }));
                 feedback.Show("Drilled a " + Inch.Format(diameter) + " hole across the " + PartLabels.Short(part) + ": a screw goes through it", FeedbackDisplay.DisplayType.success);
+                SelectionSystem.HoverSelector.Changes++;
+            }
+            return true;
+        }
+
+        // V2: the end of a standoff or HS shaft: a hole straight into its middle (teams drill and tap a shaft's end for a
+        // screw). True when the mouse is on an end.
+        private bool IntoEnd(GameObject part, Vector3 hitPoint, Vector3 normal, float diameter) {
+            if (!PartDrilling.EndSpot(part, hitPoint, normal, diameter, out var center, out var outward, out var depth)) {
+                if (PartDrilling.EndSpot(part, hitPoint, normal, 0.0625f, out _, out _, out _)) {   // an end, but the bit's too big
+                    if (preview != null) preview.SetActive(false);
+                    Interface.Overlay.Begin();
+                    Interface.Overlay.MouseText("A " + Inch.Format(diameter) + " hole is too big for this end: pick a smaller bit (9/64\" taps it for a screw)", Theme.Warning);
+                    if (MouseInput.LeftButton.wasPressedThisFrame)
+                        feedback.Show("A " + Inch.Format(diameter) + " hole is too big for this end: pick a smaller bit (9/64\" taps it for a screw)", FeedbackDisplay.DisplayType.alert);
+                    return true;
+                }
+                return false;
+            }
+            var (axisIndex, low, _, _) = PartBend.Frame(part, PartBend.Straight(part));
+            var along = center[axisIndex] - low;
+            var bends = PartBend.SavedBends(part);
+            var (point, turn) = PartBend.CenterAt(part, along, bends);
+            var world = PartBend.ToWorld(part, point);
+            var worldOut = part.transform.rotation * (turn * outward);
+            if (preview == null) ShowPreview(null);
+            preview.SetActive(true);
+            preview.transform.SetPositionAndRotation(world - worldOut * (depth / 2f - 0.01f), Quaternion.LookRotation(worldOut) * Quaternion.Euler(90f, 0f, 0f));
+            preview.transform.localScale = new Vector3(diameter, depth / 2f + 0.01f, diameter);
+            var tapped = PartDrilling.Tapped(diameter);
+            Interface.Overlay.Begin();
+            Interface.Overlay.MouseText(Inch.Format(diameter) + " hole into the end, " + Inch.Format(depth) + " deep" + (tapped ? " (tapped 8-32: a screw goes in)" : ""), Color.white);
+            if (MouseInput.LeftButton.wasPressedThisFrame) {
+                var before = new DrillElement(part);
+                if (!PartDrilling.EndDrill(part, center, outward, diameter, depth)) {
+                    feedback.Show("Couldn't drill there", FeedbackDisplay.DisplayType.alert);
+                    return true;
+                }
+                PartDrilling.RecordEnd(part.GetComponent<SavedObject>(), center, outward, diameter, depth);
+                StateSystem.AddElement(before);
+                StateSystem.AddState(new State(new List<IElement> { new DrillElement(part) }));
+                feedback.Show("Drilled into the end of the " + PartLabels.Short(part), FeedbackDisplay.DisplayType.success);
                 SelectionSystem.HoverSelector.Changes++;
             }
             return true;

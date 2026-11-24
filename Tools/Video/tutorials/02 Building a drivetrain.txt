@@ -1,0 +1,13 @@
+# Tutorial 2: Building a drivetrain (the developer's team's six-motor drive, from their photos): one side built, the
+# other mirrored.
+1 In this video, we'll build a six-motor drivetrain, the kind many teams run: three-and-a-quarter inch omni wheels, geared to three hundred sixty RPM. We'll build one side, then mirror it.
+2 First, the frame for one side: two thirty-one hole C-channels, two inches apart, tied together at both ends with standoffs.
+3 Each wheel spins on a two-and-a-half inch screw. Point at the hole in the outer rail and hold F: a screw appears. Scroll to change its length, then let go to put it in.
+4 Nuts hold the screw to both rails. Spacers and a sixty-tooth gear go on it.
+5 Now the wheel. Under Motion, Wheels, Omni wheels, pick the three-and-a-quarter inch wheel. Point at the screw, and it slides on, right beside the gear.
+6 Then two screws bolt the gear to the wheel, so they turn together.
+7 The next wheel is the same, so copy this one. Click it and press Control C: that copies everything screwed to it, the gear and its bolts too. Control V gives you another to place: point at the next screw, and click.
+8 The rest of this side goes together the same way: the front wheel, three motors screwed to the inner rail, each turning a thirty-six-tooth gear, and an idler gear, so every wheel turns the same way.
+9 Now the other side, in one step. Click the rail and press M for Mirror. Drag the arrow out: it snaps to the middle of the robot, and the whole side is copied across, wheels, gears and motors included.
+10 Last, three C-channels across the top tie the two sides together, bolted down where they cross the rails.
+11 And that's a full six-motor drivetrain, more than two hundred parts, in just a few minutes. Next, we'll cut, drill and bend parts to fit.

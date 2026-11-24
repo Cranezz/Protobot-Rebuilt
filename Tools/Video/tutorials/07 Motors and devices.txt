@@ -1,0 +1,7 @@
+# Tutorial 7: motors and the Devices window.
+1 Motors drive everything on your robot. In this video, we'll set them up in the Devices window.
+2 Click a motor with the Transform tool. The V5 Brain window opens, with every motor and sensor on its port, like the Brain's own screen.
+3 The motor you clicked opens its card: its cartridge and speed, live readings, and graphs of its power and torque.
+4 Below, set it to Normal or Reversed, Brake or Hold, and choose what runs it: keys of its own, or the left or right side of the drive.
+5 Click the arrows to run it by hand. Its whole gear train turns with it, wheels and all.
+6 Each device takes the port its cable goes to, or the next free one: click a port to change it. Next, we'll drive this robot in the simulation.

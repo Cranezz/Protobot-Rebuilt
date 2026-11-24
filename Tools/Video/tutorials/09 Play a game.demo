@@ -1,0 +1,63 @@
+# Tutorial 9: Play a game. PRE=cs/t_v9scene.cs (the Override demo robot).
+do partsreset 2
+do camera 0 0 0 30 25 40
+frame 0 0.8
+move 980,620 0.01
+wait 1.0
+
+# 1 Intro
+line 1
+frame 8 0.8 yaw:80 pitch:22
+waitline
+
+# 2 The dialog
+line 2
+click ui:Top Bar/Bar/Right/Play 0.9
+wait 2.0
+move 971,487 0.8
+wait 3.0
+move 891,647 0.7
+wait 2.0
+move text:Set up the field 0.7
+wait 0.6
+click
+waitline
+
+# 3 Setup
+line 3
+wait 1.0
+move text:Default start 0.9
+wait 2.0
+move 400,1009 0.8
+wait 3.0
+move 1756,380 1.0
+waitline
+
+# 4 Start
+line 4
+click text:Start run 0.9
+wait 4.2
+hold I
+hold W
+wait 1.3
+release W
+wait 0.8
+hold RightArrow
+wait 0.5
+release RightArrow
+release I
+waitline
+
+# 5 Scoring
+line 5
+hold LeftArrow
+wait 0.6
+release LeftArrow
+waitline
+
+# 6 End and score
+line 6
+key Esc
+wait 9
+waitline
+wait 1.0

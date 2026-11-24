@@ -1,11 +1,11 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using Protobot.StateSystems;
 using UnityEngine;
 
 namespace Protobot.Tools {
-    // V2: bending a straight part (a high strength shaft, a standoff), as teams bend HS axles and standoffs. A bend is
+    // V2: bending a straight part (a high strength shaft, a standoff, a plate), as teams bend HS axles, standoffs and plates. A bend is
     // where it starts along the part (inches from the part's low end along its length), how far it turns, which way
     // (degrees round the part's length from its "up"), and its radius: the part is cut into thin slices across the
     // bend and every point is wrapped round the bend's radius (the inside squeezed, the outside stretched), so it
@@ -52,7 +52,22 @@ namespace Protobot.Tools {
             if (id.StartsWith("SNDF")) return true;
             if (id == LinkId) return true;   // the rubber link bends in its rubber
             if (id.StartsWith("SHFT") && id.Contains("High Strength")) return true;
+            if (IsPlate(part)) return true;   // V2: plates bend across their length, about their thin side
             return id.Contains("HS Shaft");
+        }
+
+        /// <summary>V2: a flat plate (the original's plates and base plate), bent across its length into a bracket as
+        /// teams do: the bend turns about the plate's thin side, and every hole goes round with the metal.</summary>
+        public static bool IsPlate(GameObject part) {
+            if (part == null || !part.TryGetComponent(out SavedObject saved) || saved.id == null) return false;
+            return saved.id.StartsWith("PLTE") || saved.id.StartsWith("BSPT");
+        }
+
+        /// <summary>V2: a plate's way to bend: its "toward" (degrees round its length) that points along its thin side.</summary>
+        public static float PlateToward(GameObject part) {
+            var (axis, _, _, _) = Frame(part, Straight(part));
+            var size = Vector3.Scale(Straight(part).bounds.size, Abs(part.transform.localScale));
+            return size[(axis + 1) % 3] <= size[(axis + 2) % 3] ? 0f : 90f;
         }
 
         /// <summary>The part's length axis (its longest side, scale included) in its own space, its low end along it
@@ -68,8 +83,15 @@ namespace Protobot.Tools {
 
         private static Vector3 Abs(Vector3 v) => new(Mathf.Abs(v.x), Mathf.Abs(v.y), Mathf.Abs(v.z));
 
-        /// <summary>The part's thickness across its length (for the default radius).</summary>
+        /// <summary>The part's thickness across its length (for the default radius): a plate's is its thin side.</summary>
         public static float Thickness(GameObject part, Mesh straight) {
+            var (axis, _, _, _) = Frame(part, straight);
+            var size = Vector3.Scale(straight.bounds.size, Abs(part.transform.localScale));
+            return IsPlate(part) ? Mathf.Min(size[(axis + 1) % 3], size[(axis + 2) % 3]) : Mathf.Max(size[(axis + 1) % 3], size[(axis + 2) % 3]);
+        }
+
+        /// <summary>V2: how wide the part is across its length (its widest side: the rings round a plate span it).</summary>
+        public static float Width(GameObject part, Mesh straight) {
             var (axis, _, _, _) = Frame(part, straight);
             var size = Vector3.Scale(straight.bounds.size, Abs(part.transform.localScale));
             return Mathf.Max(size[(axis + 1) % 3], size[(axis + 2) % 3]);
@@ -306,6 +328,10 @@ namespace Protobot.Tools {
         private static void PlaceHoles(GameObject part, Mesh straight, IList<Bend> bends) {
             var holes = part.GetComponentsInChildren<HoleCollider>(true).Where(h => h.transform.parent == part.transform && h.GetComponent<DrilledHole>() == null).ToList();
             if (holes.Count == 0) return;
+            if (IsPlate(part)) {
+                PlacePlateHoles(part, straight, holes, bends);
+                return;
+            }
             var state = holeStates.TryGetValue(part, out var known) ? known : null;
             if (state == null) {
                 var main = holes[0];
@@ -624,6 +650,21 @@ namespace Protobot.Tools {
                 hole.transform.localPosition = Div(p, scale);
                 hole.transform.localRotation = q * hole.straightRotation;
                 if (hole.TryGetComponent(out HoleCollider collider)) collider.Refresh();
+            }
+        }
+
+        // V2: a plate's holes: each one where the bends carry the metal it was in (its place on the straight plate kept).
+        private static readonly Dictionary<HoleCollider, (Vector3 position, Quaternion rotation)> straightHoles = new();
+
+        private static void PlacePlateHoles(GameObject part, Mesh straight, List<HoleCollider> holes, IList<Bend> bends) {
+            var (axis, low, _, middle) = Frame(part, straight);
+            var scale = part.transform.localScale;
+            foreach (var hole in holes) {
+                if (!straightHoles.TryGetValue(hole, out var pose)) straightHoles[hole] = pose = (hole.transform.localPosition, hole.transform.localRotation);
+                var (p, q) = Carry(Vector3.Scale(pose.position, scale), axis, low, middle, bends);
+                hole.transform.localPosition = Div(p, scale);
+                hole.transform.localRotation = q * pose.rotation;
+                hole.Refresh();
             }
         }
 

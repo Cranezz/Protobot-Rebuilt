@@ -1,0 +1,6 @@
+# Tutorial 8: simulating and driving the robot.
+1 Once your robot is built, Simulate lets you drive it, with real physics: motor torque, gear ratios, wheel grip and weight.
+2 Click Simulate at the top. The V5 Brain window lists every motor and sensor on its port, with live readings. Fold it up to keep the view clear.
+3 Drive with the keyboard. W and S go forward and back, and the arrow keys turn. That's split arcade, like a controller's two sticks.
+4 Every motor in the gear train pushes together, so a six-motor drive gets up to speed fast. Let go, and it brakes.
+5 Stop simulating, and the robot goes back exactly where it was, ready for your next change. Next, we'll play a match on this season's field.

@@ -1,0 +1,136 @@
+# Tutorial 5: polycarbonate corner pieces sketched on the robot. Needs Video/tutorials/05-polycarbonate/target.pbb
+# (cs/t_tdrive.cs: build5, finish, save) and PRE=cs/t_v5scene.cs ("Show only this part" off, a new build).
+do partsreset 2
+do loadtarget C:/Dev/ProtobotRebuiltV2/Video/tutorials/05-polycarbonate/target.pbb
+reveal drive 0
+do camera 0 0 0 30 40 30
+frame 0 0.85 yaw:60 pitch:35 on:drive
+move 1330,190 0.01
+wait 1.0
+
+# 1 Intro
+line 1
+frame 6 0.85 yaw:20 pitch:40 on:drive
+waitline
+
+# 2 Spacers
+line 2
+frame 1.0 0.7 yaw:40 pitch:40 on:spbl
+caption Sped up
+reveal spbl 2.5
+caption
+waitline
+
+# 3 Sketch on a part, on a spacer's top
+line 3
+click ui:Top Bar/Bar/Left/Plastic 0.7
+wait 0.4
+move 215,60 0.3
+click 300,60 0.5
+wait 1.2
+click ui:Place 0.7
+wait 1.0
+frame 0.7 0.8 yaw:40 pitch:60 on:spbl
+move world:-8.05,3.249,-5.0 0.7
+wait 1.2
+click
+wait 1.0
+waitline
+
+# 4 Convert the spacers' holes
+line 4
+move world:-8.168,3.249,-7.0 0.6
+click
+move world:-8.168,3.249,-5.0 0.5
+click
+move world:-8.168,3.249,-3.5 0.5
+click
+move world:-5.492,3.249,-6.5 0.5
+click
+move world:-5.492,3.249,-3.5 0.5
+click
+waitline
+
+# 5 Rectangle, slot, fillet
+line 5
+key R
+wait 0.4
+click world:-8.8,3.249,-8.05 0.6
+wait 0.2
+click world:-5.05,3.249,-3.0 0.9
+wait 0.4
+key S
+wait 0.4
+click world:-7.06,3.249,-6.6 0.6
+click world:-7.06,3.249,-4.4 0.6
+click world:-6.41,3.249,-4.4 0.5
+wait 0.4
+click ui:Toolbar/Fillet 0.6
+wait 0.3
+click ui:Radius 0.5
+type 1
+submit
+wait 0.3
+click world:-8.8,3.249,-8.05 0.6
+wait 0.6
+waitline
+
+# 6 Make the piece
+line 6
+click text:Make piece 0.7
+wait 1.8
+click text:Clear polycarbonate 0.6
+wait 0.5
+click text:Opal white 0.6
+wait 0.8
+click 900,675 0.7
+wait 1.2
+click text:Create 0.7
+wait 1.5
+move 1330,190 0.4
+frame 1.0 0.75 yaw:40 pitch:40 on:spbl
+waitline
+
+# 7 Mirror to the other corners
+line 7
+caption Sped up
+reveal sprest 2
+caption
+frame 0.8 0.8 yaw:20 pitch:55 on:drive
+click world:-8.45,3.32,-4.0 0.7
+wait 0.3
+key M
+wait 0.5
+move mirror:1,0,0 0.6
+drag left mirror:1,0,0,centre 1.2
+wait 0.3
+do deselect
+click world:-8.45,3.32,-4.0 0.6
+key M
+wait 0.4
+move mirror:0,0,1 0.5
+drag left mirror:0,0,1,centre 1.0
+wait 0.3
+do deselect
+click world:8.45,3.32,-4.0 0.6
+key M
+wait 0.4
+move mirror:0,0,1 0.5
+drag left mirror:0,0,1,centre 1.0
+wait 0.3
+do deselect
+move 1330,190 0.4
+waitline
+
+# 8 Screws, plastic count
+line 8
+frame 1.0 0.85 yaw:35 pitch:35 on:drive
+caption Sped up
+reveal cscrews 3
+caption
+move ui:Top Bar/Bar/Right/Plastic 0.8
+wait 1.2
+move 1330,190 0.6
+frame 6 0.85 yaw:-40 pitch:30 on:drive
+waitline
+wait 0.8

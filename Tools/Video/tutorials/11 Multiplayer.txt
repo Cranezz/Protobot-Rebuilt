@@ -1,0 +1,7 @@
+# Tutorial 11: multiplayer.
+1 Protobot has online play: drive your robot against your friends' robots on the same field, each of you on your own computer.
+2 From the home menu, click Multiplayer. The server list shows the open matches. Join one, or type in a friend's invite code.
+3 To host, open Host a match. Give it a name, choose the mode and how many players, and whether it's invite only, has a password, or starts with an autonomous period.
+4 Click Host match, and you get an invite code to send. Everyone chooses their robot, places it at its start, and clicks Ready.
+5 Your computer runs the match, and the others join through a relay, so there's nothing to set up on your router. Alliance partners can even talk by voice.
+6 Your skills runs go on the Skills leaderboard, and your Profile keeps your stats and badges. Last up: a few tips and tricks you might have missed.

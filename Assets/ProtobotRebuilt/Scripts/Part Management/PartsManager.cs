@@ -94,6 +94,25 @@ namespace Protobot {
             return partObj;
         }
 
+        /// <summary>V2: sets a part type's generator to make the part with this id (as GeneratePart reads it), so placing
+        /// can start from it (paste). Old ids' defaults as GeneratePart's.</summary>
+        public static void SetParams(PartGenerator gen, string id) {
+            var idSplit = id.Split('-');
+            var p1Val = idSplit.Length >= 2 ? idSplit[1] : "";
+            var p2Val = idSplit.Length == 3 ? idSplit[2] : "";
+            if (id == "NUT") p1Val = "Lock";
+            gen.param1.value = p1Val;
+            gen.param2.value = p2Val;
+            if ((gen.name == "Omni Wheel" || gen.name == "Traction Wheel") && p2Val == "") {
+                gen.param2.value = p1Val;
+                gen.param1.value = "V1";
+            }
+            if (gen.name == "Motor" && p1Val == "") gen.param1.value = "11W";
+            if (gen.name == "Block Bearing" && p1Val == "") gen.param1.value = "Normal";
+            if (gen.name == "Cylinder" && p2Val == "") gen.param2.value = "Normal";
+            if (gen.name == "Ring" && p1Val == "") gen.param1.value = "Red";
+        }
+
         /// <Summary> Returns a list of all loaded parts in the current scene </Summary>
         public static List<GameObject> FindLoadedObjects() {
             return GameObject.FindObjectsOfType<SavedObject>().Select(x => x.gameObject).ToList();

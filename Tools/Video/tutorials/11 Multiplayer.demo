@@ -1,0 +1,58 @@
+# Tutorial 11: multiplayer (no PRE: starts at the home menu; nothing is hosted or joined).
+waitfor ui:Other Options/Multiplayer Button
+move 960,620 0.01
+wait 1.2
+
+# 1 Intro
+line 1
+wait 2.0
+move ui:Other Options/Multiplayer Button 1.5
+waitline
+
+# 2 Server list
+line 2
+click ui:Other Options/Multiplayer Button 0.6
+wait 2.5
+move 1130,256 0.9
+wait 1.5
+move 634,154 0.9
+wait 1.2
+move 789,154 0.6
+waitline
+
+# 3 Host a match
+line 3
+click text:Host a match 0.8
+wait 1.2
+move 754,184 0.7
+wait 0.8
+move 923,292 0.6
+wait 0.8
+move 700,346 0.6
+wait 0.8
+move 822,452 0.6
+wait 0.8
+move 887,502 0.6
+waitline
+
+# 4 Host match
+line 4
+move 674,575 0.8
+wait 1.5
+move 1100,575 1.0
+waitline
+
+# 5 Relay
+line 5
+move 1130,140 0.9
+waitline
+
+# 6 Leaderboard and profile
+line 6
+move text:Skills leaderboard 0.9
+wait 1.5
+move text:Profile 0.6
+wait 1.5
+move 960,700 1.2
+waitline
+wait 1.0

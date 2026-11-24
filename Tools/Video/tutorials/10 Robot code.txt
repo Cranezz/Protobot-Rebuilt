@@ -1,0 +1,7 @@
+# Tutorial 10: robot code.
+1 Protobot runs real robot code on your simulated robot: Python like VEXcode's, Blocks, and C++ with PROS, LemLib and EZ-Template.
+2 Click Code at the top to open the code window. Examples has programs to start from: let's pick Autonomous square.
+3 Each example is filled in with your robot's own motors, ports and gear ratio, so it's ready to run.
+4 Click Run. The simulation starts, and the program drives the robot, here, around a square.
+5 Its output shows below, beside the Brain's screen, a graph for tuning, and a monitor of every variable as it runs.
+6 You can build programs from Blocks too, or open them in VS Code. They're saved with your build, and run in games. Last up: multiplayer.

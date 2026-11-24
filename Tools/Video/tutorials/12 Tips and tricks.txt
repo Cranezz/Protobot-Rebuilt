@@ -1,0 +1,7 @@
+# Tutorial 12: tips and tricks (features the other videos don't show).
+1 Last one: a few tools you might not have found yet, starting with gears.
+2 With the saw, click a gear, then Gear teeth. Chamfer bevels the teeth round one face, at forty-five degrees, the way teams fit a forty-eight tooth gear inside a two-and-three-quarter inch wheel, or help gears slide into mesh.
+3 Take off teeth makes a slip gear: click the teeth to remove, then Take off. Teams use these for catapults and punchers, so the gear lets go once per turn.
+4 Rubber bands go on like the real thing. Pick a band in the parts list, click one post, then the next. Its stretch and pull show beside the mouse, and the simulation pulls just as hard.
+5 License plates carry your team number. Right-click the plate, choose Team number, and type it in.
+6 And when you're not sure what a part can do, right-click it. Every cut, hole and band is saved with your build. Have fun building!

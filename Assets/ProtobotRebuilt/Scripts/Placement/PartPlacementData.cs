@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 namespace Protobot {
     public class PartPlacementData : PlacementData {
@@ -14,6 +14,10 @@ namespace Protobot {
             this.placementTransform = placementTransform;
         }
 
-        public override Mesh GetDisplayMesh() => partGenerator.GetMesh().CombineSubmeshes();
+        /// <summary>V2: what the placing ghost shows instead of the part's own mesh (a pasted group: the part and what's
+        /// screwed to it, in the part's frame). A new mesh each call (Placement frees the last one).</summary>
+        public System.Func<Mesh> display;
+
+        public override Mesh GetDisplayMesh() => display != null ? display() : partGenerator.GetMesh().CombineSubmeshes();
     }
 }

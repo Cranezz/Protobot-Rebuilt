@@ -1,0 +1,7 @@
+# Tutorial 4: the Measure tool and Mirror.
+1 Two tools that save a lot of time: Measure, to check distances, and Mirror, to build the other side of your robot in one step.
+2 Press six for the Measure tool. Click one point, then another. Holes, corners, edges and faces all snap.
+3 You get the distance, plus how far apart the points are in each direction, labeled on the lines. Drag either end to measure somewhere else.
+4 Now Mirror. Select a part with the Transform tool, and press M. An icon appears on each side of it.
+5 Hold one and drag outward to set a gap, then let go. Everything fastened to the part is copied to that side, flipped, so left-hand parts become right-hand ones.
+6 On a drivetrain, mirrored motors even swap sides and keep turning the right way. Next, we'll design polycarbonate parts.

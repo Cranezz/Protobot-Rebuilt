@@ -1,0 +1,147 @@
+# Tutorial 2: Building a drivetrain. Needs the target build (Tools/AgentTesting/cs/t_tdrive.cs: build, finish, save
+# Video/tutorials/02-drivetrain/target.pbb, which also writes its .tags.txt) and PRE=cs/t_closelaunch.cs.
+# The left side is built (live steps once, repeats sped up), the right side made by the Mirror tool.
+do partsreset 2
+do loadtarget C:/Dev/ProtobotRebuiltV2/Video/tutorials/02-drivetrain/target.pbb
+do showtarget
+do camera 0 0 0 15 28 40
+frame 0 0.8 all
+move 980,620 0.01
+wait 1.2
+
+# 1 Intro: the finished drivetrain
+line 1
+frame 12 0.8 all yaw:105 pitch:28
+waitline
+wait 0.2
+do hidetarget
+frame 0.8 0.7 yaw:60 pitch:30 on:rail1,lframe,lwheels,w1wheel,w2wheel
+
+# 2 The frame (one side)
+line 2
+wait 0.4
+caption Sped up
+reveal rail1,lframe 4
+caption
+waitline
+
+# 3 A screw with F
+line 3
+frame 1.4 0.45 yaw:60 pitch:25 on:w1parts,w1wheel,w1screw
+move tpos:w1screw 1.0
+wait 0.8
+hold F
+wait 1.2
+scroll 12 2.0
+wait 0.8
+release F
+waitline
+
+# 4 Nuts, spacers, gear
+line 4
+caption Sped up
+reveal w1parts 3
+caption
+waitline
+
+# 5 The wheel
+line 5
+frame 0.8 0.45 yaw:70 pitch:50 on:w1wheel,w1parts
+click text:Motion 0.6
+wait 0.3
+click text:Wheels 0.5
+wait 0.3
+click text:Omni wheels 0.5
+wait 0.4
+click ui:Tiles/3.25" omni wheel 0.6
+move tpart:w1wheel 1.2
+wait 0.8
+click
+wait 0.4
+key Esc
+waitline
+
+# 6 The bolts that hold the gear to the wheel
+line 6
+caption Sped up
+reveal w1bolts 2
+caption
+waitline
+
+# 7 Copy and paste the wheel onto the next screw
+line 7
+frame 0.8 0.6 yaw:65 pitch:42 on:w1parts,w2parts,w2wheel
+click part:OMNI-V2-3.25in 0.7
+wait 0.5
+key Ctrl+C
+wait 0.4
+do deselect
+caption Sped up
+reveal w2parts 1.5
+caption
+key Ctrl+V
+wait 0.3
+move tpart:w2wheel 1.0
+wait 0.7
+click
+wait 0.4
+key Esc
+do deselect
+do droptag w2group
+probe
+waitline
+
+# 8 The rest of the side, close up
+line 8
+frame 1.0 0.9 yaw:55 pitch:38 on:rail1,lframe,lwheels,w1parts,w2parts,lmotors,m1motor
+click text:Electronics 0.7
+wait 0.3
+click text:Motors 0.5
+wait 0.3
+move ui:Tiles/11W motor 0.6
+wait 1.2
+move 960,640 0.6
+caption Sped up
+reveal lwheels 3
+reveal m1motor,lmotors 6
+caption
+waitline
+
+# 9 Mirror the side
+line 9
+frame 1.0 0.6 yaw:25 pitch:40 all
+click tpart:rail1 0.8
+wait 0.5
+key M
+wait 0.8
+move mirror:1,0,0 0.8
+wait 0.5
+drag left mirror:1,0,0,centre 1.8
+wait 0.4
+do deselect
+wait 0.2
+key Esc
+wait 0.2
+do deselect
+do droptag rside
+wait 0.3
+move 1330,190 0.5
+frame 1.0 0.6 yaw:25 pitch:40 all
+waitline
+
+# 10 Cross bars
+line 10
+move 1330,190 0.3
+frame 1.0 0.62 all yaw:30 pitch:45
+caption Sped up
+reveal bars 1.5
+reveal bar1screw,bar1nut,barscrews 4
+caption
+waitline
+
+# 11 Done
+line 11
+move 1330,190 0.3
+frame 9.5 0.8 all yaw:-50 pitch:25
+waitline
+wait 1.0

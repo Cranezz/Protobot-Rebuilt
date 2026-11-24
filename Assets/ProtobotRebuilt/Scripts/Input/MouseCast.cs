@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 namespace Protobot {
 [RequireComponent(typeof(Camera))]
@@ -44,7 +44,9 @@ namespace Protobot {
                     // V2: while placing, a hole near the mouse wins over the part around it: ports sit a little inside
                     // a valve's or cylinder's body and small holes are hard to hit, so a fitting, screw or standoff
                     // over the body beside a hole goes into the hole.
-                    if (Placement.IsPlacing && !lastHit.collider.CompareTag("HoleCollider") && (layerMask & (1 << HoleCollider.HOLE_COLLISIONS_LAYER)) != 0) {
+                    // V2: not over a screw or shaft: the mouse is on the axle a wheel, gear or nut slides along.
+                    if (Placement.IsPlacing && !lastHit.collider.CompareTag("HoleCollider") && (layerMask & (1 << HoleCollider.HOLE_COLLISIONS_LAYER)) != 0
+                        && lastHit.collider.GetComponentInParent<Screw>() == null && lastHit.collider.GetComponentInParent<Shaft>() == null) {
                         var near = NearestHole(mouseRay, lastHit.distance + 0.35f);
                         if (near.collider != null) return near;
                     }
@@ -68,6 +70,10 @@ namespace Protobot {
             foreach (var candidate in Physics.SphereCastAll(mouseRay, 0.5f, Mathf.Infinity, layerMask)) {
                 var hole = candidate.collider.transform;
                 if (hole.root.gameObject.layer == Placement.PLACEMENT_LAYER)
+                    continue;
+                // V2: only holes (the cast's mask has the Default layer too: a gear's body near the mouse was taken for
+                // a hole, and a wheel over a screw beside that gear fell back to the grid, unturned).
+                if (!candidate.collider.CompareTag("HoleCollider"))
                     continue;
                 var axis = hole.forward;
                 var facing = Vector3.Dot(axis, mouseRay.direction) > 0f ? -axis : axis;

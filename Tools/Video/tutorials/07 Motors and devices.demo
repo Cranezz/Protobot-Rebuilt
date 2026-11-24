@@ -1,0 +1,51 @@
+# Tutorial 7: motors and the Devices window. PRE=cs/t_v5scene.cs (tutorial 2's drivetrain).
+do partsreset 2
+do camera 0 0 0 30 40 30
+frame 0 0.9
+move 980,620 0.01
+wait 1.0
+
+# 1 Intro
+line 1
+frame 6 0.9 yaw:60 pitch:40
+waitline
+
+# 2 Click a motor
+line 2
+click part:MOTR 1.0
+wait 1.5
+move 1000,130 0.9
+waitline
+
+# 3 The card
+line 3
+move 1300,516 0.9
+wait 1.5
+move 1240,584 0.8
+waitline
+
+# 4 Settings
+line 4
+move 1272,691 0.8
+wait 1.2
+move 1350,691 0.6
+wait 1.2
+move 1410,726 0.7
+waitline
+
+# 5 Run it by hand
+line 5
+click 1415,416 0.8
+wait 0.4
+click 1415,416 0.3
+wait 3.5
+click 1386,416 0.5
+waitline
+
+# 6 Ports
+line 6
+move 846,127 0.9
+wait 2.5
+move 980,640 0.8
+waitline
+wait 0.8

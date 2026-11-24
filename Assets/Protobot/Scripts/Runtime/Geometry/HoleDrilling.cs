@@ -334,7 +334,8 @@ namespace Protobot.Geometry
         /// <param name="spans">V2: for each side, how far the new round wall runs along the hole (top, bottom; 0 at
         /// the hole's top face, negative into the wall): where there's material just outside the hole, so the wall
         /// never stands out past the part (a flange beside the hole doesn't make it taller all the way round).</param>
-        public static Mesh Drill(Mesh source, HoleInfo hole, float radius, bool[] walls = null, int segments = DrillSegments, Vector2[] spans = null)
+        /// <param name="closed">V2: a blind hole (into the end of a shaft): its round bottom is closed at the full depth.</param>
+        public static Mesh Drill(Mesh source, HoleInfo hole, float radius, bool[] walls = null, int segments = DrillSegments, Vector2[] spans = null, bool closed = false)
         {
             var n = hole.normal;
             Basis(n, out var a, out var b);
@@ -431,6 +432,28 @@ namespace Protobot.Geometry
                     list.AddRange(new[] { start, start + 1, start + 2, start, start + 2, start + 3 });
                 else
                     list.AddRange(new[] { start, start + 2, start + 1, start, start + 3, start + 2 });
+            }
+
+            if (closed)
+            {
+                // A disc at the bottom, facing out of the hole (toward its opening).
+                var middle = verts.Count;
+                var floor = hole.center - n * depth;
+                verts.Add(floor);
+                normals.Add(n);
+                for (var i = 0; i < segments; i++)
+                {
+                    verts.Add(floor + a * corners[i].x + b * corners[i].y);
+                    normals.Add(n);
+                }
+                var list = submeshes[wallSubmesh];
+                for (var i = 0; i < segments; i++)
+                {
+                    int p = middle + 1 + i, q = middle + 1 + (i + 1) % segments;
+                    var up = Vector3.Dot(Vector3.Cross(verts[p] - floor, verts[q] - floor), n) >= 0f;
+                    if (up) list.AddRange(new[] { middle, p, q });
+                    else list.AddRange(new[] { middle, q, p });
+                }
             }
 
             var mesh = new Mesh { name = source.name };

@@ -27,7 +27,7 @@ namespace Protobot.Interface {
             ("Paint", "Color Tool", "Enable Color Tool", 0, "Click parts to paint them. Pick the color in the options above."),
             ("Saw", "Saw Tool", "Enable Saw Tool", 1, "Click a part to place a cut. Drag the plane or type its distance, then press Enter to cut."),
             ("Drill", "Drill Tool", "Enable Drill Tool", 1, "Click a hole to drill it out round, or the side of a standoff or HS shaft to drill a hole across it. Choose the bit size above."),
-            ("Bend", "Bend Tool", "Enable Bend Tool", 1, "Bend HS shafts, standoffs and the rubber link: click where it bends, then drag the blue ring (angle) and the green ring (which way). Enter bends it."),
+            ("Bend", "Bend Tool", "Enable Bend Tool", 1, "Bend HS shafts, standoffs, plates and the rubber link: click where it bends, then drag the blue ring (angle) and the green ring (which way). Enter bends it."),
             ("Measure", "Measure Tool", "Enable Measure Tool", 2, "Click two points, edges or holes to measure the distance between them."),
         };
 

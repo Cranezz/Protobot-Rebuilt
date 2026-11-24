@@ -156,13 +156,16 @@ while True:
     wait(20, MSEC)
 ";
 
+        // V2: the drivetrain lines are the robot's own when it has one ({devices}: its motors, ports, wheels, gearing).
         private const string Square = @"from vex import *
 
+# {devices}
 brain = Brain()
 left_motor = Motor(Ports.PORT1, GearSetting.RATIO_18_1, False)
 right_motor = Motor(Ports.PORT10, GearSetting.RATIO_18_1, True)
 # wheel_travel: the wheel's circumference (4"" wheel: 12.57""); track_width: between the wheels.
 drivetrain = DriveTrain(left_motor, right_motor, 12.57, 11, 10, INCHES, 1)
+# {/devices}
 drivetrain.set_drive_velocity(50, PERCENT)
 drivetrain.set_turn_velocity(30, PERCENT)
 

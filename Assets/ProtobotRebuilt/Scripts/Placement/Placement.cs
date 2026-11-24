@@ -20,6 +20,11 @@ namespace Protobot {
         public static Placement Instance { get; private set; }  // V2
         public static bool IsPlacing => Instance != null && Instance.placing;  // V2
         public string PlacingId => currentPlacementData?.objectId;  // V2: the action log says what's being placed
+        /// <summary>V2: a part was just placed (paste copies its look and edits onto it).</summary>
+        public static event Action<GameObject> Placed;
+        /// <summary>V2: parts a Placed handler made with the placed one (the rest of a pasted group): they're in the same
+        /// undo step.</summary>
+        public static readonly List<GameObject> PlacedWith = new();
         public bool rotating;
 
         private PlacementData currentPlacementData;
@@ -185,6 +190,14 @@ namespace Protobot {
 
         private Mesh displayMesh;  // V2
 
+        /// <summary>V2: placing that starts with the part turned this way (paste: the copied part's turn).</summary>
+        public void StartPlacing(PlacementData newPlacementData, Quaternion turn) {
+            StartPlacing(newPlacementData);
+            freeRotation = startRotation = turn;
+            transform.rotation = turn;
+            currentDisplacement = new Displacement(currentDisplacement.translation.Position, turn);
+        }
+
         public void StartPlacing(PlacementData newPlacementData) {
             // V2: a part from the parts list is placed with the tools down: the drill or saw would act on the click
             // that places it (a screw placed with the drill drilled the hole).
@@ -267,8 +280,22 @@ namespace Protobot {
                 prevElement.existing = false;
                 StateSystem.AddElement(prevElement);
 
+                PlacedWith.Clear();
+                Placed?.Invoke(placedObj);   // V2 (before the undo step records it: a paste's edits are part of it)
+
                 ObjectElement objElement = new ObjectElement(placedObj);
-                StateSystem.AddState(objElement);
+                if (PlacedWith.Count == 0) StateSystem.AddState(objElement);
+                else {
+                    // V2: the rest of a pasted group comes and goes with it
+                    var elements = new List<IElement> { objElement };
+                    foreach (var other in PlacedWith) {
+                        if (other == null) continue;
+                        StateSystem.AddElement(new ObjectElement(other) { existing = false });
+                        elements.Add(new ObjectElement(other));
+                    }
+                    StateSystem.AddState(new State(elements));
+                    PlacedWith.Clear();
+                }
             }
             else if (isGameObjectPlacement) {
                 movementManager.DisplaceTo(currentDisplacement, 0);

@@ -1,0 +1,7 @@
+# Tutorial 6: gears, sprockets and chains.
+1 Gears, sprockets and chains carry power from your motors. Gears mesh by themselves when they're spaced right, and Protobot works out every ratio.
+2 For a chain, open Edit, Make a chain. Then click the sprockets in order round the loop, on the sprocket itself or its shaft.
+3 The window shows each sprocket's teeth, its speed compared to the first, and how well the chain fits. Click a sprocket again to run the chain on its inside, as an idler.
+4 When the loop works, Make chain lights up. Click it, or press Enter.
+5 Now run the motor. The chain runs round, and every sprocket on it turns at its own ratio.
+6 Chains come in normal, high strength and 6P sizes, with tank tread too. Next, we'll set up motors in the Devices window.

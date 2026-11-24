@@ -1,0 +1,10 @@
+var t = typeof(Protobot.Tools.PartClipboard);
+var f = System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static;
+var anchor = t.GetField("anchor", f).GetValue(null);
+var rest = (System.Collections.IList)t.GetField("rest", f).GetValue(null);
+var sb = new System.Text.StringBuilder();
+System.Func<object, string> Row = it => { var ty = it.GetType(); return ty.GetField("id").GetValue(it) + " at " + ((Vector3)ty.GetField("position").GetValue(it)).ToString("0.000"); };
+sb.AppendLine("anchor " + Row(anchor));
+foreach (var it in rest) sb.AppendLine("  " + Row(it));
+foreach (var s in UnityEngine.Object.FindObjectsByType<Protobot.SavedObject>(FindObjectsSortMode.None)) if (s.id == "NUT-Keps" && s.transform.position.x < -7.4f && s.transform.position.x > -7.7f) sb.AppendLine("keps " + s.transform.position.ToString("0.000") + " active " + s.gameObject.activeInHierarchy);
+return sb.ToString();

@@ -76,6 +76,10 @@ namespace Protobot.Tools {
 
         private static bool ClaimsKey(InputEvent e, Key key) {
             {
+                // V2: Ctrl+C / Ctrl+V copy and paste parts (not the color picker's C).
+                var keyboard = Keyboard.current;
+                if (keyboard != null && (keyboard.ctrlKey.isPressed || keyboard.leftCommandKey.isPressed)
+                    && (key == Keybinds.MainKey("CopyPart") || key == Keybinds.MainKey("PastePart"))) return true;
                 if (key == Keybinds.MainKey("QuickScrew") || key == Keybinds.MainKey("QuickScrewAll")) { if (HoverHole() != null) return true; }
                 if (key == Keybinds.MainKey("HoldScrew")) { if (ClaimsWheel || HoverHole() != null || HoverScrew() != null) return true; }
                 if (key == Keybinds.MainKey("HoldSpacer")) { if (ClaimsWheel || HoverHole() != null || HoverScrew() != null) return true; }

@@ -1,0 +1,11 @@
+# Tutorial 3: the saw, the drill and the bend tool.
+1 Real robots need parts cut to length, holes drilled, and plates and shafts bent. Protobot's saw, drill and bend tools do the same, on the parts in your build.
+2 The saw is key four. Click a part, and a cut plane appears through its middle, with its distance from the end.
+3 Drag the arrow to slide it, or type the distance you want in the bar at the top. Let's cut this channel five inches from the end.
+4 Press Enter to cut. Both pieces are kept, each a part of its own, and cuts between holes give clean, standard parts.
+5 The drill is key five. Pick a bit size at the top: scrolling over it steps through the sizes. Then click a hole to drill it out, round and to size.
+6 The drill works on high strength shafts too. With a smaller bit, click the side of the shaft for a hole straight through it: it snaps to the middle.
+7 Or click the end of the shaft to drill into its center, tapped for a screw, the way teams fasten a shaft end-on.
+8 Bending works on plates, high strength shafts and standoffs. Press seven, and click the plate where the bend should be.
+9 Type an angle, or drag the blue ring, then click Bend. The holes go round with the metal.
+10 Every cut, hole and bend is saved with your build, and Control Z takes it back. Next, we'll measure parts and mirror them.

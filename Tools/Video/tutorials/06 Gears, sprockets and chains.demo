@@ -1,0 +1,63 @@
+# Tutorial 6: gears, sprockets and chains. PRE=cs/t_v6scene.cs (a sprocket plate with a motor, and three geared motors).
+do partsreset 2
+do camera 0 0 0 0 50 30
+frame 0 0.9
+move 980,620 0.01
+wait 1.0
+
+# 1 Intro
+line 1
+frame 7 0.9 yaw:40 pitch:45
+waitline
+
+# 2 Make a chain
+line 2
+frame 1.0 0.55 yaw:0 pitch:55 on:SPKT
+click ui:Top Bar/Bar/Left/Edit 0.8
+wait 0.8
+click 238,210 0.6
+wait 1.5
+click part:SPKT-Normal-15T 0.9
+wait 0.8
+click part:SPKT-Normal-24T 0.9
+wait 0.8
+click part:SPKT-Normal-40T 0.9
+waitline
+
+# 3 The window
+line 3
+move 330,450 0.9
+wait 2.5
+move 330,500 0.8
+waitline
+
+# 4 Make chain
+line 4
+click text:Make chain 0.9
+wait 0.8
+move 1000,700 0.8
+waitline
+
+# 5 Run it
+line 5
+click ui:Top Bar/Bar/Left/Edit 0.8
+wait 0.6
+click 238,180 0.6
+wait 1.2
+click 1067,359 0.8
+wait 0.3
+click 1067,359 0.3
+wait 0.3
+click 1067,359 0.3
+wait 0.4
+move 1000,700 0.8
+waitline
+wait 1.5
+
+# 6 Outro
+line 6
+click 1038,359 0.7
+wait 0.4
+move 1000,700 0.6
+waitline
+wait 0.8

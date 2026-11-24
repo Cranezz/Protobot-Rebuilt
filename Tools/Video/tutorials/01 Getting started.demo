@@ -1,0 +1,189 @@
+# Tutorial 1: Getting started. The demo script (Builds/DemoPlayer) recorded to the narration: "line N" starts line N
+# (its audio is placed there), "waitline" waits for it to end. Durations come from durations.txt beside the copy of
+# this file in Video/tutorials/01-getting-started (tutorial_voice.py writes it).
+waitfor ui:Other Options/Create New Button
+do partsreset
+do camera 0 0 0 30 38 13
+move 640,760 0.01
+wait 1.2
+
+# 1 Welcome
+line 1
+wait 2.2
+move 860,600 1.8
+waitline
+wait 0.3
+
+# 2 The home menu
+line 2
+wait 1.6
+move ui:Other Options/Create New Button 0.8
+wait 1.0
+move ui:Other Options/Open Button 0.5
+wait 1.1
+move ui:Other Options/Play Game Button 0.5
+wait 1.5
+move ui:Other Options/Multiplayer Button 0.5
+wait 1.3
+move ui:Other Options/Create New Button 0.6
+waitline
+click
+wait 0.8
+
+# 3 The screen
+line 3
+wait 0.2
+move ui:Top Bar/Bar/Left/File 0.7
+move ui:Top Bar/Bar/Left/Help 0.7
+wait 0.2
+move ui:Top Bar/Bar/Left/Undo 0.5
+move ui:Top Bar/Bar/Left/Redo 0.3
+wait 0.5
+move ui:Top Bar/Bar/Right/Simulate 1.0
+wait 0.5
+move ui:Top Bar/Bar/Right/Code 0.4
+wait 0.4
+move ui:Top Bar/Bar/Right/Play 0.4
+wait 0.4
+move ui:Tool Rail/Panel/Transform 1.1
+move ui:Tool Rail/Panel/Measure 0.9
+wait 0.2
+move 1700,300 1.0
+waitline
+wait 0.2
+
+# 4 Adding a part
+line 4
+wait 1.6
+click text:Structure 0.7
+wait 0.8
+click text:C-Channels 0.6
+wait 0.6
+move ui:Tiles/1x2 C-channel 0.5
+wait 0.4
+click
+wait 0.5
+move 1700,125 0.6
+waitline
+
+# 5 Placing it
+line 5
+move world:0,0,0 1.0
+wait 0.4
+hold Ctrl
+scroll -25 2.2
+release Ctrl
+wait 0.4
+click
+wait 1.0
+move world:1,0,-4 0.8
+wait 0.3
+click
+wait 0.6
+key Esc
+frame 1.0 0.45
+waitline
+wait 0.3
+
+# 6 Connecting with the Move tool
+line 6
+wait 1.4
+click ui:Tool Rail/Panel/Move 0.8
+wait 0.6
+click tophole:2,-2 0.9
+wait 1.6
+click tophole:1,2 1.0
+wait 0.8
+frame 1.0 0.5
+waitline
+wait 0.3
+
+# 7 The camera
+line 7
+move 760,620 0.8
+wait 0.5
+drag right 1000,580 1.6
+wait 0.6
+move pairhole:2,1 0.6
+drag middle here +40,0 1.0
+wait 0.4
+drag middle here +-40,0 1.0
+wait 0.4
+scroll 3 0.9
+wait 0.4
+scroll -3 0.9
+waitline
+frame 0.8 0.55
+
+# 8 Screws
+line 8
+wait 1.2
+move pairhole:2,1 0.9
+wait 0.6
+key C
+wait 2.2
+move 800,620 0.6
+drag right 800,520 1.0
+wait 0.5
+frame 0.8 0.5
+waitline
+wait 0.3
+
+# 9 The Transform tool
+line 9
+click ui:Tool Rail/Panel/Transform 0.7
+wait 0.2
+click partn:1 0.7
+wait 0.5
+move ui:Transform Canvas/x-axis 0.5
+drag left ui:Transform Canvas/x-axis +130,-120 1.2
+wait 0.4
+move ui:Transform Canvas/Y Rotation Ring 0.5
+wait 0.6
+move 505,80 0.8
+waitline
+
+# 10 Undo and redo
+line 10
+wait 0.8
+key Ctrl+Z
+wait 1.6
+key Ctrl+Y
+waitline
+wait 0.2
+
+# 11 Settings
+line 11
+wait 2.4
+click ui:Top Bar/Bar/Right/Settings 1.2
+wait 0.7
+click text:Preferences 0.6
+wait 0.2
+click text:Camera 0.6
+wait 0.4
+move text:Orbit speed 0.5
+wait 0.5
+move text:Pan speed 0.4
+wait 0.5
+move text:Zoom speed 0.4
+waitline
+click text:Done 0.6
+wait 0.3
+
+# 12 Saving
+line 12
+click ui:Top Bar/Bar/Left/File 0.8
+wait 0.4
+move text:Save 0.5
+wait 2.0
+key Esc
+wait 0.3
+move 900,600 0.8
+waitline
+
+# 13 Outro
+line 13
+wait 0.5
+move 960,620 1.5
+waitline
+wait 1.0
