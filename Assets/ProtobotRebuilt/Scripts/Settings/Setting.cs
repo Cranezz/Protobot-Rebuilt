@@ -11,9 +11,12 @@ namespace Protobot {
 
         public object RealValue {
             get {
-                if (int.TryParse(currentValue, out int intResult))
+                // V2: numbers with a dot whatever the PC's language (a comma-decimal PC read "0.0033" as 33: the camera
+                // flew), and a comma from such a PC's old saves still reads as a decimal point.
+                var inv = System.Globalization.CultureInfo.InvariantCulture;
+                if (int.TryParse(currentValue, System.Globalization.NumberStyles.Integer, inv, out int intResult))
                     return intResult;
-                else if (float.TryParse(currentValue, out float floatResult))
+                else if (float.TryParse(currentValue.Replace(',', '.'), System.Globalization.NumberStyles.Float, inv, out float floatResult))
                     return floatResult;
                 else if (bool.TryParse(currentValue, out bool boolResult))
                     return boolResult;
@@ -77,7 +80,7 @@ namespace Protobot {
         }
 
         public void SetValue(int newValue) => SetValue(newValue.ToString());
-        public void SetValue(float newValue) => SetValue(newValue.ToString());
+        public void SetValue(float newValue) => SetValue(newValue.ToString(System.Globalization.CultureInfo.InvariantCulture));   // V2: always a dot
         public void SetValue(bool newValue) => SetValue(newValue.ToString());
     }
 }

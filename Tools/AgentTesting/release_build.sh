@@ -1,5 +1,6 @@
 # Builds the Windows player (cs/build.cs) with every step checked (lib.sh): leaves Play, starts the build, and waits for
 # build_result.txt while Unity's log keeps moving (Unity can't answer while it builds). Usage: bash release_build.sh
+cd "$(dirname "${BASH_SOURCE[0]}")" || exit 1   # (lib.sh, umcp.py and the cs scripts are beside it)
 . ./lib.sh
 step "leave Play for the build"
 state

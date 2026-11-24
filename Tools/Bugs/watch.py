@@ -12,6 +12,9 @@ three kinds of Claude Code run in the project folder (prompts in Tools/Bugs/prom
   3. release (sonnet, low) when anything was fixed: the bug-fix build, GitHub, the one-line #releases post, closing.
 One run at a time; what each did (and cost) goes to C:/Dev/ProtobotRebuiltV2/Bug Reports/runs/<time>.log.
 
+A release that fails (the fixes stay committed) is kept in pending_release.json and tried again every 30 minutes,
+up to RELEASE_TRIES times.
+
 Limits so it can't run away: at most MAX_RUNS_PER_DAY runs a day, and after a failed run it waits 30 minutes.
 
     pythonw -I Tools/Bugs/watch.py            in the background (no window)
@@ -37,6 +40,8 @@ STATE = os.path.join(ROOT, "state.json")
 RUNS = os.path.join(ROOT, "runs")
 WATCH_LOG = os.path.join(ROOT, "watch.log")
 LOCK = os.path.join(ROOT, "watch.lock")
+PENDING = os.path.join(ROOT, "pending_release.json")   # fixes committed but not released yet
+RELEASE_TRIES = 3
 CLAUDE = os.path.expanduser("~/.local/bin/claude.exe")
 POLL = 60            # seconds between checks
 WAIT = 120           # after a new report, before starting (more may come)
@@ -182,13 +187,53 @@ def fix_run(reason):
             else:
                 log(f"#{n} left open: " + ((result or {}).get("note") or "no answer")[:200])
         if fixes:
-            lines = NL.join(f"- #{n}: {s}" for n, s in fixes)
-            done = claude("release", prompt("release", fixes=lines), *RELEASE, out)
-            log("release: " + (f"build {done.get('build')}" if done and done.get("released") else "FAILED " + ((done or {}).get("note") or "")[:200]))
+            old = pending_release()
+            fixes = old.get("fixes", []) + [[n, s] for n, s in fixes if n not in [f[0] for f in old.get("fixes", [])]]
+            json.dump({"fixes": fixes, "tries": 0}, open(PENDING, "w", encoding="utf-8"))
+            release(out)
         if plan.get("note"):
             log("note: " + plan["note"][:300])
     log("run finished")
     return True
+
+
+def pending_release():
+    try:
+        return json.load(open(PENDING, encoding="utf-8")) if os.path.exists(PENDING) else {}
+    except Exception:
+        return {}
+
+
+def release(out):
+    """Releases the fixes in pending_release.json; keeps them there (for a retry) when it fails. True when released."""
+    p = pending_release()
+    if not p.get("fixes"):
+        return True
+    p["tries"] = p.get("tries", 0) + 1
+    json.dump(p, open(PENDING, "w", encoding="utf-8"))
+    lines = NL.join(f"- #{n}: {s}" for n, s in p["fixes"])
+    done = claude("release", prompt("release", fixes=lines), *RELEASE, out)
+    if done and done.get("released"):
+        os.remove(PENDING)
+        log(f"release: build {done.get('build')}")
+        return True
+    log(f"release FAILED (try {p['tries']} of {RELEASE_TRIES}): " + ((done or {}).get("note") or "no answer")[:300])
+    if p["tries"] >= RELEASE_TRIES:
+        log("giving up on this release: the fixes stay committed; release them by hand (Tools/Bugs/README.md step 4)")
+        os.replace(PENDING, PENDING.replace(".json", " (gave up).json"))
+    return False
+
+
+def retry_release():
+    """A release that failed before is tried again (after the quiet time), in a run of its own."""
+    if not pending_release().get("fixes") or runs_today() >= MAX_RUNS_PER_DAY or not signed_in():
+        return None
+    os.makedirs(RUNS, exist_ok=True)
+    name = datetime.datetime.now().strftime("%Y-%m-%d %H%M%S") + ".log"
+    log(f"retrying the release -> runs/{name}")
+    with open(os.path.join(RUNS, name), "w", encoding="utf-8") as out:
+        out.write("# Release retry" + NL)
+        return release(out)
 
 
 def check_once():
@@ -212,7 +257,8 @@ def check_once():
 def main():
     if "--status" in sys.argv:
         found = pending()
-        print("new:", found or "nothing", "| runs today:", runs_today(), "| claude signed in:", signed_in())
+        print("new:", found or "nothing", "| runs today:", runs_today(), "| claude signed in:", signed_in(),
+              "| waiting to release:", [f[0] for f in pending_release().get("fixes", [])] or "nothing")
         return
     if "--once" in sys.argv:
         print(check_once())
@@ -245,6 +291,10 @@ def main():
                         quiet_until = time.time() + 1800
                     elif result == "limit":
                         quiet_until = time.time() + 3600
+                    elif pending_release().get("fixes"):
+                        quiet_until = time.time() + 1800   # its release failed: retried after a while
+                elif retry_release() is False:
+                    quiet_until = time.time() + 1800
             time.sleep(POLL)
     finally:
         try:

@@ -7,7 +7,9 @@ Follow Tools/Bugs/README.md step 4 and AGENT_HANDOFF.md "Build and release routi
 1. Write `Release/Release v2.0 Beta 1 (build N).md` where N is the next build number (Assets/ProtobotRebuilt/Resources/
    Version/build.txt + 1: the player build bumps it): "# Protobot Rebuilt V2, v2.0 Beta 1 (build N)", a "**Bug fixes.**"
    line, then one bullet per line above (no personal details).
-2. `bash Tools/AgentTesting/release_build.sh` (it leaves Play and builds; the build number becomes N). Then in
+2. `cd Tools/AgentTesting && bash release_build.sh` (it leaves Play and builds; the build number becomes N; it prints
+   "STALLED:"/"FAILED:" and stops on a problem, and Tools/AgentTesting/status.txt shows its step: check that the time
+   there is from this run before reading anything into it). Then in
    C:/Dev/ProtobotRebuiltV2/Build/Protobot Beta 1.9: delete ProtobotRebuiltV2_BurstDebugInformation_DoNotShip, copy the
    notes there as "Release notes.md".
 3. From C:/Dev/ProtobotRebuiltV2: `vpk pack --packId ProtobotRebuiltV2 --packVersion 2.0.0-beta.1.N --packDir "Build/Protobot
