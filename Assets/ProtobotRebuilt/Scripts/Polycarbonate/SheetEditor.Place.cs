@@ -300,11 +300,11 @@ namespace Protobot.Polycarb {
             var pan = MousePivotCameraInput.PanPressed;
             if (orbit && pan) orbit = false;
             if (orbit && (MouseInput.xAxis != 0f || MouseInput.yAxis != 0f))
-                cam.OrbitControl(new Vector2(MouseInput.yAxis * 2f, MouseInput.xAxis * 2f));
+                cam.OrbitControl(new Vector2(MouseInput.yAxis * MousePivotCameraInput.OrbitSens, MouseInput.xAxis * Mathf.Abs(MousePivotCameraInput.OrbitSens)));
             if (pan && (MouseInput.xAxis != 0f || MouseInput.yAxis != 0f))
-                cam.PanControl(new Vector2(MouseInput.xAxis, MouseInput.yAxis) * 0.15f);
+                cam.PanControl(new Vector2(MouseInput.xAxis, MouseInput.yAxis) * MousePivotCameraInput.PanSens);
             var wheel = MouseInput.scrollAxis;
-            if (Mathf.Abs(wheel) > 0.001f && !overPanel && !Popup.IsOpen && Dialog.OpenCount == 0) cam.ZoomControl(wheel * 2f);
+            if (Mathf.Abs(wheel) > 0.001f && !overPanel && !Popup.IsOpen && Dialog.OpenCount == 0) cam.ZoomControl(wheel * MousePivotCameraInput.ZoomSens); // V2: the app's zoom speed, not a fixed 2
         }
 
         /// <summary>Looks straight at the sketch, fitting it (SolidWorks' Normal To).</summary>

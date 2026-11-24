@@ -27,6 +27,12 @@ namespace Protobot {
         public static bool OrbitPressed => instance != null && instance.orbitInput != null && instance.orbitInput.IsPressed;
         public static bool PanPressed => instance != null && instance.panInput != null && instance.panInput.IsPressed;
 
+        // V2: the scene's current sensitivities (Preferences changes them), for views that drive the camera themselves
+        // (sketching on a part): they used fixed numbers 800x too strong for the wheel.
+        public static float ZoomSens => instance != null ? instance.zoomSensitvity : 2f;
+        public static float OrbitSens => instance != null ? instance.orbitSensitivity * instance.invertOrbitValue : 2f;
+        public static float PanSens => instance != null ? instance.panSensitivity : 0.15f;
+
         private void Awake() => instance = this;
 
         private void Start() {
