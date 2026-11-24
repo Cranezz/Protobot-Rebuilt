@@ -5,6 +5,7 @@
                                                           1080p videos as assets and a list of them as its text
     python -I Tools/Video/publish_tutorials.py discord    one post per video in the Discord #tutorials forum, the 720p copy
                                                           attached (under 10 MB) and a link to the full-quality one
+    python -I Tools/Video/publish_tutorials.py announce   the announcement in #announcements and a 7-day "rate Protobot" poll
 
 Reruns update instead of adding: the GitHub release and its assets are replaced; the Discord posts (their ids kept in
 server_state.json as "video_N") get their text edited. The GitHub token comes from `git credential fill` and the bot
@@ -16,6 +17,8 @@ import sys
 import time
 
 import requests
+
+sys.stdout.reconfigure(errors="replace")
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(HERE, "..", "Discord"))
@@ -144,11 +147,61 @@ def discord():
         time.sleep(1.0)
 
 
+def announce():
+    """The announcement in #announcements (Announcement Pings mentioned, published to following servers) and a poll
+    under it asking how people rate Protobot so far. Posted once (ids kept in server_state.json "messages")."""
+    state = D.load_state()
+    ch, role = state["channels"], state["roles"]["ping_announce"]
+    messages = state.setdefault("messages", {})
+    channel = ch["announcements"]
+    titles = " · ".join(f"{n}. {title}" for n, _, title, _, _ in VIDEOS)
+    text = chr(10).join([
+        f"<@&{role}> 🎬 **Protobot tutorial videos are here!**",
+        "",
+        "12 short videos, about a minute each, take you from your first build to robot code and online play:",
+        titles,
+        "",
+        f"📺 Watch them in <#{ch['tutorials']}> (one post per video), or in full quality on GitHub: https://github.com/{REPO}/releases/tag/{TAG}",
+        "🆕 Build 78 is out too, with copy and paste, bending plates and drilling into shafts: Help > Check for updates.",
+        "",
+        "💬 **Tell us what you think!** What do you like, what's confusing, what's missing? "
+        f"Reply in <#{ch['general']}>, post ideas in <#{ch['ideas']}> and bugs in <#{ch['bugs']}>. "
+        "And rate Protobot so far in the poll below ⬇️",
+    ])
+    if "videos_announce" not in messages:
+        m = D.call("POST", f"/channels/{channel}/messages",
+                   {"content": text, "allowed_mentions": {"parse": [], "roles": [role]}})
+        messages["videos_announce"] = m["id"]
+        D.save_state(state)
+        try:
+            D.call("POST", f"/channels/{channel}/messages/{m['id']}/crosspost")
+        except RuntimeError as e:
+            print("not published to following servers:", str(e)[:200])
+        print("announced")
+    else:
+        D.call("PATCH", f"/channels/{channel}/messages/{messages['videos_announce']}", {"content": text, "allowed_mentions": {"parse": []}})
+        print("announcement edited")
+    # The rating: reactions people click (Proto Bot can't create polls: that needs a permission it isn't given).
+    if "rating_poll" not in messages:
+        scale = [("5️⃣", "love it"), ("4️⃣", "really good"), ("3️⃣", "it's okay"), ("2️⃣", "needs work"), ("1️⃣", "not for me yet")]
+        rating = chr(10).join(["⭐ **How would you rate Protobot so far?** React with a number:",
+                               " · ".join(f"{e} {words}" for e, words in scale)])
+        m = D.call("POST", f"/channels/{channel}/messages", {"content": rating, "allowed_mentions": {"parse": []}})
+        messages["rating_poll"] = m["id"]
+        D.save_state(state)
+        for emoji, _ in scale:
+            D.call("PUT", f"/channels/{channel}/messages/{m['id']}/reactions/{requests.utils.quote(emoji)}/@me")
+            time.sleep(0.4)
+        print("rating posted (reactions 5 to 1)")
+
+
 if __name__ == "__main__":
     what = sys.argv[1] if len(sys.argv) > 1 else ""
     if what == "github":
         github()
     elif what == "discord":
         discord()
+    elif what == "announce":
+        announce()
     else:
         sys.exit(__doc__)
