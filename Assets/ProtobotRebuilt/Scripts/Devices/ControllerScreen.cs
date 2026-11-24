@@ -37,18 +37,21 @@ namespace Protobot.Devices {
         private static readonly Color Control = new(0.22f, 0.235f, 0.27f, 1f);
         private static readonly Color Lit = new(0.157f, 0.522f, 0.957f, 1f);
 
-        public static void Open() {
-            if (open != null) return;
-            var dialog = Dialog.Open("Controller", new Vector2(1240f, 700f));
+        // V2 (build 77): a section of the Settings window now.
+        public static void Open() => SettingsWindow.Open(SettingsWindow.Section.Controller);
+
+        internal static ControllerScreen Fill(Dialog dialog) {
             var screen = dialog.gameObject.AddComponent<ControllerScreen>();
             open = screen;
             screen.dialog = dialog;
             screen.Build();
             V5Controller.Changed += screen.Refresh;
-            dialog.OnClose += () => {
-                V5Controller.Changed -= screen.Refresh;
-                if (open == screen) open = null;
-            };
+            return screen;
+        }
+
+        private void OnDestroy() {   // leaving the section or closing Settings
+            V5Controller.Changed -= Refresh;
+            if (open == this) open = null;
         }
 
         private void Build() {

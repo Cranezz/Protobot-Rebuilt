@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Protobot.Interface {
@@ -51,12 +52,25 @@ namespace Protobot.Interface {
         /// <summary>The part under the mouse (a hole's part counts), or null.</summary>
         public static GameObject PartUnderMouse(out RaycastHit hit) => PartAt(MouseInput.Position, out hit);
 
+        /// <summary>V2: parts hidden from the picker (the rest of the robot while sketching on one part only).</summary>
+        public static readonly HashSet<GameObject> Hidden = new();
+
         private static GameObject PartAt(Vector2 screen, out RaycastHit hit) {
             var camera = Overlay.ViewCamera;
             var ray = camera.ScreenPointToRay(screen);
             var mask = LayerMask.GetMask("Default", "HoleCollisions");
-            if (Physics.Raycast(ray, out hit, Mathf.Infinity, mask))
-                return PartOf(hit.collider.gameObject);
+            if (Hidden.Count == 0) {
+                if (Physics.Raycast(ray, out hit, Mathf.Infinity, mask))
+                    return PartOf(hit.collider.gameObject);
+                return null;
+            }
+            foreach (var h in Physics.RaycastAll(ray, Mathf.Infinity, mask).OrderBy(h => h.distance)) {
+                var part = PartOf(h.collider.gameObject);
+                if (part != null && Hidden.Contains(part)) continue;
+                hit = h;
+                return part;
+            }
+            hit = default;
             return null;
         }
 

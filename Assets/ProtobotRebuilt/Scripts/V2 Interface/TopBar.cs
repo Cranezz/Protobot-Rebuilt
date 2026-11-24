@@ -176,6 +176,10 @@ namespace Protobot.Interface {
             weight.Size(-1, Height);
             var fullscreen = OldToggle("Fullscreen Toggle");
             ToggleButton(right, fullscreen, "Full screen", null, "Fill the screen");
+            // V2 (build 77): every setting in one window.
+            var gear = Resources.FindObjectsOfTypeAll<Sprite>().FirstOrDefault(x => x.name == "settings-gears");
+            var settings = QuickButton(right, "Settings", gear, SettingsWindow.Open, "Settings", null);
+            Ui.Tip(settings, "Settings", null, "Preferences, camera speeds, graphics, keyboard shortcuts and the controller, all in one window.");
 
             Polycarb.SheetUsage.Changed += UpdatePlastic;
             UpdatePlastic();
@@ -223,11 +227,9 @@ namespace Protobot.Interface {
             new Item { label = "Make a chain…", action = () => Motion.ChainTool.Begin() },
             new Item { label = "Mirror", shortcut = Tools.Keybinds.Label("Mirror"), action = Tools.MirrorTool.Open },
             new Item { divider = true },
-            new Item { label = "Graphics…", action = GraphicsWindow.Open },
-            new Item { label = "Keyboard shortcuts…", action = Tools.KeybindsWindow.Open },
-            new Item { label = "Controller…", action = Devices.ControllerScreen.Open },   // V2 (Phase 7)
             new Item { label = "Robot code…", action = RobotCode.CodePanel.Open },   // V2 (Phase 9)
-            new Item { label = "Preferences…", action = PreferencesWindow.Open },   // V2: its own window now
+            // V2 (build 77): preferences, graphics, keys and the controller are one Settings window (also the gear).
+            new Item { label = "Settings…", action = SettingsWindow.Open },
         };
 
         private List<Item> PlasticMenu() => new() {

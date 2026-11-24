@@ -44,13 +44,15 @@ namespace Protobot.Interface {
 
         // ------------------------------------------------------------------ opening
 
-        public static void Open() {
-            if (open != null) return;
-            var dialog = Dialog.Open("Preferences", new Vector2(1000f, 620f));
+        // V2 (build 77): a section of the Settings window now.
+        public static void Open() => SettingsWindow.Open(SettingsWindow.Section.Preferences);
+
+        internal static PreferencesWindow Fill(Dialog dialog) {
             open = dialog.gameObject.AddComponent<PreferencesWindow>();
             open.dialog = dialog;
             open.Build();
             open.ShowTab(Tab.General);
+            return open;
         }
 
         // The original Preferences pop-up (opened from anywhere) opens this window instead.
@@ -126,12 +128,7 @@ namespace Protobot.Interface {
 
             var footerLayout = dialog.Footer.GetComponent<HorizontalLayoutGroup>();
             footerLayout.childAlignment = TextAnchor.MiddleRight;
-            var keys = Ui.Button(dialog.Footer, "Shortcuts", "Keyboard shortcuts…", () => { dialog.Close(); Tools.KeybindsWindow.Open(); }, false, 6f);
-            keys.Size(-1f, 36f);
-            Ui.Tip(keys, "Keyboard shortcuts", null, "Every key in the app, and changing them.");
-            var graphics = Ui.Button(dialog.Footer, "Graphics", "Graphics…", () => { dialog.Close(); GraphicsWindow.Open(); }, false, 6f);
-            graphics.Size(-1f, 36f);
-            Ui.Tip(graphics, "Graphics", null, "Quality presets, shadows, resolution, frame rate and the benchmark.");
+            // V2 (build 77): Keyboard shortcuts and Graphics are sections beside this one in Settings' title bar.
             var done = Ui.Button(dialog.Footer, "Done", "Done", dialog.Close, true, 6f);
             done.Size(-1f, 36f);
         }
@@ -375,7 +372,7 @@ namespace Protobot.Interface {
                 infoBody.text = tab switch {
                     Tab.Camera => "How the view moves when you orbit, pan and zoom.",
                     Tab.PartsList => "What the parts list shows. Older games' field elements are hidden unless you switch them on here.",
-                    _ => "Point at a setting to see what it does. Click its value or turn the mouse wheel over it to change it.\n\nKeys are in Keyboard shortcuts, the look and speed of the 3D view in Graphics (buttons below).",
+                    _ => "Point at a setting to see what it does. Click its value or turn the mouse wheel over it to change it.\n\nKeys are in Keyboard shortcuts, the look and speed of the 3D view in Graphics (tabs at the top). The camera speeds are under Camera.",
                 };
                 return;
             }

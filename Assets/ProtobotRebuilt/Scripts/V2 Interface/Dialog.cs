@@ -40,14 +40,7 @@ namespace Protobot.Interface {
             close.targetGraphic.color = new Color(1f, 1f, 1f, 0f);
             Ui.Tip(close, "Close", "Esc");
 
-            dialog.Body = Ui.Rect("Body", panel).Fill(20, 58, 20, 68);
-            dialog.Footer = Ui.Rect("Footer", panel);
-            dialog.Footer.anchorMin = new Vector2(0f, 0f);
-            dialog.Footer.anchorMax = new Vector2(1f, 0f);
-            dialog.Footer.pivot = new Vector2(0.5f, 0f);
-            dialog.Footer.anchoredPosition = new Vector2(0f, 16f);
-            dialog.Footer.sizeDelta = new Vector2(-40f, 36f);
-            Ui.Row(dialog.Footer, 10f, null, TextAnchor.MiddleRight);
+            dialog.MakeContent();
             OverHomeMenu(root);
             OpenCount++;
             return dialog;
@@ -63,6 +56,27 @@ namespace Protobot.Interface {
             canvas.overrideSorting = true;
             canvas.sortingOrder = home.sortingOrder + 1;
             root.gameObject.AddComponent<GraphicRaycaster>();
+        }
+
+        private void MakeContent() {
+            Body = Ui.Rect("Body", Panel).Fill(20, 58, 20, 68);
+            Footer = Ui.Rect("Footer", Panel);
+            Footer.anchorMin = new Vector2(0f, 0f);
+            Footer.anchorMax = new Vector2(1f, 0f);
+            Footer.pivot = new Vector2(0.5f, 0f);
+            Footer.anchoredPosition = new Vector2(0f, 16f);
+            Footer.sizeDelta = new Vector2(-40f, 36f);
+            Ui.Row(Footer, 10f, null, TextAnchor.MiddleRight);
+        }
+
+        /// <summary>V2: an empty body and footer again (a window showing another page: Settings' sections).</summary>
+        public void ResetContent() {
+            closeOnEscape = true;
+            foreach (var old in new[] { Body, Footer }) {
+                old.gameObject.SetActive(false);
+                Destroy(old.gameObject);
+            }
+            MakeContent();
         }
 
         public void Close() {

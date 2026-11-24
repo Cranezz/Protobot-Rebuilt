@@ -21,14 +21,16 @@ namespace Protobot.Tools {
         private int captureFrame;
         private ScrollRect scroll;
 
-        public static void Open() {
-            if (open != null) return;
-            var dialog = Dialog.Open("Keyboard shortcuts", new Vector2(680f, 640f));
+        // V2 (build 77): a section of the Settings window now.
+        public static void Open() => SettingsWindow.Open(SettingsWindow.Section.Keys);
+
+        internal static KeybindsWindow Fill(Dialog dialog) {
             var window = dialog.gameObject.AddComponent<KeybindsWindow>();
             window.dialog = dialog;
             open = window;
             window.Build();
             Interface.Interface.Say("Click a key to change it");
+            return window;
         }
 
         private static List<InputEvent> Originals() =>

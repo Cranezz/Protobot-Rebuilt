@@ -61,16 +61,18 @@ namespace Protobot.Interface {
                 Interface.Say("The graphics settings aren't available (no URP asset)", false);
                 return;
             }
-            if (open != null) {
-                if (start.HasValue) open.ShowTab(start.Value);
-                return;
-            }
-            var dialog = Dialog.Open("Graphics", new Vector2(1120f, 720f));
+            // V2 (build 77): a section of the Settings window now.
+            SettingsWindow.Open(SettingsWindow.Section.Graphics);
+            if (open != null && start.HasValue) open.ShowTab(start.Value);
+        }
+
+        internal static GraphicsWindow Fill(Dialog dialog) {
             open = dialog.gameObject.AddComponent<GraphicsWindow>();
             open.dialog = dialog;
             open.opened = GraphicsSettingsManager.Current.Clone();
             open.Build();
-            open.ShowTab(start ?? (GraphicsBenchmark.Last != null ? Tab.Benchmark : Tab.Quality));
+            open.ShowTab(GraphicsBenchmark.Last != null ? Tab.Benchmark : Tab.Quality);
+            return open;
         }
 
         private void OnDestroy() {

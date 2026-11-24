@@ -33,6 +33,12 @@ namespace Protobot.Polycarb {
         private ShapeGraphic pickShapes;
         private TextMeshProUGUI pickLabel;
         private Button placeButton;
+        // V2 (build 77, a tester's ask): "Show only this part" hides every other part while sketching on one (their
+        // renderers off, and FeaturePicker skips them), so the face isn't buried in the robot. Kept as a preference.
+        private Button onlyButton;
+        private bool onlyThisPart;
+        private readonly List<Renderer> isolatedOff = new();
+        private const string OnlyKey = "V2.Sketch.OnlyThisPart";
 
         /// <summary>Opens the editor on a piece in the build, sketching on it where it is.</summary>
         public static void EditInPlace(CustomPartData part, GameObject piece) {
@@ -83,6 +89,34 @@ namespace Protobot.Polycarb {
             }, false, 6f, Theme.FontSmall);
             placeButton.Size(-1, 32f);
             Ui.Tip(placeButton, "Sketch on a part", null, "Pick a flat face of a part in the build and sketch right on it, with the robot around it to draw from (as sketching on a face in SolidWorks).");
+            onlyButton = Ui.Button(top, "Only", "Show only this part", () => {
+                PlayerPrefs.SetInt(OnlyKey, onlyThisPart ? 0 : 1);
+                SetOnlyThisPart(!onlyThisPart);
+            }, false, 6f, Theme.FontSmall);
+            onlyButton.Size(-1, 32f);
+            Ui.Tip(onlyButton, "Show only this part", null, "Hide the rest of the robot while you sketch, so only the part you're sketching on shows (and can be picked). Click again to bring everything back.");
+            onlyButton.gameObject.SetActive(false);
+        }
+
+        private void SetOnlyThisPart(bool on) {
+            foreach (var r in isolatedOff)
+                if (r != null) r.enabled = true;
+            isolatedOff.Clear();
+            FeaturePicker.Hidden.Clear();
+            onlyThisPart = on && inPlace && planePart != null;
+            if (onlyThisPart)
+                foreach (var part in PartsManager.FindLoadedObjects()) {
+                    if (part == null || part == planePart || part.IsDeleted()) continue;
+                    FeaturePicker.Hidden.Add(part);
+                    foreach (var r in part.GetComponentsInChildren<Renderer>())
+                        if (r.enabled) {
+                            r.enabled = false;
+                            isolatedOff.Add(r);
+                        }
+                }
+            if (onlyButton == null) return;
+            onlyButton.GetComponentInChildren<TextMeshProUGUI>().text = onlyThisPart ? "Show all parts" : "Show only this part";
+            Audio.Sounds.Play(Audio.Sounds.Tick);
         }
 
         // ------------------------------------------------------------------ picking the face
@@ -203,6 +237,8 @@ namespace Protobot.Polycarb {
             if (PivotCamera.Main != null) PivotCamera.Main.snapSensitivity = 0f;
             NormalTo();
             if (placeButton != null) placeButton.GetComponentInChildren<TextMeshProUGUI>().text = "Back to the sheet";
+            if (onlyButton != null) onlyButton.gameObject.SetActive(part != null);
+            if (PlayerPrefs.GetInt(OnlyKey, 0) == 1) SetOnlyThisPart(true);
             SetTool(part != null ? Tool.Project : Tool.Select);
             Changed();
         }
@@ -214,6 +250,7 @@ namespace Protobot.Polycarb {
             RestoreScene();
             SetBackdrop(true);
             if (placeButton != null) placeButton.GetComponentInChildren<TextMeshProUGUI>().text = "Sketch on a part";
+            if (onlyButton != null) onlyButton.gameObject.SetActive(false);
             if (tool == Tool.Project) SetTool(Tool.Select);
             Fit();
             if (say) Interface.Interface.Say("Back to the flat sheet (the sketch is kept)", true);
@@ -273,6 +310,13 @@ namespace Protobot.Polycarb {
         }
 
         private void RestoreScene() {
+            if (onlyThisPart || isolatedOff.Count > 0) {
+                onlyThisPart = false;
+                foreach (var r in isolatedOff)
+                    if (r != null) r.enabled = true;
+                isolatedOff.Clear();
+                FeaturePicker.Hidden.Clear();
+            }
             ShowChrome();
             if (!savedCamera.HasValue || PivotCamera.Main == null) {
                 savedCamera = null;
@@ -460,7 +504,7 @@ namespace Protobot.Polycarb {
             if (!inPlace) return;
             var shape = new SketchProject.Shape();
             foreach (var part in PartsManager.FindLoadedObjects()) {
-                if (part == null || part.IsDeleted() || part == placedPiece) continue;
+                if (part == null || part.IsDeleted() || part == placedPiece || FeaturePicker.Hidden.Contains(part)) continue;
                 var one = SketchProject.Part(part, plane, projectDepth);
                 shape.AddRange(one);
             }
