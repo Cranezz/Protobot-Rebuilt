@@ -1,1 +1,1 @@
-UnityEngine.PlayerPrefs.SetString("t_cc_names", "Presence,DeleteMyData"); return "set";
+UnityEngine.PlayerPrefs.SetString("t_cc_names", "Presence"); return "set";

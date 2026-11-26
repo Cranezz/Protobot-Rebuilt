@@ -148,6 +148,130 @@ namespace Protobot.Game {
 
         public void NotifyChanged() => Changed?.Invoke();
 
+        // ------------------------------------------------------------------ V2 (build 80): starts as teams set them up
+
+        // Teams line a robot up on the field's tiles: an edge on a tile seam, or centred on a tile, back to the wall.
+        // The tiles are 24" and the seams run through the field's middle, so along any wall they're at 0, ±24, ±48.
+        private static readonly float[] Seams = { -48f, -24f, 0f, 24f, 48f };
+        private static readonly float[] TileMiddles = { -60f, -36f, -12f, 12f, 36f, 60f };
+        public const float SnapReach = 1.5f;
+
+        /// <summary>The footprint's ends along its wall (in Slide's inches) at a given slide.</summary>
+        private (float lo, float hi) Ends(float slide) {
+            var tangent = WallTangent;
+            var along = Corners().Select(c => Vector2.Dot(c, tangent)).ToArray();
+            var shift = slide - Slide;
+            return (along.Min() + shift, along.Max() + shift);
+        }
+
+        // Tiles along the wall are counted from the robot's left (seen from behind it, facing into the field).
+        private bool LeftIsPlus => Vector2.Dot(FromLeft(StartQuadrant, Vector2.up), WallTangent) > 0f;
+        private int TileNumber(float along) {
+            var index = Mathf.FloorToInt((along + 72f) / 24f);   // 0 at the − end
+            index = Mathf.Clamp(index, 0, 5);
+            return LeftIsPlus ? 6 - index : index + 1;
+        }
+        private string LeftOrRight(bool lowEnd) => (lowEnd ^ LeftIsPlus) ? "left" : "right";
+
+        /// <summary>The nearest team-style spot to `slide` within SnapReach: an edge on a seam or the middle on a tile's
+        /// (with what it is, "tile 2 · left edge on the seam"); else `slide` itself and null.</summary>
+        public float SnapSlide(float slide, out string what) {
+            what = null;
+            var (lo, hi) = Ends(slide);
+            var best = slide;
+            var bestGap = SnapReach;
+            foreach (var s in Seams) {
+                if (Mathf.Abs(lo - s) < bestGap) { bestGap = Mathf.Abs(lo - s); best = slide + (s - lo); what = $"tile {TileNumber(s + 1f)} · {LeftOrRight(true)} edge on the seam"; }
+                if (Mathf.Abs(hi - s) < bestGap) { bestGap = Mathf.Abs(hi - s); best = slide + (s - hi); what = $"tile {TileNumber(s - 1f)} · {LeftOrRight(false)} edge on the seam"; }
+            }
+            foreach (var m in TileMiddles)
+                if (Mathf.Abs(slide - m) < bestGap) { bestGap = Mathf.Abs(slide - m); best = m; what = $"tile {TileNumber(m)} · centered"; }
+            return best;
+        }
+
+        /// <summary>Every legal team-style spot along the wall at the current angle, in order along it.</summary>
+        public List<(float slide, string what)> Spots() {
+            var keep = (x, y, heading);
+            var list = new List<(float, string)>();
+            var (lo, hi) = Ends(Slide);
+            var half = (hi - lo) / 2f;
+            var candidates = new List<float>();
+            foreach (var s in Seams) { candidates.Add(s + half + 0.01f); candidates.Add(s - half - 0.01f); }
+            candidates.AddRange(TileMiddles);
+            foreach (var c in candidates.OrderBy(v => v)) {
+                MoveAlong(c);
+                if (Mathf.Abs(Slide - c) > 0.05f || !Legal) continue;
+                SnapSlide(c, out var what);
+                if (what == null || list.Any(l => Mathf.Abs(l.Item1 - c) < 0.5f)) continue;
+                list.Add((c, what));
+            }
+            (x, y, heading) = keep;
+            return LeftIsPlus ? list.OrderByDescending(l => l.Item1).ToList() : list;
+        }
+
+        /// <summary>Which spot it's on now (null when between spots).</summary>
+        public string SpotNow() {
+            SnapSlide(Slide, out var what);
+            var snapped = SnapSlide(Slide, out _);
+            return Mathf.Abs(snapped - Slide) < 0.02f ? what : null;
+        }
+
+        /// <summary>Turns the robot so its front points at a field point (a Goal, a Pin, a spot), still on its wall, and
+        /// moves it to the nearest legal spot if the turn made it touch something.</summary>
+        public void AimAt(Vector2 target) {
+            for (var round = 0; round < 3; round++) {
+                for (var i = 0; i < 3; i++) {   // turning moves its middle a little: aim again from where it ends up
+                    var want = HeadingOf(target - new Vector2(x, y));
+                    var turn = Mathf.DeltaAngle(90f, HeadingOf(ToLeft(StartQuadrant, Dir(want))));
+                    if (Mathf.Abs(turn) > 89f) turn = Mathf.Sign(turn) * 89f;   // the front can't face the wall it's on
+                    SetTurn(turn);
+                }
+                if (Legal || !KeepLegal()) break;
+            }
+        }
+
+        /// <summary>Turns it (0 = square to the wall, + clockwise) and keeps the start legal.</summary>
+        public void Face(float turn) {
+            SetTurn(turn);
+            KeepLegal();
+        }
+
+        /// <summary>When the start isn't legal (a turn put it on a Goal or in a Load Zone), the nearest legal team spot
+        /// along the wall, else the nearest legal place; false when there's none at this angle (left where it was).</summary>
+        public bool KeepLegal() {
+            if (Legal) return true;
+            var from = Slide;
+            foreach (var (slide, _) in Spots().OrderBy(sp => Mathf.Abs(sp.slide - from))) {
+                SetSlide(slide);
+                if (Legal) return true;
+            }
+            for (var step = 0.25f; step < 80f; step += 0.25f)
+                foreach (var s in new[] { from + step, from - step }) {
+                    MoveAlong(s);
+                    if (Mathf.Abs(Slide - s) < 0.01f && Legal) {
+                        Apply();
+                        return true;
+                    }
+                }
+            SetSlide(from);
+            return false;
+        }
+
+        /// <summary>The middle of the Goal nearest a field point (within 10"), else the point.</summary>
+        public Vector2 AimTarget(Vector2 at) {
+            if (field == null) return at;
+            var best = at;
+            var bestDistance = 10f;
+            foreach (var g in field.goals) {
+                var d = Vector2.Distance(g.position, at);
+                if (d < bestDistance) {
+                    bestDistance = d;
+                    best = g.position;
+                }
+            }
+            return best;
+        }
+
         // ------------------------------------------------------------------ undo (setup only)
 
         private readonly List<(float x, float y, float h, float tx, float ty, float th)> undo = new();

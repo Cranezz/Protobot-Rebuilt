@@ -32,6 +32,21 @@ namespace Protobot.Motion {
 
         public float PitchRadius(int teeth) => pitch / (2f * Mathf.Sin(Mathf.PI / Mathf.Max(teeth, 3)));
 
+        /// <summary>V2: the chain's pitch line round a smooth idler (a spacer): its rollers sit on the surface, so the
+        /// line is about a roller's radius out from it.</summary>
+        public float IdlerRadius(float surface) => surface + pitch * 0.3f;
+
+        /// <summary>V2: a wrap's radius: a sprocket's pitch radius, or round a smooth idler (teeth 0) its own.</summary>
+        public float RadiusOf(int teeth, float idlerSurface) => teeth > 0 ? PitchRadius(teeth) : IdlerRadius(idlerSurface);
+
+        /// <summary>V2: whether a part can be a smooth idler in a chain (a spacer or washer: the chain slides round it).</summary>
+        public static bool IsIdler(GameObject part) {
+            if (part == null || !part.TryGetComponent(out SavedObject saved) || saved.id == null) return false;
+            var id = saved.id;
+            if (!(id.StartsWith("SPCR-") || id.StartsWith("PSPC-") || id.StartsWith("VXSPACERS"))) return false;
+            return GearTrain.Teeth(part, out _) <= 0;
+        }
+
         // ------------------------------------------------------------------ the link (pins at x = 0 and x = pitch, along z)
 
         private Mesh[] meshes;
@@ -113,7 +128,9 @@ namespace Protobot.Motion {
         public Vector2 center;
         public float radius;
         public int way = 1;
-        public int teeth;
+        public int teeth;   // V2: 0 = a smooth idler (a spacer the chain slides round)
+
+        public ChainWrap Copy() => (ChainWrap)MemberwiseClone();
     }
 
     // The chain's line in its plane: straight spans tangent to each pair of sprockets in turn and arcs round them,
@@ -133,7 +150,70 @@ namespace Protobot.Motion {
         public int TeethIn(int wrap, int teeth) => wrapAngles == null || wrap >= wrapAngles.Length ? 0 : Mathf.RoundToInt(wrapAngles[wrap] / (2f * Mathf.PI) * teeth);
         public bool Valid => problem == null;
 
-        public static ChainPath Build(IList<ChainWrap> wraps, float pitch, Vector2 down) {
+        /// <summary>V2: the loop's length round the wraps (spans and arcs) without making its points, for solving a
+        /// tensioner many times a step; NaN when two wraps are too close for the chain to go between them.</summary>
+        public static float Tight(IList<ChainWrap> wraps) {
+            var n = wraps.Count;
+            if (n < 2 || n > 64) return float.NaN;
+            System.Span<Vector2> outPoint = stackalloc Vector2[n];
+            System.Span<Vector2> inPoint = stackalloc Vector2[n];
+            var total = 0f;
+            for (var i = 0; i < n; i++) {
+                var a = wraps[i];
+                var b = wraps[(i + 1) % n];
+                if (!Tangent(a, b, out var left, out var straight)) return float.NaN;
+                outPoint[i] = a.center - a.way * a.radius * left;
+                inPoint[(i + 1) % n] = b.center - b.way * b.radius * left;
+                total += straight;
+            }
+            var area = 0f;
+            for (var i = 0; i < n; i++) {
+                var a = wraps[i].center;
+                var b = wraps[(i + 1) % n].center;
+                area += a.x * b.y - b.x * a.y;
+            }
+            var loop = LoopWay(wraps, area);
+            for (var i = 0; i < n; i++) {
+                var w = wraps[i];
+                var from = Mathf.Atan2(inPoint[i].y - w.center.y, inPoint[i].x - w.center.x);
+                var to = Mathf.Atan2(outPoint[i].y - w.center.y, outPoint[i].x - w.center.x);
+                var sweep = Mathf.Repeat((to - from) * w.way, Mathf.PI * 2f);
+                // As Build: an idler pressed in from outside the loop has to touch it; no span runs through a wrap.
+                if (n > 2 && w.way != loop && sweep > Mathf.PI) return float.NaN;
+                total += sweep * w.radius;
+                for (var j = 0; j < n; j++) {
+                    if (j == i || j == (i + 1) % n) continue;
+                    if (DistanceToSegment(wraps[j].center, outPoint[i], inPoint[(i + 1) % n]) < wraps[j].radius - 0.02f) return float.NaN;
+                }
+            }
+            return total;
+        }
+
+        // V2: the way round the loop goes: the way most of its wraps go (an idler pressed in from outside goes the
+        // other way), else the way its middles go round. By the middles alone, an idler pressed in past the line between
+        // the other two sprockets turned the loop round and the chain was refused.
+        private static int LoopWay(IList<ChainWrap> wraps, float area) {
+            var sum = 0;
+            foreach (var w in wraps) sum += w.way;
+            return sum != 0 ? (sum > 0 ? 1 : -1) : area < 0f ? -1 : 1;
+        }
+
+        private static bool Tangent(ChainWrap a, ChainWrap b, out Vector2 left, out float straight) {
+            var d = b.center - a.center;
+            var distance = d.magnitude;
+            var delta = b.way * b.radius - a.way * a.radius;
+            left = Vector2.zero;
+            straight = 0f;
+            if (distance <= Mathf.Abs(delta) + 1e-3f) return false;
+            straight = Mathf.Sqrt(distance * distance - delta * delta);
+            var angle = Mathf.Atan2(d.y, d.x) - Mathf.Atan2(delta, straight);
+            left = new Vector2(-Mathf.Sin(angle), Mathf.Cos(angle));
+            return true;
+        }
+
+        /// <summary>The chain round the wraps. <paramref name="fixedLinks"/> (V2): a chain kept tight by a tensioner
+        /// keeps its own number of links whatever the loop comes to; 0 = as many as fit the loop.</summary>
+        public static ChainPath Build(IList<ChainWrap> wraps, float pitch, Vector2 down, int fixedLinks = 0) {
             var path = new ChainPath();
             if (wraps.Count < 2) {
                 path.problem = "Pick at least two sprockets";
@@ -187,7 +267,7 @@ namespace Protobot.Motion {
                     var b = wraps[(i + 1) % n].center;
                     area += a.x * b.y - b.x * a.y;
                 }
-                var loop = area < 0f ? -1 : 1;
+                var loop = LoopWay(wraps, area);
                 for (var i = 0; i < n; i++)
                     if (wraps[i].way != loop && Mathf.Abs(sweeps[i]) > Mathf.PI) {
                         path.problem = "Sprocket " + (i + 1) + " is outside the chain's path, so it can't press on it from inside: move it in toward the others, or wrap it from outside";
@@ -197,7 +277,7 @@ namespace Protobot.Motion {
             path.tight = tight;
             path.wrapAngles = new float[n];
             for (var i = 0; i < n; i++) path.wrapAngles[i] = Mathf.Abs(sweeps[i]);
-            path.links = Mathf.Max(2, Mathf.RoundToInt(tight / pitch));
+            path.links = fixedLinks > 0 ? fixedLinks : Mathf.Max(2, Mathf.RoundToInt(tight / pitch));
             path.length = path.links * pitch;
             for (var i = 0; i < n; i++) {
                 var w = wraps[i];
@@ -298,6 +378,7 @@ namespace Protobot.Motion {
         public string style = "chain";
         public readonly List<ChainWrap> wraps = new();
         public float phase;
+        public int fixedLinks;   // V2: kept by a tensioner (ChainTensioner): the chain's own links, not the loop's
         public ChainPath Path { get; private set; }
         public Vector3 Normal => transform.forward;
 
@@ -336,6 +417,7 @@ namespace Protobot.Motion {
             yield return null;
             yield return null;
             Connect();
+            if (fixedLinks > 0) Follow(false);   // V2: a tensioner settles round the chain it was made with
         }
 
         /// <summary>Joins the sprockets it goes round (so it moves with the build).</summary>
@@ -360,21 +442,60 @@ namespace Protobot.Motion {
         }
 
         /// <summary>A sprocket moved apart from the others (its shaft moved): the chain goes round it where it is now.</summary>
-        public void Follow() {
-            if (parts == null || parts.Length != wraps.Count) return;
+        public void Follow() => Follow(true);
+
+        /// <summary>V2: reads where its sprockets are; a tensioner (an idler on an arm a band pulls) then turns until the
+        /// chain is tight again. <paramref name="speak"/>: say when it can't (not while dragging).</summary>
+        public bool Follow(bool speak) {
+            if (parts == null || parts.Length != wraps.Count) return false;
+            var changed = ReadCenters(0.01f);
+            var tensioner = fixedLinks > 0 ? ChainTensioner.Of(this) : null;
+            if (tensioner != null) {
+                if (ChainTensioner.Settle(tensioner, out var problem) && ReadCenters(0.0005f)) changed = true;
+                if (problem != null && speak) Interface.Interface.Say(problem, false);
+            }
+            if (!changed) return false;
+            Save();
+            Rebuild();
+            if (speak && Path != null && !Path.Valid) Interface.Interface.Say("The chain can't go round its sprockets where they are now: " + Path.problem, false);
+            return true;
+        }
+
+        private bool ReadCenters(float tolerance) {
             var changed = false;
             for (var i = 0; i < wraps.Count; i++) {
                 if (parts[i] == null || parts[i].IsDeleted()) continue;
                 var local = transform.InverseTransformPoint(SprocketFrame(parts[i]).center);
                 var flat = new Vector2(local.x, local.y);
-                if (Vector2.Distance(flat, wraps[i].center) < 0.01f) continue;
+                if (Vector2.Distance(flat, wraps[i].center) < tolerance) continue;
                 wraps[i].center = flat;
                 changed = true;
             }
-            if (!changed) return;
-            Save();
-            Rebuild();
-            if (Path != null && !Path.Valid) Interface.Interface.Say("The chain can't go round its sprockets where they are now: " + Path.problem, false);
+            return changed;
+        }
+
+        /// <summary>V2: a point in its plane's coordinates.</summary>
+        public Vector2 ToFlat(Vector3 world) {
+            var local = transform.InverseTransformPoint(world);
+            return new Vector2(local.x, local.y);
+        }
+
+        /// <summary>V2: the parts it goes round, by wrap (null where one is missing).</summary>
+        public GameObject PartOf(int wrap) => parts != null && wrap >= 0 && wrap < parts.Length ? parts[wrap] : null;
+
+        // V2: a tensioned chain follows its sprockets live (a sprocket's arm dragged, a shaft moved): its tensioner
+        // swings as it goes, not only once the move ends. Not while the tensioner itself is being dragged.
+        private void LateUpdate() {
+            if (fixedLinks <= 0 || parts == null || Sandbox.Running || Time.frameCount % 2 != 0) return;
+            var tensioner = ChainTensioner.Of(this);
+            if (tensioner == null || tensioner.BeingMoved()) return;
+            var moved = false;
+            for (var i = 0; i < wraps.Count && !moved; i++) {
+                if (parts[i] == null) continue;
+                var local = transform.InverseTransformPoint(SprocketFrame(parts[i]).center);
+                if (Vector2.Distance(new Vector2(local.x, local.y), wraps[i].center) > 0.003f) moved = true;
+            }
+            if (moved) Follow(false);
         }
 
         // ------------------------------------------------------------------ data
@@ -383,7 +504,7 @@ namespace Protobot.Motion {
             var c = CultureInfo.InvariantCulture;
             return family.key + "|" + phase.ToString("0.####", c) + "|" + string.Join("/", wraps.Select(w =>
                 w.center.x.ToString("0.#####", c) + "," + w.center.y.ToString("0.#####", c) + "," + w.radius.ToString("0.#####", c) + "," + w.way + "," + w.teeth))
-                + "|" + style;
+                + "|" + style + (fixedLinks > 0 ? "|" + fixedLinks : "");
         }
 
         public void Load(string token = null) {
@@ -395,6 +516,7 @@ namespace Protobot.Motion {
             family = ChainFamily.Of(parts[0]);
             float.TryParse(parts[1], NumberStyles.Float, c, out phase);
             style = parts.Length > 3 && parts[3].Length > 0 ? parts[3] : "chain";
+            fixedLinks = parts.Length > 4 && int.TryParse(parts[4], out var kept) ? kept : 0;   // V2
             wraps.Clear();
             foreach (var entry in parts[2].Split('/')) {
                 var v = entry.Split(',');
@@ -409,7 +531,11 @@ namespace Protobot.Motion {
         public void Save() => Dynamics.SetToken(gameObject, "chain", Token());
 
         /// <summary>Its wraps from sprockets in the world (the chain's frame: origin on the first, z = their axle).</summary>
-        public void Set(ChainFamily chainFamily, IList<(Vector3 center, Vector3 axis, int teeth, int way)> world, string chainStyle = "chain") {
+        public void Set(ChainFamily chainFamily, IList<(Vector3 center, Vector3 axis, int teeth, int way)> world, string chainStyle = "chain") =>
+            Set(chainFamily, world.Select(w => (w.center, w.axis, w.teeth, w.way, 0f)).ToList(), chainStyle);
+
+        /// <summary>V2: with each wrap's radius when it's a smooth idler (teeth 0; its pitch line's radius).</summary>
+        public void Set(ChainFamily chainFamily, IList<(Vector3 center, Vector3 axis, int teeth, int way, float radius)> world, string chainStyle = "chain") {
             family = chainFamily;
             style = chainFamily.HasTreads ? chainStyle : "chain";
             var normal = world[0].axis.normalized;
@@ -418,10 +544,11 @@ namespace Protobot.Motion {
             if (up.sqrMagnitude < 0.01f) up = Vector3.ProjectOnPlane(Vector3.forward, normal);
             transform.SetPositionAndRotation(origin, Quaternion.LookRotation(normal, up));
             wraps.Clear();
-            foreach (var (center, _, teeth, way) in world) {
+            foreach (var (center, _, teeth, way, radius) in world) {
                 var local = transform.InverseTransformPoint(center);
-                wraps.Add(new ChainWrap { center = new Vector2(local.x, local.y), radius = family.PitchRadius(teeth), way = way, teeth = teeth });
+                wraps.Add(new ChainWrap { center = new Vector2(local.x, local.y), radius = teeth > 0 ? family.PitchRadius(teeth) : radius, way = way, teeth = teeth });
             }
+            fixedLinks = 0;
             Save();
         }
 
@@ -446,6 +573,36 @@ namespace Protobot.Motion {
             return index;
         }
 
+        // V2: every smooth idler (spacer, washer) with its middle, axle, surface radius and length along the axle.
+        private static readonly List<(GameObject part, Vector3 center, Vector3 axis, float radius, float length)> idlers = new();
+        private static long idlerVersion = -1;
+
+        public static List<(GameObject part, Vector3 center, Vector3 axis, float radius, float length)> AllIdlers() {
+            if (idlerVersion == Dynamics.Version) return idlers;
+            idlers.Clear();
+            foreach (var saved in Object.FindObjectsByType<SavedObject>(FindObjectsSortMode.None)) {
+                var go = saved.gameObject;
+                if (go.IsDeleted() || !ChainFamily.IsIdler(go)) continue;
+                var (c, axis, radius, length) = IdlerFrame(go);
+                idlers.Add((go, c, axis, radius, length));
+            }
+            idlerVersion = Dynamics.Version;
+            return idlers;
+        }
+
+        /// <summary>V2: a smooth idler's middle, axle, outside radius and length (from its mesh round its middle hole).</summary>
+        public static (Vector3 center, Vector3 axis, float radius, float length) IdlerFrame(GameObject part) {
+            var (center, axis, _) = SprocketTeeth(part);
+            if (!part.TryGetComponent(out MeshFilter filter) || filter.sharedMesh == null || !Teeth.TryGetValue(filter.sharedMesh, out var teeth))
+                return (center, axis, 0.15f, 0.25f);
+            var t = part.transform;
+            var radius = t.TransformVector(teeth.tip).magnitude;
+            var size = Vector3.Scale(filter.sharedMesh.bounds.size, t.lossyScale);
+            var localAxis = t.InverseTransformDirection(axis);
+            var length = Mathf.Abs(size.x * localAxis.x) + Mathf.Abs(size.y * localAxis.y) + Mathf.Abs(size.z * localAxis.z);
+            return (center, axis, radius, length);
+        }
+
         /// <summary>The sprockets it goes round (found by place), each with its wrap's index.</summary>
         public List<(GameObject part, int wrap)> Sprockets() {
             var result = new List<(GameObject, int)>();
@@ -454,6 +611,21 @@ namespace Protobot.Motion {
                 var center = transform.TransformPoint(wraps[i].center);
                 GameObject best = null;
                 var bestDistance = 0.08f;
+                if (wraps[i].teeth <= 0) {   // V2: a smooth idler: a spacer there, as big as its wrap
+                    foreach (var (part, c, axis, radius, length) in AllIdlers()) {
+                        if (part == null || Mathf.Abs(Vector3.Dot(axis, Normal)) < 0.98f) continue;
+                        if (Mathf.Abs(family.IdlerRadius(radius) - wraps[i].radius) > 0.03f) continue;
+                        var offset = c - center;
+                        if (Mathf.Abs(Vector3.Dot(offset, Normal)) > length / 2f + 0.1f) continue;
+                        var inPlane = Vector3.ProjectOnPlane(offset, Normal).magnitude;
+                        if (inPlane < bestDistance) {
+                            bestDistance = inPlane;
+                            best = part;
+                        }
+                    }
+                    if (best != null) result.Add((best, i));
+                    continue;
+                }
                 foreach (var (part, chainFamily, teeth, c, axis) in all) {
                     if (part == null || chainFamily != family || teeth != wraps[i].teeth) continue;
                     if (Mathf.Abs(Vector3.Dot(axis, Normal)) < 0.98f) continue;
@@ -551,7 +723,7 @@ namespace Protobot.Motion {
         }
 
         public void Rebuild() {
-            Path = ChainPath.Build(wraps, family.pitch, LocalDown());
+            Path = ChainPath.Build(wraps, family.pitch, LocalDown(), fixedLinks);
             var count = Path.Valid ? Path.links : 0;
             var meshes = family.LinksFor(style);
             var linkWidth = family.WidthFor(style);
@@ -631,14 +803,17 @@ namespace Protobot.Motion {
         }
 
         /// <summary>Puts links (its own or a copy's) along the chain at a phase.</summary>
-        public void Place(IList<Transform> targets, float at) {
-            if (Path == null || !Path.Valid) return;
-            var count = Mathf.Min(targets.Count, Path.links);
-            var step = Path.length / Mathf.Max(Path.links, 1);
-            var next = Path.At(at);
+        public void Place(IList<Transform> targets, float at) => Place(targets, at, Path);
+
+        /// <summary>V2: along another path of the same chain (the sandbox's, round where its sprockets are now).</summary>
+        public void Place(IList<Transform> targets, float at, ChainPath path) {
+            if (path == null || !path.Valid) return;
+            var count = Mathf.Min(targets.Count, path.links);
+            var step = path.length / Mathf.Max(path.links, 1);
+            var next = path.At(at);
             for (var i = 0; i < count; i++) {
                 var pin = next;
-                next = Path.At(at + (i + 1) * step);
+                next = path.At(at + (i + 1) * step);
                 var dir = next - pin;
                 var angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
                 if (targets[i] == null) continue;
@@ -657,7 +832,7 @@ namespace Protobot.Motion {
         public IReadOnlyList<Transform> Links => links;
 
         /// <summary>Inches of chain per radian a sprocket turns: one link per tooth (not quite its pitch radius).</summary>
-        public float Rolling(int wrap) => family.pitch * wraps[wrap].teeth / (2f * Mathf.PI);
+        public float Rolling(int wrap) => wraps[wrap].teeth > 0 ? family.pitch * wraps[wrap].teeth / (2f * Mathf.PI) : wraps[wrap].radius;
 
         private void Update() {
             // Painted: the links take the part's color.

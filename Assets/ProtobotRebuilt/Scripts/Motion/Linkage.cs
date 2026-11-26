@@ -199,8 +199,15 @@ namespace Protobot.Motion {
                 if (x != y) parent[x] = y;
             }
             var pinned = new List<(GameObject screw, GameObject part)>();
+            var chains = new List<GameObject>();
             foreach (var obj in set) {
                 if (obj.GetComponent<ConnectingPart>() == null) continue;
+                // V2: a chain doesn't hold its sprockets together (one on a swinging arm, a tensioner's idler, turn
+                // apart from the rest): it goes with one of them (below).
+                if (obj.GetComponent<ChainLoop>() != null) {
+                    chains.Add(obj);
+                    continue;
+                }
                 var joint = IsJoint(obj);
                 var threaded = joint ? Threaded(obj) : null;
                 var head = joint ? HeadPart(obj) : null;
@@ -239,6 +246,14 @@ namespace Protobot.Motion {
                         Union(obj, t.gameObject);
                         break;
                     }
+
+            // V2: a chain is carried by the body most of its sprockets are on (a grounded one first).
+            foreach (var chain in chains) {
+                var best = GroupManager.Neighbours(chain).Where(set.Contains).GroupBy(Find)
+                    .OrderByDescending(g => set.Any(o => Find(o) == g.Key && IsGrounded(o)) ? 1 : 0).ThenByDescending(g => g.Count())
+                    .FirstOrDefault();
+                if (best != null) Union(chain, best.Key);
+            }
 
             // Two pins between the same bodies that aren't on one line hold them tight.
             for (var changed = true; changed;) {

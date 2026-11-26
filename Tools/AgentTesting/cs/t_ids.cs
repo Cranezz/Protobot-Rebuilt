@@ -1,3 +1,1 @@
-var sb = new System.Text.StringBuilder();
-foreach (var t in Resources.LoadAll<Protobot.PartType>("Part Prefabs")) if (!t.id.StartsWith("VX")) sb.Append(t.id + " ");
-return sb.ToString();
+var s=""; foreach (var p in Protobot.PartsManager.FindLoadedObjects()) { if (p==null) continue; var id=Protobot.Builds.PartPrices.IdOf(p); if (id.StartsWith("NUT")||id.StartsWith("SPCR")) s+=id+"; "; } return s;

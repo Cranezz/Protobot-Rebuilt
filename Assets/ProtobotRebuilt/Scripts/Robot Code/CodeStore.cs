@@ -74,6 +74,11 @@ namespace Protobot.RobotCode {
                     System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(code, "\"" + Folder + "\" \"" + path + "\"") { UseShellExecute = false });
                     Interface.Interface.Announce("Opened in VS Code: saving there updates the program here");
                 }
+                else if (Application.platform == RuntimePlatform.OSXPlayer || Application.platform == RuntimePlatform.OSXEditor) {
+                    // V2 (build 79): a Mac without VS Code: its default text editor (TextEdit).
+                    System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo("open", "-t \"" + path + "\"") { UseShellExecute = false });
+                    Interface.Interface.Announce("Opened in your text editor (VS Code wasn't found): saving there updates the program here");
+                }
                 else {
                     System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo("notepad.exe", "\"" + path + "\"") { UseShellExecute = false });
                     Interface.Interface.Announce("Opened in Notepad (VS Code wasn't found): saving there updates the program here");
@@ -190,6 +195,8 @@ namespace Protobot.RobotCode {
                 Path.Combine(local, "Programs", "VSCodium", "VSCodium.exe"),
                 "/Applications/Visual Studio Code.app/Contents/Resources/app/bin/code",
                 "/usr/bin/code",
+                "/usr/local/bin/code", "/opt/homebrew/bin/code",
+                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Applications", "Visual Studio Code.app", "Contents", "Resources", "app", "bin", "code"),
             };
             return candidates.FirstOrDefault(File.Exists);
         }

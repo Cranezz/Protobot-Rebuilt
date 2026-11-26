@@ -18,4 +18,7 @@ ScriptedImporter:
   - Name: account
     ParameterType: 0
     Required: 0
+  - Name: leaving
+    ParameterType: 0
+    Required: 0
   Source: 0

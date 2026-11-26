@@ -1039,6 +1039,9 @@ namespace Protobot.Game {
                     if (!onlineClient && (Time.time - endingSince > 5f || (Time.time - endingSince > 0.5f && Still()))) Finish();
                     break;
             }
+            // V2 (build 79): the robot's path in this run, for the path planner (and its odometry's idea of it).
+            if (state == State.Running || state == State.Ending) RecordTrail();
+            else if (state == State.Setup) RobotCode.PathTrail.Ended();
             if ((state == State.Running || state == State.Ending || state == State.Countdown) && Time.time >= nextScore) {
                 nextScore = Time.time + 0.25f;
                 score = Evaluate();
@@ -1110,6 +1113,19 @@ namespace Protobot.Game {
             }
             return OverrideScoring.Evaluate(field, pins.Where(p => p != null).ToList(), cups.Where(c => c != null).ToList(),
                 toggles.Where(t => t != null).ToList(), RobotInMidfield());
+        }
+
+        private GameObject trailBrain;
+
+        private void RecordTrail() {
+            if (online || field == null || !Sandbox.Running) return;
+            if (trailBrain == null) {
+                var brain = FindObjectsByType<SavedObject>(FindObjectsSortMode.None).FirstOrDefault(p => p.gameObject.activeInHierarchy && IsBrain(p));
+                if (brain == null) return;
+                trailBrain = brain.gameObject;
+            }
+            var middle = Sandbox.SimPoint(trailBrain, new Vector3(robotCenter.x, robotFloor, robotCenter.z));
+            RobotCode.PathTrail.Record(field.ToField(middle), RobotCode.PathTrail.Odom2);
         }
 
         // V2: the middle of the robot's bodies in the simulation (where the Midfield points rise from).

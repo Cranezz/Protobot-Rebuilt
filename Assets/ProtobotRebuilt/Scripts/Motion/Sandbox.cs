@@ -144,6 +144,7 @@ namespace Protobot.Motion {
             public PneumaticCylinder.AirPorts ports;
             public Rigidbody rod, barrel;
             public float changedAt = -10f;   // V2: when its key last changed it (its state is shown on it for a moment)
+            public float psi = AirSupply.MaxPsi;   // V2: the pressure it pushes with (its last fill from the tanks)
         }
 
         private class Wheel {
@@ -169,9 +170,310 @@ namespace Protobot.Motion {
             public Rigidbody rotor, frame;
             public Vector3 axisLocal;
             public float inchesPerRadian, phase;
+            public Transform holder;    // V2: the chain's plane (rides on frame)
+            public SimTension tension;  // V2: its tensioner, if it has one
+            public SimStop stop;        // V2: its length stops sprockets that move apart (not on its frame)
         }
 
         private readonly List<SimChain> chains = new();
+
+        // V2: a chain tensioner (ChainTensioner): the arm swings on its joint screw, pulled by its band; the chain stops
+        // it where the loop round the sprockets (where they are now) comes to the chain's own length. That stop is a
+        // joint the chain moves every step: a distance limit from a point on the arm (a carried wrap's middle) to a
+        // point on the frame 150° back round the pivot from where that point is when the chain is tight, so the arm is
+        // free to swing away from the chain and stopped (by PhysX, with the reaction on the frame) going into it.
+        private class SimTension {
+            public SimChain sim;
+            public ChainTensioner tensioner;
+            public Rigidbody arm, frame;
+            public ConfigurableJoint joint;
+            public Vector3 pivotInFrame, axisInFrame, pointInArm;
+            public float reach;
+            public readonly List<GameObject> parts = new();
+            public readonly List<Vector3> buildCenters = new();
+            public readonly List<ChainWrap> wraps = new(), scratch = new();
+            public readonly List<Vector3> world = new();
+            public ChainPath path;
+            public int pathFrame = -1;
+            public float slack;   // inches the chain has over the loop (tests read it)
+        }
+
+        private readonly List<SimTension> tensions = new();
+
+        private const float TensionWindow = 150f;
+
+        private void MakeTensioners() {
+            foreach (var sim in chains) {
+                var chain = sim.chain;
+                if (chain == null || chain.fixedLinks <= 0) continue;
+                var t = ChainTensioner.Of(chain);
+                if (t == null || !bodyOf.TryGetValue(t.armPart, out var armBody) || !bodyOf.TryGetValue(t.framePart, out var frameBody)) continue;
+                if (armBody.rb == null || frameBody.rb == null || armBody == frameBody || sim.holder == null) continue;
+                var st = new SimTension { sim = sim, tensioner = t, arm = armBody.rb, frame = frameBody.rb };
+                for (var i = 0; i < chain.wraps.Count; i++) {
+                    var part = chain.PartOf(i);
+                    if (part == null || !bodyOf.ContainsKey(part)) {
+                        st = null;
+                        break;
+                    }
+                    st.parts.Add(part);
+                    st.buildCenters.Add(chain.transform.TransformPoint(chain.wraps[i].center));
+                    st.wraps.Add(chain.wraps[i].Copy());
+                    st.world.Add(Vector3.zero);
+                }
+                if (st == null) continue;
+                // The sim's bodies start where the build's parts are.
+                var axis = t.Axis.normalized * t.pull;   // the way the band pulls it, right-handed
+                st.pivotInFrame = st.frame.transform.InverseTransformPoint(t.Point);
+                st.axisInFrame = st.frame.transform.InverseTransformDirection(axis);
+                var p = st.buildCenters[t.wraps[0]];
+                st.pointInArm = st.arm.transform.InverseTransformPoint(p);
+                st.reach = Vector3.ProjectOnPlane(p - t.Point, axis).magnitude;
+                if (st.reach < 0.1f) continue;
+                var joint = st.arm.gameObject.AddComponent<ConfigurableJoint>();
+                joint.connectedBody = st.frame;
+                joint.autoConfigureConnectedAnchor = false;
+                joint.anchor = st.pointInArm;
+                joint.connectedAnchor = st.frame.transform.InverseTransformPoint(p);
+                joint.xMotion = joint.yMotion = joint.zMotion = ConfigurableJointMotion.Limited;
+                joint.angularXMotion = joint.angularYMotion = joint.angularZMotion = ConfigurableJointMotion.Free;
+                joint.linearLimit = new SoftJointLimit { limit = 2f * st.reach * Mathf.Sin(TensionWindow / 2f * Mathf.Deg2Rad) };
+                joint.enableCollision = false;
+                joint.enablePreprocessing = false;
+                // A tensioner arm is a few grams that a band pulls with a pound or more: the solver needs more passes
+                // to hold it on its stop, and anything past it is put back (projection).
+                joint.projectionMode = JointProjectionMode.PositionAndRotation;
+                joint.projectionDistance = 0.003f;
+                joint.projectionAngle = 1f;
+                foreach (var rb in new[] { st.arm }.Concat(bodies.Where(b => b.rb != null && b.rb != st.frame && b.rb.GetComponents<Joint>().Any(j => j.connectedBody == st.arm)).Select(b => b.rb))) {
+                    rb.solverIterations = Mathf.Max(rb.solverIterations, 60);
+                    rb.solverVelocityIterations = Mathf.Max(rb.solverVelocityIterations, 20);
+                }
+                st.joint = joint;
+                sim.tension = st;
+                tensions.Add(st);
+                Tension(st);
+            }
+        }
+
+        // Where the chain stops the arm now: the turn (toward the band's pull) that makes the loop the chain's length.
+        private void Tension(SimTension st) {
+            if (st.joint == null || st.arm == null || st.frame == null) return;
+            var chain = st.sim.chain;
+            var plane = st.sim.holder;
+            var pivot = st.frame.transform.TransformPoint(st.pivotInFrame);
+            var axis = st.frame.transform.TransformDirection(st.axisInFrame).normalized;
+            for (var i = 0; i < st.parts.Count; i++) {
+                st.world[i] = SimPoint(st.parts[i], st.buildCenters[i]);
+                var local = plane.InverseTransformPoint(st.world[i]);
+                st.wraps[i].center = new Vector2(local.x, local.y);
+            }
+            var carried = st.tensioner.wraps;
+            var target = chain.fixedLinks * chain.family.pitch;
+            float SlackAt(float degrees) {
+                st.scratch.Clear();
+                var turn = Quaternion.AngleAxis(degrees, axis);
+                for (var i = 0; i < st.wraps.Count; i++) {
+                    var w = st.wraps[i].Copy();
+                    if (carried.Contains(i)) {
+                        var local = plane.InverseTransformPoint(pivot + turn * (st.world[i] - pivot));
+                        w.center = new Vector2(local.x, local.y);
+                    }
+                    st.scratch.Add(w);
+                }
+                var tight = ChainPath.Tight(st.scratch);
+                return float.IsNaN(tight) ? float.NaN : target - tight;
+            }
+            var f0 = SlackAt(0f);
+            st.slack = f0;
+            var angle = float.NaN;
+            if (!float.IsNaN(f0)) {
+                const float H = 0.25f;
+                var fp = SlackAt(H);
+                var fm = SlackAt(-H);
+                var slope = (fp - fm) / (2f * H);
+                if (!float.IsNaN(slope) && Mathf.Abs(slope) > 1e-5f) {
+                    angle = Mathf.Clamp(-f0 / slope, -30f, 30f);
+                    var fa = SlackAt(angle);
+                    if (!float.IsNaN(fa)) angle = Mathf.Clamp(angle - fa / slope, -30f, 30f);
+                }
+            }
+            if (float.IsNaN(angle) || float.IsNaN(SlackAt(angle))) {
+                // Newton couldn't find it (the idler is off the chain, or the chain is too short for where its sprockets
+                // went: a real one would stop them; here nothing stops them): the arm stops where the chain comes
+                // closest to its length, at the end of its travel. Nowhere at all: the band alone.
+                ChainTensioner.SolveAngle(SlackAt, 1, out angle, out var left);
+                if (float.IsNaN(left)) {
+                    st.joint.linearLimit = new SoftJointLimit { limit = 1000f };
+                    return;
+                }
+            }
+            var point = st.arm.transform.TransformPoint(st.pointInArm);
+            var stop = pivot + Quaternion.AngleAxis(angle, axis) * (point - pivot);
+            var behind = pivot + Quaternion.AngleAxis(-TensionWindow, axis) * (stop - pivot);
+            st.joint.connectedAnchor = st.frame.transform.InverseTransformPoint(behind);
+            st.joint.linearLimit = new SoftJointLimit { limit = 2f * st.reach * Mathf.Sin(TensionWindow / 2f * Mathf.Deg2Rad) };
+        }
+
+        // V2 (build 79): a chain can't stretch. A sprocket whose middle moves relative to the chain's frame (on an arm, a
+        // slide, anything not hinged straight to the frame) is held by its chain: a distance limit from its middle to a
+        // point far back on the frame (40") along the way that lengthens the loop, moved every step to where the loop
+        // would be exactly the chain's length (Newton, the slack shared by the moving sprockets), so it's a wall it can
+        // come back from but not pass, and PhysX puts the reaction on the frame. (Tensioned chains have their own.)
+        private class SimStop {
+            public SimChain sim;
+            public Rigidbody frame;
+            public readonly List<GameObject> parts = new();
+            public readonly List<Vector3> buildCenters = new();
+            public readonly List<ChainWrap> wraps = new();
+            public readonly List<(int wrap, ConfigurableJoint joint, Vector3 anchorLocal)> moving = new();
+            public float target, slack;
+            public int nan;   // steps the loop couldn't be worked out (tests)
+            public ChainPath path;
+            public int pathFrame = -1;
+        }
+
+        private readonly List<SimStop> stops = new();
+        private const float StopReach = 40f;
+
+        private void MakeChainStops() {
+            foreach (var sim in chains) {
+                var chain = sim.chain;
+                if (chain == null || sim.tension != null || sim.frame == null || sim.holder == null || chain.Path == null || !chain.Path.Valid) continue;
+                var st = new SimStop { sim = sim, frame = sim.frame };
+                var ok = true;
+                for (var i = 0; i < chain.wraps.Count; i++) {
+                    var part = chain.PartOf(i);
+                    if (part == null || !bodyOf.TryGetValue(part, out var body) || body.rb == null) { ok = false; break; }
+                    var center = chain.transform.TransformPoint(chain.wraps[i].center);
+                    st.parts.Add(part);
+                    st.buildCenters.Add(center);
+                    st.wraps.Add(chain.wraps[i].Copy());
+                    var rb = body.rb;
+                    if (rb == sim.frame || OnHingeAxis(rb, sim.frame, center)) continue;   // its middle stays put on the frame
+                    var joint = rb.gameObject.AddComponent<ConfigurableJoint>();
+                    joint.connectedBody = sim.frame;
+                    joint.autoConfigureConnectedAnchor = false;
+                    joint.anchor = rb.transform.InverseTransformPoint(center);
+                    joint.connectedAnchor = sim.frame.transform.InverseTransformPoint(center);
+                    joint.xMotion = joint.yMotion = joint.zMotion = ConfigurableJointMotion.Limited;
+                    joint.angularXMotion = joint.angularYMotion = joint.angularZMotion = ConfigurableJointMotion.Free;
+                    joint.linearLimit = new SoftJointLimit { limit = 1000f };
+                    joint.enableCollision = true;
+                    joint.enablePreprocessing = false;
+                    // A motor pushing every step stretched it 0.2" (the solver gives a little each step): projection puts
+                    // the sprocket back on its wall when it's past it (as the tensioners do).
+                    joint.projectionMode = JointProjectionMode.PositionAndRotation;
+                    joint.projectionDistance = 0.01f;
+                    joint.projectionAngle = 180f;
+                    st.moving.Add((i, joint, joint.anchor));
+                    rb.solverIterations = Mathf.Max(rb.solverIterations, 40);   // a stiff chain: it stretched 0.1" at a motor's stall
+                    rb.solverVelocityIterations = Mathf.Max(rb.solverVelocityIterations, 12);
+                }
+                if (!ok || st.moving.Count == 0) {
+                    foreach (var m in st.moving) if (m.joint != null) Destroy(m.joint);
+                    continue;
+                }
+                // Its length: its links, or the loop as built if that's longer (a chain made a touch tight).
+                st.target = Mathf.Max(chain.Path.links * chain.family.pitch, ChainPath.Tight(st.wraps));
+                sim.stop = st;
+                stops.Add(st);
+                ChainStop(st);
+            }
+        }
+
+        // Whether `point` stays put relative to `frame` as `body` moves: it's on the line of a hinge joining them (a
+        // sprocket on a shaft turning in the frame), not off it (an idler on an arm that swings on the frame).
+        private bool OnHingeAxis(Rigidbody body, Rigidbody frame, Vector3 point) {
+            foreach (var (owner, other) in new[] { (body, frame), (frame, body) })
+                foreach (var joint in owner.GetComponents<ConfigurableJoint>()) {
+                    if (joint.connectedBody != other || joint.angularXMotion != ConfigurableJointMotion.Free) continue;
+                    var axis = joint.transform.TransformDirection(joint.axis).normalized;
+                    var anchor = joint.transform.TransformPoint(joint.anchor);
+                    if (Vector3.ProjectOnPlane(point - anchor, axis).magnitude < 0.05f) return true;
+                }
+            return false;
+        }
+
+        private void ChainStop(SimStop st) {
+            if (st.frame == null) return;
+            var plane = st.sim.holder;
+            for (var i = 0; i < st.parts.Count; i++) {
+                var local = plane.InverseTransformPoint(SimPoint(st.parts[i], st.buildCenters[i]));
+                st.wraps[i].center = new Vector2(local.x, local.y);
+            }
+            var length = ChainPath.Tight(st.wraps);
+            // The loop can't be worked out here (an idler pushed across the line between the others): the walls stay
+            // where they were last (letting go let a motor swing its arm 25° on, the chain 0.85" too long).
+            if (float.IsNaN(length)) { st.nan++; return; }
+            st.slack = st.target - length;
+            // Each moving middle's way of lengthening the loop (in the chain's plane) and how fast.
+            const float H = 0.05f;
+            var grads = new List<Vector2>();
+            var total = 0f;
+            foreach (var m in st.moving) {
+                var c = st.wraps[m.wrap].center;
+                float At(Vector2 at) {
+                    st.wraps[m.wrap].center = at;
+                    var l = ChainPath.Tight(st.wraps);
+                    st.wraps[m.wrap].center = c;
+                    return l;
+                }
+                var g = new Vector2(At(c + Vector2.right * H) - At(c - Vector2.right * H), At(c + Vector2.up * H) - At(c - Vector2.up * H)) / (2f * H);
+                if (float.IsNaN(g.x) || float.IsNaN(g.y)) g = Vector2.zero;
+                grads.Add(g);
+                total += g.magnitude;
+            }
+            if (total < 1e-4f) return;
+            var step = st.slack / total;   // each moves this far along its way to make the loop the chain's length
+            for (var k = 0; k < st.moving.Count; k++) {
+                var (_, joint, anchorLocal) = st.moving[k];
+                if (joint == null || grads[k].sqrMagnitude < 1e-8f) continue;
+                var way = plane.TransformDirection(new Vector3(grads[k].x, grads[k].y, 0f)).normalized;
+                var now = joint.transform.TransformPoint(anchorLocal);
+                var wall = now + way * step;
+                joint.connectedAnchor = st.frame.transform.InverseTransformPoint(wall - way * StopReach);
+                joint.linearLimit = new SoftJointLimit { limit = StopReach };
+            }
+        }
+
+        /// <summary>V2 (tests): a chain stop's wraps now and what ChainPath.Build says of them.</summary>
+        public static string ChainStopDetail(int index) {
+            if (instance == null || index >= instance.stops.Count) return "none";
+            var st = instance.stops[index];
+            var path = ChainPath.Build(st.wraps, st.sim.chain.family.pitch, Vector2.down, st.sim.chain.Path.links);
+            var who = "frame " + st.frame.name + " parts " + string.Join(",", st.parts.Select(p => p.name + "@" + (instance.bodyOf.TryGetValue(p, out var b) ? b.rb.name + (instance.HingedTo(b.rb) != null ? "~" + instance.HingedTo(b.rb).name : "") : "?"))) + " moving " + string.Join(",", st.moving.Select(m => m.wrap)) + " || ";
+            return who + string.Join(" / ", st.wraps.Select(w => w.center.ToString("F3") + " r" + w.radius.ToString("F3") + " way" + w.way)) + " | tight " + ChainPath.Tight(st.wraps) + " | " + (path.Valid ? "valid" : path.problem);
+        }
+
+        /// <summary>V2 (tests): each chain held by its length: its slack now (inches) and how many sprockets move.</summary>
+        public static List<(ChainLoop chain, float slack, int moving)> ChainStops() {
+            var list = new List<(ChainLoop, float, int)>();
+            if (instance != null) foreach (var st in instance.stops) list.Add((st.sim.chain, st.slack, st.moving.Count * 100000 + st.nan));
+            return list;
+        }
+
+        /// <summary>V2 (tests): each tensioned chain's slack (inches of chain over the loop round its sprockets now)
+        /// and its arm's turn about the pivot from the start (degrees).</summary>
+        public static List<(ChainLoop chain, float slack, float turned)> Tensions() {
+            var list = new List<(ChainLoop, float, float)>();
+            if (instance == null) return list;
+            foreach (var st in instance.tensions) {
+                if (st.arm == null || st.frame == null) continue;
+                var rel = Quaternion.Inverse(st.frame.rotation) * st.arm.rotation;
+                var startRel = Quaternion.Inverse(instance.StartRotation(st.frame)) * instance.StartRotation(st.arm);
+                (rel * Quaternion.Inverse(startRel)).ToAngleAxis(out var deg, out var ax);
+                if (deg > 180f) deg -= 360f;
+                list.Add((st.sim.chain, st.slack, deg * Mathf.Sign(Vector3.Dot(ax, st.axisInFrame))));
+            }
+            return list;
+        }
+
+        private Quaternion StartRotation(Rigidbody rb) {
+            foreach (var body in bodies)
+                if (body.rb == rb) return body.startInverse.inverse.rotation;
+            return rb.rotation;
+        }
         private readonly List<(Collider collider, Vector3 point, Vector3 normal, float impulse, Rigidbody other)> contacts = new();
         private Transform root;
         private SimBody main;
@@ -245,6 +547,7 @@ namespace Protobot.Motion {
             foreach (var motor in MotorDrive.Live()) motor.Manual = 0f;   // V2
             foreach (var motor in MotorDrive.Live()) motor.Silence();
             FlexGrip.Clear();
+            AirSupply.End();   // V2
             DriveEnabled = true;
             if (!Hosted) Interface.Interface.Say("Back to building: the build is as it was", true);
         }
@@ -478,6 +781,9 @@ namespace Protobot.Motion {
             driven.Clear();   // V2: the bodies a gear train turns (Omnis: a free wheel's grip is worked out apart)
             foreach (var train in trains) foreach (var rotor in train.rotors) driven.Add(rotor.rb);
             StillChains();
+            MakeTensioners();   // V2
+            MakeChainStops();   // V2
+            AirSupply.Begin(parts);   // V2: the robot's tanks (before the slides take their first pressure)
             MakeSlides(cylinders);
         }
 
@@ -1291,7 +1597,7 @@ namespace Protobot.Motion {
             var holder = new GameObject("Chain").transform;
             holder.SetParent(frame != null ? frame.transform : root, false);
             holder.SetPositionAndRotation(chain.transform.position, chain.transform.rotation);
-            var sim = new SimChain { chain = chain, rotor = rotor, frame = frame, axisLocal = rotor.transform.InverseTransformDirection(axis), inchesPerRadian = inchesPerRadian, phase = chain.phase };
+            var sim = new SimChain { chain = chain, rotor = rotor, frame = frame, axisLocal = rotor != null ? rotor.transform.InverseTransformDirection(axis) : axis, inchesPerRadian = inchesPerRadian, phase = chain.phase, holder = holder };
             foreach (var link in chain.Links) {
                 if (link == null) continue;
                 var copy = new GameObject(link.name);
@@ -1322,11 +1628,33 @@ namespace Protobot.Motion {
 
         private void RunChains(float dt) {
             foreach (var sim in chains) {
-                if (sim.rotor == null || Mathf.Abs(sim.inchesPerRadian) < 1e-6f) continue;
-                var axis = sim.rotor.transform.TransformDirection(sim.axisLocal);
-                var w = Vector3.Dot(sim.rotor.angularVelocity - (sim.frame != null ? sim.frame.angularVelocity : Vector3.zero), axis);
-                sim.phase += w * sim.inchesPerRadian * dt;
-                sim.chain.Place(sim.links, sim.phase);
+                var driven = sim.rotor != null && Mathf.Abs(sim.inchesPerRadian) >= 1e-6f;
+                if (driven) {
+                    var axis = sim.rotor.transform.TransformDirection(sim.axisLocal);
+                    var w = Vector3.Dot(sim.rotor.angularVelocity - (sim.frame != null ? sim.frame.angularVelocity : Vector3.zero), axis);
+                    sim.phase += w * sim.inchesPerRadian * dt;
+                }
+                if (sim.tension != null) {
+                    // V2: round its sprockets where they are now (the tensioner swings), once a frame.
+                    var st = sim.tension;
+                    if (st.pathFrame != Time.frameCount) {
+                        st.pathFrame = Time.frameCount;
+                        var path = ChainPath.Build(st.wraps, sim.chain.family.pitch, Vector2.down, sim.chain.fixedLinks);
+                        if (path.Valid) st.path = path;
+                    }
+                    sim.chain.Place(sim.links, sim.phase, st.path ?? sim.chain.Path);
+                }
+                else if (sim.stop != null) {
+                    // V2: round its sprockets where they are now (one rides on an arm), once a frame.
+                    var st = sim.stop;
+                    if (st.pathFrame != Time.frameCount) {
+                        st.pathFrame = Time.frameCount;
+                        var path = ChainPath.Build(st.wraps, sim.chain.family.pitch, Vector2.down, sim.chain.Path.links);
+                        if (path.Valid) st.path = path;
+                    }
+                    sim.chain.Place(sim.links, sim.phase, st.path ?? sim.chain.Path);
+                }
+                else if (driven) sim.chain.Place(sim.links, sim.phase);
             }
         }
 
@@ -1351,7 +1679,8 @@ namespace Protobot.Motion {
                 joint.enablePreprocessing = false;
                 // V2: with air to one end only, the valve starts off: no air, the rod loose.
                 var slide = new Slide { cylinder = cylinder, joint = joint, rod = rod.rb, barrel = barrel.rb, extended = cylinder.Extended,
-                                        ports = cylinder.Ports, loose = cylinder.Ports != PneumaticCylinder.AirPorts.Both };
+                                        ports = cylinder.Ports, loose = cylinder.Ports != PneumaticCylinder.AirPorts.Both,
+                                        psi = AirSupply.Of(cylinder)?.Working ?? AirSupply.MaxPsi };   // V2: charged before the start
                 slides.Add(slide);
                 SetSlide(slide);
             }
@@ -1364,9 +1693,17 @@ namespace Protobot.Motion {
                 slide.joint.targetVelocity = Vector3.zero;
                 return;
             }
-            var force = (slide.extended ? PneumaticCylinder.ExtendForceNewtons : PneumaticCylinder.RetractForceNewtons) * Newton;
-            slide.joint.xDrive = new JointDrive { positionSpring = 0f, positionDamper = force / CylinderSpeed, maximumForce = force };
-            slide.joint.targetVelocity = new Vector3(SlideSign * (slide.extended ? CylinderSpeed : -CylinderSpeed), 0f, 0f);
+            // V2: force with the pressure it was filled at (12 lbf at 100 psi), and slower at low pressure (flow).
+            var share = Mathf.Clamp01(slide.psi / PneumaticCylinder.Psi);
+            var force = (slide.extended ? PneumaticCylinder.ExtendForceNewtons : PneumaticCylinder.RetractForceNewtons) * Newton * share;
+            var speed = CylinderSpeed * Mathf.Sqrt(share);
+            if (force <= 0.001f) {
+                slide.joint.xDrive = new JointDrive { positionSpring = 0f, positionDamper = 0.5f * Newton / CylinderSpeed, maximumForce = 1f * Newton };
+                slide.joint.targetVelocity = Vector3.zero;
+                return;
+            }
+            slide.joint.xDrive = new JointDrive { positionSpring = 0f, positionDamper = force / speed, maximumForce = force };
+            slide.joint.targetVelocity = new Vector3(SlideSign * (slide.extended ? speed : -speed), 0f, 0f);
         }
 
         // ------------------------------------------------------------------ driving
@@ -1463,6 +1800,7 @@ namespace Protobot.Motion {
                     slide.loose = false;
                 }
                 else slide.loose = true;
+                if (!slide.loose) slide.psi = AirSupply.Move(slide.cylinder, slide.extended);   // V2: air from the tanks
                 SetSlide(slide);
                 slide.changedAt = Time.unscaledTime;
                 Audio.Sounds.PlayAt(Audio.Sounds.Air, slide.rod.position, slide.loose ? 0.4f : 0.7f);
@@ -1516,6 +1854,8 @@ namespace Protobot.Motion {
             Omnis();
             BogieFriction();   // V2
             PullBands();   // V2
+            foreach (var st in tensions) Tension(st);   // V2: chain tensioners
+            foreach (var st in stops) ChainStop(st);    // V2: chains don't stretch
             HoldStill();   // V2
         }
 
@@ -2004,7 +2344,7 @@ namespace Protobot.Motion {
                 if (!any) Interface.Overlay.Begin();
                 any = true;
                 if (!Interface.Overlay.ToScreen(slide.rod.worldCenterOfMass, out var at)) continue;
-                var text = slide.loose ? "Loose (no air)" : slide.extended ? "Air: out" : "Air: in";
+                var text = slide.loose ? "Loose (no air)" : (slide.extended ? "Air: out" : "Air: in") + (slide.psi < AirSupply.MaxPsi - 0.5f ? " · " + Mathf.RoundToInt(slide.psi) + " psi" : "");
                 Interface.Overlay.Text(at + new Vector2(0f, 28f), text, slide.loose ? Interface.Theme.TextDim : Interface.Theme.Accent, null, true);
             }
         }
@@ -2027,9 +2367,11 @@ namespace Protobot.Motion {
                     // Air to one end only: that end's way when switched on, loose when off.
                     var way = slide.ports == PneumaticCylinder.AirPorts.Back;
                     var on = extend == way;
+                    if (slide.extended == way && slide.loose == !on) continue;
                     slide.extended = way;
                     slide.loose = !on;
                 }
+                if (!slide.loose) slide.psi = AirSupply.Move(slide.cylinder, slide.extended);   // V2: air from the tanks
                 SetSlide(slide);
                 slide.changedAt = Time.unscaledTime;
                 Audio.Sounds.PlayAt(Audio.Sounds.Air, slide.rod.position, slide.loose ? 0.4f : 0.7f);

@@ -12,7 +12,18 @@ namespace Protobot.EditorTools {
         private const string File = "Assets/ProtobotRebuilt/Resources/Version/build.txt";
         public int callbackOrder => 0;
 
-        public void OnPreprocessBuild(BuildReport report) => Next();
+        /// <summary>V2 (build 84): set before a build that must keep the number (the Mac build of a release made just
+        /// after the Windows one: multiplayer only joins the same build). Used once.</summary>
+        public const string KeepKey = "V2.Build.KeepNumber";
+
+        public void OnPreprocessBuild(BuildReport report) {
+            if (EditorPrefs.GetBool(KeepKey, false)) {
+                EditorPrefs.DeleteKey(KeepKey);
+                Debug.Log("[Build] Build number kept at " + Current());
+                return;
+            }
+            Next();
+        }
 
         [MenuItem("Tools/Protobot/Next Build Number")]
         public static void Next() {

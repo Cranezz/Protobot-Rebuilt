@@ -468,6 +468,15 @@ namespace Protobot.Game {
                 if (lowest && faces.All(f => Mathf.Abs(Mathf.DeltaAngle(f, a)) > 40)) faces.Add(a);
             }
             if (faces.Count < 3) faces = new List<int> { 90, 210, 330 };   // fall back to a face on top
+            // V2: the cross-section's height (face to the opposite corner) is 1.5 x middle-to-corner, wherever the origin is.
+            toggle.cornerRadius = (support[faces[0]] + support[(faces[0] + 180) % 360]) / 1.5f;
+            // ...and its middle: for three faces 120° apart, the sum of n x support(n) is 1.5 x the middle (the bar turned
+            // about its bounding box's middle came down a quarter inch off its seat after a turn).
+            var middle = Vector3.zero;
+            foreach (var f in faces.Take(3)) middle += (Quaternion.AngleAxis(f, axis) * reference) * support[f];
+            middle *= 2f / 3f;
+            middle -= axis * Vector3.Dot(middle, axis);
+            toggle.pivotLocal = middle;
             var normals = faces.Take(3).Select(a => Quaternion.AngleAxis(a, axis) * reference).OrderByDescending(n => n.y).ToList();
             // Yellow on top (as at the start), then red and blue going round.
             var first = normals[0];
@@ -496,21 +505,42 @@ namespace Protobot.Game {
             toggle.body = ElementShapes.Body(go, ElementShapes.ToggleMass);
             toggle.body.collisionDetectionMode = CollisionDetectionMode.Continuous;
             // V2: it turns on its long axis and can be lifted in its brackets (the rules count it only fully seated):
-            // free to turn, up to Toggle.Lift straight up, held down by its weight.
+            // a carriage (no shape, no turning) slides straight up to Toggle.Lift and the bar turns freely on it. One
+            // joint doing both turned its slide with the bar: after a turn it rested a quarter inch up, never seated.
+            var pivot = go.transform.TransformPoint(toggle.pivotLocal);
+            toggle.body.centerOfMass = toggle.pivotLocal;   // a symmetric bar: its weight is on its middle line
+            var carriageGo = new GameObject("Toggle Carriage");   // no shape: the replay recorder skips it (Default layer)
+            carriageGo.transform.SetParent(root, false);
+            carriageGo.transform.SetPositionAndRotation(pivot, Quaternion.identity);
+            var carriage = carriageGo.AddComponent<Rigidbody>();
+            carriage.mass = 0.05f;
+            carriage.inertiaTensor = Vector3.one * 0.01f;
+            carriage.constraints = RigidbodyConstraints.FreezeRotation;
+            carriage.interpolation = RigidbodyInterpolation.Interpolate;
+            carriage.sleepThreshold = 4f;
+            var slide = carriageGo.AddComponent<ConfigurableJoint>();
+            slide.axis = Vector3.right;
+            slide.secondaryAxis = Vector3.up;
+            slide.anchor = Vector3.zero;
+            slide.autoConfigureConnectedAnchor = false;
+            slide.connectedAnchor = pivot + Vector3.up * (Toggle.Lift / 2f);   // limits are ±: centred half way up
+            slide.xMotion = ConfigurableJointMotion.Locked;
+            slide.yMotion = ConfigurableJointMotion.Limited;
+            slide.zMotion = ConfigurableJointMotion.Locked;
+            slide.linearLimit = new SoftJointLimit { limit = Toggle.Lift / 2f };
+            slide.angularXMotion = slide.angularYMotion = slide.angularZMotion = ConfigurableJointMotion.Locked;
             var joint = go.AddComponent<ConfigurableJoint>();
+            joint.connectedBody = carriage;
             joint.axis = axis;
             joint.secondaryAxis = go.transform.InverseTransformDirection(Vector3.up);
-            joint.anchor = Vector3.zero;
+            joint.anchor = toggle.pivotLocal;
             joint.autoConfigureConnectedAnchor = false;
-            joint.connectedAnchor = go.transform.position + Vector3.up * (Toggle.Lift / 2f);   // limits are ±: centred half way up
-            joint.xMotion = ConfigurableJointMotion.Locked;
-            joint.yMotion = ConfigurableJointMotion.Limited;
-            joint.zMotion = ConfigurableJointMotion.Locked;
-            joint.linearLimit = new SoftJointLimit { limit = Toggle.Lift / 2f };
+            joint.connectedAnchor = Vector3.zero;
+            joint.xMotion = joint.yMotion = joint.zMotion = ConfigurableJointMotion.Locked;
             joint.angularXMotion = ConfigurableJointMotion.Free;
             joint.angularYMotion = ConfigurableJointMotion.Locked;
             joint.angularZMotion = ConfigurableJointMotion.Locked;
-            toggle.restHeight = go.transform.position.y;
+            toggle.restHeight = go.transform.TransformPoint(toggle.pivotLocal).y;
             return toggle;
         }
 

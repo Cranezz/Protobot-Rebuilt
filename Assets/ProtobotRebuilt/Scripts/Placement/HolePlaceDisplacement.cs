@@ -38,7 +38,7 @@ namespace Protobot {
             var near = Vector3.Dot(mouseCast.hit.point - head, down);
             var keyboard = UnityEngine.InputSystem.Keyboard.current;
             var used = AxleLine.Used(face.gameObject, head, down, screw.ScrewLength);
-            var start = AxleLine.Free(used, near, high - low, 0f, screw.ScrewLength, true, keyboard != null && keyboard.ctrlKey.isPressed, out var edge);
+            var start = AxleLine.Free(used, near, high - low, 0f, screw.ScrewLength, true, keyboard != null && (keyboard.ctrlKey.isPressed || keyboard.leftCommandKey.isPressed), out var edge);
             if (!start.HasValue) return false;
             // The smallest turn that lines the hole up with the screw, unless it snaps against a neighbour: then the
             // face that was grabbed is the one that goes against it (the part turns round if it has to), as a hole

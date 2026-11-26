@@ -70,6 +70,18 @@ namespace Protobot.Online {
             return pad != null && (pad.leftStick.ReadValue().sqrMagnitude > 0.04f || pad.rightStick.ReadValue().sqrMagnitude > 0.04f);
         }
 
+        // V2 (build 79): closing the app says so, so the count (and the Discord server's "Players online" channel) drops at
+        // once instead of 2.5 minutes later. Best effort: the app may be gone before it's sent.
+        private void OnApplicationQuit() {
+            if (!AgeCheck.Ready || Online < 0) return;   // never got through: nothing to take back
+            try {
+                _ = CloudCodeService.Instance.CallEndpointAsync("Presence", new Dictionary<string, object> {
+                    { "leaving", "1" }, { "name", OnlineServices.Name }, { "account", Accounts.IsGuest ? "0" : "1" },
+                });
+            }
+            catch (Exception) { /* closing anyway */ }
+        }
+
         private async System.Threading.Tasks.Task Beat() {
             if (!AgeCheck.Ready) return;   // nothing is sent before the age question and the terms
             sending = true;

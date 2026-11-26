@@ -1,0 +1,1 @@
+return UnityEditor.PlayerSettings.GetScriptingBackend(UnityEditor.Build.NamedBuildTarget.Standalone) + " active " + UnityEditor.EditorUserBuildSettings.activeBuildTarget + " mac " + UnityEditor.BuildPipeline.IsBuildTargetSupported(UnityEditor.BuildTargetGroup.Standalone, UnityEditor.BuildTarget.StandaloneOSX);

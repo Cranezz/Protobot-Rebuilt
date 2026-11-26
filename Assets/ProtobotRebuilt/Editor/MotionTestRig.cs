@@ -684,5 +684,232 @@ namespace Protobot.EditorTools {
             Part("PLTE-20-5", origin + new Vector3(0f, 0.47f + 0.02f + 0.023f, 0f), Quaternion.LookRotation(Vector3.up, Vector3.forward));
             return made.GetRange(start, made.Count - start);
         }
+    
+        // ------------------------------------------------------------------ V2: chain tensioners
+
+        /// <summary>A flat plate (holes up) whose two end holes are on <paramref name="a"/> and <paramref name="b"/>.</summary>
+        public static GameObject PlateBetween(string id, Vector3 a, Vector3 b) {
+            var part = Part(id, a, Quaternion.LookRotation(Vector3.up, Vector3.forward));
+            Physics.SyncTransforms();
+            var holes = part.GetComponentsInChildren<HoleCollider>(true).Where(h => Mathf.Abs(Vector3.Dot(h.transform.forward, Vector3.up)) > 0.98f).ToList();
+            HoleCollider h1 = null, h2 = null;
+            var most = -1f;
+            foreach (var x in holes)
+                foreach (var y in holes) {
+                    var d = (x.transform.position - y.transform.position).sqrMagnitude;
+                    if (d > most) {
+                        most = d;
+                        h1 = x;
+                        h2 = y;
+                    }
+                }
+            if (h1 == null) return part;
+            var have = Vector3.ProjectOnPlane(h2.transform.position - h1.transform.position, Vector3.up);
+            var want = Vector3.ProjectOnPlane(b - a, Vector3.up);
+            part.transform.RotateAround(h1.transform.position, Vector3.up, Vector3.SignedAngle(have, want, Vector3.up));
+            part.transform.position += a - h1.transform.position;
+            Physics.SyncTransforms();
+            return part;
+        }
+
+        /// <summary>A round part (spacer, sprocket) on an upright axle through (x, z): its bottom at <paramref name="bottom"/>
+        /// (or, with <paramref name="middle"/>, its teeth's middle there). Returns it; its top is its renderer's top.</summary>
+        public static GameObject Stand(string id, Vector3 at, bool middle = false) {
+            var part = Part(id, at, Quaternion.identity);
+            Physics.SyncTransforms();
+            var (_, axis) = Motion.ChainLoop.SprocketFrame(part);
+            part.transform.rotation = Quaternion.FromToRotation(axis, Vector3.up) * part.transform.rotation;
+            Physics.SyncTransforms();
+            var (center, _) = Motion.ChainLoop.SprocketFrame(part);
+            var y = middle ? at.y - center.y : at.y - part.GetComponent<Renderer>().bounds.min.y;
+            part.transform.position += new Vector3(at.x - center.x, y, at.z - center.z);
+            Physics.SyncTransforms();
+            return part;
+        }
+
+        private static float Top(GameObject part) => part.GetComponent<Renderer>().bounds.max.y;
+
+        // Shaft collars on a hanging shaft: one on top of what holds it, one under the sprocket (a shaft joins the
+        // parts between two collars).
+        private static void Collars(Vector3 axle, float holderTop, GameObject sprocket) {
+            Stand("CLMP-Normal-Normal", new Vector3(axle.x, holderTop, axle.z));
+            var below = Stand("CLMP-Normal-Normal", new Vector3(axle.x, 0f, axle.z));
+            below.transform.position += Vector3.up * (sprocket.GetComponent<Renderer>().bounds.min.y - Top(below));
+            Physics.SyncTransforms();
+        }
+
+        private const string Spacer1 = "VXSPACERS-1.00\" Nylon Spacer (3/8\" OD)";
+        private const string SpacerHalf = "VXSPACERS-1/2\" Nylon Spacer (3/8\" OD)";
+        private const string SpacerQuarter = "VXSPACERS-1/4\" Nylon Spacer (3/8\" OD)";
+
+        public static readonly Dictionary<string, GameObject> TensionerParts = new();
+
+        /// <summary>
+        /// Two chains with tensioners, as teams build them, on a 25 x 25 plate (chains 3/4" up, x = -3 and x = +3):
+        /// station 1 (left): a motor's 15T drives a 24T on a shaft hanging from a C-channel arm that a second motor (100
+        /// rpm, U/J, hold) swings on a shaft collar; the tensioner is a 1/2" spacer on a screw at the end of a 1x6 plate
+        /// that turns on a joint screw over a 1" spacer, a #32 band (two wraps) pulling it into the chain. Station 2
+        /// (right): 15T to a fixed 24T, its tensioner a 10T sprocket on a shaft through the arm's end. FinishTensioners
+        /// after the screws connect.
+        /// </summary>
+        public static List<GameObject> TensionerRig(Vector3 origin) {
+            var start = made.Count;
+            TensionerParts.Clear();
+            var up = Vector3.up;
+            const float half = 0.023f, chainY = 0.75f;
+            var plate = Part("PLTE-25-25", origin, Quaternion.LookRotation(up, Vector3.forward));
+            TensionerParts["plate"] = plate;
+            Vector3 Hole(float x, float z) => origin + new Vector3(x, 0f, z);
+
+            GameObject DriveSprocket(float x, float z, Vector3 along, string id) {
+                var hole = Hole(x, z);
+                Motor(hole - up * half, up, along);
+                foreach (var d in new[] { 0.5f, 1.0f }) Screw(hole + new Vector3(0f, half, 0f) + along * d, up);
+                Shaft(hole + up * 0.2f, up, 3);
+                return Stand(id, hole + up * chainY, true);
+            }
+
+            // The tensioner arm: a 1x6 plate on a 1" spacer, a joint screw down through both and the plate.
+            GameObject Arm(string key, Vector3 pivot, Vector3 idler) {
+                var column = Stand(Spacer1, pivot + up * half);
+                var armY = Top(column) + half;
+                var arm = PlateBetween("PLTE-1-6", new Vector3(pivot.x, armY, pivot.z), new Vector3(idler.x, armY, idler.z));
+                var screw = Screw(new Vector3(pivot.x, armY + half, pivot.z), up, "1.25in");
+                Nut(pivot - up * half, up);
+                TensionerParts[key + " arm"] = arm;
+                TensionerParts[key + " pivot"] = screw;
+                return arm;
+            }
+
+            // A band post on the plate: 1" + 1/4" spacers on a screw up from under it.
+            GameObject Post(string key, Vector3 at) {
+                var low = Stand(Spacer1, at + up * half);
+                var high = Stand(SpacerQuarter, new Vector3(at.x, Top(low), at.z));
+                Screw(at - up * half, -up, "1.50in");
+                Nut(new Vector3(at.x, Top(high), at.z), -up);
+                TensionerParts[key + " post"] = high;
+                return high;
+            }
+
+            // ---- station 1: spacer idler, driven sprocket on a swinging arm
+            TensionerParts["1 drive"] = DriveSprocket(-3f, -4.5f, Vector3.left, "SPKT-Normal-15T");
+            var p1 = Hole(-2.5f, 3.5f);
+            var swingMotor = Motor(p1 - up * half, up, Vector3.forward);
+            foreach (var d in new[] { 0.5f, 1.0f }) Screw(p1 + new Vector3(0f, half, d), up);
+            Shaft(p1 + up * 0.7f, up, 4);
+            TensionerParts["swing motor"] = swingMotor;
+            var r = Vector3.left;
+            var h = p1 + up * 2f;
+            var collarTurn = Quaternion.LookRotation(up, -r);
+            Part("CLMP-Normal-Normal", h - collarTurn * new Vector3(0f, 0.007f, 0f), collarTurn);
+            var channelTurn = Quaternion.LookRotation(-r, up);
+            var channel = Part("CCHL-1x2-8", h + r * (0.2165f + 0.0555f) + channelTurn * new Vector3(0.5f, 0f, 0f), channelTurn);   // a base hole on the set screw
+            Screw(h + r * (0.2165f + 0.0625f), r, "1/4in");
+            TensionerParts["swing arm"] = channel;
+            Physics.SyncTransforms();
+            // The driven shaft down through the channel's flange holes 2.5" along it.
+            var flange = channel.GetComponentsInChildren<HoleCollider>(true)
+                .Where(x => Mathf.Abs(x.transform.forward.y) > 0.98f)
+                .OrderBy(x => Mathf.Abs(Vector3.ProjectOnPlane(x.transform.position - p1, up).magnitude - 2.55f)).First();
+            var c1 = new Vector3(flange.transform.position.x, origin.y, flange.transform.position.z);
+            Shaft(c1 + up * 1.65f, up, 3);
+            TensionerParts["1 driven"] = Stand("SPKT-Normal-24T", c1 + up * chainY, true);
+            Collars(c1, Top(channel), TensionerParts["1 driven"]);
+            // The tensioner.
+            // The arm runs along the chain (turning it moves the idler into the chain, not along it); the band goes
+            // over the chain to a post on its far side.
+            var t1 = Hole(-2f, 0.5f);
+            var i1 = t1 + (new Vector3(-0.8f, 0f, -2.5f)).normalized * 2.5f;
+            var arm1 = Arm("1", t1, i1);
+            var armTop = Top(arm1);
+            var armBottom = armTop - 2f * half;
+            var idler = Stand(SpacerHalf, new Vector3(i1.x, armBottom, i1.z));
+            idler.transform.position += up * (armBottom - Top(idler));   // hanging under the arm
+            Physics.SyncTransforms();
+            TensionerParts["1 idler"] = idler;
+            TensionerParts["1 idler screw"] = Screw(new Vector3(i1.x, armTop, i1.z), up, "3/4in");
+            Nut(new Vector3(i1.x, idler.GetComponent<Renderer>().bounds.min.y, i1.z), up);
+            Post("1", Hole(-4.5f, -1.5f));
+
+            // ---- station 2: sprocket idler, fixed sprockets
+            TensionerParts["2 drive"] = DriveSprocket(3f, -4.5f, Vector3.right, "SPKT-Normal-15T");
+            var c2 = Hole(3f, 1f);
+            Shaft(c2 + up * 0.2f, up, 3);
+            TensionerParts["2 driven"] = Stand("SPKT-Normal-24T", c2 + up * chainY, true);
+            var t2 = Hole(2f, 0.5f);
+            var i2 = t2 + (new Vector3(0.8f, 0f, -2.5f)).normalized * 2.5f;
+            var arm2 = Arm("2", t2, i2);
+            var i2Hole = new Vector3(i2.x, origin.y, i2.z);
+            Shaft(i2Hole + up * 1.75f, up, 3);
+            TensionerParts["2 idler"] = Stand("SPKT-Normal-10T", i2Hole + up * chainY, true);
+            Collars(i2Hole, Top(arm2), TensionerParts["2 idler"]);
+            // Its band goes round a screw one hole in from the idler.
+            var postAt = i2 + (t2 - i2).normalized * 0.5f;
+            var top2 = Top(arm2);
+            TensionerParts["2 arm post"] = Screw(new Vector3(postAt.x, top2, postAt.z), up, "1/2in");
+            Nut(new Vector3(postAt.x, top2 - 2f * half, postAt.z), up);
+            Post("2", Hole(4.5f, -1.5f));
+            return made.GetRange(start, made.Count - start);
+        }
+
+        /// <summary>After TensionerRig's screws have connected: joints, the plate grounded, motors, bands, chains.</summary>
+        public static string FinishTensioners() {
+            var log = new System.Text.StringBuilder();
+            Motion.Linkage.SetGrounded(TensionerParts["plate"], true);
+            foreach (var key in new[] { "1 pivot", "2 pivot" }) Motion.Linkage.SetJoint(TensionerParts[key], true);
+            foreach (var motor in Object.FindObjectsByType<Motion.MotorDrive>(FindObjectsSortMode.None)) {
+                if (motor.gameObject == TensionerParts["swing motor"]) {
+                    motor.SetCartridge(100, false);
+                    Motion.Controls.SetName(motor.gameObject, "Swing arm");
+                    Motion.Controls.SetHold(motor.gameObject, true);
+                    Motion.Controls.SetSpeed(motor.gameObject, 0.25f);   // slow enough to swing it through the tensioner's range by key
+                    Motion.Controls.SetForwardKey(motor.gameObject, UnityEngine.InputSystem.Key.U);
+                    Motion.Controls.SetReverseKey(motor.gameObject, UnityEngine.InputSystem.Key.J);
+                }
+                else {
+                    motor.SetCartridge(200, false);
+                    var left = motor.transform.position.x < 0f;
+                    Motion.Controls.SetName(motor.gameObject, left ? "Chain 1" : "Chain 2");
+                    Motion.Controls.SetForwardKey(motor.gameObject, left ? UnityEngine.InputSystem.Key.I : UnityEngine.InputSystem.Key.O);
+                    Motion.Controls.SetReverseKey(motor.gameObject, left ? UnityEngine.InputSystem.Key.K : UnityEngine.InputSystem.Key.L);
+                }
+            }
+            // The bands: #32, two wraps, from the arm's post to the plate's.
+            foreach (var station in new[] { "1", "2" }) {
+                var armPost = TensionerParts.TryGetValue(station + " arm post", out var p) ? p : TensionerParts[station + " idler screw"];
+                var framePost = TensionerParts[station + " post"];
+                var posts = new List<Motion.BandPost> {
+                    new() { part = armPost, local = armPost.transform.InverseTransformPoint(armPost.transform.position + Vector3.up * 0.06f),
+                            axisLocal = armPost.transform.InverseTransformDirection(Vector3.up), radius = 0.15f, what = "screw head" },
+                    new() { part = framePost, local = framePost.transform.InverseTransformPoint(framePost.GetComponent<Renderer>().bounds.center),
+                            axisLocal = framePost.transform.InverseTransformDirection(Vector3.up), radius = 0.19f, what = "spacer" },
+                };
+                var type = PartsManager.GetPartType("BAND");
+                var generator = type.GetComponent<PartGenerator>();
+                generator.param1.value = "V32";
+                var obj = generator.Generate(posts[0].Center, Quaternion.identity);
+                made.Add(obj);
+                obj.GetComponent<Motion.ElasticBand>().Set(posts, 1, 2, 0f, Vector3.up);
+                log.AppendLine("band " + station + " " + obj.GetComponent<Motion.ElasticBand>().Describe());
+            }
+            // The chains: drive, driven, idler (the idler pressing in from outside the loop).
+            foreach (var station in new[] { "1", "2" }) {
+                var parts = new List<GameObject> { TensionerParts[station + " drive"], TensionerParts[station + " driven"], TensionerParts[station + " idler"] };
+                Motion.ChainLoop chain = null;
+                foreach (var flip in new[] { new[] { 2 }, new int[0] }) {
+                    chain = Chain(parts, "chain", flip);
+                    if (chain != null) break;
+                }
+                // As teams cut it: a link longer than the bare loop, so the idler presses in and the tensioner sits
+                // mid-travel (room both ways).
+                if (chain != null && chain.fixedLinks > 0) {
+                    chain.fixedLinks += 1;
+                    chain.Save();
+                    chain.Rebuild();
+                }
+                log.AppendLine("chain " + station + " " + (chain != null ? chain.Path.links + " links, fixed " + chain.fixedLinks + ", tensioner " + (Motion.ChainTensioner.Of(chain) != null) : "NOT made"));
+            }
+            return log.ToString();
+        }
     }
 }

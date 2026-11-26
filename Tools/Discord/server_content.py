@@ -61,6 +61,8 @@ CATEGORIES = [
     ]},
     {"key": "community", "name": "💬 COMMUNITY", "channels": [
         {"key": "general", "name": "general", "kind": "public", "topic": "Talk about Protobot, robots and VEX. Be kind!"},
+        {"key": "leaderboard", "name": "skills-leaderboard", "kind": "readonly",
+         "topic": "The live Robot Skills leaderboards from Protobot (Play game > Robot Skills, signed in). Updated as soon as a new best is posted."},
         {"key": "showcase", "name": "show-your-robot", "kind": "support", "forum": True,
          "topic": "Show off a robot you built in Protobot: a picture, a video or the .pbb file.",
          "tags": [("Drivetrain", "🛞"), ("Intake", "🌀"), ("Lift / Arm", "🦾"), ("Full robot", "🤖"), ("Robot code", "💻"),

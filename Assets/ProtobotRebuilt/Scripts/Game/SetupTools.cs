@@ -12,7 +12,7 @@ namespace Protobot.Game {
     /// click two points (robot, tool or field): the distance, with how far apart they are along each axis. Ctrl+Z
     /// takes back the last move. Run from SkillsGame.DrawSetup, after the field's drawings.</summary>
     public class SetupTools {
-        public enum Mode { Move, LineUp, Measure, Preload }
+        public enum Mode { Move, LineUp, Measure, Preload, Aim }
 
         public Mode mode;
         public bool toolSelected;
@@ -45,6 +45,7 @@ namespace Protobot.Game {
         public string Instructions => mode switch {
             Mode.LineUp => !first.Valid ? "Click a face or point on your robot" : "Now click a face on the alignment tool or the field to put it against (or a point to line up with)",
             Mode.Measure => !first.Valid || second.Valid ? "Click a point on the robot, the tool or the field" : "Click a second point",
+            Mode.Aim => "Click a Goal or a spot on the field: the robot's front turns to face it (still on its wall)",
             Mode.Preload => "Click your robot where the Preload goes (it has to touch the robot). R: " + (preloadStanding ? "lay it down" : "stand it up") + ", Q/E: turn it",
             _ => "Drag the robot to slide it along the wall, drag the blue ring to turn it" + (game.tool != null ? ". Drag the tool to move it" : ""),
         };
@@ -76,7 +77,7 @@ namespace Protobot.Game {
                     escFrame = Time.frameCount;
                 }
             }
-            if (keyboard != null && !typing && keyboard.ctrlKey.isPressed && keyboard.zKey.wasPressedThisFrame && drag == Drag.None && game.Undo())
+            if (keyboard != null && !typing && (keyboard.ctrlKey.isPressed || keyboard.leftCommandKey.isPressed) && keyboard.zKey.wasPressedThisFrame && drag == Drag.None && game.Undo())
                 Audio.Sounds.Play(Audio.Sounds.Tick);
 
             if (game.tool != null) DrawFootprint(game.ToolCorners(), toolSelected ? ToolColor : new Color(ToolColor.r, ToolColor.g, ToolColor.b, 0.45f));
@@ -85,7 +86,27 @@ namespace Protobot.Game {
                 case Mode.LineUp: LineUp(free); break;
                 case Mode.Measure: Measure(free); break;
                 case Mode.Preload: PlacePreload(free); break;
+                case Mode.Aim: Aim(free); break;
             }
+        }
+
+        // ------------------------------------------------------------------ V2 (build 80): aim
+
+        private void Aim(bool free) {
+            if (!free || !Floor(out var at)) return;
+            var target = game.AimTarget(at);
+            var onGoal = (target - at).sqrMagnitude > 0.01f;
+            DrawLine(new Vector2(game.x, game.y), target, Theme.Warning);
+            Overlay.MouseText(onGoal ? "Aim at this Goal" : "Aim here", Theme.Warning);
+            if (!MouseInput.LeftButton.wasPressedThisFrame) return;
+            game.PushUndo();
+            game.AimAt(target);
+            Audio.Sounds.Play(Audio.Sounds.Tick);
+            SetMode(Mode.Move);
+        }
+
+        private void DrawLine(Vector2 a, Vector2 b, Color color) {
+            Overlay.Line(game.field.ToWorld(a, 1f), game.field.ToWorld(b, 1f), color, 2f);
         }
 
         // ------------------------------------------------------------------ move
@@ -101,7 +122,7 @@ namespace Protobot.Game {
             var onToolRing = toolRing != null && Overlay.DistanceTo(toolRing, mouse) < 10f;
             var keyboard = Keyboard.current;
             var shift = keyboard != null && keyboard.shiftKey.isPressed;
-            var ctrl = keyboard != null && keyboard.ctrlKey.isPressed;
+            var ctrl = keyboard != null && (keyboard.ctrlKey.isPressed || keyboard.leftCommandKey.isPressed);
 
             if (drag == Drag.None) {
                 var under = free ? Under() : Drag.None;
@@ -145,9 +166,14 @@ namespace Protobot.Game {
             switch (drag) {
                 case Drag.Robot: {
                     var slide = slideStart + Vector2.Dot(at - pressAt, game.WallTangent);
-                    if (!shift) slide = Mathf.Round(slide * 8f) / 8f;
+                    // V2 (build 80): it snaps to the spots teams use (an edge on a tile seam, centred on a tile); Shift: free.
+                    string spot = null;
+                    if (!shift) {
+                        slide = game.SnapSlide(slide, out spot);
+                        if (spot == null) slide = Mathf.Round(slide * 8f) / 8f;
+                    }
                     game.SetSlide(slide);
-                    Overlay.MouseText(Inch.Format(game.Slide) + " from the wall's middle", Theme.Text);
+                    Overlay.MouseText(spot != null && Mathf.Abs(game.Slide - slide) < 0.05f ? char.ToUpper(spot[0]) + spot.Substring(1) : Inch.Format(game.Slide) + " from the wall's middle (Shift: no snapping)", spot != null ? Theme.Success : Theme.Text);
                     break;
                 }
                 case Drag.Tool: {

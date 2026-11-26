@@ -2,7 +2,7 @@
 
     python -I Tools/Discord/setup_server.py [steps...]
 
-Steps (default: all, in this order): settings roles channels community automod messages guides tutorials welcome
+Steps (default: all, in this order): settings roles channels online leaderboard community automod messages guides tutorials welcome
 onboarding webhooks invite check. Safe to run again: roles and channels are found by name, messages are edited in place.
 Private output (webhook URLs, the invite) goes to C:/Dev/ProtobotRebuiltV2/Discord, never to the repository."""
 import json
@@ -199,6 +199,42 @@ def channels():
             call("DELETE", f"/channels/{c['id']}", reason=REASON)
             log("  removed the starting channel", c["name"])
     log("channels:", len(ids), "in", len(cats), "categories")
+
+
+def online():
+    """The "Players online" counter at the very top of the channel list: a voice channel nobody can join, outside every
+    category. Its name is changed by Cloud Code Presence.js (the app's heartbeat, and an hourly schedule) through the bot,
+    which may manage this one channel (an overwrite: it still works once the bot's role is cut back)."""
+    ids = state.setdefault("channels", {})
+    bot = state["bot_role"]
+    ow = [{"id": G, "type": 0, "allow": str(perms("VIEW_CHANNEL")), "deny": str(perms("CONNECT", "SPEAK", "SEND_MESSAGES"))},
+          {"id": bot, "type": 0, "allow": str(perms("VIEW_CHANNEL", "MANAGE_CHANNELS", "CONNECT")), "deny": "0"}]
+    found = call("GET", f"/channels/{ids['online']}", ok404=True) if ids.get("online") else None
+    if found:
+        call("PATCH", f"/channels/{found['id']}", {"parent_id": None, "position": 0, "permission_overwrites": ow}, REASON)
+    else:
+        found = call("POST", f"/guilds/{G}/channels", {"name": "🟢 Players online: …", "type": 2, "position": 0,
+                                                       "permission_overwrites": ow}, REASON)
+        ids["online"] = found["id"]
+        save_state(state)
+    log("online counter:", found["name"])
+
+
+def leaderboard():
+    """The live skills leaderboard: one message in #skills-leaderboard that Cloud Code DiscordLeaderboard.js keeps up to
+    date (after every score posted, and hourly). Posted once here (a placeholder); its id goes to Cloud Save from
+    Tools/AgentTesting/cs/t_discord_lb.cs."""
+    msgs = state.setdefault("messages", {})
+    channel = state["channels"]["leaderboard"]
+    mid = msgs.get("leaderboard")
+    if mid and call("GET", f"/channels/{channel}/messages/{mid}", ok404=True):
+        log("leaderboard message: kept")
+        return
+    m = call("POST", f"/channels/{channel}/messages", {"embeds": [{"title": "🏆 Protobot Skills Leaderboard",
+              "description": "Loading the leaderboards…", "color": 0xF5A524}], "allowed_mentions": {"parse": []}})
+    msgs["leaderboard"] = m["id"]
+    save_state(state)
+    log("leaderboard message: posted")
 
 
 def community():
@@ -433,7 +469,7 @@ def check():
     log("check:", "ok" if problems == 0 else f"{problems} roles with too much")
 
 
-STEPS = {"settings": settings, "roles": roles, "channels": channels, "community": community, "automod": automod,
+STEPS = {"settings": settings, "roles": roles, "channels": channels, "online": online, "leaderboard": leaderboard, "community": community, "automod": automod,
          "messages": messages, "guides": guides, "tutorials": tutorials, "welcome": welcome_screen,
          "onboarding": onboarding, "webhooks": webhooks, "invite": invite, "check": check}
 

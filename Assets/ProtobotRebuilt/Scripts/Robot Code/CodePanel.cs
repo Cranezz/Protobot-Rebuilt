@@ -162,6 +162,10 @@ namespace Protobot.RobotCode {
             var devices = Ui.Button(header, "Insert devices", "Devices", InsertDevices, false, 5f, Theme.FontSmall);
             devices.Size(-1, 26f);
             Ui.Tip(devices, "Insert devices", null, "Writes the robot's configuration at the top of the program: every motor on its port with its cartridge and direction, the drive's motor groups and a drivetrain measured from your build (wheel size, track width, gear ratio), the sensors and pneumatics. Again after you change the robot: it replaces the old block.");
+            // V2 (build 79): plan a path on the field (as path.jerryio) and write it into the program.
+            var paths = Ui.Button(header, "Path planner", "Paths", () => { Commit(); PathPlanner.Open(); }, false, 5f, Theme.FontSmall);
+            paths.Size(-1, 26f);
+            Ui.Tip(paths, "Path planner", null, "Draw the robot's path on the field: waypoints, speeds, a smooth curve. It writes it for LemLib (a path file and follow), EZ-Template or Python's motion module, with set_pose for the start, and shows where the robot really went in the last run.");
             var external = Ui.Button(header, "Open in VS Code", "VS Code", () => {
                 Commit();
                 CodeStore.OpenExternally();
@@ -680,10 +684,16 @@ namespace Protobot.RobotCode {
             var sections = CodeProject.Split(field.text);
             var items = new List<string> { "Open a project folder…", "Add path files…" };
             items.AddRange(sections.Select(s => "Go to " + s.path));
+            var planned = sections.Where(s => s.text.Contains("#PROTOBOT-PATH")).ToList();   // V2: paths the planner made
+            items.AddRange(planned.Select(s => "Edit path " + System.IO.Path.GetFileNameWithoutExtension(s.path) + "…"));
             Popup.Open(anchor, items.ToArray(), -1, i => {
                 if (i == 0) OpenProjectFolder();
                 else if (i == 1) AddPathFiles();
                 else if (i - 2 < sections.Count) ScrollToLine(sections[i - 2].markerLine + 1);
+                else if (i - 2 - sections.Count < planned.Count) {
+                    Commit();
+                    PathPlanner.OpenFile(planned[i - 2 - sections.Count].text);
+                }
             });
         }
 
@@ -741,6 +751,61 @@ namespace Protobot.RobotCode {
             Commit();
             output.Append("<color=#8A93A0>Added " + Escape(string.Join(", ", added)) + ": ASSET(name_txt) and follow(\"name.txt\") read it.</color>\n");
             outputDirty = true;
+        }
+
+        /// <summary>V2 (build 79, the path planner): writes lines into the program where the cursor is (the window open;
+        /// else at the end), indented like the line they go in; `globalLine` (LemLib's ASSET) after the last #include if
+        /// it isn't there; and a file into the project (a path file). Null when done, else why not.</summary>
+        public static string InsertCode(string snippet, string filePath, string fileText, string globalLine) {
+            var panel = open != null && open.field != null ? open : null;
+            var source = (panel != null ? panel.field.text : CodeStore.Source) ?? "";
+            if (Blocks.BlockProgram.IsBlocks(source)) return "This program is made of blocks: turn it into a text program first (Blocks > Convert to a text program)";
+            var caret = panel != null ? Mathf.Clamp(panel.field.stringPosition, 0, source.Length) : source.Length;
+            if (panel == null && Scripting.CppTranslator.LooksLikeCpp(source)) {
+                // C++ with the window closed: the end of the file is outside every function: at the top of autonomous().
+                var auton = System.Text.RegularExpressions.Regex.Match(source, @"void\s+autonomous\s*\(\s*(void)?\s*\)\s*\{[^\n]*\n");
+                if (!auton.Success) return "Open the code window (Code) and put the cursor where the path should run, then insert it again";
+                caret = auton.Index + auton.Length;
+                var nextEnd = source.IndexOf('\n', caret);
+                var nextLine = source.Substring(caret, (nextEnd < 0 ? source.Length : nextEnd) - caret);
+                if (nextLine.Trim().Length > 0) {
+                    // Insert before the function's first line, indented like it.
+                    var indentFirst = new string(nextLine.TakeWhile(char.IsWhiteSpace).ToArray());
+                    var text = string.Join("\n", snippet.TrimEnd('\n').Split('\n').Select(l => indentFirst + l)) + "\n";
+                    source = source.Insert(caret, text);
+                    snippet = null;
+                }
+            }
+            if (snippet == null) goto Rest;
+            var lines = snippet.TrimEnd('\n').Split('\n');
+            if (source.Trim().Length == 0) source = "";
+            var lineStart = caret == 0 ? 0 : source.LastIndexOf('\n', caret - 1) + 1;
+            var lineEnd = source.IndexOf('\n', caret);
+            if (lineEnd < 0) lineEnd = source.Length;
+            var line = source.Substring(lineStart, lineEnd - lineStart);
+            var indent = new string(line.TakeWhile(char.IsWhiteSpace).ToArray());
+            var block = string.Join("\n", lines.Select(l => indent + l));
+            if (line.Trim().Length == 0) source = source.Substring(0, lineStart) + block + source.Substring(lineEnd);   // an empty line: in its place
+            else source = source.Substring(0, lineEnd) + "\n" + block + source.Substring(lineEnd);
+            Rest:
+            if (!string.IsNullOrEmpty(globalLine) && !source.Contains(globalLine)) {
+                var all = source.Split('\n').ToList();
+                var after = all.FindLastIndex(l => l.TrimStart().StartsWith("#include"));
+                all.Insert(after + 1, globalLine);
+                source = string.Join("\n", all);
+            }
+            if (filePath != null) source = CodeProject.WithFile(source, filePath, fileText);
+            if (panel != null) {
+                panel.Snapshot();
+                panel.SetText(source, Mathf.Min(source.Length, caret));
+                panel.Snapshot();
+                panel.Commit();
+                panel.UpdateMode();
+                panel.output.Append("<color=#8A93A0>Path inserted" + (filePath != null ? " (its file: " + Escape(filePath) + ")" : "") + ". Ctrl+Z takes it out.</color>\n");
+                panel.outputDirty = true;
+            }
+            else CodeStore.Set(source);
+            return null;
         }
 
         private void UseExample(int i) {

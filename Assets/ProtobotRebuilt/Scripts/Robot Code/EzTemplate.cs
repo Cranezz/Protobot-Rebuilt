@@ -668,7 +668,7 @@ namespace Protobot.RobotCode {
             if (odomStarted && program.Time >= nextGraph) {
                 nextGraph = (float)program.Time + 0.02f;
                 TuningData.Get("odom x", "in", false).Add((float)program.Time, (float)x);
-                TuningData.Get("odom y", "in", false).Add((float)program.Time, (float)y);
+                TuningData.Get("odom y", "in", false).Add((float)program.Time, (float)y); PathTrail.Odom2 = new UnityEngine.Vector2((float)x, (float)y);   // V2: the path planner draws it
                 TuningData.Get("odom theta", "deg", false).Add((float)program.Time, (float)theta);
                 TuningData.Version++;
             }

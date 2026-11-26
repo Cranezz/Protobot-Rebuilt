@@ -124,7 +124,7 @@ namespace Protobot {
         private static bool Free {
             get {
                 var keyboard = UnityEngine.InputSystem.Keyboard.current;
-                return keyboard != null && keyboard.ctrlKey.isPressed;
+                return keyboard != null && (keyboard.ctrlKey.isPressed || keyboard.leftCommandKey.isPressed);
             }
         }
 

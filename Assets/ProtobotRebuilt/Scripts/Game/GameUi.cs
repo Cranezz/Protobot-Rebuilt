@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using System.Collections.Generic;
 using System.Linq;
 using Protobot.GraphicsQuality;
 using Protobot.Interface;
@@ -248,6 +249,7 @@ namespace Protobot.Game {
             private RectTransform content;
             private bool dirty;
             private string saveName = "Start 1";
+            private const string MoreKey = "V2.Setup.More";
 
             private void OnEnable() { if (game != null) game.Changed += MarkDirty; }
             private void OnDisable() { if (game != null) game.Changed -= MarkDirty; }
@@ -305,188 +307,259 @@ namespace Protobot.Game {
                 var sub = Ui.Text(column, "Sub", $"{game.definition.Name} · " + (game.SkillsRun ? Clock(game.definition.skillsSeconds) + (game.mode == SkillsGame.Mode.Programming ? " of robot code" : "") : "0:15 autonomous + 1:45 driver"), Theme.FontSmall, Theme.TextDim);
                 sub.Size(-1, 20f);
 
-                // The robot.
-                Dialog.Heading(column, "Robot");
-                var fits = game.depth <= 18.02f && game.width <= 18.02f && game.height <= 18.02f;
-                var size = Ui.Text(column, "Size", $"{game.buildName} · length {SkillsGame.Number(game.depth)}\" · width {SkillsGame.Number(game.width)}\" · height {SkillsGame.Number(game.height)}\"", Theme.FontSmall, fits ? Theme.TextDim : Theme.Danger);
-                size.Size(-1, 20f);
-                var frontRow = Row(column, "Front", 34f);
-                foreach (var name in SkillsGame.FrontNames) {
-                    var selected = game.FrontName == name;
-                    var b = Ui.Button(frontRow, name, name, () => game.SetFront(name), selected, 6f, Theme.FontSmall);
-                    b.Size(48f, 30f);
-                }
-                Ui.Tip(frontRow, "The robot's front", null, "Which side of the build is its front (the yellow arrow points to it). Headings are the way the front faces.");
-
-                // The start.
-                // V2: a match: the Alliance and its Quadrant, and the autonomous period.
-                if (game.mode == SkillsGame.Mode.Match && game.online) {   // V2: online, the lobby set them
-                    Dialog.Heading(column, "Alliance and start");
-                    var seat = Row(column, "Seat", 30f);
-                    Ui.Text(seat, "Seat", (game.redAlliance ? "Red" : "Blue") + " Alliance · " + game.startQuadrant + " Quadrant (from the lobby)", Theme.FontSmall,
-                        game.redAlliance ? new Color(0.95f, 0.45f, 0.45f) : new Color(0.45f, 0.65f, 1f), Theme.Medium).Size(-1, 30f, 1f);
+                // V2 (build 80): set up as teams do it: pick the Quadrant on a map of the field, put the robot on a spot
+                // lined up with the tiles, choose which way it faces, its preload; the rest is under More options.
+                if (game.mode == SkillsGame.Mode.Match && game.online) {   // online, the lobby set the seat
+                    var seat = Ui.Text(column, "Seat", (game.redAlliance ? "Red" : "Blue") + " Alliance · " + game.startQuadrant + " Quadrant (from the lobby)", Theme.FontSmall,
+                        game.redAlliance ? new Color(0.95f, 0.45f, 0.45f) : new Color(0.45f, 0.65f, 1f), Theme.Medium);
+                    seat.Size(-1, 26f);
                 }
                 else if (game.mode == SkillsGame.Mode.Match) {
-                    Dialog.Heading(column, "Alliance and start");
                     var allianceRow = Row(column, "Alliance", 34f);
                     foreach (var red in new[] { true, false }) {
                         var picked = game.redAlliance == red;
-                        var b = Ui.Button(allianceRow, red ? "Red" : "Blue", red ? "Red" : "Blue", () => game.SetAlliance(red), picked, 6f, Theme.FontSmall);
+                        var b = Ui.Button(allianceRow, red ? "Red" : "Blue", red ? "Red Alliance" : "Blue Alliance", () => { game.PushUndo(); game.SetAlliance(red); }, picked, 6f, Theme.FontSmall);
                         if (picked) b.targetGraphic.color = red ? new Color(0.85f, 0.25f, 0.25f) : new Color(0.2f, 0.45f, 0.9f);
-                        b.Size(70f, 30f);
+                        b.Size(-1, 30f);
                     }
-                    var quadrantRow = Row(column, "Quadrant", 34f);
-                    foreach (var q in game.redAlliance ? new[] { Quadrant.Left, Quadrant.Bottom } : new[] { Quadrant.Right, Quadrant.Top }) {
-                        var b = Ui.Button(quadrantRow, q.ToString(), q.ToString(), () => game.SetQuadrant(q), game.startQuadrant == q, 6f, Theme.FontSmall);
-                        b.Size(80f, 30f);
-                    }
-                    Ui.Tip(quadrantRow, "Start Quadrant", null, "SG1: each robot starts in its own Quadrant on its Alliance's side of the Autonomous Line (the dashed diagonal), touching the Field Perimeter.");
-                    ToolOptions.Switch(column, "Skip autonomous (straight to driver control; the 0:15 runs the robot's program)", game.skipAutonomous, game.SetSkipAutonomous);
                 }
+                StartMap.Make(column, game, 326f);
+                var mapHint = Ui.Text(column, "Map hint", game.mode == SkillsGame.Mode.Match && !game.online
+                        ? "Click your Quadrant, then along its wall"
+                        : "Click along the wall to move the robot there", Theme.FontSmall - 1f, Theme.TextFaint, null, TextAlignmentOptions.Center);
+                mapHint.Size(-1, 18f);
 
-                // V2: the robot always touches its wall (SG1): where along it, and which way it's turned.
-                Dialog.Heading(column, "Start position");
-                var note = Ui.Text(column, "Frame", "Your robot starts touching the wall (SG1). Drag it on the field to slide it along the wall; drag the blue ring to turn it.", Theme.FontSmall - 1f, Theme.TextFaint);
-                note.textWrappingMode = TextWrappingModes.Normal;
-                note.Size(-1, 34f);
-                NumberRow(column, "Along wall", () => game.Slide, game.SetSlide, "\"");
-                // V2: how far the robot's footprint is from each end of its wall (teams measure from the corners).
-                var (toNear, toFar) = game.CornerGaps();
-                var gaps = Ui.Text(column, "Gaps", "Gap to the corners: " + Inch.Format(toNear) + " (−) · " + Inch.Format(toFar) + " (+)", Theme.FontSmall - 1f, Theme.TextDim);
-                gaps.Size(-1, 20f);
-                NumberRow(column, "Angle", () => game.Turn, game.SetTurn, "°");
-                var nudges = Row(column, "Nudge", 32f);
-                foreach (var (label, action) in new (string, System.Action)[] {
-                             ("Slide −", () => { game.PushUndo(); game.SlideBy(-0.25f); }), ("Slide +", () => { game.PushUndo(); game.SlideBy(0.25f); }),
-                             ("Turn −", () => { game.PushUndo(); game.TurnBy(-5f); }), ("Turn +", () => { game.PushUndo(); game.TurnBy(5f); }),
+                // Where along the wall: the spots teams line up on.
+                Dialog.Heading(column, "Spot");
+                var spots = game.Spots();
+                var spotNow = game.SpotNow();
+                var spotRow = Row(column, "Spot", 34f);
+                var index = spots.FindIndex(sp => Mathf.Abs(sp.slide - game.Slide) < 0.05f);
+                var prev = Ui.Button(spotRow, "Previous", "<", () => StepSpot(-1), false, 6f, Theme.FontSmall);
+                prev.Size(34f, 30f);
+                Ui.Tip(prev, "Previous spot", null, "The next spot to the robot's left.");
+                Button pick = null;
+                pick = Ui.Button(spotRow, "Pick", spotNow != null ? Cap(spotNow) : "Between spots: pick one", () => {
+                    if (spots.Count == 0) {
+                        Interface.Interface.Say("No spot on the tiles is legal at this angle: square it to the wall or move it by hand", false);
+                        return;
+                    }
+                    Popup.Open((RectTransform)pick.transform, spots.Select(sp => Cap(sp.what)).ToArray(), index, i => {
+                        game.PushUndo();
+                        game.SetSlide(spots[i].slide);
+                        Audio.Sounds.Play(Audio.Sounds.Tick);
+                    });
+                }, spotNow != null, 6f, Theme.FontSmall);
+                pick.Size(-1, 30f);
+                Popup.Chevron(pick.transform);
+                pick.transform.Find("Chevron").gameObject.AddComponent<LayoutElement>().ignoreLayout = true;
+                pick.GetComponent<HorizontalLayoutGroup>().padding.right = 24;
+                Ui.Tip(pick, "Spot", null, "Where along the wall, lined up with the field tiles as teams do (tiles counted from the robot's left): an edge on a tile seam, or centred on a tile. Only legal spots are listed. Dragging the robot snaps to them too (Shift: no snapping).");
+                var next = Ui.Button(spotRow, "Next", ">", () => StepSpot(1), false, 6f, Theme.FontSmall);
+                next.Size(34f, 30f);
+                Ui.Tip(next, "Next spot", null, "The next spot to the robot's right.");
+
+                // Which way it faces.
+                Dialog.Heading(column, "Facing");
+                var faceRow = Row(column, "Facing", 32f);
+                foreach (var (label, turn, tip) in new[] {
+                             ("Straight", 0f, "Back to the wall, facing straight into the field"), ("45° left", -45f, "Turned 45° to its left"),
+                             ("45° right", 45f, "Turned 45° to its right"), ("Backwards", 180f, "Front against the wall, back to the field"),
                          }) {
-                    var b = Ui.Button(nudges, label, label, action, false, 5f, Theme.FontSmall);
-                    b.Size(-1, 30f);
+                    var on = Mathf.Abs(Mathf.DeltaAngle(game.Turn, turn)) < 0.5f;
+                    var b = Ui.Button(faceRow, label, label, () => { game.PushUndo(); game.Face(turn); Audio.Sounds.Play(Audio.Sounds.Tick); }, on, 6f, Theme.FontSmall - 1f);
+                    b.Size(-1, 28f);
+                    Ui.Tip(b, label, null, tip + ". Then pick a spot again (the robot keeps touching the wall).");
                 }
-                var hint = Ui.Hint(column, "Arrows", "slide", "Q/E", "turn", "Ctrl+Z", "undo");
-                hint.Size(-1, 22f);
-                var tools = Row(column, "Tools", 34f);
-                var square = Ui.Button(tools, "Square", "Square to the wall", () => { game.PushUndo(); game.SetTurn(0f); }, false, 6f, Theme.FontSmall);
-                square.Size(-1, 30f);
-                var reset = Ui.Button(tools, "Default", "Default start", () => { game.PushUndo(); game.DefaultStart(); }, false, 6f, Theme.FontSmall);
-                reset.Size(-1, 30f);
+                var aimRow = Row(column, "Aim", 32f);
+                var aiming = game.setupTools != null && game.setupTools.mode == SetupTools.Mode.Aim;
+                var aim = Ui.Button(aimRow, "Aim", aiming ? "Click a Goal or a spot…" : "Aim at a Goal…", () => game.setupTools?.SetMode(aiming ? SetupTools.Mode.Move : SetupTools.Mode.Aim), aiming, 6f, Theme.FontSmall);
+                aim.Size(-1, 28f);
+                Ui.Tip(aim, "Aim", "Esc stops", "Click a Goal (or anywhere) on the field: the robot turns its front toward it, staying on its wall: the start for an autonomous that drives straight there.");
+                var angle = Ui.Text(aimRow, "Angle", Mathf.Abs(game.Turn) < 0.05f ? "square" : Mathf.RoundToInt(Mathf.Abs(game.Turn)) + "° " + (game.Turn < 0f ? "left" : "right"), Theme.FontSmall, Theme.TextDim, null, TextAlignmentOptions.MidlineRight);
+                angle.Size(90f, 28f);
 
-                // V2: Line up (a simple mate) and Measure, on the field.
-                Dialog.Heading(column, "Line up and measure");
-                var modes = Row(column, "Modes", 34f);
-                var setupTools = game.setupTools;
-                foreach (var (label, m, tip) in new[] {
-                             ("Line up", SetupTools.Mode.LineUp, "Click a face or point on your robot, then a face on the alignment tool or the field: the robot goes against it (turning to face it when you picked a face), still touching its wall."),
-                             ("Measure", SetupTools.Mode.Measure, "Click two points on the robot, the tool or the field: the distance, and how far apart they are along X, Y and up."),
-                         }) {
-                    var on = setupTools != null && setupTools.mode == m;
-                    var b = Ui.Button(modes, label, label, () => setupTools?.SetMode(on ? SetupTools.Mode.Move : m), on, 6f, Theme.FontSmall);
-                    b.Size(-1, 30f);
-                    Ui.Tip(b, label, "Esc stops", tip);
-                }
-                if (setupTools != null) {
-                    var instructions = Ui.Text(column, "Instructions", setupTools.Instructions, Theme.FontSmall - 1f, setupTools.mode == SetupTools.Mode.Move ? Theme.TextFaint : Theme.Accent);
-                    instructions.textWrappingMode = TextWrappingModes.Normal;
-                    instructions.Size(-1, 34f);
-                    if (setupTools.Readout.Length > 0) {
-                        var readout = Ui.Text(column, "Readout", setupTools.Readout, Theme.FontSmall, Theme.Dimension, Theme.Medium);
-                        readout.textWrappingMode = TextWrappingModes.Normal;
-                        readout.Size(-1, 34f);
-                    }
-                    if (!string.IsNullOrEmpty(setupTools.message)) {
-                        var said = Ui.Text(column, "Message", setupTools.message, Theme.FontSmall - 1f, Theme.Warning);
-                        said.textWrappingMode = TextWrappingModes.Normal;
-                        said.Size(-1, 34f);
-                    }
-                }
+                // Legal or not, in one line.
+                var checks = game.Checks();
+                var failed = checks.FirstOrDefault(c => !c.ok);
+                var status = Row(column, "Status", 26f);
+                var statusDot = Ui.Image(status, "Dot", failed.rule == null ? Theme.Success : Theme.Danger);
+                statusDot.sprite = Theme.Circle;
+                statusDot.Size(10f, 10f);
+                var statusText = Ui.Text(status, "Status", failed.rule == null ? "Legal start" : failed.rule, Theme.FontSmall, failed.rule == null ? Theme.Success : Theme.Danger, Theme.Medium);
+                statusText.Size(-1, 26f, 1f);
+                statusText.overflowMode = TextOverflowModes.Ellipsis;
+                Ui.Tip(statusText, "The start rules", null, string.Join("\n", checks.Select(c => (c.ok ? "✓ " : "✗ ") + c.rule)));
 
-                // Saved starts.
-                Dialog.Heading(column, "Saved starts");
-                var names = game.StartNames();
-                if (names.Count > 0) {
-                    var useRow = Row(column, "Use", 34f);
-                    // V2: a button naming the start in use (a choice with nothing picked showed blank)
-                    var current = names.IndexOf(game.lastStart);
-                    var use = Ui.Button(useRow, "Use", current >= 0 ? game.lastStart + "  …" : $"Use a saved start ({names.Count})…",
-                        () => Popup.Open((RectTransform)useRow, names.ToArray(), current, i => game.UseStart(names[i])), current >= 0, 6f, Theme.FontSmall);
-                    use.Size(200f, 30f);
-                    var del = Ui.Button(useRow, "Delete", "Delete…", () => Popup.Open((RectTransform)useRow, names.ToArray(), -1, i => game.DeleteStart(names[i])), false, 6f, Theme.FontSmall);
-                    del.Size(-1, 30f);
-                }
-                var saveRow = Row(column, "Save", 34f);
-                var field = Ui.Field(saveRow, "Name", saveName, v => saveName = string.IsNullOrWhiteSpace(v) ? saveName : v.Trim(), Theme.FontSmall);
-                field.Size(180f, 30f);
-                var save = Ui.Button(saveRow, "Save", "Save this start", () => game.SaveStart(saveName), false, 6f, Theme.FontSmall);
-                save.Size(-1, 30f);
-
-                // Preload and alignment tool.
+                // The preload.
                 Dialog.Heading(column, "Preload");
-                var preloadRow = Row(column, "Preload", 34f);
-                var pre = Ui.Button(preloadRow, "Preload", game.preload ? char.ToUpper(SkillsGame.LoadName(game.PreloadColors)[0]) + SkillsGame.LoadName(game.PreloadColors).Substring(1) + ": on" : "Preload: off", () => game.SetPreload(!game.preload), game.preload, 6f, Theme.FontSmall);
-                pre.Size(-1, 30f);
-                // V2: where it touches the robot (SG5).
+                ToolOptions.Switch(column, game.preload ? Cap(SkillsGame.LoadName(game.PreloadColors)) + " touching the robot" : "No preload", game.preload, on => game.SetPreload(on));
                 if (game.preload) {
-                    var spotRow = Row(column, "Where", 34f);
+                    var spotRow2 = Row(column, "Where", 30f);
                     foreach (SkillsGame.PreloadSpot spot in System.Enum.GetValues(typeof(SkillsGame.PreloadSpot))) {
-                        var b = Ui.Button(spotRow, spot.ToString(), spot == SkillsGame.PreloadSpot.Top ? "On top" : spot.ToString(), () => game.SetPreloadSpot(spot), game.preloadSpot == spot && game.customPreload == null, 6f, Theme.FontSmall - 1f);
-                        b.Size(-1, 28f);
+                        var b = Ui.Button(spotRow2, spot.ToString(), spot == SkillsGame.PreloadSpot.Top ? "Top" : spot.ToString(), () => game.SetPreloadSpot(spot), game.preloadSpot == spot && game.customPreload == null, 6f, Theme.FontSmall - 1f);
+                        b.Size(-1, 26f);
                     }
-                    Ui.Tip(spotRow, "Preload", null, "SG5: one Pin of your Alliance's color, touching your robot (the dashed yellow outline) and nothing else.");
-                    // V2: anywhere on the robot, as in a real match (or where the build's own Pin is).
-                    var placeRow = Row(column, "Place", 34f);
-                    var placing = setupTools != null && setupTools.mode == SetupTools.Mode.Preload;
-                    var place = Ui.Button(placeRow, "Place on robot", placing ? "Click the robot…" : game.customPreload != null ? "Placed on the robot: move it" : "Place on the robot…",
-                        () => setupTools?.SetMode(placing ? SetupTools.Mode.Move : SetupTools.Mode.Preload), placing || game.customPreload != null, 6f, Theme.FontSmall - 1f);
+                    Ui.Tip(spotRow2, "Preload", null, "SG5: one Pin of your Alliance's color, touching your robot (the dashed yellow outline) and nothing else.");
+                    var placing = game.setupTools != null && game.setupTools.mode == SetupTools.Mode.Preload;
+                    var place = Ui.Button(column, "Place on robot", placing ? "Click the robot…" : game.customPreload != null ? "Placed on the robot: move it" : "Put it somewhere else on the robot…",
+                        () => game.setupTools?.SetMode(placing ? SetupTools.Mode.Move : SetupTools.Mode.Preload), placing || game.customPreload != null, 6f, Theme.FontSmall - 1f);
                     place.Size(-1, 28f);
-                    Ui.Tip(placeRow, "Place the Preload", null, "Click a face of your robot: the Pin rests on it, touching the robot (lying across it; R stands it up, Q/E turn it). A Pin saved on your robot in the build is used where it is.");
+                    Ui.Tip(place, "Place the Preload", null, "Click a face of your robot: the Pin rests on it, touching the robot (lying across it; R stands it up, Q/E turn it). A Pin saved on your robot in the build is used where it is.");
                 }
-                if (game.ElementProblem != null) {   // V2: game elements saved in the build
+                if (game.ElementProblem != null) {
                     var warn = Ui.Text(column, "Element problem", game.ElementProblem, Theme.FontSmall - 1f, Theme.Warning);
+                    warn.textWrappingMode = TextWrappingModes.Normal;
                     warn.Size(-1, 44f);
                 }
 
-                // V2: the alignment tool from a build file or a saved group; it appears beside the robot.
-                Dialog.Heading(column, "Alignment tool");
-                if (game.tool == null) {
-                    var loadRow = Row(column, "Load", 34f);
-                    var load = Ui.Button(loadRow, "Load tool", "Build file…", game.LoadTool, false, 6f, Theme.FontSmall);
-                    load.Size(-1, 30f);
-                    Button groups = null;
-                    groups = Ui.Button(loadRow, "Groups", "Saved group…", () => {
-                        var names = Builds.SavedGroups.Names();
-                        if (names.Count == 0) {
-                            Interface.Interface.Say("No saved groups yet: in build mode, right-click a part > Save group", false);
-                            return;
-                        }
-                        Popup.Open((RectTransform)groups.transform, names.ToArray(), -1, i => game.LoadToolGroup(names[i]));
-                    }, false, 6f, Theme.FontSmall);
-                    groups.Size(-1, 30f);
-                    var toolNote = Ui.Text(column, "Tool Note", "Build your jig as its own build (or save it as a group). It appears beside your robot against the wall: drag it to move it (it sits flat on a wall when it's near one), drag its ring to turn it, then Line up your robot against it. It's removed when the run starts, like a real one.", Theme.FontSmall - 1f, Theme.TextFaint);
-                    toolNote.textWrappingMode = TextWrappingModes.Normal;
-                    toolNote.Size(-1, 66f);
-                }
-                else {
-                    var toolRow = Row(column, "Tool", 32f);
-                    var toolName = Ui.Text(toolRow, "Name", game.toolName, Theme.FontSmall, Theme.Text, Theme.Medium);
-                    toolName.Size(-1, 30f, 1f);
-                    var beside = Ui.Button(toolRow, "Beside", "Beside robot", () => { game.PushUndo(); game.ToolBesideRobot(); }, false, 6f, Theme.FontSmall);
-                    beside.Size(-1, 30f);
-                    var remove = Ui.Button(toolRow, "Remove", "Remove", () => game.RemoveTool(), false, 6f, Theme.FontSmall);
-                    remove.Size(-1, 30f);
-                    NumberRow(column, "Tool X", () => game.toolX, v => game.SetTool(v, game.toolY, game.toolHeading), "\"");
-                    NumberRow(column, "Tool Y", () => game.toolY, v => game.SetTool(game.toolX, v, game.toolHeading), "\"");
-                    NumberRow(column, "Tool heading", () => game.toolHeading, v => game.SetTool(game.toolX, game.toolY, v), "°");
+                // A match: the autonomous period.
+                if (game.mode == SkillsGame.Mode.Match && !game.online) {
+                    Dialog.Heading(column, "Autonomous");
+                    ToolOptions.Switch(column, "0:15 autonomous first (robot code)", !game.skipAutonomous, on => game.SetSkipAutonomous(!on));
                 }
 
-                // The checklist.
-                Dialog.Heading(column, game.SkillsRun ? "Legal start (SG1, RSC2)" : "Legal start (SG1, SG5)");
-                foreach (var (rule, ok) in game.Checks()) {
-                    var check = Row(column, "Check", 22f);
-                    var dot = Ui.Image(check, "Dot", ok ? Theme.Success : Theme.Danger);
-                    dot.sprite = Theme.Circle;
-                    dot.Size(10f, 10f);
-                    var line = Ui.Text(check, "Rule", rule, Theme.FontSmall, ok ? Theme.Text : Theme.Danger);
-                    line.Size(-1, 22f, 1f);
+                // V2 (build 80): everything else, folded away.
+                var moreOpen = UnityEngine.PlayerPrefs.GetInt(MoreKey, 0) == 1;
+                var moreButton = Ui.Button(column, "More", (moreOpen ? "Fewer options" : "More options"), () => {
+                    UnityEngine.PlayerPrefs.SetInt(MoreKey, moreOpen ? 0 : 1);
+                    dirty = true;
+                }, false, 6f, Theme.FontSmall);
+                moreButton.Size(-1, 30f);
+                Ui.Tip(moreButton, "More options", null, "The robot's front, exact numbers, Line up and Measure, saved starts, the alignment tool and the full checklist.");
+                if (moreOpen) {
+                    // The robot.
+                    Dialog.Heading(column, "Robot");
+                    var fits = game.depth <= 18.02f && game.width <= 18.02f && game.height <= 18.02f;
+                    var size = Ui.Text(column, "Size", $"{game.buildName} · length {SkillsGame.Number(game.depth)}\" · width {SkillsGame.Number(game.width)}\" · height {SkillsGame.Number(game.height)}\"", Theme.FontSmall, fits ? Theme.TextDim : Theme.Danger);
+                    size.Size(-1, 20f);
+                    var frontRow = Row(column, "Front", 34f);
+                    foreach (var name in SkillsGame.FrontNames) {
+                        var selected = game.FrontName == name;
+                        var b = Ui.Button(frontRow, name, name, () => game.SetFront(name), selected, 6f, Theme.FontSmall);
+                        b.Size(48f, 30f);
+                    }
+                    Ui.Tip(frontRow, "The robot's front", null, "Which side of the build is its front (the yellow arrow points to it). Headings are the way the front faces.");
+
+                    // V2: the robot always touches its wall (SG1): where along it, and which way it's turned.
+                    Dialog.Heading(column, "Start position");
+                    var note = Ui.Text(column, "Frame", "Your robot starts touching the wall (SG1). Drag it on the field to slide it along the wall; drag the blue ring to turn it.", Theme.FontSmall - 1f, Theme.TextFaint);
+                    note.textWrappingMode = TextWrappingModes.Normal;
+                    note.Size(-1, 34f);
+                    NumberRow(column, "Along wall", () => game.Slide, game.SetSlide, "\"");
+                    // V2: how far the robot's footprint is from each end of its wall (teams measure from the corners).
+                    var (toNear, toFar) = game.CornerGaps();
+                    var gaps = Ui.Text(column, "Gaps", "Gap to the corners: " + Inch.Format(toNear) + " (−) · " + Inch.Format(toFar) + " (+)", Theme.FontSmall - 1f, Theme.TextDim);
+                    gaps.Size(-1, 20f);
+                    NumberRow(column, "Angle", () => game.Turn, game.SetTurn, "°");
+                    var nudges = Row(column, "Nudge", 32f);
+                    foreach (var (label, action) in new (string, System.Action)[] {
+                                 ("Slide −", () => { game.PushUndo(); game.SlideBy(-0.25f); }), ("Slide +", () => { game.PushUndo(); game.SlideBy(0.25f); }),
+                                 ("Turn −", () => { game.PushUndo(); game.TurnBy(-5f); }), ("Turn +", () => { game.PushUndo(); game.TurnBy(5f); }),
+                             }) {
+                        var b = Ui.Button(nudges, label, label, action, false, 5f, Theme.FontSmall);
+                        b.Size(-1, 30f);
+                    }
+                    var hint = Ui.Hint(column, "Arrows", "slide", "Q/E", "turn", "Ctrl+Z", "undo");
+                    hint.Size(-1, 22f);
+                    var tools = Row(column, "Tools", 34f);
+                    var square = Ui.Button(tools, "Square", "Square to the wall", () => { game.PushUndo(); game.SetTurn(0f); }, false, 6f, Theme.FontSmall);
+                    square.Size(-1, 30f);
+                    var reset = Ui.Button(tools, "Default", "Default start", () => { game.PushUndo(); game.DefaultStart(); }, false, 6f, Theme.FontSmall);
+                    reset.Size(-1, 30f);
+
+                    // V2: Line up (a simple mate) and Measure, on the field.
+                    Dialog.Heading(column, "Line up and measure");
+                    var modes = Row(column, "Modes", 34f);
+                    var setupTools = game.setupTools;
+                    foreach (var (label, m, tip) in new[] {
+                                 ("Line up", SetupTools.Mode.LineUp, "Click a face or point on your robot, then a face on the alignment tool or the field: the robot goes against it (turning to face it when you picked a face), still touching its wall."),
+                                 ("Measure", SetupTools.Mode.Measure, "Click two points on the robot, the tool or the field: the distance, and how far apart they are along X, Y and up."),
+                             }) {
+                        var on = setupTools != null && setupTools.mode == m;
+                        var b = Ui.Button(modes, label, label, () => setupTools?.SetMode(on ? SetupTools.Mode.Move : m), on, 6f, Theme.FontSmall);
+                        b.Size(-1, 30f);
+                        Ui.Tip(b, label, "Esc stops", tip);
+                    }
+                    if (setupTools != null) {
+                        var instructions = Ui.Text(column, "Instructions", setupTools.Instructions, Theme.FontSmall - 1f, setupTools.mode == SetupTools.Mode.Move ? Theme.TextFaint : Theme.Accent);
+                        instructions.textWrappingMode = TextWrappingModes.Normal;
+                        instructions.Size(-1, 34f);
+                        if (setupTools.Readout.Length > 0) {
+                            var readout = Ui.Text(column, "Readout", setupTools.Readout, Theme.FontSmall, Theme.Dimension, Theme.Medium);
+                            readout.textWrappingMode = TextWrappingModes.Normal;
+                            readout.Size(-1, 34f);
+                        }
+                        if (!string.IsNullOrEmpty(setupTools.message)) {
+                            var said = Ui.Text(column, "Message", setupTools.message, Theme.FontSmall - 1f, Theme.Warning);
+                            said.textWrappingMode = TextWrappingModes.Normal;
+                            said.Size(-1, 34f);
+                        }
+                    }
+
+                    // Saved starts.
+                    Dialog.Heading(column, "Saved starts");
+                    var names = game.StartNames();
+                    if (names.Count > 0) {
+                        var useRow = Row(column, "Use", 34f);
+                        // V2: a button naming the start in use (a choice with nothing picked showed blank)
+                        var current = names.IndexOf(game.lastStart);
+                        var use = Ui.Button(useRow, "Use", current >= 0 ? game.lastStart + "  …" : $"Use a saved start ({names.Count})…",
+                            () => Popup.Open((RectTransform)useRow, names.ToArray(), current, i => game.UseStart(names[i])), current >= 0, 6f, Theme.FontSmall);
+                        use.Size(200f, 30f);
+                        var del = Ui.Button(useRow, "Delete", "Delete…", () => Popup.Open((RectTransform)useRow, names.ToArray(), -1, i => game.DeleteStart(names[i])), false, 6f, Theme.FontSmall);
+                        del.Size(-1, 30f);
+                    }
+                    var saveRow = Row(column, "Save", 34f);
+                    var field = Ui.Field(saveRow, "Name", saveName, v => saveName = string.IsNullOrWhiteSpace(v) ? saveName : v.Trim(), Theme.FontSmall);
+                    field.Size(180f, 30f);
+                    var save = Ui.Button(saveRow, "Save", "Save this start", () => game.SaveStart(saveName), false, 6f, Theme.FontSmall);
+                    save.Size(-1, 30f);
+
+                    // V2: the alignment tool from a build file or a saved group; it appears beside the robot.
+                    Dialog.Heading(column, "Alignment tool");
+                    if (game.tool == null) {
+                        var loadRow = Row(column, "Load", 34f);
+                        var load = Ui.Button(loadRow, "Load tool", "Build file…", game.LoadTool, false, 6f, Theme.FontSmall);
+                        load.Size(-1, 30f);
+                        Button groups = null;
+                        groups = Ui.Button(loadRow, "Groups", "Saved group…", () => {
+                            var names = Builds.SavedGroups.Names();
+                            if (names.Count == 0) {
+                                Interface.Interface.Say("No saved groups yet: in build mode, right-click a part > Save group", false);
+                                return;
+                            }
+                            Popup.Open((RectTransform)groups.transform, names.ToArray(), -1, i => game.LoadToolGroup(names[i]));
+                        }, false, 6f, Theme.FontSmall);
+                        groups.Size(-1, 30f);
+                        var toolNote = Ui.Text(column, "Tool Note", "Build your jig as its own build (or save it as a group). It appears beside your robot against the wall: drag it to move it (it sits flat on a wall when it's near one), drag its ring to turn it, then Line up your robot against it. It's removed when the run starts, like a real one.", Theme.FontSmall - 1f, Theme.TextFaint);
+                        toolNote.textWrappingMode = TextWrappingModes.Normal;
+                        toolNote.Size(-1, 66f);
+                    }
+                    else {
+                        var toolRow = Row(column, "Tool", 32f);
+                        var toolName = Ui.Text(toolRow, "Name", game.toolName, Theme.FontSmall, Theme.Text, Theme.Medium);
+                        toolName.Size(-1, 30f, 1f);
+                        var beside = Ui.Button(toolRow, "Beside", "Beside robot", () => { game.PushUndo(); game.ToolBesideRobot(); }, false, 6f, Theme.FontSmall);
+                        beside.Size(-1, 30f);
+                        var remove = Ui.Button(toolRow, "Remove", "Remove", () => game.RemoveTool(), false, 6f, Theme.FontSmall);
+                        remove.Size(-1, 30f);
+                        NumberRow(column, "Tool X", () => game.toolX, v => game.SetTool(v, game.toolY, game.toolHeading), "\"");
+                        NumberRow(column, "Tool Y", () => game.toolY, v => game.SetTool(game.toolX, v, game.toolHeading), "\"");
+                        NumberRow(column, "Tool heading", () => game.toolHeading, v => game.SetTool(game.toolX, game.toolY, v), "°");
+                    }
+
+                    // The checklist.
+                    Dialog.Heading(column, game.SkillsRun ? "Legal start (SG1, RSC2)" : "Legal start (SG1, SG5)");
+                    foreach (var (rule, ok) in game.Checks()) {
+                        var check = Row(column, "Check", 22f);
+                        var dot = Ui.Image(check, "Dot", ok ? Theme.Success : Theme.Danger);
+                        dot.sprite = Theme.Circle;
+                        dot.Size(10f, 10f);
+                        var line = Ui.Text(check, "Rule", rule, Theme.FontSmall, ok ? Theme.Text : Theme.Danger);
+                        line.Size(-1, 22f, 1f);
+                    }
+
                 }
 
                 var buttons = Row(footer, "Buttons", 46f);
@@ -516,6 +589,34 @@ namespace Protobot.Game {
                 }
             }
 
+            private static string Cap(string s) => string.IsNullOrEmpty(s) ? s : char.ToUpper(s[0]) + s.Substring(1);
+
+            // The next spot to the robot's left (-1) or right (+1); between spots, the nearest that way.
+            private void StepSpot(int way) {
+                var spots = game.Spots();
+                if (spots.Count == 0) {
+                    Interface.Interface.Say("No spot on the tiles is legal at this angle: square it to the wall or move it by hand", false);
+                    return;
+                }
+                // The list runs from the robot's left to its right: work in that order's positions.
+                var now = game.Slide;
+                var first = spots[0].slide;
+                var last = spots[spots.Count - 1].slide;
+                var leftToRight = last > first ? 1f : -1f;
+                var order = spots.Select((sp, i) => (sp, i)).ToList();
+                var cur = order.FindIndex(o => Mathf.Abs(o.sp.slide - now) < 0.05f);
+                int target;
+                if (cur >= 0) target = Mathf.Clamp(cur + way, 0, spots.Count - 1);
+                else {
+                    var pos = now * leftToRight;
+                    target = way > 0 ? order.FindIndex(o => o.sp.slide * leftToRight > pos) : order.FindLastIndex(o => o.sp.slide * leftToRight < pos);
+                    if (target < 0) target = way > 0 ? spots.Count - 1 : 0;
+                }
+                game.PushUndo();
+                game.SetSlide(spots[target].slide);
+                Audio.Sounds.Play(Audio.Sounds.Tick);
+            }
+
             private static RectTransform Row(RectTransform parent, string name, float height) {
                 var row = Ui.Rect(name, parent);
                 Ui.Row(row, 6f);
@@ -539,7 +640,7 @@ namespace Protobot.Game {
                     value = get();
                     var keyboard = UnityEngine.InputSystem.Keyboard.current;
                     var shift = keyboard != null && keyboard.shiftKey.isPressed;
-                    var ctrl = keyboard != null && keyboard.ctrlKey.isPressed;
+                    var ctrl = keyboard != null && (keyboard.ctrlKey.isPressed || keyboard.leftCommandKey.isPressed);
                     var step = degrees ? (shift ? 0.5f : ctrl ? 15f : 5f) : (shift ? 0.0625f : ctrl ? 1f : 0.25f);
                     set(value + direction * step);
                     Audio.Sounds.Play(Audio.Sounds.Tick);
@@ -553,6 +654,109 @@ namespace Protobot.Game {
                 field.Size(140f, 30f);
                 var u = Ui.Text(row, "Unit", unit, Theme.FontBody, Theme.TextDim);
                 u.Size(20f, 30f);
+            }
+        }
+
+        // V2 (build 80): a top view of the field in the setup panel (Resources/Games/Override Map.png, 152" across, the
+        // field frame: +X right toward blue, +Y up away from the audience). It shows the Quadrants' start zones (the ones
+        // you may pick brighter, yours filled), the tile seams along your wall and the robot. Click a Quadrant of your
+        // Alliance to start there; click or drag along your wall to put the robot there (snapped to the tile spots,
+        // Shift: free).
+        private class StartMap : MonoBehaviour, UnityEngine.EventSystems.IPointerDownHandler, UnityEngine.EventSystems.IDragHandler, UnityEngine.EventSystems.IPointerUpHandler {
+            private const float MapInches = 152f;
+            private SkillsGame game;
+            private ShapeGraphic shapes;
+            private RectTransform rect;
+
+            public static void Make(RectTransform parent, SkillsGame game, float size) {
+                var holder = Ui.Rect("Map", parent);
+                holder.Size(-1, size);
+                var box = Ui.Image(holder, "Frame", Color.black, 8f, true).rectTransform;
+                box.anchorMin = box.anchorMax = new Vector2(0.5f, 0.5f);
+                box.sizeDelta = new Vector2(size, size);
+                var picture = Ui.Rect("Picture", box).Fill(2, 2, 2, 2);
+                var raw = picture.gameObject.AddComponent<RawImage>();
+                raw.texture = Resources.Load<Texture2D>("Games/Override Map");
+                raw.raycastTarget = true;
+                var map = picture.gameObject.AddComponent<StartMap>();
+                map.game = game;
+                map.rect = picture;
+                map.shapes = ShapeGraphic.Create(picture);
+            }
+
+            private Vector2 ToMap(Vector2 field) => field / MapInches * rect.rect.width;
+            private Vector2 ToField(Vector2 local) => local / rect.rect.width * MapInches;
+            private bool CanPick => game.mode == SkillsGame.Mode.Match && !game.online;
+
+            private IEnumerable<Quadrant> Mine => game.SkillsRun ? new[] { Quadrant.Left }
+                : game.redAlliance ? new[] { Quadrant.Left, Quadrant.Bottom } : new[] { Quadrant.Right, Quadrant.Top };
+
+            private void LateUpdate() {
+                if (game == null || rect == null) return;
+                shapes.Clear();
+                var h = GameField.Half;
+                foreach (Quadrant q in new[] { Quadrant.Left, Quadrant.Bottom, Quadrant.Right, Quadrant.Top }) {
+                    var a = ToMap(SkillsGame.FromLeft(q, new Vector2(-h, -h)));
+                    var b = ToMap(SkillsGame.FromLeft(q, new Vector2(-h, h)));
+                    var c = Vector2.zero;
+                    var redSide = q == Quadrant.Left || q == Quadrant.Bottom;
+                    var tint = redSide ? new Color(0.95f, 0.25f, 0.25f) : new Color(0.25f, 0.5f, 1f);
+                    var mine = Mine.Contains(q);
+                    var picked = q == game.StartQuadrant;
+                    if (picked) shapes.Triangle(a, b, c, new Color(tint.r, tint.g, tint.b, 0.35f));
+                    shapes.Polyline(new List<Vector2> { a, b, c }, new Color(tint.r, tint.g, tint.b, picked ? 1f : mine && CanPick ? 0.7f : 0.25f), picked ? 2.5f : 1.5f, true);
+                }
+                // The tile seams along your wall (24" apart, through the field's middle).
+                var qn = game.StartQuadrant;
+                foreach (var s in new[] { -48f, -24f, 0f, 24f, 48f }) {
+                    var on = ToMap(SkillsGame.FromLeft(qn, new Vector2(-h, s)));
+                    var inward = ToMap(SkillsGame.FromLeft(qn, new Vector2(-h + 6f, s)));
+                    shapes.Line(on, inward, new Color(1f, 1f, 1f, 0.8f), 1.5f);
+                }
+                // The robot, its front marked.
+                var corners = game.Corners().Select(ToMap).ToList();
+                shapes.Quad(corners[0], corners[1], corners[2], corners[3], new Color(1f, 0.85f, 0.2f, 0.85f));
+                shapes.Polyline(corners, Color.black, 1.2f, true);
+                var middle = new Vector2(game.x, game.y);
+                shapes.Line(ToMap(middle), ToMap(middle + SkillsGame.Dir(game.heading) * (game.depth / 2f + 4f)), Color.black, 2f);
+            }
+
+            private Vector2 Local(UnityEngine.EventSystems.PointerEventData e) {
+                RectTransformUtility.ScreenPointToLocalPointInRectangle(rect, e.position, e.pressEventCamera, out var local);
+                return local;
+            }
+
+            public void OnPointerDown(UnityEngine.EventSystems.PointerEventData e) {
+                if (e.button != UnityEngine.EventSystems.PointerEventData.InputButton.Left || game.state != SkillsGame.State.Setup) return;
+                var p = ToField(Local(e));
+                var q = GameField.QuadrantOf(p);
+                if (CanPick && q != game.StartQuadrant && Mine.Contains(q)) {
+                    game.PushUndo();
+                    game.SetQuadrant(q);
+                    Audio.Sounds.Play(Audio.Sounds.Tick);
+                    return;
+                }
+                game.PushUndo();
+                MoveTo(p);
+            }
+
+            public void OnDrag(UnityEngine.EventSystems.PointerEventData e) {
+                if (game.state != SkillsGame.State.Setup) return;
+                MoveTo(ToField(Local(e)));
+            }
+
+            // Let go somewhere that breaks a start rule (a Load Zone, touching a Goal): the nearest legal spot.
+            public void OnPointerUp(UnityEngine.EventSystems.PointerEventData e) {
+                if (game.state != SkillsGame.State.Setup || (game.online && game.onlineLocked)) return;
+                if (!game.Legal) game.KeepLegal();
+            }
+
+            private void MoveTo(Vector2 p) {
+                if (game.online && game.onlineLocked) return;
+                var slide = SkillsGame.ToLeft(game.StartQuadrant, p).y;
+                var k = UnityEngine.InputSystem.Keyboard.current;
+                if (k == null || !k.shiftKey.isPressed) slide = game.SnapSlide(slide, out _);
+                game.SetSlide(slide);
             }
         }
 

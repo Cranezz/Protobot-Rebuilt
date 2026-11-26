@@ -21,8 +21,10 @@ namespace Protobot.Motion {
         private class Pick {
             public GameObject part;
             public Vector3 center, axis;
-            public int teeth;
+            public int teeth;       // V2: 0 = a smooth idler (a spacer)
+            public float surface;   // V2: an idler's outside radius
             public bool flipped;
+            public bool Idler => teeth <= 0;
         }
 
         private readonly List<Pick> picks = new();
@@ -49,7 +51,8 @@ namespace Protobot.Motion {
                 active.style = edit.style;
                 foreach (var (part, wrap) in edit.Sprockets().OrderBy(s => s.wrap)) {
                     var (center, axis) = ChainLoop.SprocketFrame(part);
-                    active.picks.Add(new Pick { part = part, center = center, axis = axis, teeth = edit.wraps[wrap].teeth });
+                    var w = edit.wraps[wrap];
+                    active.picks.Add(new Pick { part = part, center = center, axis = axis, teeth = w.teeth, surface = w.teeth > 0 ? 0f : w.radius - edit.family.IdlerRadius(0f) });
                 }
                 // Keep the ways it had: flipped where it goes the other way from the loop's own.
                 active.Refresh();
@@ -220,7 +223,7 @@ namespace Protobot.Motion {
             var wordsLayout = words.GetComponent<LayoutElement>();
             wordsLayout.preferredWidth = 0f;
             wordsLayout.minWidth = 0f;
-            var name = Ui.Text(words, "Name", pick.teeth + "T sprocket", Theme.FontBody, Theme.Text, Theme.Medium);
+            var name = Ui.Text(words, "Name", pick.Idler ? "Spacer idler (" + Inch.Format(pick.surface * 2f) + " OD)" : pick.teeth + "T sprocket", Theme.FontBody, Theme.Text, Theme.Medium);
             name.Size(-1, 21f);
             var detail = Ui.Text(words, "Detail", Detail(index, ways), Theme.FontSmall, Theme.TextDim);
             detail.Size(-1, 18f);
@@ -246,13 +249,14 @@ namespace Protobot.Motion {
             Ui.Tip(remove, "Take it off", null, "Takes this sprocket off the chain.");
             var hit = row.gameObject.AddComponent<Image>();
             hit.color = new Color(1f, 1f, 1f, 0f);
-            Ui.Tip(hit, pick.teeth + "T sprocket", null,
+            Ui.Tip(hit, pick.Idler ? "Spacer idler" : pick.teeth + "T sprocket", null,
                 "Speed is next to sprocket 1 (" + picks[0].teeth + "T). Teeth in: how many of its teeth are in the chain at once; under 3 and a loaded chain can skip.");
         }
 
         // "×0.5 speed, backward · 9 teeth in" (speed next to the first sprocket; teeth in the chain at once).
         private string Detail(int index, List<int> ways) {
             var pick = picks[index];
+            if (pick.Idler) return "Smooth: the chain slides round it";
             var ratio = (float)picks[0].teeth / Mathf.Max(pick.teeth, 1) * (ways[index] == ways[0] ? 1f : -1f);
             var text = "×" + Mathf.Abs(ratio).ToString("0.##", System.Globalization.CultureInfo.InvariantCulture) + " speed" + (ratio < 0f ? ", backward" : "");
             if (preview == null || !preview.Valid) return text;
@@ -373,17 +377,19 @@ namespace Protobot.Motion {
             return new Vector2(local.x, local.y);
         }
 
-        private ChainPath PathFor(IList<Vector2> flat, IList<int> teeth, IList<int> ways) {
+        private float RadiusOf(Pick p) => family != null ? family.RadiusOf(p.teeth, p.surface) : 0.5f;
+
+        private ChainPath PathFor(IList<Vector2> flat, IList<Pick> of, IList<int> ways) {
             var wraps = new List<ChainWrap>();
             for (var i = 0; i < flat.Count; i++)
-                wraps.Add(new ChainWrap { center = flat[i], radius = family.PitchRadius(teeth[i]), way = ways[i], teeth = teeth[i] });
+                wraps.Add(new ChainWrap { center = flat[i], radius = RadiusOf(of[i]), way = ways[i], teeth = of[i].teeth });
             var down = Quaternion.Inverse(frame) * Vector3.down;
             return ChainPath.Build(wraps, family.pitch, new Vector2(down.x, down.y));
         }
 
         private void UpdatePreview(List<int> ways) {
             Plane();
-            preview = family == null || picks.Count < 2 ? null : PathFor(picks.Select(p => Flat(p.center)).ToList(), picks.Select(p => p.teeth).ToList(), ways);
+            preview = family == null || picks.Count < 2 ? null : PathFor(picks.Select(p => Flat(p.center)).ToList(), picks, ways);
         }
 
         // Every order of the sprockets (the first stays first): the one making the shortest chain that works. Past
@@ -400,7 +406,7 @@ namespace Protobot.Motion {
                     var tried = new List<Pick> { picks[0] };
                     tried.AddRange(order.Select(i => picks[i]));
                     var flat = tried.Select(p => Flat(p.center)).ToList();
-                    var path = PathFor(flat, tried.Select(p => p.teeth).ToList(), WaysFor(flat, tried.Select(p => p.flipped).ToList()));
+                    var path = PathFor(flat, tried, WaysFor(flat, tried.Select(p => p.flipped).ToList()));
                     if (!path.Valid || path.tight >= bestLength) continue;
                     bestLength = path.tight;
                     best = tried;
@@ -444,6 +450,7 @@ namespace Protobot.Motion {
             if (!Physics.Raycast(camera.ScreenPointToRay(MouseInput.Position), out var hit, Mathf.Infinity, LayerMask.GetMask("Default", "HoleCollisions"))) return null;
             var saved = SelectAs.Resolve(hit.collider.gameObject)?.GetComponentInParent<SavedObject>();
             if (saved != null && ChainFamily.ForSprocket(saved.gameObject) != null) return saved.gameObject;
+            if (saved != null && ChainFamily.IsIdler(saved.gameObject)) return saved.gameObject;   // V2: a spacer idler
             // On its shaft or hub, or just off its teeth: the sprocket round that point.
             GameObject best = null;
             var nearest = float.MaxValue;
@@ -464,8 +471,15 @@ namespace Protobot.Motion {
 
         private void Click(GameObject part) {
             var chainFamily = ChainFamily.ForSprocket(part);
+            var idler = chainFamily == null && ChainFamily.IsIdler(part);   // V2: spacers the chain slides round
+            if (idler && family == null) {
+                Interface.Interface.Say("Click a sprocket first: the chain's size comes from its teeth. Spacers can be idlers after that", false);
+                Audio.Sounds.Play(Audio.Sounds.Error);
+                return;
+            }
+            if (idler) chainFamily = family;
             if (chainFamily == null) {
-                Interface.Interface.Say("That's not a sprocket: click the sprockets the chain goes round", false);
+                Interface.Interface.Say("That's not a sprocket or a spacer: click the sprockets (or spacer idlers) the chain goes round", false);
                 Audio.Sounds.Play(Audio.Sounds.Error);
                 return;
             }
@@ -491,16 +505,23 @@ namespace Protobot.Motion {
                     return;
                 }
                 var off = Vector3.Dot(center - picks[0].center, normal.normalized);
-                if (Mathf.Abs(off) > 0.3f) {
+                var room = idler ? ChainLoop.IdlerFrame(part).length / 2f + 0.1f : 0.3f;   // V2: along a spacer
+                if (Mathf.Abs(off) > room) {
                     Interface.Interface.Say("That sprocket is " + Inch.Format(Mathf.Abs(off)) + " out of line with the first: line them up along the axle", false);
                     Audio.Sounds.Play(Audio.Sounds.Error);
                     return;
                 }
             }
             family = chainFamily;
-            picks.Add(new Pick { part = part, center = center, axis = axis, teeth = GearTrain.Teeth(part, out _) });
+            if (idler) {
+                var frame = ChainLoop.IdlerFrame(part);
+                // Its middle along the axle may be off the chain's line (a long spacer): the chain runs at the first sprocket's.
+                if (picks.Count > 0) center = frame.center + picks[0].axis.normalized * Vector3.Dot(picks[0].center - frame.center, picks[0].axis.normalized);
+                picks.Add(new Pick { part = part, center = center, axis = axis, teeth = 0, surface = frame.radius });
+            }
+            else picks.Add(new Pick { part = part, center = center, axis = axis, teeth = GearTrain.Teeth(part, out _) });
             Audio.Sounds.Play(Audio.Sounds.Tick);
-            Interface.Interface.Say("Sprocket " + picks.Count + " added: " + picks[picks.Count - 1].teeth + "T", true);
+            Interface.Interface.Say((idler ? "Spacer idler " : "Sprocket ") + picks.Count + " added" + (idler ? "" : ": " + picks[picks.Count - 1].teeth + "T"), true);
             Refresh();
         }
 
@@ -511,12 +532,18 @@ namespace Protobot.Motion {
                 return;
             }
             var ways = Ways();
-            var world = picks.Select((p, i) => (p.center, p.axis, p.teeth, ways[i])).ToList();
+            var world = picks.Select((p, i) => (p.center, p.axis, p.teeth, ways[i], RadiusOf(p))).ToList();
+            if (picks[0].Idler) {
+                Interface.Interface.Say("The chain has to start on a sprocket: take the spacer off the front, or start over from a sprocket", false);
+                Audio.Sounds.Play(Audio.Sounds.Error);
+                return;
+            }
             if (editing != null) {
                 var before = new ChainLoop.LoopElement(editing);
                 editing.Set(family, world, style);
                 editing.Rebuild();
                 editing.Connect();
+                ChainTensioner.Begin(editing);   // V2
                 StateSystem.AddElement(before);
                 StateSystem.AddState(new ChainLoop.LoopElement(editing));
                 Stop("Chain changed: " + editing.Path.links + " links");
@@ -527,6 +554,7 @@ namespace Protobot.Motion {
             loop.Set(family, world, style);
             loop.Rebuild();
             loop.SeatOn(picks[0].part);
+            ChainTensioner.Begin(loop);   // V2: an idler on a band-pulled arm keeps it tight from now on
             var placed = new ObjectElement(chain) { existing = false };
             StateSystem.AddElement(placed);
             StateSystem.AddState(new ObjectElement(chain));
@@ -578,13 +606,16 @@ namespace Protobot.Motion {
             ghost = null;
             if (hover == null || picks.Count == 0 || picks.Any(p => p.part == hover)) return;
             var chainFamily = ChainFamily.ForSprocket(hover);
+            var idler = chainFamily == null && ChainFamily.IsIdler(hover);
+            if (idler) chainFamily = family;
             if (chainFamily == null || chainFamily != family) return;
             var (center, axis) = ChainLoop.SprocketFrame(hover);
-            if (Mathf.Abs(Vector3.Dot(axis, picks[0].axis)) < 0.98f || Mathf.Abs(Vector3.Dot(center - picks[0].center, picks[0].axis.normalized)) > 0.3f) return;
+            var room = idler ? ChainLoop.IdlerFrame(hover).length / 2f + 0.1f : 0.3f;
+            if (Mathf.Abs(Vector3.Dot(axis, picks[0].axis)) < 0.98f || Mathf.Abs(Vector3.Dot(center - picks[0].center, picks[0].axis.normalized)) > room) return;
             Plane();
+            var next = new Pick { part = hover, center = center, axis = axis, teeth = idler ? 0 : GearTrain.Teeth(hover, out _), surface = idler ? ChainLoop.IdlerFrame(hover).radius : 0f };
             var flat = picks.Select(p => Flat(p.center)).Append(Flat(center)).ToList();
-            var teeth = picks.Select(p => p.teeth).Append(GearTrain.Teeth(hover, out _)).ToList();
-            ghost = PathFor(flat, teeth, WaysFor(flat, picks.Select(p => p.flipped).Append(false).ToList()));
+            ghost = PathFor(flat, picks.Append(next).ToList(), WaysFor(flat, picks.Select(p => p.flipped).Append(false).ToList()));
         }
 
         private void Draw(GameObject hover) {
@@ -592,11 +623,13 @@ namespace Protobot.Motion {
             var color = Theme.Accent;
             Vector3 World(Vector2 flat) => origin + frame * new Vector3(flat.x, flat.y, 0f);
             UpdateGhost(hover);
-            if (hover != null && ChainFamily.ForSprocket(hover) is ChainFamily f) {
+            var hoverFamily = hover == null ? null : ChainFamily.ForSprocket(hover) ?? (family != null && ChainFamily.IsIdler(hover) ? family : null);
+            if (hoverFamily is ChainFamily f) {
                 var (center, axis) = ChainLoop.SprocketFrame(hover);
                 var picked = picks.Any(p => p.part == hover);
                 var fits = family == null || f == family;
-                Overlay.WorldCircle(center, axis, f.PitchRadius(GearTrain.Teeth(hover, out _)), picked ? Theme.Warning : fits ? Color.white : Theme.Danger, 1.5f);
+                var hoverRadius = ChainFamily.IsIdler(hover) ? f.IdlerRadius(ChainLoop.IdlerFrame(hover).radius) : f.PitchRadius(GearTrain.Teeth(hover, out _));
+                Overlay.WorldCircle(center, axis, hoverRadius, picked ? Theme.Warning : fits ? Color.white : Theme.Danger, 1.5f);
                 if (!picked && Overlay.ToScreen(center, out var at))
                     Overlay.Text(at + new Vector2(0f, -22f), fits ? "add as " + (picks.Count + 1) : "takes " + f.name.ToLower(), fits ? Color.white : Theme.Danger, null, true);
             }
@@ -608,7 +641,7 @@ namespace Protobot.Motion {
             }
             for (var i = 0; i < picks.Count; i++) {
                 var p = picks[i];
-                var radius = family != null ? family.PitchRadius(p.teeth) : 0.5f;
+                var radius = RadiusOf(p);
                 Overlay.WorldCircle(p.center, p.axis, radius, p.flipped ? Theme.Warning : color, 1.5f);
                 if (Overlay.ToScreen(p.center, out var at)) Overlay.Text(at, (i + 1) + (p.flipped ? "  inside" : "  outside"), p.flipped ? Theme.Warning : color, null, true);
             }

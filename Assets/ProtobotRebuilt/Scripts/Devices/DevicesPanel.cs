@@ -231,7 +231,7 @@ namespace Protobot.Devices {
 
         private string Signature() {
             var sb = new System.Text.StringBuilder();
-            sb.Append(page).Append(Sandbox.Running).Append(Controls.Drive).Append(Columns).Append(Mathf.RoundToInt(width / 24f)).Append('|');
+            sb.Append(page).Append(Sandbox.Running).Append(Controls.Drive).Append(Columns).Append(Mathf.RoundToInt(width / 24f)).Append(AirSignature()).Append('|');
             foreach (var d in V5Brain.Devices) {
                 sb.Append(d.Key).Append(d.port).Append(d.wired).Append(d.Name).Append(expanded.Contains(d.Key));
                 if (d.part != null) sb.Append(Dynamics.Token(d.part, "cartridge")).Append(Dynamics.Token(d.part, "side")).Append(Dynamics.Token(d.part, "rev"))
@@ -344,6 +344,7 @@ namespace Protobot.Devices {
             batteryValue = Ui.Text(row, "Value", "100%", Theme.FontSmall, Theme.Text, Theme.Medium);
             batteryValue.Size(40f, 20f);
             Ui.Tip(tile, "Battery", null, "The V5 battery (1100 mAh): the motors drain it while the simulation runs.");
+            AirTile();   // V2
         }
 
         private TextMeshProUGUI Tab(Page which, string label, string tip) {
@@ -376,6 +377,7 @@ namespace Protobot.Devices {
             batteryValue.text = Mathf.RoundToInt(b * 100f) + "%";
             batteryFill.rectTransform.anchorMax = new Vector2(Mathf.Max(0.02f, b), 1f);
             batteryFill.color = b > 0.3f ? Theme.Success : b > 0.15f ? Theme.Warning : Theme.Danger;
+            UpdateAirTile();   // V2
             foreach (var (which, image) in tabImages) image.color = which == page ? Theme.Hover : Theme.PanelRaised;
             subtitle.text = devices.Count == 0 ? "no devices yet" : devices.Count + (devices.Count == 1 ? " device" : " devices");
             if (Sandbox.Running && Sandbox.Instance != null) {
@@ -447,6 +449,7 @@ namespace Protobot.Devices {
             }
             Section("Motors", devices.Where(d => d is MotorDevice));
             Section("Sensors", devices.Where(d => !d.threeWire && !(d is MotorDevice)));
+            AirCard();   // V2: the tanks
             Section("Pneumatics", devices.Where(d => d is SolenoidDevice));
             Section("3-wire devices", devices.Where(d => d.threeWire && !(d is SolenoidDevice)));
             var off = devices.Where(d => !d.OnBrain).ToList();

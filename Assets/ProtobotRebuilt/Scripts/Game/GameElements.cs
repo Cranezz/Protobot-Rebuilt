@@ -41,14 +41,28 @@ namespace Protobot.Game {
         public readonly List<(Vector3 normal, PieceColor color)> faces = new();
         private float startAngle;
         private readonly HashSet<Collider> touching = new();
-        private const float Stiffness = 1500f, Damping = 25f;   // a gentle detent (kg·in²/s² per radian)
+        // V2 (build 79): the detent is the bar's own weight. A triangular bar resting on a face has to be rolled over an
+        // edge to turn: the push back is its weight times how far its middle is beside that edge (R cos(30° + turn),
+        // R = middle to corner), most at the start (half a side: ~0.09 N·m for this bar), nothing at 60°, where it falls
+        // onto the next face. It was a spring of 1500 kg·in²/s² per radian (about 1 N·m before it gave: 12x a real bar),
+        // so a robot's arm pressing it never turned it over.
+        private const float Damping = 1.2f;   // kg·in²/s² per rad/s
+        private const float Landing = 0.2f;   // spin kept when it lands flat on a face (plastic on plastic: a dull thud)
+        private float lastError;
+        /// <summary>V2: middle of the bar's cross-section to a corner (inches).</summary>
+        public float cornerRadius = 1.15f;
 
         /// <summary>V2: how far the bar can be lifted in its brackets (it drops back by its weight).</summary>
         public const float Lift = 1f;
         public float restHeight;
+        /// <summary>V2: the middle of the bar's cross-section (local): it turns about this line.</summary>
+        public Vector3 pivotLocal;
+
+        /// <summary>V2: how far it's lifted in its brackets (inches).</summary>
+        public float Lifted => transform.TransformPoint(pivotLocal).y - restHeight;
 
         /// <summary>V2: down in its brackets (SC: a Toggle counts only when fully seated).</summary>
-        public bool Seated => body == null || transform.position.y - restHeight < 0.1f;
+        public bool Seated => body == null || Lifted < 0.1f;
 
         public bool TouchedByRobot => touching.Count > 0;
 
@@ -62,15 +76,48 @@ namespace Protobot.Game {
             return Vector3.SignedAngle(reference, Vector3.ProjectOnPlane(normal, axis), axis);
         }
 
+        // V2 (tests): a push at a world point for some physics steps, and a trace of the turn and lift every 60 steps.
+        private Vector3 testForce, testPoint;
+        private int testSteps, testStep = -1;
+        public readonly System.Text.StringBuilder TestTrace = new();
+
+        public void TestPush(Vector3 force, Vector3 localPoint, int steps) {
+            testForce = force;
+            testPoint = localPoint;
+            testSteps = steps;
+            testStep = 0;
+            TestTrace.Clear();
+            body.WakeUp();
+        }
+
         private void FixedUpdate() {
             if (body == null || faces.Count == 0) return;
+            if (testStep >= 0) {
+                if (testStep < testSteps) body.AddForceAtPosition(testForce, transform.TransformPoint(testPoint), ForceMode.Force);
+                if (testStep % 60 == 0) TestTrace.Append(" [" + testStep + ": " + Turned.ToString("F0") + " h" + Lifted.ToString("F2") + "]");
+                if (++testStep > testSteps + 1200) testStep = -1;
+            }
             var axis = transform.TransformDirection(axisLocal);
             var angle = Angle() - startAngle;
             var nearest = Mathf.Round(angle / 120f) * 120f;
             var error = Mathf.DeltaAngle(nearest, angle) * Mathf.Deg2Rad;
             var spin = Vector3.Dot(body.angularVelocity, axis);
-            body.AddTorque(axis * (-Stiffness * error - Damping * spin), ForceMode.Force);
+            // Rolling onto a face is a landing: most of the spin goes (else it would roll on over the next corner).
+            if (lastError != 0f && Mathf.Sign(error) != Mathf.Sign(lastError) && Mathf.Abs(error) < 0.35f && Mathf.Abs(lastError) < 0.35f) {
+                body.angularVelocity += axis * (spin * (Landing - 1f));
+                spin *= Landing;
+            }
+            lastError = error;
+            var turned = Mathf.Abs(error);
+            var lever = cornerRadius * Mathf.Cos(Mathf.PI / 6f + Mathf.Min(turned, Mathf.PI / 3f));
+            var weight = body.mass * Physics.gravity.magnitude;
+            var soft = Mathf.Clamp01(turned / (1.5f * Mathf.Deg2Rad));   // no chatter right on the face
+            body.AddTorque(axis * (-Mathf.Sign(error) * soft * weight * lever - Damping * spin), ForceMode.Force);
         }
+
+        /// <summary>V2 (tests): the turn from the start (degrees) and the steadiest push that rolls it over.</summary>
+        public float Turned => Angle() - startAngle;
+        public float HoldTorque => body != null ? body.mass * Physics.gravity.magnitude * cornerRadius * Mathf.Cos(Mathf.PI / 6f) : 0f;
 
         /// <summary>The color on top, if it rests in a set position and no robot touches it; else yellow (neutral).</summary>
         public PieceColor SetColor {

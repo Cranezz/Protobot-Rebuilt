@@ -26,11 +26,14 @@ namespace Protobot.Builds {
 
         private static bool checking;
 
+        /// <summary>V2 (build 79): updates are Windows only (Velopack's Setup.exe and the launcher).</summary>
+        public static bool OnWindows => Application.platform == RuntimePlatform.WindowsPlayer || Application.platform == RuntimePlatform.WindowsEditor;
+
         // Velopack's hooks normally start the launcher, not this app; if one ever starts the app itself, it just quits
         // (the hook has nothing to set up here).
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         private static void Hooks() {
-            if (Application.isEditor) return;
+            if (Application.isEditor || !OnWindows) return;   // V2: Velopack's installs are Windows'; a Mac copy is a plain .app
             if (Environment.GetCommandLineArgs().Any(a => a.StartsWith("--veloapp-", StringComparison.OrdinalIgnoreCase))) {
                 Debug.Log("[Updater] Velopack hook start: quitting");
                 Quit();
@@ -95,6 +98,11 @@ namespace Protobot.Builds {
             try {
                 if (Application.isEditor) {
                     if (manual) Interface.Interface.Say("Updates work in the installed app (not the editor)", false);
+                    return;
+                }
+                if (!OnWindows) {
+                    // V2 (build 79): the Mac version is a download of its own: no installer to update it.
+                    if (manual) Interface.Interface.Say("On a Mac, download the newest version from the releases page (Help > Patch notes says what's new)", false);
                     return;
                 }
                 var manager = Manager();

@@ -37,3 +37,25 @@ Reports from the app: Cloud Code `SendReport.js` posts bug reports to #app-bug-r
 #player-reports and appeals to #appeals (Cloud Save private "secrets": webhook_bug / webhook_report / webhook_appeal,
 discordWebhook = fallback). Set them with Tools > Protobot > Skills Leaderboard Moderation (`SetWebhook(url, key)`) or
 `Tools/AgentTesting/cs/t_webhooks_set.cs`.
+
+## Players online channel
+The voice channel "🟢 Players online: N" at the very top (outside every category, nobody can join it) is made by
+`setup_server.py online` (its id is `channels.online` in server_state.json). Cloud Code `Presence.js` renames it: on the
+app's heartbeat when the count changed (at most once in 5 minutes: Discord allows two renames in 10), when a player
+closes the app (`leaving`), and every hour from the UGS schedule "discord-online" (trigger "discord-online", no player),
+so it goes back to "⚫ Players online: 0" when everyone has left. The bot token and the channel id are on the server
+(Cloud Save private custom data "secrets": discordBotToken, discordOnlineChannel), set by
+`Tools/AgentTesting/cs/t_discord_online.cs` (rerun it after resetting the token). The bot may manage that one channel by
+overwrite, so the counter keeps working when its role is cut back to the reduced set.
+
+## Skills leaderboard channel
+#skills-leaderboard (COMMUNITY, read-only) holds one message (posted by `setup_server.py leaderboard`, id in
+server_state.json `messages.leaderboard`) that Cloud Code `DiscordLeaderboard.js` edits: the top 10 of the Driving and
+Programming Skills leaderboards, names through the app's name filter (its lists are copied in by
+`Tools/AgentTesting/lb_filter.py`), players who deleted their data left out. UGS Triggers run it on every score posted
+("discord-leaderboard": com.unity.services.leaderboards.score-submitted.v1) and hourly ("discord-leaderboard-hourly":
+the "discord-online" schedule). Ids in Cloud Save private "secrets" (`Tools/AgentTesting/cs/t_discord_lb.cs`).
+
+## Tutorial posts
+`Tools/Video/publish_tutorials.py discord|announce` posts with links in <...> and the SUPPRESS_EMBEDS flag (no GitHub
+card, no second copy of the video under the attached one).

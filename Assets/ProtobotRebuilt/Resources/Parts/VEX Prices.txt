@@ -1,0 +1,136 @@
+# VEX prices for the parts list's cost (Builds/PartPrices.cs). Read from vexrobotics.com product pages on 2026-11-25,
+# US dollars, before tax and shipping. VEX sells parts in packs; a cut part costs its share of the stock piece it's cut
+# from (a 25-hole C-channel is 25/35 of a 35-hole one).
+#
+# rule | SKU | pack price | parts in the pack | stock (each / holes N / inches N / area W L / variety N) | VEX's product
+# Fields are split on " | " (spaces round the bar), so a rule can use | inside: (Lock|Nylock).
+# variety N: a pack of N kinds, "parts in the pack" of each (a spacer variety pack: 10 each of 4 lengths).
+# A rule is a regular expression on the part's id (first match wins); "name:" starts one on the part's name instead.
+# Parts with no rule have no price: type one in the parts list. Not on vexrobotics.com in Nov 2026: 3" and 4" flex wheels
+# (the VEXpro 217- ones) and polycarbonate sheet (217-6626/6627); VEX's flex-style wheels are its 1.625"/2" compression wheels.
+
+# ---- structure
+^CCHL-1x1-        | 276-2289 | 44.69 | 6  | holes 35 | 1x2x1x35 Aluminum C-Channel (6-pack)
+^CCHL-1x2-        | 276-2289 | 44.69 | 6  | holes 35 | 1x2x1x35 Aluminum C-Channel (6-pack)
+^CCHL-1x3-        | 276-4359 | 44.69 | 6  | holes 35 | 1x3x1x35 Aluminum C-Channel (6-pack)
+^CCHL-1x5-        | 276-2298 | 55.99 | 6  | holes 35 | 1x5x1x35 Aluminum C-Channel (6-pack)
+^ANGL-1x1-        | 276-6484 | 29.79 | 6  | holes 35 | 1x1x35 Aluminum Angle (6-pack)
+^ANGL-2x2-        | 276-2304 | 44.69 | 6  | holes 35 | 2x2x35 Aluminum Angle (6-pack)
+^ANGL-3x3-        | 275-1144 | 24.49 | 4  | holes 35 | 3x3x35 Steel Angle (4-pack)
+^UCHL-            | 276-7285 | 44.69 | 6  | holes 20 | 2x2x2x20 Aluminum U-Channel (6-pack)
+^PLTE-1-          | 276-2307 | 36.99 | 16 | holes 25 | 1x25 Aluminum Bar (16-pack)
+^PLTE-[1-5]-      | 276-2311 | 31.49 | 6  | area 5 25 | 5x25 Aluminum Plate (6-pack)
+^PLTE-            | 276-1341 | 36.99 | 2  | area 15 30 | 15x30 Steel Base Plate (2-pack)
+^BSPT             | 276-1341 | 36.99 | 2  | each | 15x30 Steel Base Plate (2-pack)
+^GSET-            | 276-1110 | 9.29  | 8  | each | Gusset Pack
+
+# ---- screws (star drive), nuts, standoffs, couplers
+^SCRW-1/4in       | 276-4990 | 6.49  | 100 | each | #8-32 x 1/4" Star Drive Screw (100-pack)
+^SCRW-3/8in       | 276-4991 | 6.49  | 100 | each | #8-32 x 3/8" Star Drive Screw (100-pack)
+^SCRW-1/2in       | 276-4992 | 6.49  | 100 | each | #8-32 x 1/2" Star Drive Screw (100-pack)
+^SCRW-5/8in       | 276-4993 | 7.39  | 100 | each | #8-32 x 5/8" Star Drive Screw (100-pack)
+^SCRW-3/4in       | 276-4994 | 7.39  | 100 | each | #8-32 x 3/4" Star Drive Screw (100-pack)
+^SCRW-7/8in       | 276-4995 | 8.79  | 100 | each | #8-32 x 7/8" Star Drive Screw (100-pack)
+^SCRW-1(\.00)?in  | 276-4996 | 8.79  | 100 | each | #8-32 x 1.000" Star Drive Screw (100-pack)
+^SCRW-1\.25in     | 276-4997 | 6.49  | 50  | each | #8-32 x 1.250" Star Drive Screw (50-pack)
+^SCRW-1\.50?in    | 276-4998 | 6.49  | 50  | each | #8-32 x 1.500" Star Drive Screw (50-pack)
+^SCRW-1\.75in     | 276-4999 | 7.39  | 50  | each | #8-32 x 1.750" Star Drive Screw (50-pack)
+^SCRW-2(\.00)?in  | 276-5004 | 6.49  | 25  | each | #8-32 x 2.000" Star Drive Screw (25-pack)
+^SCRW-2\.25in     | 276-8015 | 6.29  | 25  | each | #8-32 x 2.250" Star Drive Screw (25-pack)
+^SCRW-2\.50?in    | 276-8016 | 6.29  | 25  | each | #8-32 x 2.500" Star Drive Screw (25-pack)
+^NUT-Keps         | 275-1026 | 4.89  | 100 | each | #8-32 Keps Nut (100-pack)
+^NUT-(Lock|Nylock) | 275-1027 | 4.99  | 100 | each | #8-32 Nylock Nut (100-pack)
+^NUT-Low          | 276-7767 | 5.89  | 100 | each | #8-32 Low Profile Nut (100-pack)
+^NUT-             | 275-1028 | 3.79  | 100 | each | #8-32 Hex Nut (100-pack)
+^SNDF-1/4in       | 275-1013 | 3.79  | 10  | each | #8-32 Standoff 1/4" (10-pack)
+^SNDF-1/2in       | 275-1014 | 3.79  | 10  | each | #8-32 Standoff 1/2" (10-pack)
+^SNDF-3/4in       | 275-1015 | 4.99  | 10  | each | #8-32 Standoff 3/4" (10-pack)
+^SNDF-1(\.00)?in  | 275-1016 | 4.99  | 10  | each | #8-32 Standoff 1" (10-pack)
+^SNDF-1\.50?in    | 275-1017 | 9.99  | 10  | each | #8-32 Standoff 1.5" (10-pack)
+^SNDF-2(\.00)?in  | 275-1018 | 9.99  | 10  | each | #8-32 Standoff 2" (10-pack)
+^SNDF-2\.50?in    | 275-1019 | 7.29  | 4   | each | #8-32 Standoff 2.5" (4-pack)
+^SNDF-3(\.00)?in  | 275-1020 | 8.79  | 4   | each | #8-32 Standoff 3" (4-pack)
+^SNDF-4(\.00)?in  | 275-1021 | 9.99  | 4   | each | #8-32 Standoff 4" (4-pack)
+^SNDF-5(\.00)?in  | 275-1022 | 11.19 | 4   | each | #8-32 Standoff 5" (4-pack)
+^SNDF-6(\.00)?in  | 275-1023 | 12.29 | 4   | each | #8-32 Standoff 6" (4-pack)
+name:Coupler.*1/2 | 276-4989 | 2.69  | 25  | each | #8-32 x 0.500" Star Drive Coupler (25-pack)
+name:Coupler      | 276-4988 | 3.79  | 25  | each | #8-32 x 1.000" Star Drive Coupler (25-pack)
+
+# ---- spacers, washers, bearings, collars
+^SPCR-Nylon-      | 275-1066 | 6.29  | 10  | variety 4 | 0.50" OD Nylon Spacer Variety Pack (10 each of 1/8", 1/4", 3/8", 1/2")
+VXSPACERS-(1/8|1/4|3/8|1/2)" Nylon Spacer \(3/8" OD\) | 276-6340 | 6.29 | 10 | variety 4 | 0.375" OD Nylon Spacer Variety Pack (10 each of 1/8", 1/4", 3/8", 1/2")
+^WSHR-Steel       | 275-1024 | 6.29  | 200 | each | Steel Washer (200-pack)
+^WSHR-            | 275-1025 | 6.29  | 25  | each | Teflon Washer (25-pack)
+^BRNG-            | 276-1209 | 6.29  | 10  | each | Bearing Flat (10-pack)
+^CLMP-            | 276-6103 | 9.99  | 16  | each | Star Drive Shaft Collar (16-pack)
+
+# ---- shafts
+^SHFT-High        | 276-7465 | 18.99 | 2  | inches 24 | 24" High Strength Shaft (2-pack)
+^SHFT-            | 276-1149 | 11.19 | 4  | inches 12 | 12" Drive Shaft (4-pack)
+name:Shaft Coupler | 276-1843 | 6.29  | 5  | each | Shaft Coupler (5-pack)
+name:Universal Joint | 276-2723 | 16.49 | 5 | each | Universal Joint (5-pack)
+
+# ---- wheels
+^OMNI-.*2\.75     | 276-8106 | 24.49 | 2  | each | 2.75" Omni-Directional Anti-Static Wheel (2-pack)
+^OMNI-.*3\.25     | 276-8026 | 24.49 | 2  | each | 3.25" Omni-Directional Anti-Static Wheel (2-pack)
+^OMNI-.*4\.00?    | 276-8107 | 30.89 | 2  | each | 4" Omni-Directional Anti-Static Wheel (2-pack)
+^OMNI-.*2\.00?    | 276-9044 | 24.49 | 4  | each | 2" Omni-Directional Wheel (4-pack)
+^TWHL-.*2\.75     | 276-8098 | 9.99  | 2  | each | 2.75" Anti-Static Wheel (2-pack)
+^TWHL-.*3\.25     | 276-7771 | 14.39 | 2  | each | 3.25" Anti-Static Wheel (2-pack)
+^TWHL-.*4\.00?    | 276-8103 | 16.49 | 2  | each | 4" Anti-Static Wheel (2-pack)
+^MECN             | 276-1447 | 68.99 | 4  | each | 4" Mecanum Wheel (4-pack)
+^FWHL-.*1\.625   | 276-8878 | 19.99 | 4  | each | Compression Wheel Kit 1.625" OD, 40 durometer (4-pack, VEX's flex wheels)
+^FWHL-.*-2(\.00)?in | 276-8881 | 19.99 | 4 | each | Compression Wheel Kit 2" OD, 40 durometer (4-pack, VEX's flex wheels)
+
+# ---- gears, sprockets
+^GEAR-High Strength-12T | 276-2251 | 24.29 | 12 | each | 12T High Strength Metal Pinion (12-pack)
+^GEAR-High Strength-24T | 276-7572 | 18.99 | 8  | each | 24T High Strength Gear v2 (8-pack)
+^GEAR-High Strength-36T | 276-7747 | 18.99 | 8  | each | 36T High Strength Gear v2 (8-pack)
+^GEAR-High Strength-48T | 276-7573 | 18.99 | 8  | each | 48T High Strength Gear v2 (8-pack)
+^GEAR-High Strength-60T | 276-7748 | 18.99 | 8  | each | 60T High Strength Gear v2 (8-pack)
+^GEAR-High Strength-72T | 276-7574 | 18.99 | 6  | each | 72T High Strength Gear v2 (6-pack)
+^GEAR-High Strength-84T | 276-7749 | 18.99 | 4  | each | 84T High Strength Gear v2 (4-pack)
+^GEAR-.*-12T            | 276-7368 | 12.25 | 12 | each | 12T Metal Gear (12-pack)
+^SPKT-High Strength-6T  | 276-3876 | 15.99 | 8  | each | 6T High Strength Sprocket (8-pack)
+^SPKT-High Strength-12T | 276-3877 | 15.99 | 4  | each | 12T High Strength Sprocket (4-pack)
+^SPKT-High Strength-18T | 276-3878 | 15.99 | 4  | each | 18T High Strength Sprocket (4-pack)
+^SPKT-High Strength-24T | 276-3879 | 15.99 | 4  | each | 24T High Strength Sprocket (4-pack)
+^SPKT-High Strength-30T | 276-3880 | 15.99 | 4  | each | 30T High Strength Sprocket (4-pack)
+VXSPROCKETS-6P 8T       | 276-8030 | 22.25 | 8  | each | 8T Sprocket, 6P (8-pack)
+VXSPROCKETS-6P 16T      | 276-8328 | 27.49 | 8  | each | 16T Sprocket, 6P (8-pack)
+VXSPROCKETS-6P 24T      | 276-8329 | 27.49 | 8  | each | 24T Sprocket, 6P (8-pack)
+VXSPROCKETS-6P 32T      | 276-8330 | 27.49 | 4  | each | 32T Sprocket, 6P (4-pack)
+VXSPROCKETS-6P 40T      | 276-8331 | 27.49 | 4  | each | 40T Sprocket, 6P (4-pack)
+
+# ---- electronics
+^BRAN             | 276-4810 | 384.99 | 1 | each | V5 Robot Brain
+^BTRY             | 276-4811 | 76.99  | 1 | each | V5 Robot Battery Li-Ion 1100mAh
+^RDIO             | 276-4831 | 48.79  | 1 | each | V5 Robot Radio
+^MOTR-11W         | 276-4840 | 49.99  | 1 | each | V5 Smart Motor (11W)
+^MOTR-5           | 276-4842 | 33.49  | 1 | each | Smart Motor (5.5W)
+Inertial          | 276-4855 | 55.49  | 1 | each | Inertial Sensor
+Rotation          | 276-6050 | 44.29  | 1 | each | Rotation Sensor
+Distance          | 276-4852 | 49.99  | 1 | each | Distance Sensor
+Optical           | 276-7043 | 49.99  | 1 | each | Optical Sensor
+AI Vision         | 276-8659 | 95.49  | 1 | each | AI Vision Sensor
+GPS               | 276-7405 | 209.99 | 1 | each | V5 GPS Sensor
+Potentiometer     | 276-7417 | 15.99  | 2 | each | Potentiometer V2 (2-pack)
+Limit             | 276-2174 | 15.99  | 2 | each | Limit Switch (2-pack)
+Bumper            | 276-4858 | 15.99  | 2 | each | Bumper Switch v2 (2-pack)
+3-Wire Expander   | 276-5299 | 44.29  | 1 | each | 3-Wire Expander
+
+# ---- pneumatics (V5)
+^(PNMT|PSTN)-25mm | 276-8642 | 23.99 | 1  | each | V5 Dual Acting Cylinder, 25mm Stroke
+^(PNMT|PSTN)-50mm | 276-8644 | 26.49 | 1  | each | V5 Dual Acting Cylinder, 50mm Stroke
+^(PNMT|PSTN)-75mm | 276-8646 | 29.19 | 1  | each | V5 Dual Acting Cylinder, 75mm Stroke
+^TANK-V5          | 276-8749 | 32.49 | 1  | each | Air Tank 200ml
+Double Acting Solenoid | 276-8752 | 47.79 | 1 | each | Double Acting Solenoid
+Pressure Regulator | 276-8748 | 52.99 | 1  | each | Pneumatic Pressure Regulator
+Straight.*Fitting | 276-8636 | 11.69 | 10 | each | V5 Pneumatics Straight Fitting (10-pack)
+Elbow             | 276-8637 | 13.29 | 8  | each | V5 Pneumatics 90-Degree Elbow Fitting (8-pack)
+Tee               | 276-8638 | 15.99 | 5  | each | T Pneumatic Fittings (5-pack)
+
+# ---- the rest
+^BAND-V32         | 275-1089 | 3.49  | 20 | each | Synthetic Rubber Band #32 (20-pack)
+^BAND-V64         | 276-3990 | 4.49  | 10 | each | Synthetic Rubber Band #64 (10-pack)
+License Plate     | 276-3938 | 6.29  | 1  | each | VEX V5 Competition License Plate Kit

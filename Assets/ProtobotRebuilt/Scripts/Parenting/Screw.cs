@@ -114,7 +114,7 @@ namespace Protobot {
             var used = AxleLine.Used(gameObject, head, down, ScrewLength);
             var keyboard = UnityEngine.InputSystem.Keyboard.current;
             // V2: a threaded part (standoff, nut) on a shoulder screw goes no higher than the shoulder's end.
-            var start = AxleLine.Free(used, Vector3.Dot(near - head, down), length, threaded ? Shoulder : 0f, ScrewLength, true, keyboard != null && keyboard.ctrlKey.isPressed);
+            var start = AxleLine.Free(used, Vector3.Dot(near - head, down), length, threaded ? Shoulder : 0f, ScrewLength, true, keyboard != null && (keyboard.ctrlKey.isPressed || keyboard.leftCommandKey.isPressed));
             return start.HasValue ? head + down * start.Value : GetLowestPoint();
         }
 

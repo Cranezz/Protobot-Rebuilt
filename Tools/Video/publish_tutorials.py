@@ -27,6 +27,7 @@ import discord_api as D  # noqa: E402
 ROOT = "C:/Dev/ProtobotRebuiltV2/Video/tutorials"
 REPO = "Cranezz/Protobot-Rebuilt"
 TAG = "tutorials"
+NO_EMBEDS = 1 << 2   # Discord's SUPPRESS_EMBEDS message flag
 
 # (number, folder, title, what it shows, the #tutorials forum tag)
 VIDEOS = [
@@ -126,12 +127,13 @@ def discord():
     for n, folder, title, what, tag in reversed(VIDEOS):
         key = f"video_{n}"
         name = f"🎬 Video {n}: {title}"
-        content = f"**{what}**\n\nFull quality (1080p): {asset_url(n, title)}\nEvery video: https://github.com/{REPO}/releases/tag/{TAG}"
+        # Links in <...> and SUPPRESS_EMBEDS: no GitHub card and no second copy of the video under the attached one.
+        content = f"**{what}**\n\nFull quality (1080p): <{asset_url(n, title)}>\nEvery video: <https://github.com/{REPO}/releases/tag/{TAG}>"
         applied = [tags[tag]] if tag in tags else []
         tid = threads.get(key)
         thread = D.call("GET", f"/channels/{tid}", ok404=True) if tid else None
         if thread:
-            D.call("PATCH", f"/channels/{tid}/messages/{tid}", {"content": content, "allowed_mentions": {"parse": []}})
+            D.call("PATCH", f"/channels/{tid}/messages/{tid}", {"content": content, "flags": NO_EMBEDS, "allowed_mentions": {"parse": []}})
             D.call("PATCH", f"/channels/{tid}", {"name": name, "applied_tags": applied})
             print("edited", name)
         else:
@@ -139,7 +141,7 @@ def discord():
             if os.path.getsize(path) > 10 * 1024 * 1024:
                 sys.exit(f"{path} is over Discord's 10 MB upload limit")
             body = {"name": name, "applied_tags": applied, "auto_archive_duration": 10080,
-                    "message": {"content": content, "allowed_mentions": {"parse": []}, "attachments": [{"id": 0}]}}
+                    "message": {"content": content, "flags": NO_EMBEDS, "allowed_mentions": {"parse": []}, "attachments": [{"id": 0}]}}
             thread = D.call_with_file("POST", f"/channels/{forum_id}/threads", body, path, asset_name(n, title))
             threads[key] = thread["id"]
             D.save_state(state)
@@ -161,7 +163,7 @@ def announce():
         "12 short videos, about a minute each, take you from your first build to robot code and online play:",
         titles,
         "",
-        f"📺 Watch them in <#{ch['tutorials']}> (one post per video), or in full quality on GitHub: https://github.com/{REPO}/releases/tag/{TAG}",
+        f"📺 Watch them in <#{ch['tutorials']}> (one post per video), or in full quality on GitHub: <https://github.com/{REPO}/releases/tag/{TAG}>",
         "🆕 Build 78 is out too, with copy and paste, bending plates and drilling into shafts: Help > Check for updates.",
         "",
         "💬 **Tell us what you think!** What do you like, what's confusing, what's missing? "
@@ -170,7 +172,7 @@ def announce():
     ])
     if "videos_announce" not in messages:
         m = D.call("POST", f"/channels/{channel}/messages",
-                   {"content": text, "allowed_mentions": {"parse": [], "roles": [role]}})
+                   {"content": text, "flags": NO_EMBEDS, "allowed_mentions": {"parse": [], "roles": [role]}})
         messages["videos_announce"] = m["id"]
         D.save_state(state)
         try:
@@ -179,7 +181,7 @@ def announce():
             print("not published to following servers:", str(e)[:200])
         print("announced")
     else:
-        D.call("PATCH", f"/channels/{channel}/messages/{messages['videos_announce']}", {"content": text, "allowed_mentions": {"parse": []}})
+        D.call("PATCH", f"/channels/{channel}/messages/{messages['videos_announce']}", {"content": text, "flags": NO_EMBEDS, "allowed_mentions": {"parse": []}})
         print("announcement edited")
     # The rating: reactions people click (Proto Bot can't create polls: that needs a permission it isn't given).
     if "rating_poll" not in messages:

@@ -450,9 +450,9 @@ namespace Protobot.RobotCode {
             foreach (var p in Ops.Iterate(o)) {
                 if (p is MotionPose pose) points.Add((pose.x, pose.y, double.NaN));
                 else {
-                    var xy = Ops.Iterate(p).Take(2).Select(v => Ops.ToDouble(v)).ToArray();
+                    var xy = Ops.Iterate(p).Take(3).Select(v => Ops.ToDouble(v)).ToArray();
                     if (xy.Length < 2) throw new PyError("TypeError", "a path is a list of points like [(0, 0), (0, 24), (24, 36)]");
-                    points.Add((xy[0], xy[1], double.NaN));
+                    points.Add((xy[0], xy[1], xy.Length > 2 ? xy[2] : double.NaN));   // V2: (x, y, speed 0-127) as a path file has
                 }
             }
             if (points.Count < 2) throw new PyError("ValueError", "a path needs at least 2 points");
@@ -580,7 +580,7 @@ namespace Protobot.RobotCode {
             if (odomStarted && program.Time >= nextGraph) {
                 nextGraph = (float)program.Time + 0.02f;
                 TuningData.Get("odom x", "in", false).Add((float)program.Time, (float)x);
-                TuningData.Get("odom y", "in", false).Add((float)program.Time, (float)y);
+                TuningData.Get("odom y", "in", false).Add((float)program.Time, (float)y); PathTrail.Odom2 = new UnityEngine.Vector2((float)x, (float)y);   // V2: the path planner draws it
                 TuningData.Get("odom theta", "deg", false).Add((float)program.Time, (float)theta);
                 TuningData.Version++;
             }

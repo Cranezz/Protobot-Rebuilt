@@ -21,6 +21,32 @@ namespace Protobot.Motion {
             // Parts on a joint screw to what turns: they're carried round, turning about the joint as little as
             // they can (Linkage.Trail), each led by its rotor's turn so far.
             public readonly List<(Rotor rotor, Linkage.Body leader, Linkage.Body body, Linkage.Pin pin)> hanging = new();
+            // V2: shafts of other systems that turn in bearings on what turns (a sprocket's shaft on a swinging arm):
+            // they're carried round with it.
+            public readonly List<(Rotor carrier, List<GameObject> parts)> riders = new();
+        }
+
+        // V2: a shaft whose bearings are all on one of the system's turning rotors rides on it.
+        private static void FindRiders(Run run, List<Rotor> all) {
+            var carrierOf = new Dictionary<GameObject, Rotor>();
+            foreach (var rotor in run.system.rotors)
+                foreach (var part in rotor.parts)
+                    if (part != null) carrierOf[part] = rotor;
+            foreach (var rotor in all) {
+                if (run.system.rotors.Contains(rotor) || rotor.bearings.Count == 0 || rotor.motors.Count > 0) continue;
+                Rotor carrier = null;
+                var rides = true;
+                foreach (var (part, _) in rotor.bearings) {
+                    if (part == null || !carrierOf.TryGetValue(part, out var c) || (carrier != null && c != carrier)) {
+                        rides = false;
+                        break;
+                    }
+                    carrier = c;
+                }
+                if (!rides || carrier == null) continue;
+                var parts = rotor.parts.Where(p => p != null && !carrierOf.ContainsKey(p)).ToList();
+                if (parts.Count > 0) run.riders.Add((carrier, parts));
+            }
         }
 
         // What hangs on joint screws from a system's turning parts (and isn't also held by the frame).
@@ -124,7 +150,8 @@ namespace Protobot.Motion {
                 }
                 var run = new Run { system = system, parts = parts, starter = motor };
                 FindHanging(run);
-                var moved = parts.Concat(run.hanging.SelectMany(h => h.body.objects)).Distinct().ToList();
+                FindRiders(run, CurrentRotors());   // V2
+                var moved = parts.Concat(run.hanging.SelectMany(h => h.body.objects)).Concat(run.riders.SelectMany(r => r.parts)).Distinct().ToList();
                 run.parts = moved;
                 run.before = moved.Select(p => (IElement)new ObjectElement(p)).ToList();
                 foreach (var (chain, _, _) in system.chains) run.before.Add(new ChainLoop.PhaseElement(chain));
@@ -157,6 +184,10 @@ namespace Protobot.Motion {
                     foreach (var part in rotor.parts)
                         if (part != null) part.transform.RotateAround(pivot, rotor.axis, turn);
                     // The rotor's line stays where it is; its start point turns about its own axis (no change).
+                    foreach (var (carrier, riding) in run.riders)
+                        if (carrier == rotor)
+                            foreach (var part in riding)
+                                if (part != null) part.transform.RotateAround(pivot, rotor.axis, turn);
                 }
                 // Chains run with the sprockets that turn them.
                 foreach (var (chain, rotor, inchesPerRadian) in run.system.chains)
