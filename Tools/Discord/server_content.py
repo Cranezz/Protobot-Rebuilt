@@ -81,7 +81,7 @@ CATEGORIES = [
         {"key": "bugs", "name": "bug-reports", "kind": "support", "forum": True, "require_tag": True,
          "topic": "Found a bug? Help > Report a bug in Protobot sends your logs privately; or post it here.",
          "tags": [("Crash", "💥"), ("Building", "🔩"), ("Tools", "🪚"), ("Simulation", "🏎️"), ("Robot code", "💻"),
-                  ("Online", "🌐"), ("Graphics", "🖥️"), ("Confirmed", "🔍"), ("Fixed", "✅"), ("Can't reproduce", "❔")]},
+                  ("Online", "🌐"), ("Graphics", "🖥️"), ("Mac", "🍎"), ("Confirmed", "🔍"), ("Fixed", "✅"), ("Can't reproduce", "❔")]},
         {"key": "ideas", "name": "feature-requests", "kind": "support", "forum": True,
          "topic": "Ideas for Protobot. One idea per post; react 👍 to the ones you want.",
          "tags": [("Building", "🔩"), ("Tools", "🪚"), ("Simulation", "🏎️"), ("Robot code", "💻"), ("Game", "🏆"),
@@ -213,6 +213,10 @@ def download(ids):
             "**Needs:** Windows 10 or 11, 64-bit. Any graphics card from the last ~10 years; pick a lower graphics preset "
             "in Edit > Graphics on older PCs.\n\n"
             "**SmartScreen:** Windows may say it protected your PC (Protobot isn't code-signed yet): click **More info > Run anyway**.\n\n"
+            "🍎 **Mac (test version):** the same page has **ProtobotRebuiltV2-mac.zip** for Intel and Apple Silicon Macs. Unzip it, "
+            "then right-click the app and choose **Open** the first time (it isn't notarized by Apple). If macOS says it's damaged, run "
+            "`xattr -cr \"Protobot Rebuilt V2.app\"` in Terminal. Macs don't update by themselves: download new versions here. "
+            f"It's new and untested on real Macs: please report what works and what doesn't in {ch(ids, 'bugs')} with the **Mac** tag.\n\n"
             f"⚠️ Only download Protobot from this link. Nobody from the team will ever send you a different download in DMs.\n\n"
             f"Then start with the guides in {ch(ids, 'tutorials')}."),
     }]
