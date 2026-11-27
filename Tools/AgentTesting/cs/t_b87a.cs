@@ -9,7 +9,7 @@ foreach (var id in new[] { "VXSPACERS-1/2\" Nylon Spacer (5/16\" OD)", "VXSPACER
   UnityEngine.Object.Destroy(p);
 }
 var fam = typeof(Protobot.Interface.PartsBrowser).GetMethod("FamilyOf", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic);
-foreach (var name in new[] { "2\" Flex Wheel, 45A", "1/4\" Nylon Spacer (3/8\" OD)", "36T Bevel Gear" }) {
+foreach (var name in new[] { "2\" Flex Wheel, 40A", "1/4\" Nylon Spacer (5/16\" OD)", "36T Bevel Gear", "Normal" }) {
   Protobot.Interface.CatalogNode leaf = null;
   foreach (var root in Protobot.Interface.PartsCatalog.Nodes) foreach (var l in root.Leaves()) if (leaf == null && l.p1 != null && l.p1.StartsWith(name)) leaf = l;
   if (leaf == null) { sb.AppendLine(name + ": no leaf"); continue; }

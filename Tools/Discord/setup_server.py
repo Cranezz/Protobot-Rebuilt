@@ -68,10 +68,18 @@ def roles():
     everyone = existing["@everyone"]
     call("PATCH", f"/guilds/{G}/roles/{everyone['id']}", {"permissions": str(perms(*C.EVERYONE))}, REASON)
     ids = state.setdefault("roles", {})
+    # Roles above the bot's own (the owner moved Admin to the top) can't be edited by it: left as they are.
+    bot_now = next(r for r in existing.values() if r.get("tags", {}).get("bot_id") == me["id"])
+    above = set()
     for spec in C.ROLES:
         body = {"name": spec["name"], "permissions": str(perms(*spec["perms"])), "color": spec["color"],
                 "hoist": spec["hoist"], "mentionable": False}
         role = existing.get(spec["name"]) or (call("GET", f"/guilds/{G}/roles/{ids[spec['key']]}", ok404=True) if spec["key"] in ids else None)
+        if role and role["position"] >= bot_now["position"]:
+            above.add(role["id"])
+            ids[spec["key"]] = role["id"]
+            log("  left alone (above the bot):", spec["name"])
+            continue
         if role:
             call("PATCH", f"/guilds/{G}/roles/{role['id']}", body, REASON)
         else:
@@ -84,7 +92,7 @@ def roles():
     bot_role = next(r for r in current.values() if r.get("tags", {}).get("bot_id") == me["id"])
     state["bot_role"] = bot_role["id"]
     top = bot_role["position"] - 1
-    order = [ids[s["key"]] for s in C.ROLES]
+    order = [ids[s["key"]] for s in C.ROLES if ids[s["key"]] not in above]
     call("PATCH", f"/guilds/{G}/roles", [{"id": rid, "position": max(1, top - i)} for i, rid in enumerate(order)], REASON)
     save_state(state)
     log("roles:", ", ".join(s["name"] for s in C.ROLES), "| @everyone: basic chat and voice only")
@@ -491,6 +499,54 @@ def invite():
 
 # ------------------------------------------------------------------ check
 
+EVENT_COORDINATOR = perms("VIEW_CHANNEL", "MANAGE_CHANNELS", "MANAGE_ROLES", "MANAGE_MESSAGES", "MANAGE_THREADS", "PIN_MESSAGES",
+                          "SEND_MESSAGES", "SEND_MESSAGES_IN_THREADS", "CREATE_PUBLIC_THREADS", "CREATE_PRIVATE_THREADS",
+                          "EMBED_LINKS", "ATTACH_FILES", "READ_MESSAGE_HISTORY", "SEND_POLLS", "CONNECT", "SPEAK",
+                          "MUTE_MEMBERS", "DEAFEN_MEMBERS", "MOVE_MEMBERS")
+
+
+def event():
+    """🏆 EVENTS: a category Event Coordinators run. On the category (so on every channel made in it) they may make, edit
+    and delete channels and set who sees them ("Manage Permissions" there is only for the category's channels), tidy
+    messages and threads, run its voice channels. Outside it they're ordinary members. #event-info: everyone reads,
+    coordinators post. Run the roles step first (the role)."""
+    r = state["roles"]
+    every, bot, coord = G, state["bot_role"], r["event"]
+    cats = state.setdefault("categories", {})
+    ids = state.setdefault("channels", {})
+    cat_ow = [{"id": every, "type": 0, "allow": "0", "deny": "0"},
+              {"id": coord, "type": 0, "allow": str(EVENT_COORDINATOR), "deny": "0"},
+              {"id": r["mod"], "type": 0, "allow": str(perms("VIEW_CHANNEL", "MANAGE_MESSAGES", "MANAGE_THREADS")), "deny": "0"},
+              {"id": bot, "type": 0, "allow": str(POST), "deny": "0"}]
+    body = {"name": "🏆 EVENTS", "type": 4, "permission_overwrites": cat_ow}
+    cat = call("GET", f"/channels/{cats['events']}", ok404=True) if cats.get("events") else None
+    if cat:
+        body.pop("type")
+        cat = call("PATCH", f"/channels/{cat['id']}", body, REASON)
+    else:
+        cat = call("POST", f"/guilds/{G}/channels", body, REASON)
+        cats["events"] = cat["id"]
+        save_state(state)
+    info_ow = [{"id": every, "type": 0, "allow": "0", "deny": str(READONLY_DENY)}] + cat_ow[1:]
+    info = {"name": "event-info", "type": 0, "parent_id": cat["id"], "permission_overwrites": info_ow,
+            "topic": "What's on: the event, its rules, when it starts and how to join. Event Coordinators post here."}
+    found = call("GET", f"/channels/{ids['event_info']}", ok404=True) if ids.get("event_info") else None
+    if found:
+        info.pop("type")
+        found = call("PATCH", f"/channels/{found['id']}", info, REASON)
+    else:
+        found = call("POST", f"/guilds/{G}/channels", info, REASON)
+        ids["event_info"] = found["id"]
+        save_state(state)
+    # Just under COMMUNITY.
+    order = sorted((c for c in call("GET", f"/guilds/{G}/channels") if c["type"] == 4), key=lambda c: c["position"])
+    order = [c for c in order if c["id"] != cat["id"]]
+    at = next((i + 1 for i, c in enumerate(order) if c["id"] == cats.get("community")), len(order))
+    order.insert(at, cat)
+    call("PATCH", f"/guilds/{G}/channels", [{"id": c["id"], "position": i} for i, c in enumerate(order)], REASON)
+    log("events category:", cat["name"], "| #event-info | Event Coordinator manages channels there only")
+
+
 def check():
     """What each role can do: nobody below Admin can manage roles, channels, webhooks, the server or mention everyone."""
     # (Proto Bot may mention roles in #releases and #announcements only, by channel overwrite: not a role power.)
@@ -509,7 +565,7 @@ def check():
     log("check:", "ok" if problems == 0 else f"{problems} roles with too much")
 
 
-STEPS = {"settings": settings, "roles": roles, "channels": channels, "online": online, "leaderboard": leaderboard, "console": console, "community": community, "automod": automod,
+STEPS = {"settings": settings, "roles": roles, "channels": channels, "online": online, "leaderboard": leaderboard, "console": console, "event": event, "community": community, "automod": automod,
          "messages": messages, "guides": guides, "tutorials": tutorials, "welcome": welcome_screen,
          "onboarding": onboarding, "webhooks": webhooks, "invite": invite, "check": check}
 

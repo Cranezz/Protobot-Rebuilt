@@ -30,7 +30,10 @@ it again with the reduced set (permissions=2252126231325760) and run `check`.
 
 Roles, top to bottom: Admin (Administrator; only the owner gives it), Proto Bot, Developer, Moderator (kick, ban, time
 out, manage messages/threads/nicknames, audit log), Helper (manage threads; manage messages in the support forums), Beta
-Tester, VEX Team Member, Announcement/Update/Event Pings. Nobody below Admin can manage roles, channels, webhooks or the
+Tester, VEX Team Member, Announcement/Update/Event Pings. Event Coordinator (between Helper and Beta Tester; only server-wide power: create
+Discord scheduled events) runs the 🏆 EVENTS category: there it makes, edits and deletes channels, sets their
+permissions, tidies messages and runs voice (`setup_server.py event`; #event-info: everyone reads, coordinators post).
+The roles step leaves roles above the bot (Admin, once moved to the top) as they are. Nobody below Admin can manage roles, channels, webhooks or the
 server or mention everyone; self-assigned roles (onboarding) have no permissions. `check` lists any role with too much.
 
 Reports from the app: Cloud Code `SendReport.js` posts bug reports to #app-bug-reports, player reports to

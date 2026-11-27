@@ -19,6 +19,9 @@ ROLES = [
      "perms": ["KICK_MEMBERS", "BAN_MEMBERS", "MODERATE_MEMBERS", "MANAGE_MESSAGES", "MANAGE_THREADS",
                "MANAGE_NICKNAMES", "VIEW_AUDIT_LOG", "MUTE_MEMBERS", "DEAFEN_MEMBERS", "MOVE_MEMBERS"]},
     {"key": "helper", "name": "Helper", "color": 0x30A46C, "hoist": True, "perms": ["MANAGE_THREADS"]},
+    # Runs community events: makes, edits and deletes channels inside the 🏆 EVENTS category only (category overwrites,
+    # setup_server.event), and Discord scheduled events. No server-wide channel or role powers.
+    {"key": "event", "name": "Event Coordinator", "color": 0xE8A13A, "hoist": True, "perms": ["CREATE_EVENTS"]},
     {"key": "tester", "name": "Beta Tester", "color": 0x12A594, "hoist": False, "perms": []},
     {"key": "team", "name": "VEX Team Member", "color": 0x3E8ED0, "hoist": False, "perms": []},
     {"key": "ping_announce", "name": "Announcement Pings", "color": 0, "hoist": False, "perms": []},
