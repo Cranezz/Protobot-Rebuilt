@@ -189,6 +189,20 @@ namespace Protobot {
                 displacement = Seat(axle, current, template, pocket);
                 return true;
             }
+            // V2 (build 87): the hole under the mouse itself, not only the selection system's hovered face, which could
+            // still be the last hole hovered (half an inch away: a washer landed off its hole) or empty. Its end the hit
+            // leans to, else the end facing the camera; the hovered face is used when it's this hole (its flip key).
+            var direct = hover != null ? hover.GetComponent<HoleCollider>() : null;
+            if (direct != null && direct.holeData != null && direct.transform.parent != null && direct.transform.parent.gameObject != self
+                && !(hoverHoleFace != null && hoverHoleFace.gameObject.activeInHierarchy && hoverHoleFace.hole == direct.holeData)) {
+                var holeAxis = direct.transform.forward.normalized;
+                var lean = Vector3.Dot(mouseCast.hit.normal, holeAxis);
+                if (Mathf.Abs(lean) < 0.5f) lean = Vector3.Dot(-mouseCast.ray.direction, holeAxis);
+                var faceDir = holeAxis * (lean >= 0f ? 1f : -1f);
+                var facePoint = direct.transform.position + faceDir * (direct.transform.lossyScale.z / 2f);
+                displacement = Onto(axle, current, facePoint, faceDir, 0f, direct.transform.up, nut ? -1 : 0);
+                return true;
+            }
             // V2: a nut over a hole sits flat on the hole's face (it used to be left where the mouse was), the side it
             // threads on from against the part.
             if (hoverHoleFace != null && hoverHoleFace.gameObject.activeInHierarchy && hoverHoleFace.direction != Vector3.zero
