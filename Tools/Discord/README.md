@@ -59,3 +59,15 @@ the "discord-online" schedule). Ids in Cloud Save private "secrets" (`Tools/Agen
 ## Tutorial posts
 `Tools/Video/publish_tutorials.py discord|announce` posts with links in <...> and the SUPPRESS_EMBEDS flag (no GitHub
 card, no second copy of the video under the attached one).
+
+## Player messages channel
+#player-messages (🧾 PROTOBOT REPORTS, admins only; `setup_server.py console` makes it and pins the help) is how the
+developer talks to the players online. Commands (typed by a person; the bot's own `!` messages count too, for tests):
+`!ask <question>` (a card with a text box in every app online, and in apps opened while it's up), `!notify <text>`,
+`!ask 2h ...` (how long: default 24h, at most 7d), `!test ask|notify ...` (only the players in Cloud Save private
+"secrets"/"devPlayers"), `!list`, `!stop <id>|all`, `!help`. Cloud Code `Presence.js` reads the channel on the app's
+heartbeat (at most every 20 s, whoever comes first) and hourly, and answers each command as a reply; `Feedback.js`
+posts each answer as a reply to its question (3 per player per question, 10 an hour). The channel id is "secrets"/
+"discordConsoleChannel" and devPlayers is set from PlayerPrefs "t_dev_players", both by
+`Tools/AgentTesting/cs/t_discord_console.cs`. The same heartbeat also hands every app the newest release's build number
+(GitHub's latest releases.win.json, at most once a minute), so the app's "Update available" card shows within a minute.

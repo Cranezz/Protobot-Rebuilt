@@ -19,7 +19,8 @@ Follow Tools/Bugs/README.md step 4 and AGENT_HANDOFF.md "Build and release routi
    belongs), push `git push origin v2-classic-protobot:main`.
 5. `vpk upload github --repoUrl https://github.com/Cranezz/Protobot-Rebuilt --token <git credential fill, never printed>
    --publish --tag v2.0.0-beta.1.N --releaseName "v2.0 Beta 1 (build N)" --outputDir C:/Dev/ProtobotRebuiltV2/Releases`.
-6. `python -I Tools/Discord/post_release.py N --short`, then `python -I Tools/Bugs/bugs.py fixed ISSUE --build N` for each
+6. `python -I Tools/Release/tidy_release.py N` (the Download table at the top of the release, drops the portable zip),
+   then `python -I Tools/Discord/post_release.py N --short`, then `python -I Tools/Bugs/bugs.py fixed ISSUE --build N` for each
    issue above.
 7. Add a short "Build N" line to CLAUDE.md (git-ignored: just edit it).
 If the build or upload fails, don't retry blindly: say what failed (the fixes stay committed; push them if step 4 didn't).

@@ -181,6 +181,20 @@ namespace Protobot.Interface {
                 choices = new[] { "Off", "Every minute" },
                 get = () => Builds.AutoSave.Enabled ? 1 : 0, set = i => Builds.AutoSave.Enabled = i == 1,
             });
+            // V2 (build 85): Discord Rich Presence (Online/DiscordPresence).
+            Section("Discord");
+            AddRow(new Option {
+                title = "Show on Discord",
+                description = "While Discord is running on this computer, your Discord profile shows that you're using Protobot and what you're doing (building, simulating, playing a game, writing code), like games do. Protobot only tells the Discord app on this computer; nothing else is sent.",
+                choices = new[] { "Off", "On" },
+                get = () => Online.DiscordPresence.Enabled ? 1 : 0, set = i => Online.DiscordPresence.Enabled = i == 1,
+            });
+            AddRow(new Option {
+                title = "Build name on Discord",
+                description = "Also show the open build's name (its file name) on your Discord profile. Off: only what you're doing shows.",
+                choices = new[] { "Hidden", "Shown" },
+                get = () => Online.DiscordPresence.ShowBuildName ? 1 : 0, set = i => Online.DiscordPresence.ShowBuildName = i == 1,
+            });
             Section("Snapping");
             AddRow(new Option {
                 title = "Move step",

@@ -64,20 +64,80 @@ namespace Protobot.Builds {
         }
 
         private class Runner : MonoBehaviour {
-            private float at;
+            private float at, again;
 
-            private void Start() => at = Time.realtimeSinceStartup + 6f;   // after the intro and home menu
+            private void Start() {
+                at = Time.realtimeSinceStartup + 6f;   // after the intro and home menu
+                again = at + LookEvery;
+            }
 
             private void Update() {
                 if (at > 0f && Time.realtimeSinceStartup > at) {
                     at = -1f;
-                    _ = Check(false);
+                    // Testing: "-update-live" shows the live card (as when a release comes out while it's open) instead.
+                    if (Environment.GetCommandLineArgs().Contains("-update-live")) _ = Live(0);
+                    else _ = Check(false);
+                }
+                // V2 (build 85): a player the heartbeat can't tell (offline, or not past the terms yet) still hears of an
+                // update: GitHub is asked again every half hour.
+                if (Time.realtimeSinceStartup > again) {
+                    again = Time.realtimeSinceStartup + LookEvery;
+                    if (Time.realtimeSinceStartup - heardAt > LookEvery) _ = Live(0);
                 }
             }
         }
 
+        private const float LookEvery = 1800f;
+        private static float heardAt = -9999f;
+        private static int offered;   // the newest build already offered this session (the card or the window)
+
+        /// <summary>V2 (build 85): Presence's heartbeat says the newest release is `build` (0 = look on GitHub now). When
+        /// it's newer than this one, the "Update available" card shows (once per build): Update now (installed copies) or
+        /// Download (Mac, unzipped copies), and What's new. Within about a minute of a release being published.</summary>
+        public static async Task Live(int build) {
+            if (build > 0) heardAt = Time.realtimeSinceStartup;
+            if (build > 0 && (build <= BuildInfo.Build || build <= offered)) return;
+            if (checking) return;
+            if (Application.isEditor && !TestInEditor) return;
+            if (!OnWindows || Application.isEditor) {
+                if (build <= 0) return;   // nothing to ask GitHub with here: wait for the heartbeat
+                offered = build;
+                Online.Notices.ShowUpdate(BuildInfo.Name(build), "Protobot " + BuildInfo.Name(build) + " is out. "
+                    + (OnWindows ? "This copy wasn't installed with Setup: download the new one from the releases page." : "Download the new Mac version from the releases page."),
+                    "Download", () => Application.OpenURL(ReleasesUrl), null, null);
+                return;
+            }
+            checking = true;
+            try {
+                var manager = Manager();
+                if (!manager.IsInstalled) {
+                    if (build > 0) {
+                        offered = build;
+                        Online.Notices.ShowUpdate(BuildInfo.Name(build), "Protobot " + BuildInfo.Name(build) + " is out. This copy wasn't installed with Setup, so download the new one.",
+                            "Download", () => Application.OpenURL(ReleasesUrl), null, null);
+                    }
+                    return;
+                }
+                var info = await manager.CheckForUpdatesAsync();
+                if (info == null) return;
+                var version = info.TargetFullRelease.Version.ToString();
+                var number = int.TryParse(version.Substring(version.LastIndexOf('.') + 1), out var n) ? n : build;
+                if (number <= offered) return;
+                offered = number;
+                Debug.Log("[Updater] live: " + version + " is out");
+                Online.Notices.ShowUpdate(version, "Protobot " + BuildInfo.Readable(version) + " is out (" + Megabytes(DownloadBytes(info))
+                    + "). Protobot saves your build, updates and restarts.", "Save and update now", () => SaveThenUpdate(manager, info),
+                    "What's new", () => Offer(manager, info));
+            }
+            catch (Exception e) { Debug.LogWarning("V2: live update check: " + e.Message); }
+            finally { checking = false; }
+        }
+
+        /// <summary>For tests: Live shows its card in the editor too (with Download).</summary>
+        public static bool TestInEditor;
+
         // Testing: "-update-from <folder>" reads releases from a folder instead of GitHub; "-update-now" takes an update
-        // without asking.
+        // without asking; "-update-live" (build 85) shows the "Update available" card at start (Live) instead of the window.
         private static string Arg(string name) {
             var args = Environment.GetCommandLineArgs();
             var i = Array.IndexOf(args, name);
@@ -117,6 +177,8 @@ namespace Protobot.Builds {
                     if (manual) Interface.Interface.Announce("Protobot is up to date (" + BuildInfo.Display + ")");
                     return;
                 }
+                var v = info.TargetFullRelease.Version.ToString();
+                if (int.TryParse(v.Substring(v.LastIndexOf('.') + 1), out var shownBuild)) offered = Math.Max(offered, shownBuild);
                 if (UpdateNow) UpdateScreen.Run(manager, info);
                 else Offer(manager, info);
             }
@@ -165,7 +227,7 @@ namespace Protobot.Builds {
             var dialog = Dialog.Open("Update available", new Vector2(560f, 470f));
             var head = Ui.Text(dialog.Body, "Head", "Protobot " + version + " is ready", Theme.FontTitle + 4f, Theme.Text, Theme.Medium);
             head.Size(-1, 34f);
-            var sub = Ui.Text(dialog.Body, "Sub", "You have " + BuildInfo.Label + ".  Download: " + Megabytes(DownloadBytes(info)) + ".  Protobot restarts when it's done: save your build first.",
+            var sub = Ui.Text(dialog.Body, "Sub", "You have " + BuildInfo.Label + ".  Download: " + Megabytes(DownloadBytes(info)) + ".  Protobot saves your build, then restarts when it's done.",
                 Theme.FontSmall, Theme.TextDim);
             sub.textWrappingMode = TextWrappingModes.Normal;
             sub.Size(-1, 40f);
@@ -174,11 +236,25 @@ namespace Protobot.Builds {
             notes.textWrappingMode = TextWrappingModes.Normal;
             notes.overflowMode = TextOverflowModes.Ellipsis;
             notes.Size(-1, 250f);
-            Ui.Button(dialog.Footer, "Update", "Update now", () => {
+            Ui.Button(dialog.Footer, "Update", "Save and update now", () => {
                 dialog.Close();
-                UpdateScreen.Run(manager, info);
+                SaveThenUpdate(manager, info);
             }, true, 6f).Size(-1, 34f);
             Ui.Button(dialog.Footer, "Later", "Later", dialog.Close, false, 6f).Size(-1, 34f);
+        }
+
+        /// <summary>V2 (build 85): "Save and update now": the open build is saved first when it has unsaved changes (a
+        /// build never saved asks where, as File > Save does); if that's cancelled or fails, nothing is updated.</summary>
+        private static void SaveThenUpdate(UpdateManager manager, UpdateInfo info) {
+            var builds = UnityEngine.Object.FindAnyObjectByType<BuildsManager>();
+            if (builds != null && builds.HasUnsavedChanges()) {
+                builds.Save();
+                if (builds.HasUnsavedChanges()) {
+                    Interface.Interface.Say("Not updated: the build wasn't saved", false);
+                    return;
+                }
+            }
+            UpdateScreen.Run(manager, info);
         }
 
         // The updating screen: over everything, the logo, the version, a progress bar with the megabytes, then

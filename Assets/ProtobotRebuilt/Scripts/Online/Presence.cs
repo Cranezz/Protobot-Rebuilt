@@ -21,6 +21,9 @@ namespace Protobot.Online {
         public static int Online { get; private set; } = -1;
         public static event Action Changed;
 
+        /// <summary>V2 (build 85): the newest release's build number from the last heartbeat (0 before it).</summary>
+        public static int Latest { get; private set; }
+
         private readonly Dictionary<string, float> seconds = new();
         private float lastInput, next = 8f;
         private bool sending;
@@ -101,6 +104,13 @@ namespace Protobot.Online {
                         Changed?.Invoke();
                     }
                 }
+                // V2 (build 85): the newest release and the developer's messages (Notices shows them).
+                if (result != null && result.TryGetValue("latest", out var latest)) {
+                    Latest = Convert.ToInt32(latest);
+                    _ = Builds.Updater.Live(Latest);
+                }
+                if (result != null && result.TryGetValue("messages", out var messages))
+                    Notices.Receive(messages as Newtonsoft.Json.Linq.JArray);
             }
             catch (Exception e) { Debug.LogWarning("[Online] presence: " + e.Message); }   // offline: kept for the next one
             finally { sending = false; }

@@ -1,8 +1,17 @@
+# Protobot Rebuilt V2, v2.0 Beta 1 (build 85)
+
+**Updates show up while Protobot is open, the developer can ask you questions, and Protobot shows on your Discord profile.**
+
+- **Live updates:** when a new version comes out, an "Update available" card appears in the top right within about a minute, even if Protobot has been open for hours. Update now, What's new or Later. It waits until a game run or an online match is over.
+- **Messages from the developer:** sometimes a card asks for your opinion on a feature, with a box to type your answer. Press Send and it goes straight to the developer (with the name you play under), or Not now to skip it. Each one shows once.
+- **Discord status:** with the Discord app running, your profile shows "Playing Protobot Rebuilt V2" and what you're doing (building, simulating, a game, writing code). Settings > Preferences > Discord turns it off, or adds your build's name.
+- **Easier downloads:** the release page starts with a Download table: Setup.exe for Windows, the zip for Mac. The other files are for automatic updates.
+
 # Protobot Rebuilt V2, v2.0 Beta 1 (build 84)
 
 **Protobot on Mac, a path planner, a simpler match setup, chain tensioners, air in the tanks, and what your robot costs.**
 
-- **Protobot on Mac (test version):** one app for Intel and Apple Silicon Macs, "Protobot Rebuilt V2 (Mac).zip" on the download page. It hasn't been tried on a real Mac yet, so please tell us in the Discord what works and what doesn't. The first time, right-click the app and choose Open (it isn't notarized by Apple). Macs don't update by themselves: download new versions from the releases page.
+- **Protobot on Mac (test version):** one app for Intel and Apple Silicon Macs, "ProtobotRebuiltV2-mac.zip" on the download page. It hasn't been tried on a real Mac yet, so please tell us in the Discord what works and what doesn't. The first time, right-click the app and choose Open (it isn't notarized by Apple). Macs don't update by themselves: download new versions from the releases page.
 - **Path planner:** in the code window, Paths. Click points on a top view of the field, drag them and set each one's speed; the path is a smooth curve. It writes the code for your program: LemLib (a path file and follow), EZ-Template or Python, starting from where your robot starts. After a run it shows where the robot really went, and where its odometry thought it was.
 - **Simpler match setup:** a map of the field to pick your Quadrant and click where along the wall to start; spots lined up with the tiles, as teams do on a real field (an edge on a tile seam, or centred on a tile); Straight, 45° and Backwards, or Aim at a Goal; one line that says whether the start is legal. The rest is under More options.
 - **Chain tensioners:** a spacer or sprocket idler on an arm pulled by a rubber band keeps a chain tight, in the build and in the simulation. The Chain tool takes spacers as idlers. Sample: Sample Builds/Chain Tensioners.pbb.

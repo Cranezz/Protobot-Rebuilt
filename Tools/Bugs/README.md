@@ -59,7 +59,8 @@ hand.
    "Bug fixes:" bullets, one per issue, no personal details), build and release as in CLAUDE.md / AGENT_HANDOFF.md
    ("Build and release routine"): `bash Tools/AgentTesting/release_build.sh`, delete the
    BurstDebugInformation folder, copy the notes into the build folder as "Release notes.md", `vpk pack` (version
-   2.0.0-beta.1.N), `vpk upload github --tag v2.0.0-beta.1.N --releaseName "v2.0 Beta 1 (build N)"`, then a one-line
+   2.0.0-beta.1.N), `vpk upload github --tag v2.0.0-beta.1.N --releaseName "v2.0 Beta 1 (build N)"`, `python -I Tools/Release/tidy_release.py N` (Download table, no portable
+   zip), then a one-line
    post in #releases: `python -I Tools/Discord/post_release.py N --short` (the owner's rule: bug fixes get one line, the
    full notes are on GitHub; no ping). Revert the font atlases, commit (no co-author line), push
    `git push origin v2-classic-protobot:main`, then `bugs.py fixed ISSUE --build N` for each fixed issue (closes it and

@@ -18,6 +18,8 @@ These are kept in your user folder (AppData) and never leave it unless you send 
 - Protobot's settings, including the month and year you were born (from the question before you first go online; not the day)
 - a session log of what you did in Protobot (each tool, click and key, but not what you type in text boxes) and the errors, used for bug reports
 
+If the Discord app is running on your computer, Protobot tells it what you're doing (for example "Building a robot" or "Match practice · Override"), and Discord shows that on your Discord profile, as it does for games. Protobot only talks to the Discord app on your computer; Discord's own privacy policy covers what it shows and keeps. The open build's name is only included if you switch it on. Turn it off in Settings > Preferences > Discord.
+
 # What goes online, and who sees it
 
 **Unity Gaming Services** (run by Unity Technologies; their privacy policy: https://unity.com/legal/game-player-and-app-user-privacy-policy):
@@ -31,11 +33,12 @@ These are kept in your user folder (AppData) and never leave it unless you send 
 - **Shared replays:** your best skills run on the leaderboard, so others can watch it. It holds your robot and its program. Players under 13 don't share replays.
 - **Voice chat (13 and older):** in online matches you can talk to your alliance partner through Unity's Vivox service. Voice is sent live and isn't recorded or kept by Protobot. You can switch it off. Players under 13 don't hear voice chat and aren't heard; a crossed-out speaker by their name tells their teammates.
 
-**Reports** (bug reports, reports of a player, appeals), only when you press Send:
+**Reports** (bug reports, reports of a player, appeals, answers to the developer's questions), only when you press Send:
 - They go to the developer's private Discord channel, through Unity's servers. Only the developer and any moderators they add can read them.
 - A bug report holds what you wrote, the session logs (with your computer's user name taken out), your build if you leave that switched on, a picture of the screen if you leave that on, Protobot's version, and your computer's OS, processor, memory and graphics card.
 - A player report holds what you wrote, both players' names and ids, the match record (where each robot was) and the reported robot's custom parts.
-- Please don't put your name, email address or other personal details in a report.
+- An answer to a question from the developer (a card that sometimes appears while you're online, with a box to type in) holds what you wrote, the name you play under, your player id, Protobot's version and which part of the app you were in. It goes to the same private Discord channel only when you press Send.
+- Please don't put your name, email address or other personal details in a report or an answer.
 - Reports are kept only as long as they're needed to fix the bug or deal with the report. Ask for one to be deleted (see "Contact").
 
 **Updates:** Protobot checks GitHub (github.com/Cranezz/Protobot-Rebuilt) for a new version. GitHub sees your IP address, as with any download.

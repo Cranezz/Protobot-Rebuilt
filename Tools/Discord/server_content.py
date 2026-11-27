@@ -108,6 +108,8 @@ CATEGORIES = [
          "topic": "Reports of players and leaderboard runs sent from Protobot. Private."},
         {"key": "appeals", "name": "appeals", "kind": "reports", "topic": "Appeals sent from Protobot (Multiplayer > Account > Appeal). Private."},
         {"key": "dev_log", "name": "dev-log", "kind": "admin", "topic": "Developer notes and release drafts."},
+        {"key": "console", "name": "player-messages", "kind": "admin",
+         "topic": "Message the players online: !ask <question>, !notify <text>, !list, !stop <id>, !help. Answers come back here."},
     ]},
 ]
 

@@ -220,6 +220,46 @@ def online():
     log("online counter:", found["name"])
 
 
+CONSOLE_HELP = (
+    "**Message the players who are online in Protobot.** Commands (only this channel, only Admins can see it):\n"
+    "`!ask <question>`: a card with a text box; each answer comes back here as a reply to your command.\n"
+    "`!notify <text>`: a card with just your message and OK.\n"
+    "`!ask 2h <question>` / `!notify 30m <text>`: how long it stays up (default 24h, at most 7d). Players who open "
+    "Protobot while it's up see it too; each player sees it once.\n"
+    "`!test ask <question>` / `!test notify <text>`: only your own Protobot gets it (the players in Cloud Save "
+    "\"devPlayers\"): try a message before sending it to everyone.\n"
+    "`!list`: what's up now. `!stop <id>` / `!stop all`: take it down. `!help`: this.\n"
+    "Cloud Code (Presence.js) reads this channel within about a minute while anyone is online, and every hour. "
+    "Answers: Feedback.js (at most 3 per player per question).")
+
+
+def console():
+    """#player-messages (admins only): the developer's commands to the players online (Cloud Code Presence.js reads
+    them, Feedback.js posts the answers). Its id goes to Cloud Save from Tools/AgentTesting/cs/t_discord_console.cs."""
+    ids = state.setdefault("channels", {})
+    spec = next(c for cat in C.CATEGORIES for c in cat["channels"] if c["key"] == "console")
+    body = {"name": spec["name"], "type": 0, "topic": spec["topic"], "parent_id": state["categories"]["reports"],
+            "permission_overwrites": overwrites("admin", spec)}
+    found = call("GET", f"/channels/{ids['console']}", ok404=True) if ids.get("console") else None
+    if found:
+        call("PATCH", f"/channels/{found['id']}", body, REASON)
+    else:
+        found = call("POST", f"/guilds/{G}/channels", body, REASON)
+        ids["console"] = found["id"]
+        save_state(state)
+    msgs = state.setdefault("messages", {})
+    embed = {"title": "📣 Player messages", "description": CONSOLE_HELP, "color": 0x2885F4}
+    mid = msgs.get("console_help")
+    if mid and call("GET", f"/channels/{found['id']}/messages/{mid}", ok404=True):
+        call("PATCH", f"/channels/{found['id']}/messages/{mid}", {"embeds": [embed]})
+    else:
+        m = call("POST", f"/channels/{found['id']}/messages", {"embeds": [embed], "allowed_mentions": {"parse": []}})
+        msgs["console_help"] = m["id"]
+        call("PUT", f"/channels/{found['id']}/pins/{m['id']}")
+        save_state(state)
+    log("player messages channel:", found["name"])
+
+
 def leaderboard():
     """The live skills leaderboard: one message in #skills-leaderboard that Cloud Code DiscordLeaderboard.js keeps up to
     date (after every score posted, and hourly). Posted once here (a placeholder); its id goes to Cloud Save from
@@ -469,7 +509,7 @@ def check():
     log("check:", "ok" if problems == 0 else f"{problems} roles with too much")
 
 
-STEPS = {"settings": settings, "roles": roles, "channels": channels, "online": online, "leaderboard": leaderboard, "community": community, "automod": automod,
+STEPS = {"settings": settings, "roles": roles, "channels": channels, "online": online, "leaderboard": leaderboard, "console": console, "community": community, "automod": automod,
          "messages": messages, "guides": guides, "tutorials": tutorials, "welcome": welcome_screen,
          "onboarding": onboarding, "webhooks": webhooks, "invite": invite, "check": check}
 
