@@ -280,7 +280,8 @@ namespace Protobot.Interface {
                 map[i] = id;
             }
             // Each edge's triangle normals.
-            var faces = new Dictionary<long, (Vector3 first, int count, bool sharp)>();
+            // (V2: a hash that spreads: with long's own, the Override goal took about 4 minutes here and froze the app)
+            var faces = new Dictionary<long, (Vector3 first, int count, bool sharp)>(Protobot.Geometry.EdgeKeys.Comparer);
             for (var t = 0; t + 2 < triangles.Length; t += 3) {
                 int i0 = map[triangles[t]], i1 = map[triangles[t + 1]], i2 = map[triangles[t + 2]];
                 if (i0 == i1 || i1 == i2 || i0 == i2) continue;
@@ -316,7 +317,7 @@ namespace Protobot.Interface {
         }
 
         private static void AddEdge(Dictionary<long, (Vector3 first, int count, bool sharp)> faces, int i, int j, Vector3 normal) {
-            var key = i < j ? ((long)i << 32) | (uint)j : ((long)j << 32) | (uint)i;
+            var key = Protobot.Geometry.EdgeKeys.Of(i, j);
             if (faces.TryGetValue(key, out var entry))
                 faces[key] = (entry.first, entry.count + 1, entry.sharp || Vector3.Angle(entry.first, normal) > 25f);
             else

@@ -47,10 +47,11 @@ namespace Protobot.Custom {
             }
 
             // The triangle across each edge (one, when two triangles share it; edges of three or more are borders).
-            var firstOnEdge = new Dictionary<long, int>();
+            // (a hash that spreads: long's own made big models take minutes here, see EdgeKeys)
+            var firstOnEdge = new Dictionary<long, int>(Protobot.Geometry.EdgeKeys.Comparer);
             var across = new int[count * 3];
             for (var i = 0; i < across.Length; i++) across[i] = -1;
-            long EdgeKey(int a, int b) => a < b ? ((long)a << 32) | (uint)b : ((long)b << 32) | (uint)a;
+            long EdgeKey(int a, int b) => Protobot.Geometry.EdgeKeys.Of(a, b);
             for (var t = 0; t < count; t++) {
                 if (!valid[t]) continue;
                 for (var k = 0; k < 3; k++) {
