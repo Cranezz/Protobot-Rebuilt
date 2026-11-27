@@ -77,6 +77,7 @@ namespace Protobot {
             ThreadPlaceDisplacement.AddTo(this, placePositions);  // V2: a cylinder held by its thread
             CappedShaftPlaceDisplacement.AddTo(this, placePositions);  // V2: the capped shaft into holes
             MountPlaceDisplacement.AddTo(this, placePositions);  // V2: pneumatic mounts onto cylinders
+            FollowerPlaceDisplacement.AddTo(this, placePositions);  // V2: a cam follower through its mounting bracket
             Motion.SlidePlaceDisplacement.AddTo(this, placePositions);  // V2: slide trucks into slide members
             placing = false;
             rotating = false;

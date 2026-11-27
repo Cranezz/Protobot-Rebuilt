@@ -1208,6 +1208,33 @@ namespace Protobot.Online {
             if (blurred != null) return blurred;
             var source = Sharp();
             if (source == null) return null;
+            return blurred = BlurOf(source, "Multiplayer background");
+        }
+
+        private static Texture2D view;
+
+        /// <summary>V2: the 3D view as the camera draws it now, blurred like the backgrounds (the home menu shows the open
+        /// build behind it, so you can see you haven't left it). Null when there's no camera.</summary>
+        public static Texture2D BlurredView(Camera camera) {
+            if (camera == null) return null;
+            var w = Mathf.Max(64, Screen.width / 2);
+            var h = Mathf.Max(64, Screen.height / 2);
+            var rt = RenderTexture.GetTemporary(w, h, 24, RenderTextureFormat.ARGB32);
+            var target = camera.targetTexture;
+            try {
+                camera.targetTexture = rt;
+                camera.Render();
+            }
+            finally {
+                camera.targetTexture = target;
+            }
+            if (view != null) UnityEngine.Object.Destroy(view);
+            view = BlurOf(rt, "Build behind the menu");
+            RenderTexture.ReleaseTemporary(rt);
+            return view;
+        }
+
+        private static Texture2D BlurOf(Texture source, string name) {
             const int width = 400;
             var height = Mathf.Max(1, Mathf.RoundToInt(width * (float)source.height / source.width));
             // Halve it a few times so the small copy keeps every pixel's colour (one big step would skip most).
@@ -1230,7 +1257,7 @@ namespace Protobot.Online {
             if (current != null) RenderTexture.ReleaseTemporary(current);
             var active = RenderTexture.active;
             RenderTexture.active = small;
-            var texture = new Texture2D(width, height, TextureFormat.RGBA32, false) { wrapMode = TextureWrapMode.Clamp, filterMode = FilterMode.Bilinear, name = "Multiplayer background" };
+            var texture = new Texture2D(width, height, TextureFormat.RGBA32, false) { wrapMode = TextureWrapMode.Clamp, filterMode = FilterMode.Bilinear, name = name };
             texture.ReadPixels(new Rect(0, 0, width, height), 0, 0);
             RenderTexture.active = active;
             RenderTexture.ReleaseTemporary(small);
@@ -1238,7 +1265,7 @@ namespace Protobot.Online {
             Blur(pixels, width, height, 3f);
             texture.SetPixels(pixels);
             texture.Apply(false, true);
-            return blurred = texture;
+            return texture;
         }
 
         private static void Blur(Color[] pixels, int w, int h, float sigma) {

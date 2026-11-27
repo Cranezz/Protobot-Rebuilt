@@ -40,6 +40,12 @@ namespace Protobot.Motion {
         public readonly List<(ChainLoop chain, Rotor rotor, float inchesPerRadian)> chains = new();
         public bool jammed;
         public string jamReason;
+        // V2 (advanced gear kit): racks, lead screw nuts and cam followers it drives in a straight line; a worm's wheel
+        // driving its worm (it can't: the system was reached through one); the way its first rotor can't turn
+        // (a ratchet and pawl: +1 / -1 about its axis, 0 free).
+        public readonly List<Slider> sliders = new();
+        public bool backdriven;
+        public int blocked;
 
         public IEnumerable<MotorDrive> Motors => rotors.SelectMany(r => r.motors).Distinct();
 
@@ -185,6 +191,7 @@ namespace Protobot.Motion {
                 if (locked.Contains(part)) continue;
                 var hole = info.hole;
                 if (rotor.motors.Any(m => m.gameObject == part)) continue;   // driven, not locked
+                if (GearKit.Rides(part)) continue;   // V2: a lead screw's nut, a follower: carried, not a bearing
                 // V2: a rotation sensor, encoder or potentiometer measures the shaft turning in it.
                 if (Devices.V5Brain.MeasuresShaft(part)) {
                     if (turnsIn.Add(part)) rotor.bearings.Add((part, info.position));
@@ -214,7 +221,7 @@ namespace Protobot.Motion {
         public static bool TurnsWithShaft(GameObject part) {
             if (!part.TryGetComponent(out SavedObject saved) || string.IsNullOrEmpty(saved.id)) return false;
             var id = saved.id.ToUpperInvariant();
-            return Teeth(part, out _) > 0 || id.StartsWith("OMNI-") || id.StartsWith("TWHL-") || id.StartsWith("FWHL-") || id.StartsWith("MECN")
+            return Teeth(part, out _) > 0 || GearKit.TurnsWithShaft(part) || id.StartsWith("OMNI-") || id.StartsWith("TWHL-") || id.StartsWith("FWHL-") || id.StartsWith("MECN")
                    || id.StartsWith("SPKT-") || (id.StartsWith("VX") && (id.Contains("WHEEL") || id.Contains("SPROCKET") || id.Contains("PULLEY")));
         }
 
@@ -349,6 +356,25 @@ namespace Protobot.Motion {
                         }
                     }
             }
+            // V2: the advanced gear kit: bevel gears and worms link shafts (BFS again over what the system reached,
+            // so a link found here can lead on to more gears).
+            for (var i = 0; i < system.rotors.Count; i++) {
+                var rotor = system.rotors[i];
+                foreach (var (other, kitRatio, backdrive) in GearKit.Links(rotor, all)) {
+                    var ratio = system.ratio[rotor] * kitRatio;
+                    if (system.ratio.TryGetValue(other, out var known)) {
+                        if (Mathf.Abs(known - ratio) > 0.01f * Mathf.Abs(known) && !system.jammed) {
+                            system.jammed = true;
+                            system.jamReason = "the gears go round in a loop that can't turn";
+                        }
+                        continue;
+                    }
+                    if (backdrive) system.backdriven = true;
+                    system.ratio[other] = ratio;
+                    system.rotors.Add(other);
+                    ExtendBySpurs(system, other, all);
+                }
+            }
             // V2: universal joints: the shaft in one yoke turns the shaft in the other (the same way along the path
             // the turn takes through the joint). Done after the gears, over every rotor the system reached.
             for (var i = 0; i < system.rotors.Count; i++) {
@@ -373,6 +399,18 @@ namespace Protobot.Motion {
                     }
                 }
             }
+            // V2: racks, nuts and followers it drives; a ratchet's pawl.
+            system.sliders.AddRange(GearKit.Sliders(system));
+            foreach (var rotor in system.rotors) {
+                var way = GearKit.Blocked(rotor);
+                if (way == 0) continue;
+                var held = way * (int)Mathf.Sign(system.ratio[rotor]);
+                if (system.blocked != 0 && system.blocked != held && !system.jammed) {
+                    system.jammed = true;
+                    system.jamReason = "two ratchets hold it both ways";
+                }
+                system.blocked = held;
+            }
             var stuck = system.rotors.FirstOrDefault(r => r.fixedToFrame);
             if (stuck != null && !system.jammed) {
                 system.jammed = true;
@@ -389,6 +427,35 @@ namespace Protobot.Motion {
                     owner[part] = rotor;
                 }
             return system;
+        }
+
+        // V2: spur gears from a rotor reached through a kit link (the main search is done by then).
+        private static void ExtendBySpurs(DriveSystem system, Rotor from, List<Rotor> all) {
+            var queue = new Queue<Rotor>();
+            queue.Enqueue(from);
+            while (queue.Count > 0) {
+                var rotor = queue.Dequeue();
+                foreach (var gear in rotor.gears)
+                    foreach (var other in all) {
+                        if (other == rotor) continue;
+                        foreach (var otherGear in other.gears) {
+                            if (!Meshes(gear, otherGear)) continue;
+                            if (!system.meshes.Any(m => (m.a == otherGear && m.b == gear) || (m.a == gear && m.b == otherGear)))
+                                system.meshes.Add((gear, otherGear));
+                            var ratio = -system.ratio[rotor] * gear.teeth / otherGear.teeth * Mathf.Sign(Vector3.Dot(rotor.axis, other.axis));
+                            if (system.ratio.TryGetValue(other, out var known)) {
+                                if (Mathf.Abs(known - ratio) > 0.01f * Mathf.Abs(known) && !system.jammed) {
+                                    system.jammed = true;
+                                    system.jamReason = "the gears go round in a loop that can't turn";
+                                }
+                                continue;
+                            }
+                            system.ratio[other] = ratio;
+                            system.rotors.Add(other);
+                            queue.Enqueue(other);
+                        }
+                    }
+            }
         }
 
         /// <summary>The system a motor drives (null when no shaft is in it).</summary>

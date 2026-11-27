@@ -241,7 +241,8 @@ namespace Protobot.Motion {
 
         // ------------------------------------------------------------------ the numbers
 
-        public float Natural => kind.tubing ? Mathf.Max(0.5f, rest) : kind.NaturalLoop;
+        // V2: a band's natural loop is its size's unless its stretch was set (BandEditor's Stretch: rest > 0).
+        public float Natural => kind.tubing ? Mathf.Max(0.5f, rest) : rest > 0.1f ? rest : kind.NaturalLoop;
         public float Stretch(float loopLength) => loopLength * wraps / Natural;
 
         /// <summary>The pull along each span between posts (lbf): every strand there.</summary>

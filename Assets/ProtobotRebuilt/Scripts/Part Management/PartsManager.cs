@@ -20,6 +20,7 @@ namespace Protobot {
             partTypes = partTypes.Concat(Custom.CustomPartGenerator.CreateTypes()).ToArray();
             // V2: chains (made round sprockets by the chain tool).
             partTypes = partTypes.Append(Motion.ChainPartGenerator.CreateType()).ToArray();
+            partTypes = partTypes.Append(Motion.RoboSourceSpacers.CreateType()).ToArray();   // V2: RoboSource's thin washers and spacers
             // V2: rubber bands and latex tubing (loops round posts) and pneumatic tubing (routed between fittings).
             partTypes = partTypes.Append(Motion.ElasticPartGenerator.CreateType()).ToArray();
             partTypes = partTypes.Append(Motion.TubePartGenerator.CreateType()).ToArray();

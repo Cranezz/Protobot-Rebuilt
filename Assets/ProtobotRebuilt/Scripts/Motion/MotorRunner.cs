@@ -11,7 +11,7 @@ namespace Protobot.Motion {
     public class MotorRunner : MonoBehaviour {
         private static MotorRunner host;
 
-        private class Run {
+        public class Run {
             public DriveSystem system;
             public float speed;       // rpm of the system's first rotor
             public float turned;      // degrees of the first rotor
@@ -24,6 +24,104 @@ namespace Protobot.Motion {
             // V2: shafts of other systems that turn in bearings on what turns (a sprocket's shaft on a swinging arm):
             // they're carried round with it.
             public readonly List<(Rotor carrier, List<GameObject> parts)> riders = new();
+            // V2 (advanced gear kit): what it drives in a straight line, each with how far it's gone and where its
+            // parts started (a follower: its cam's reach when the run began).
+            public readonly List<(Slider slider, List<(Transform t, Vector3 at)> start, float moved, float reach)> sliders = new();
+        }
+
+        /// <summary>V2: starts turning a system by hand or by motor (null and why when it can't). The motor runs and
+        /// the hand crank both go through Begin / Apply / End.</summary>
+        public static Run Begin(DriveSystem system, MotorDrive starter, out string refusal) {
+            refusal = null;
+            if (system.jammed) {
+                refusal = system.jamReason;
+                return null;
+            }
+            if (system.backdriven) {
+                refusal = "a worm gear's wheel can't turn its worm (turn the worm's shaft)";
+                return null;
+            }
+            var parts = system.rotors.SelectMany(r => r.parts).Where(p => p != null).Distinct().ToList();
+            var grounded = parts.Concat(system.sliders.SelectMany(sl => sl.parts)).FirstOrDefault(Linkage.IsGrounded);
+            if (grounded != null) {
+                refusal = Interface.PartLabels.Short(grounded) + " on its shaft is grounded";
+                return null;
+            }
+            var run = new Run { system = system, parts = parts, starter = starter };
+            FindHanging(run);
+            FindRiders(run, CurrentRotors());
+            foreach (var slider in system.sliders) {
+                var start = slider.parts.Where(p => p != null).Select(p => (p.transform, p.transform.position)).ToList();
+                run.sliders.Add((slider, start, 0f, GearKit.CamReach(slider)));
+            }
+            var moved = parts.Concat(run.hanging.SelectMany(h => h.body.objects)).Concat(run.riders.SelectMany(r => r.parts))
+                             .Concat(system.sliders.SelectMany(sl => sl.parts)).Where(p => p != null).Distinct().ToList();
+            run.parts = moved;
+            run.before = moved.Select(p => (IElement)new ObjectElement(p)).ToList();
+            foreach (var (chain, _, _) in system.chains) run.before.Add(new ChainLoop.PhaseElement(chain));
+            return run;
+        }
+
+        /// <summary>V2: turns the system's first rotor by up to `degrees` (less where a rack or nut reaches the end of
+        /// its travel, none the way a ratchet holds); what it turned.</summary>
+        public static float Apply(Run run, float degrees) {
+            if (Mathf.Abs(degrees) < 1e-6f) return 0f;
+            var system = run.system;
+            if (system.blocked != 0 && Mathf.Sign(degrees) == system.blocked) return 0f;
+            // The straight-line movers' travel limits it.
+            var scale = 1f;
+            foreach (var (slider, _, moved, _) in run.sliders) {
+                if (slider.cam != null || !system.ratio.TryGetValue(slider.rotor, out var k)) continue;
+                var step = degrees * k * Mathf.Deg2Rad * slider.inchesPerRadian;
+                if (Mathf.Abs(step) < 1e-7f) continue;
+                var room = step > 0f ? slider.high - moved : slider.low - moved;
+                if (room * step <= 0f) scale = 0f;
+                else if (step / room > 1f) scale = Mathf.Min(scale, room / step);
+            }
+            degrees *= scale;
+            if (Mathf.Abs(degrees) < 1e-6f) return 0f;
+            run.turned += degrees;
+            // V2: each part's new pose from where it was before this step (parents set before their children), so a
+            // part inside another that turns on a different shaft (a universal joint's far yoke) isn't turned twice.
+            var moves = new List<(Transform t, Vector3 position, Quaternion rotation, int depth)>();
+            foreach (var rotor in system.rotors) {
+                var q = Quaternion.AngleAxis(degrees * system.ratio[rotor], rotor.axis);
+                var pivot = rotor.start;
+                void Turn(GameObject part) {
+                    if (part == null) return;
+                    var t = part.transform;
+                    var depth = 0;
+                    for (var up = t.parent; up != null; up = up.parent) depth++;
+                    moves.Add((t, pivot + q * (t.position - pivot), q * t.rotation, depth));
+                }
+                foreach (var part in rotor.parts) Turn(part);
+                foreach (var (carrier, riding) in run.riders)
+                    if (carrier == rotor)
+                        foreach (var part in riding) Turn(part);
+            }
+            foreach (var (t, position, rotation, _) in moves.OrderBy(m => m.depth))
+                if (t != null) t.SetPositionAndRotation(position, rotation);
+            foreach (var (chain, rotor, inchesPerRadian) in system.chains)
+                if (chain != null) chain.Advance(degrees * system.ratio[rotor] * Mathf.Deg2Rad * inchesPerRadian);
+            foreach (var (rotor, leader, body, pin) in run.hanging) {
+                var q = Quaternion.AngleAxis(run.turned * system.ratio[rotor], rotor.axis);
+                leader.Set(q, rotor.start - q * rotor.start, false);
+                Linkage.Trail(body, pin, leader);
+            }
+            for (var i = 0; i < run.sliders.Count; i++) {
+                var (slider, start, moved, reach) = run.sliders[i];
+                if (slider.cam != null) moved = GearKit.CamReach(slider) - reach;   // it rides on its cam
+                else moved += degrees * system.ratio[slider.rotor] * Mathf.Deg2Rad * slider.inchesPerRadian;
+                foreach (var (t, at) in start)
+                    if (t != null) t.position = at + slider.axis * moved;
+                run.sliders[i] = (slider, start, moved, reach);
+            }
+            return degrees;
+        }
+
+        /// <summary>V2: one undo step for the run (nothing when it didn't turn).</summary>
+        public static void End(Run run) {
+            if (run != null) Finish(run);
         }
 
         // V2: a shaft whose bearings are all on one of the system's turning rotors rides on it.
@@ -134,27 +232,13 @@ namespace Protobot.Motion {
                     idle.Add(motor);
                     continue;
                 }
-                if (system.jammed) {
+                var run = Begin(system, motor, out var why);   // V2: shared with the hand crank
+                if (run == null) {
                     refused.Add(motor);
-                    Interface.Interface.Say(motor.Label + " can't turn: " + system.jamReason, false);
+                    Interface.Interface.Say(motor.Label + " can't turn: " + why, false);
                     Audio.Sounds.Play(Audio.Sounds.Error);
                     continue;
                 }
-                var parts = system.rotors.SelectMany(r => r.parts).Where(p => p != null).Distinct().ToList();
-                var grounded = parts.FirstOrDefault(Linkage.IsGrounded);
-                if (grounded != null) {
-                    refused.Add(motor);
-                    Interface.Interface.Say(motor.Label + " can't turn: " + Interface.PartLabels.Short(grounded) + " on its shaft is grounded", false);
-                    Audio.Sounds.Play(Audio.Sounds.Error);
-                    continue;
-                }
-                var run = new Run { system = system, parts = parts, starter = motor };
-                FindHanging(run);
-                FindRiders(run, CurrentRotors());   // V2
-                var moved = parts.Concat(run.hanging.SelectMany(h => h.body.objects)).Concat(run.riders.SelectMany(r => r.parts)).Distinct().ToList();
-                run.parts = moved;
-                run.before = moved.Select(p => (IElement)new ObjectElement(p)).ToList();
-                foreach (var (chain, _, _) in system.chains) run.before.Add(new ChainLoop.PhaseElement(chain));
                 runs.Add(run);
 
             }
@@ -177,26 +261,8 @@ namespace Protobot.Motion {
                 // V5 motors get up to speed in a moment.
                 run.speed = Mathf.MoveTowards(run.speed, target, fastest / 0.2f * Time.deltaTime);
                 var degrees = run.speed * 6f * Time.deltaTime;
-                run.turned += degrees;
-                foreach (var rotor in run.system.rotors) {
-                    var turn = degrees * run.system.ratio[rotor];
-                    var pivot = rotor.start;
-                    foreach (var part in rotor.parts)
-                        if (part != null) part.transform.RotateAround(pivot, rotor.axis, turn);
-                    // The rotor's line stays where it is; its start point turns about its own axis (no change).
-                    foreach (var (carrier, riding) in run.riders)
-                        if (carrier == rotor)
-                            foreach (var part in riding)
-                                if (part != null) part.transform.RotateAround(pivot, rotor.axis, turn);
-                }
-                // Chains run with the sprockets that turn them.
-                foreach (var (chain, rotor, inchesPerRadian) in run.system.chains)
-                    if (chain != null) chain.Advance(degrees * run.system.ratio[rotor] * Mathf.Deg2Rad * inchesPerRadian);
-                foreach (var (rotor, leader, body, pin) in run.hanging) {
-                    var q = Quaternion.AngleAxis(run.turned * run.system.ratio[rotor], rotor.axis);
-                    leader.Set(q, rotor.start - q * rotor.start, false);
-                    Linkage.Trail(body, pin, leader);
-                }
+                // V2: a rack or nut at the end of its travel, or a ratchet holding, stalls it.
+                if (Mathf.Abs(Apply(run, degrees)) < Mathf.Abs(degrees) * 0.999f) run.speed = 0f;
                 foreach (var motor in run.system.Motors)
                     motor.Level = run.speed * run.system.MotorRatio(motor) / Mathf.Max(1f, motor.Rpm);
                 if (driving == 0 && Mathf.Abs(run.speed) < 0.001f) {
@@ -207,7 +273,7 @@ namespace Protobot.Motion {
             foreach (var motor in motors) motor.Sound(motor.Level);
         }
 
-        private void Finish(Run run) {
+        private static void Finish(Run run) {
             var turns = Mathf.Abs(run.turned) / 360f;
             if (turns < 0.001f) return;
             StateSystem.AddElements(run.before);

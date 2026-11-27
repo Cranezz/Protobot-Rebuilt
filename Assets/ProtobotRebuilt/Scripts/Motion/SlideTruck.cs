@@ -12,12 +12,17 @@ namespace Protobot.Motion {
     public class SlideTruck : MonoBehaviour {
         public const string TruckId = "VXSLIDEASSEMBLYP-Inner Acetal Slide Truck";
 
-        public static bool IsTruck(string id) => id == TruckId;
+        // V2: the original's slide trunks too (its linear motion kit): the inner one is VEX's truck modelled along z;
+        // the outer one wraps round the outside of a member.
+        public const string ClassicInner = "LMTK-Inner Slide Trunk", ClassicOuter = "LMTK-Outer Slide Trunk";
+        public static bool IsTruck(string id) => id == TruckId || id == ClassicInner || id == ClassicOuter;
         public static bool IsMember(GameObject part) =>
             part != null && part.TryGetComponent(out SavedObject saved) && saved.id != null
             && (saved.id.EndsWith("-Outer Slide Member") || saved.id.EndsWith("-Inner Slide Member"));
 
         public GameObject Member { get; private set; }
+        private string id => TryGetComponent(out SavedObject saved) ? saved.id : TruckId;
+        private Bounds Bounds() => TryGetComponent(out MeshFilter f) && f.sharedMesh != null ? f.sharedMesh.bounds : new Bounds();
         private long seenVersion = -1;
 
         private static readonly Dictionary<Mesh, (float centerY, float webInner)> channels = new();
@@ -39,15 +44,25 @@ namespace Protobot.Motion {
         private static readonly Quaternion TruckTurn = Quaternion.AngleAxis(-90f, Vector3.forward);   // its length along the member's
 
         /// <summary>Where a truck goes in this member, nearest the point.</summary>
-        public static Displacement Seat(GameObject member, Vector3 near, bool free = false) {
+        public static Displacement Seat(GameObject member, Vector3 near, bool free = false, string truckId = TruckId, Bounds? truckBounds = null) {
             var mesh = member.GetComponent<MeshFilter>().sharedMesh;
             var (centerY, web) = Channel(mesh);
             var b = mesh.bounds;
             var x = member.transform.InverseTransformPoint(near).x;
             if (!free) x = Mathf.Round(x * 16f) / 16f;
             x = Mathf.Clamp(x, b.min.x + HalfLength, b.max.x - HalfLength);
-            var local = new Vector3(x, centerY, web - HalfDepth - Clearance);
-            return new Displacement(member.transform.TransformPoint(local), member.transform.rotation * TruckTurn);
+            if (truckId == TruckId) {
+                var local = new Vector3(x, centerY, web - HalfDepth - Clearance);
+                return new Displacement(member.transform.TransformPoint(local), member.transform.rotation * TruckTurn);
+            }
+            // V2: the classic trunks (length along their z, depth along y): turned so z runs along the member, y
+            // toward its web; inner: in the channel against the web, outer: round the member, on its middle.
+            var turn = member.transform.rotation * Quaternion.LookRotation(Vector3.right, Vector3.forward);
+            var tb = truckBounds ?? new Bounds(Vector3.zero, new Vector3(0.69f, 0.33f, 2f));
+            var middle = truckId == ClassicInner
+                ? new Vector3(x, centerY, web - tb.extents.y - Clearance)
+                : new Vector3(x, centerY, b.center.z);
+            return new Displacement(member.transform.TransformPoint(middle) - turn * tb.center, turn);
         }
 
         /// <summary>The member's length line (world): a point, the way along it, and how far each way the truck can go.</summary>
@@ -67,7 +82,7 @@ namespace Protobot.Motion {
             GameObject found = null;
             foreach (var obj in PartsManager.FindLoadedObjects()) {
                 if (obj == null || obj == gameObject || obj.IsDeleted() || !IsMember(obj)) continue;
-                var seat = Seat(obj, transform.position, true);
+                var seat = Seat(obj, transform.position, true, id, Bounds());
                 if ((seat.translation.Position - transform.position).sqrMagnitude < 0.03f * 0.03f
                     && Quaternion.Angle(seat.rotation.Orientation, transform.rotation) < 3f) {
                     found = obj;
@@ -103,16 +118,21 @@ namespace Protobot.Motion {
             if (mouseCast == null || mouseCast.gameObject == null) return false;
             string id = null;
             GameObject self = null;
-            if (placementData is PartPlacementData part && part.partGenerator != null) id = part.partGenerator.GetId();
+            Mesh mesh = null;
+            if (placementData is PartPlacementData part && part.partGenerator != null) {
+                id = part.partGenerator.GetId();
+                mesh = part.partGenerator.GetMesh();
+            }
             else if (placementData.TryParse(out GameObjectPlacementData moving) && moving.GetGameObject() != null && moving.GetGameObject().TryGetComponent(out SavedObject saved)) {
                 self = moving.GetGameObject();
                 id = saved.id;
+                mesh = self.GetComponent<MeshFilter>()?.sharedMesh;
             }
             if (!SlideTruck.IsTruck(id)) return false;
             var hovered = mouseCast.gameObject.GetComponentInParent<SavedObject>();
             if (hovered == null || hovered.gameObject == self || !SlideTruck.IsMember(hovered.gameObject)) return false;
             var keyboard = UnityEngine.InputSystem.Keyboard.current;
-            displacement = SlideTruck.Seat(hovered.gameObject, mouseCast.hit.point, keyboard != null && keyboard.shiftKey.isPressed);
+            displacement = SlideTruck.Seat(hovered.gameObject, mouseCast.hit.point, keyboard != null && keyboard.shiftKey.isPressed, id, mesh != null ? mesh.bounds : (Bounds?)null);
             return true;
         }
     }

@@ -93,7 +93,10 @@ namespace Protobot {
             var wide = Mathf.Max(across[0], across[1]);
             var narrow = Mathf.Min(across[0], across[1]);
             // Thin along its axle, not a long bar (a channel's middle hole isn't where it goes on).
-            if (thick > narrow + 0.01f || wide > 6.5f || wide > narrow * 4f) return false;
+            // A tube (a spacer longer than it's wide: 1/2", 7/8", 1"): narrow, its hole running its whole length, not
+            // threaded (a standoff). These were refused and fell back to plain hole placing, turned the wrong way.
+            var tube = wide <= 0.6f && middle.transform.localScale.z >= thick * 0.85f && middle.holeType != HoleCollider.HoleType.Threaded;
+            if ((thick > narrow + 0.01f && !tube) || wide > 6.5f || wide > narrow * 4f) return false;
             axle.center = middle.transform.localPosition;
             axle.axis = axis;
             float low = float.MaxValue, high = float.MinValue;
@@ -180,13 +183,43 @@ namespace Protobot {
                 displacement = Onto(axle, current, from, direction, start.Value, t.up, nut ? edge : 0);
                 return true;
             }
-            if (placementData.objectId.StartsWith("NUT")) return false;   // a nut over a hole: as before
+            // V2: a nut over a nut retainer drops into its hex pocket, its flats lined up with the pocket's.
+            var pocket = nut && hover != null ? hover.GetComponentInParent<Motion.NutPocket>() : null;
+            if (pocket != null && pocket.gameObject != self && pocket.GetComponent<SavedObject>() != null) {
+                displacement = Seat(axle, current, template, pocket);
+                return true;
+            }
+            // V2: a nut over a hole sits flat on the hole's face (it used to be left where the mouse was), the side it
+            // threads on from against the part.
             if (hoverHoleFace != null && hoverHoleFace.gameObject.activeInHierarchy && hoverHoleFace.direction != Vector3.zero
                 && (hover == null || hover.GetComponent<SavedObject>() == null || hoverHoleFace.hole == null || hoverHoleFace.hole.part != self)) {
-                displacement = Onto(axle, current, hoverHoleFace.position, hoverHoleFace.direction.normalized, 0f, hoverHoleFace.transform.up);
+                displacement = Onto(axle, current, hoverHoleFace.position, hoverHoleFace.direction.normalized, 0f, hoverHoleFace.transform.up, nut ? -1 : 0);
                 return true;
             }
             return false;
+        }
+
+        private static readonly Dictionary<int, float> pocketAngles = new();
+
+        // A nut in a retainer's pocket: its threading side on the pocket's floor, axle out through the mouth, turned
+        // about it so its corners sit in the pocket's corners.
+        private static Displacement Seat(Axle axle, Quaternion current, GameObject template, Motion.NutPocket pocket) {
+            var pt = pocket.transform;
+            var outward = pt.TransformDirection(pocket.outward).normalized;
+            var floor = pt.TransformPoint(pocket.floor);
+            var rotation = Quaternion.FromToRotation(-(current * axle.axis), outward) * current;
+            var refLocal = Vector3.Cross(pocket.outward, Mathf.Abs(pocket.outward.y) < 0.9f ? Vector3.up : Vector3.right).normalized;
+            var key = pocket.GetInstanceID();
+            if (!pocketAngles.TryGetValue(key, out var want)) pocketAngles[key] = want = pocket.CornerAngle(refLocal);
+            if (!float.IsNaN(want) && template != null && template.TryGetComponent(out MeshFilter nutFilter) && nutFilter.sharedMesh != null && nutFilter.sharedMesh.isReadable) {
+                var refNut = Quaternion.Inverse(rotation) * pt.TransformDirection(refLocal);
+                var corner = pocket.across * 0.5f / Mathf.Cos(30f * Mathf.Deg2Rad);
+                // Only up to the pocket's corner: a keps nut's star teeth reach farther.
+                var have = Motion.NutPocket.HexCorner(nutFilter.sharedMesh.vertices, axle.center, -axle.axis, refNut, pocket.across * 0.4f, corner + 0.03f, -10f, 10f);
+                if (!float.IsNaN(have)) rotation = Quaternion.AngleAxis(want - have, outward) * rotation;
+            }
+            var position = floor + outward * axle.high - rotation * axle.center;
+            return new Displacement(position, rotation);
         }
 
         // The part's pose with its axle on the line (origin + direction * distance), reaching from `start` along it.

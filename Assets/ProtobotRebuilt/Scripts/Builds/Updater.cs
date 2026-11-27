@@ -225,7 +225,8 @@ namespace Protobot.Builds {
         private static void Offer(UpdateManager manager, UpdateInfo info) {
             var version = BuildInfo.Readable(info.TargetFullRelease.Version.ToString());   // V2: "v2.0 Beta 1 (build 71)"
             var dialog = Dialog.Open("Update available", new Vector2(560f, 470f));
-            var head = Ui.Text(dialog.Body, "Head", "Protobot " + version + " is ready", Theme.FontTitle + 4f, Theme.Text, Theme.Medium);
+            Ui.Column(dialog.Body, 8f);   // V2: the body lays its rows out (they were drawn on top of each other)
+            var head =Ui.Text(dialog.Body, "Head", "Protobot " + version + " is ready", Theme.FontTitle + 4f, Theme.Text, Theme.Medium);
             head.Size(-1, 34f);
             var sub = Ui.Text(dialog.Body, "Sub", "You have " + BuildInfo.Label + ".  Download: " + Megabytes(DownloadBytes(info)) + ".  Protobot saves your build, then restarts when it's done.",
                 Theme.FontSmall, Theme.TextDim);

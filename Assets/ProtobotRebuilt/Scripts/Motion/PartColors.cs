@@ -41,7 +41,25 @@ namespace Protobot.Motion {
             if (id.StartsWith("VXSLIDEASSEMBLYP") && name.Contains("Slide Member"))
                 return Like("SCRW", null, current.Length);
             if (id.StartsWith("VXPNEUMATICS")) return Pneumatic(name, current);
+            if (id.StartsWith("VXADVANCEDGEARS") || id.StartsWith("MCMS-")) return Kit(id, name, current);
             return null;
+        }
+
+        // V2: the advanced gear kit as VEX's CAD colors it: dark green gears, cams, cranks, racks and screws, gray
+        // brackets and nuts (VEX-CAD's 32,92,64 and 84,88,90), plain plastic. The original's kit parts were red and
+        // a too-bright metallic gray, and VEX-CAD's gray brackets had come in green (the nearest palette color).
+        private static Material[] Kit(string id, string name, Material[] current) {
+            if (!id.StartsWith("VXADVANCEDGEARS") && GearKit.Kind(id) == KitKind.None && !name.StartsWith("Screw Kit") && !name.StartsWith("Worm and Wheel")) return null;
+            var grayPart = name.Contains("Bracket") || name.Contains("Nut");
+            var green = Tinted("Kit Green", current[0], new Color(0.09f, 0.25f, 0.16f), 0.25f, 0f);
+            var gray = Tinted("Kit Gray", current[0], new Color(0.17f, 0.18f, 0.19f), 0.25f, 0f);
+            var result = new Material[current.Length];
+            for (var i = 0; i < current.Length; i++) {
+                var m = current[i] != null ? current[i].name : "";
+                result[i] = m.Contains("Steel") || m.Contains("Metal") || m.StartsWith("White") ? current[i]
+                    : m.StartsWith("Dark Gray") || grayPart ? gray : green;
+            }
+            return result;
         }
 
         /// <summary>V2: RoboSource's head color for a shoulder screw's length (robosource.net, color coded shoulder
@@ -125,12 +143,13 @@ namespace Protobot.Motion {
             return material != null ? Enumerable.Repeat(material, count).ToArray() : null;
         }
 
-        private static Material Tinted(string key, Material basis, Color color, float smoothness) {
+        private static Material Tinted(string key, Material basis, Color color, float smoothness, float metallic = -1f) {
             if (made.TryGetValue(key, out var m) && m != null) return m;
             m = new Material(basis) { name = key };
             m.color = color;
             if (m.HasProperty("_BaseColor")) m.SetColor("_BaseColor", color);
             if (m.HasProperty("_Smoothness")) m.SetFloat("_Smoothness", smoothness);
+            if (metallic >= 0f && m.HasProperty("_Metallic")) m.SetFloat("_Metallic", metallic);   // V2
             return made[key] = m;
         }
     }

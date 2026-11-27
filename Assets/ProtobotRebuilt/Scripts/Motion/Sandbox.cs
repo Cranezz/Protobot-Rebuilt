@@ -134,6 +134,10 @@ namespace Protobot.Motion {
             // V2: its shafts' hinges (with each one's ratio), whose drives hold a stopped train (GearboxFriction).
             public readonly List<(ConfigurableJoint joint, float k)> hinges = new();
             public float holding = -1f;   // the torque the hinges' drives hold now
+            // V2 (advanced gear kit): racks and lead screw nuts it drives along their slide joint (k: inches per radian
+            // of the train's turn), and the way its first rotor can't turn (a ratchet: +1 / -1, 0 free).
+            public readonly List<(Rigidbody rb, Rigidbody frame, Vector3 axisLocal, float k)> sliders = new();
+            public int blocked;
         }
 
         private class Slide {
@@ -1588,8 +1592,39 @@ namespace Protobot.Motion {
                 foreach (var motor in system.Motors)
                     if (bodyOf.TryGetValue(motor.gameObject, out var motorBody) && !seen.Contains(motorBody.rb))
                         train.motors.Add((motor, system.MotorRatio(motor)));
+                // V2: the advanced gear kit's straight-line movers: a slide joint to what the driving shaft turns in;
+                // racks and nuts are driven by the train, followers slide freely and ride on their cam.
+                train.blocked = system.blocked;
+                foreach (var slider in system.sliders) {
+                    if (!bodyOf.TryGetValue(slider.part, out var sliderBody) || !bodyOf.TryGetValue(slider.rotor.shaft, out var rotorBody)) continue;
+                    var frame = HingedTo(rotorBody.rb);
+                    if (frame == null || frame == sliderBody.rb) continue;
+                    MakeSliderJoint(sliderBody.rb, frame, slider);
+                    if (slider.cam == null && seen.Contains(rotorBody.rb))
+                        train.sliders.Add((sliderBody.rb, frame, frame.transform.InverseTransformDirection(slider.axis), system.ratio[slider.rotor] * slider.inchesPerRadian));
+                }
                 if (train.rotors.Count > 0) trains.Add(train);
             }
+        }
+
+        // V2: a rack, nut or follower slides along its axis on the frame, within its travel (the limit is symmetric
+        // round the joint's rest place: the middle of the travel).
+        private static void MakeSliderJoint(Rigidbody body, Rigidbody frame, Slider slider) {
+            var at = slider.part.transform.position;
+            var middle = (slider.low + slider.high) / 2f;
+            var joint = body.gameObject.AddComponent<ConfigurableJoint>();
+            joint.connectedBody = frame;
+            joint.autoConfigureConnectedAnchor = false;
+            joint.anchor = body.transform.InverseTransformPoint(at);
+            joint.connectedAnchor = frame.transform.InverseTransformPoint(at + slider.axis * middle);
+            joint.axis = body.transform.InverseTransformDirection(slider.axis);
+            joint.secondaryAxis = body.transform.InverseTransformDirection(Perpendicular(slider.axis));
+            joint.xMotion = ConfigurableJointMotion.Limited;
+            joint.yMotion = joint.zMotion = ConfigurableJointMotion.Locked;
+            joint.angularXMotion = joint.angularYMotion = joint.angularZMotion = ConfigurableJointMotion.Locked;
+            joint.linearLimit = new SoftJointLimit { limit = Mathf.Max(0.01f, Mathf.Min(6f, (slider.high - slider.low) / 2f)) };
+            joint.enableCollision = false;
+            joint.enablePreprocessing = false;
         }
 
         private void MakeChain(ChainLoop chain, Rigidbody rotor, Rigidbody frame, Vector3 axis, float inchesPerRadian) {
@@ -1934,6 +1969,16 @@ namespace Protobot.Motion {
                 inertia += k * k * spin[i];
                 momentum += k * spin[i] * now[i];
             }
+            // V2: racks and nuts it drives carry their mass at their ratio (inches per radian of the train).
+            var slid = new float[train.sliders.Count];
+            for (var i = 0; i < train.sliders.Count; i++) {
+                var (rb, frame, axisLocal, k) = train.sliders[i];
+                if (rb == null || frame == null) continue;
+                var n = frame.transform.TransformDirection(axisLocal);
+                slid[i] = Vector3.Dot(rb.linearVelocity - frame.GetPointVelocity(rb.worldCenterOfMass), n);
+                inertia += k * k * rb.mass;
+                momentum += k * rb.mass * slid[i];
+            }
             if (inertia <= 0f) return;
             var speed = momentum / inertia;
             float a = 0f, b = 0f, most = 0f;
@@ -1968,6 +2013,8 @@ namespace Protobot.Motion {
             var next = (inertia * speed + a * dt) / (inertia + b * dt);
             // V2: hold mode (Controls.Hold): not driven, its motors stop the train where it is (up to their stall torque).
             if (hold) next = 0f;
+            // V2: a ratchet's pawl: never the way it holds.
+            if (train.blocked != 0 && Mathf.Sign(next) == train.blocked) next = 0f;
             // The V5 motor's current limit: no more than its stall torque.
             var torque = (next - speed) * inertia / dt;
             if (Mathf.Abs(torque) > most && most > 0f) next = speed + Mathf.Sign(torque) * most * dt / inertia;
@@ -1978,6 +2025,16 @@ namespace Protobot.Motion {
                 var n = rb.transform.TransformDirection(axisLocal);
                 Spin(rb, n, change, rb.transform.TransformPoint(pointLocal));
                 if (frame != null) frame.AddTorque(-n * (change * spin[i]), ForceMode.Impulse);
+                rb.WakeUp();
+            }
+            for (var i = 0; i < train.sliders.Count; i++) {
+                var (rb, frame, axisLocal, k) = train.sliders[i];
+                if (rb == null || frame == null) continue;
+                var n = frame.transform.TransformDirection(axisLocal);
+                var change = k * next - slid[i];
+                if (Mathf.Abs(change) < 1e-6f) continue;
+                rb.linearVelocity += n * change;
+                frame.AddForce(-n * (change * rb.mass), ForceMode.Impulse);
                 rb.WakeUp();
             }
             foreach (var (motor, k) in train.motors) motor.Level = k * next / FreeSpeed(motor);

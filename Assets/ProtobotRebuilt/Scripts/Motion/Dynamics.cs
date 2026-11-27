@@ -28,6 +28,7 @@ namespace Protobot.Motion {
                 if (RubberLinkPart.Is(id) && part.GetComponent<RubberLinkPart>() == null) part.AddComponent<RubberLinkPart>();   // V2: studs, bending
             }
             else if (VexHoleFixes.Handles(id)) VexHoleFixes.Apply(part, id);
+            if (id.StartsWith("MCMS-")) PartColors.Apply(part, id);   // V2: the original's gear kit in VEX's colors
             if (id.StartsWith("FWHL-") || id.StartsWith("SPCR-") || id.StartsWith("PSPC-")) PartColors.Apply(part, id);   // V2: flex wheels by hardness, gray spacers
         }
 
@@ -38,6 +39,8 @@ namespace Protobot.Motion {
         private static void CleanVexHoles(GameObject part, string id) {
             var type = PartsManager.GetPartType(id);
             if (type == null || type.group == PartType.PartGroup.Structure) return;
+            if (id.Contains("Hex Retainer")) return;
+            var followerBracket = id.Contains("Cam Follower Mounting Bracket");   // V2: its window holds the follower   // V2: VexHoleFixes.Retainer sorts it (the hex pocket is a nut seat)
             var holes = part.GetComponentsInChildren<HoleCollider>(true).Where(h => h.transform.parent == part.transform).ToList();
             if (holes.Count == 0) return;
             HoleCollider middle = null;
@@ -52,6 +55,7 @@ namespace Protobot.Motion {
                 var wide = Mathf.Max(scale.x, scale.y);
                 var narrow = Mathf.Min(scale.x, scale.y);
                 var odd = hole.holeData != null && hole.holeData.outline != null;
+                if (followerBracket && narrow > 0.4f) continue;
                 if (wide > 0.3f || wide - narrow > 0.03f || odd) {
                     hole.transform.SetParent(null);
                     Object.DestroyImmediate(hole.gameObject);

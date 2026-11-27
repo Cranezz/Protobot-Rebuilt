@@ -44,10 +44,11 @@ namespace Protobot.Interface {
                 holder.gameObject.AddComponent<RectMask2D>();
                 var picture = Online.Backgrounds.Blurred();
                 if (picture != null) {
-                    var raw = Ui.Rect("Picture", holder).gameObject.AddComponent<RawImage>();
+                    var raw = background = Ui.Rect("Picture", holder).gameObject.AddComponent<RawImage>();
+                    backgroundFit = raw.gameObject.AddComponent<AspectRatioFitter>();
                     raw.texture = picture;
                     raw.raycastTarget = false;
-                    var fit = raw.gameObject.AddComponent<AspectRatioFitter>();
+                    var fit = backgroundFit;
                     fit.aspectMode = AspectRatioFitter.AspectMode.EnvelopeParent;
                     fit.aspectRatio = (float)picture.width / picture.height;
                     raw.gameObject.AddComponent<Online.BackgroundDrift>();
@@ -128,9 +129,32 @@ namespace Protobot.Interface {
         // Recent builds: the list is remade when the window opens, so its names are tidied as they come.
         private float next;
 
+        private RawImage background;
+        private AspectRatioFitter backgroundFit;
+        private bool menuShown;
+
+        // V2: going back to the home menu with a build open shows that build, blurred, behind the menu (you haven't
+        // left it); with nothing built, the field picture.
+        private void ChooseBackground() {
+            if (background == null) return;
+            var parts = 0;
+            foreach (var saved in FindObjectsByType<SavedObject>(FindObjectsSortMode.None))
+                if (saved.gameObject.activeInHierarchy && saved.gameObject.layer != LayerMask.NameToLayer("Deleted")) parts++;
+            var picture = parts > 0 ? Online.Backgrounds.BlurredView(PivotCamera.Main != null ? PivotCamera.Main.camera : Camera.main) : null;
+            if (picture == null) picture = Online.Backgrounds.Blurred();
+            if (picture == null) return;
+            background.texture = picture;
+            backgroundFit.aspectRatio = (float)picture.width / picture.height;
+        }
+
         private void Update() {
-            // V2: the 3D view isn't drawn while the home menu covers it.
-            if (splashPanel != null) Online.ViewHider.Set(this, splashPanel.gameObject.activeInHierarchy);
+            // V2: the 3D view isn't drawn while the home menu covers it (looked at once first, for its background).
+            if (splashPanel != null) {
+                var shown = splashPanel.gameObject.activeInHierarchy;
+                if (shown && !menuShown) ChooseBackground();
+                menuShown = shown;
+                Online.ViewHider.Set(this, shown);
+            }
             // V2: the credits are longer now: the recent builds step aside while they show.
             if (creditsPanel != null && recentBuilds != null && recentBuilds.activeSelf == creditsPanel.activeInHierarchy) recentBuilds.SetActive(!creditsPanel.activeInHierarchy);
             if (launch == null || Time.unscaledTime < next) return;

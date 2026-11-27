@@ -801,10 +801,73 @@ namespace Protobot.Interface {
                 });
             var hint = Ui.Hint(footer, "Click", "place", "R", "turn", "Esc", "stop");
             hint.Size(-1, 20f);
-            if (stepHoles != null)
+            var holes = stepHoles != null;
+            // V2: Ctrl+wheel steps through the part's sizes and kinds when it has no hole count (a screw's lengths; a flex
+            // wheel's diameters and hardnesses: the parts listed with it in its family).
+            if (!holes) stepHoles = StepSizes(generator, vex);
+            if (holes)
                 Ui.Hint(footer, "Ctrl+Wheel", "more or fewer holes", "T", "reset turn").Size(-1, 20f);
+            else if (stepHoles != null)
+                Ui.Hint(footer, "Ctrl+Wheel", "size or kind", "T", "reset turn").Size(-1, 20f);
             else
                 Ui.Hint(footer, "Ctrl", "slide freely on a screw", "T", "reset turn").Size(-1, 20f);
+        }
+
+        private System.Action<int> StepSizes(PartGenerator generator, bool vex) {
+            // The parts listed with it first (sizes and kinds as the list shows them), else its own options.
+            var family = FamilyOf(selected);
+            if (family.Count >= 2)
+                return direction => {
+                    var i = Mathf.Max(0, family.IndexOf(selected));
+                    Choose(family[(i + direction + family.Count) % family.Count]);
+                };
+            if (!vex && generator.UsesParams && !generator.param1.custom) {
+                var options = generator.GetParam1Options();
+                if (options.Count > 1)
+                    return direction => {
+                        var i = Mathf.Max(0, options.IndexOf(generator.param1.value));
+                        generator.param1.value = options[(i + direction + options.Count) % options.Count];
+                        if (generator.UsesTwoParams) {
+                            var second = generator.GetParam2Options();
+                            if (!generator.param2.custom && second.Count > 0 && !second.Contains(generator.param2.value)) generator.param2.value = second[0];
+                        }
+                        BuildSizes();
+                        StartPlacing();
+                    };
+            }
+            return null;
+        }
+
+        // The parts listed with this one, of its family: its group's, or the group above when that holds more of the
+        // family (flex wheels: one group per diameter, by hardness, under "Flex wheels").
+        private static List<CatalogNode> FamilyOf(CatalogNode leaf) {
+            var path = new List<CatalogNode>();
+            bool Find(CatalogNode node) {
+                path.Add(node);
+                if (node == leaf) return true;
+                if (node.IsGroup)
+                    foreach (var child in node.children)
+                        if (Find(child)) return true;
+                path.RemoveAt(path.Count - 1);
+                return false;
+            }
+            if (leaf == null || leaf.typeId == null) return new List<CatalogNode>();
+            foreach (var root in PartsCatalog.Nodes)
+                if (Find(root)) break;
+            if (path.Count < 2 || !path[path.Count - 2].IsGroup) return new List<CatalogNode>();
+            var parent = path[path.Count - 2];
+            var family = parent.Leaves().Where(l => l.typeId != null && l.action == null).Distinct().ToList();
+            // The group above when the family fills it in groups of two or more (flex wheels: a group per diameter, by
+            // hardness): then Ctrl+wheel goes through every size and hardness. Not a whole kit (the advanced gears).
+            if (path.Count >= 3 && path[path.Count - 3].IsGroup) {
+                var grand = path[path.Count - 3];
+                var groups = grand.children.Where(c => c.IsGroup && c.Leaves().Any(l => l.typeId == leaf.typeId)).ToList();
+                var all = grand.Leaves().Where(l => l.typeId == leaf.typeId && l.action == null).Distinct().ToList();
+                if (groups.Count >= 2 && groups.All(g => g.Leaves().Count(l => l.typeId == leaf.typeId) >= 2)
+                    && all.All(l => groups.Any(g => g.Leaves().Contains(l))) && all.Count <= 40)
+                    family = all;
+            }
+            return family;
         }
 
         private void ParamRow(Parameter parameter, List<string> options, System.Action<string> set) {

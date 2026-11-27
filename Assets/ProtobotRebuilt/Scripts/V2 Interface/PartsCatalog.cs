@@ -186,6 +186,9 @@ namespace Protobot.Interface {
                 Group(s, "Nylon (5/16\" OD)", "VXSPACERS", Vex(s, "VXSPACERS", o => Contains(o, "5/16\" OD") && !o.Contains("Black") && !o.Contains("White"), o => o.Replace(" (5/16\" OD)", ""))),
                 Group(s, "Nylon (1/2\" OD)", "VXSPACERS", Vex(s, "VXSPACERS", o => Contains(o, "1/2\" OD") && Contains(o, "Nylon") && !o.Contains("Black") && !o.Contains("White"), o => o.Replace(" (1/2\" OD)", ""))),
                 Group(s, "High strength", "SPCR", Sizes(s, "SPCR", "High Strength", o => Pretty(o) + " HS spacer")),
+                // V2: RoboSource's thin nylon washers, 1/4" OD spacers and fender washer (Motion/RoboSourceSpacers).
+                Group(s, "RoboSource", "RSSP", Protobot.Motion.RoboSourceSpacers.All.Select(k => Leaf(s, k.name, "RSSP", k.key, null,
+                    "RoboSource " + k.name + ": " + k.material + ", " + Inch.Format(k.od) + " across, for #8 screws and VEX shafts."))),
                 Group(s, "Plastic", "SPCR", Sizes(s, "SPCR", "Plastic", o => Pretty(o) + " plastic spacer")),
                 Group(s, "Click-on", "VXSPACERS", Vex(s, "VXSPACERS", o => Contains(o, "Click On")))));
             Add(Group(s, "Washers", "VXSPACERS",
@@ -274,9 +277,11 @@ namespace Protobot.Interface {
                 section = s, name = k.tubing ? k.name : k.shortName, action = "band:" + k.key, iconType = "SPCR",
                 tip = (k.tubing ? "Latex tubing" : "Rubber band") + " " + k.Size + ", " + k.material + " (" + k.source + "). Click the posts it goes round (a standoff, screw, shaft, "
                       + "spacer, a hole or any edge): two clicks make it, Shift+click adds more. It pulls in the simulation as hard as the real one stretched that far." };
-            Add(Group(s, "Rubber bands", "SPCR",
-                Group(s, "VEX", "SPCR", Protobot.Motion.ElasticKind.All.Where(k => !k.tubing && k.source.StartsWith("VEX")).Select(Band)),
-                Group(s, "RoboSource", "SPCR", Protobot.Motion.ElasticKind.All.Where(k => !k.tubing && k.source.StartsWith("RoboSource")).Select(Band))));
+            // V2: one rubber band (the user's ask); its size, how many, wraps and stretch are set in its bar.
+            Add(new CatalogNode { section = s, name = "Rubber band", action = "band:V64", iconType = "SPCR",
+                                  tip = "A rubber band round two or more posts (a standoff, screw, shaft, spacer, a hole or any edge): two clicks make it, Shift+click "
+                                        + "adds more. Its size (#32, #64, #117B), bands side by side and wraps are in the bar; click a band to set how far it's stretched. "
+                                        + "It pulls in the simulation as hard as a real one stretched that far." });
             foreach (var k in Protobot.Motion.ElasticKind.All.Where(k => k.tubing)) Add(Band(k));
             Add(Group(s, "Lock bars", "LKBR",
                 Group(s, "Normal", "LKBR", Each(s, "LKBR", o => o + " lock bar")),
@@ -290,7 +295,8 @@ namespace Protobot.Interface {
                     .Concat(Sizes(s, "MCMS", "Screw Kit", o => "Lead screw " + o.ToLowerInvariant()))
                     .Concat(Vex(s, "VXADVANCEDGEARS", o => o == "Lead Screw Segment"))),
                 Group(s, "Cams and cranks", "MCMS", Leaf(s, "Cam follower", "MCMS", "Cam Follower"), Leaf(s, "Drop off cam", "MCMS", "Drop Off Cam"),
-                    Leaf(s, "Hand crank", "MCMS", "Hand Crank"), Leaf(s, "Rack", "MCMS", "Rack")),
+                    Leaf(s, "Hand crank", "MCMS", "Hand Crank"), Leaf(s, "Rack", "MCMS", "Rack"),
+                    Leaf(s, "Cam follower mounting bracket", "VXADVANCEDGEARS", "Cam Follower Mounting Bracket")),   // V2: holds the follower
                 Group(s, "Winch and ratchet", "VXADVANCEDGEARS", Vex(s, "VXADVANCEDGEARS", o => Contains(o, "Winch Drum", "Winch Pawl", "Ratchet"))),
                 Group(s, "Differential and joints", "VXADVANCEDGEARS", Vex(s, "VXADVANCEDGEARS", o => Contains(o, "Differential", "Universal Joint"))),
                 Group(s, "Pulley", "VXMOTIONPARTS", Vex(s, "VXMOTIONPARTS", o => o == "Pulley"))));
@@ -301,7 +307,8 @@ namespace Protobot.Interface {
                 Leaf(s, "Slide truck", "VXSLIDEASSEMBLYP", "Inner Acetal Slide Truck"),
                 Leaf(s, "Inner slide truck (classic)", "LMTK", "Inner Slide Trunk"), Leaf(s, "Outer slide truck (classic)", "LMTK", "Outer Slide Trunk")));
             // V2: one hinge per size (both leaves and the pin: Motion/HingePart), not its three pieces.
-            Add(Group(s, "Hinges", "VXHINGES", Vex(s, "VXHINGES", o => o.EndsWith("(bottom)"), o => o.Replace(" Hole Hinge (bottom)", " hole hinge"))));
+            // V2 (the user's ask): just the 5 hole hinge, the whole part (both leaves and the pin), turning on its pin.
+            Add(Group(s, "Hinges", "VXHINGES", Vex(s, "VXHINGES", o => o == "5 Hole Hinge (bottom)", o => "Hinge (5 holes)")));
             Add(Leaf(s, "Rubber bumper", "RBMP"));
         }
 

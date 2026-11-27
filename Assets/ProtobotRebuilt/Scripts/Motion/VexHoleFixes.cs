@@ -15,6 +15,9 @@ namespace Protobot.Motion {
         private class Fix {
             public readonly List<int> remove = new();
             public readonly List<CustomHole> add = new();
+            public bool pocket;   // V2: a nut retainer's hex pocket (NutPocket)
+            public Vector3 pocketFloor, pocketOut;
+            public float pocketDepth, pocketAcross;
         }
 
         private static readonly Dictionary<string, Fix> cache = new();
@@ -31,6 +34,83 @@ namespace Protobot.Motion {
                 Object.DestroyImmediate(holes[index].gameObject);
             }
             if (fix.add.Count > 0) CustomParts.AddHoles(part, fix.add);
+            if (fix.pocket) {
+                var pocket = part.GetComponent<NutPocket>();
+                if (pocket == null) pocket = part.AddComponent<NutPocket>();
+                pocket.floor = fix.pocketFloor;
+                pocket.outward = fix.pocketOut;
+                pocket.depth = fix.pocketDepth;
+                pocket.across = fix.pocketAcross;
+            }
+        }
+
+        // V2 (hole audit, build 87: cs/t_audit.cs): parts whose model has screw or shaft openings the scanner left
+        // without a hole: VEX's drop off cam, the ratchet's and HS gears' bolt holes, the 6P 24T sprocket's, the bent
+        // gussets' angled legs, the brain mounts' and battery clip's slots, the bumper's slots, the old 2.75" omni
+        // wheel (no hole at all). Each opening there with no hole gets one (its own size and
+        // shape); the wheels' and sprockets' weight-saving pockets aren't holes and aren't touched.
+        private static bool MissesHoles(string id, string name) =>
+            (id.StartsWith("VXADVANCEDGEARS") && (name == "Drop Off Cam" || name == "Ratchet Gear" || name == "Winch Drum"))
+            || (id.StartsWith("VXGEARS") && name.StartsWith("HS "))
+            || (id.StartsWith("VXSPROCKETS") && name.StartsWith("6P "))
+            || (id.StartsWith("VXGUSSETSVEX") && name.Contains("Bent"))
+            || (id.StartsWith("VXV5ELECTRONICS") && (name.StartsWith("Brain Mount") || name == "Battery Clip"))
+            || (id.StartsWith("VXSENSORS") && name.Contains("Bumper"))
+            || (id.StartsWith("VXWHEELS") && name.Contains("Omni Wheel (old)"));
+
+        private static void AddMissing(Mesh mesh, List<HoleCollider> holes, Fix fix) {
+            var probe = new GameObject("Opening Probe") { hideFlags = HideFlags.HideAndDontSave };
+            var collider = probe.AddComponent<MeshCollider>();
+            collider.sharedMesh = mesh;
+            try {
+                foreach (var o in Openings(mesh, collider)) {
+                    var small = Mathf.Min(o.size, o.size2 > 0f ? o.size2 : o.size);
+                    var big = Mathf.Max(o.size, o.size2);
+                    if (small < 0.12f || small > 0.27f || big > 1f) continue;
+                    var covered = holes.Any(h => {
+                        var off = h.transform.localPosition - o.centre;
+                        var lateral = (off - o.normal * Vector3.Dot(off, o.normal)).magnitude;
+                        return lateral < 0.08f && Mathf.Abs(Vector3.Dot(h.transform.localRotation * Vector3.forward, o.normal)) > 0.9f;
+                    }) || fix.add.Any(a => (a.center - o.centre).magnitude < 0.08f);
+                    if (covered) continue;
+                    fix.add.Add(new CustomHole { center = o.centre, axis = o.normal, up = o.up, size = o.size, size2 = o.size2, depth = o.depth, square = o.square, outline = o.outline });
+                }
+            }
+            finally {
+                Object.DestroyImmediate(probe);
+            }
+        }
+
+        // V2: nut retainers (hex) and standoff retainers. The hex pocket isn't a hole (the scanner saw a 0.364" round
+        // one: a circle drawn over the nut's seat); it becomes a NutPocket. The 4-post ones' gaps between their posts
+        // were taken for 0.11" x 0.33" slots: gone too.
+        private static void Retainer(string name, List<HoleCollider> holes, Fix fix) {
+            float Size(HoleCollider h) => Mathf.Max(h.transform.localScale.x, h.transform.localScale.y);
+            float Narrow(HoleCollider h) => Mathf.Min(h.transform.localScale.x, h.transform.localScale.y);
+            var hex = name.Contains("Hex") && !name.Contains("Standoff");
+            HoleCollider small = null;
+            for (var i = 0; i < holes.Count; i++) {
+                var h = holes[i];
+                if (Narrow(h) < 0.13f && Size(h) > 0.25f && !fix.remove.Contains(i)) fix.remove.Add(i);   // between the posts
+                else if (Size(h) > 0.15f && Size(h) < 0.19f && (small == null || Mathf.Abs(Size(h) - 0.168f) < Mathf.Abs(Size(small) - 0.168f))) small = h;
+            }
+            if (!hex) return;
+            for (var i = 0; i < holes.Count; i++) {
+                var h = holes[i];
+                if (Size(h) < 0.33f || Size(h) > 0.4f || Narrow(h) < 0.33f) continue;
+                if (!fix.remove.Contains(i)) fix.remove.Add(i);
+                var t = h.transform;
+                var axis = (t.localRotation * Vector3.forward).normalized;
+                var depth = t.localScale.z;
+                // The mouth is the end away from the screw hole at the pocket's bottom.
+                var sign = small != null && Vector3.Dot(t.localPosition - small.transform.localPosition, axis) < 0f ? -1f : 1f;
+                fix.pocket = true;
+                fix.pocketOut = axis * sign;
+                fix.pocketFloor = t.localPosition - fix.pocketOut * (depth / 2f);
+                fix.pocketDepth = depth;
+                fix.pocketAcross = Narrow(h);
+                break;
+            }
         }
 
         private static Fix Plan(GameObject part, string id, List<HoleCollider> holes) {
@@ -47,6 +127,8 @@ namespace Protobot.Motion {
             if (name.Contains("Standoff Retainer"))
                 for (var i = 0; i < holes.Count; i++)
                     if (Size(holes[i]) > 0.25f) fix.remove.Add(i);
+            if (name.Contains("Retainer")) Retainer(name, holes, fix);
+            if (MissesHoles(id, name)) AddMissing(mesh, holes, fix);
             if (name.Contains("Click On Spacer") && holes.Count == 0) {
                 var size = mesh.bounds.size;
                 var thin = size.x <= size.y && size.x <= size.z ? Vector3.right : size.y <= size.z ? Vector3.up : Vector3.forward;

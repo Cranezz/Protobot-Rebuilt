@@ -138,10 +138,20 @@ namespace Protobot.Online {
             var chip = Ui.Image(parent, "Badge " + id, BetaColor, height / 2f);
             var label = Ui.Text(chip.transform, "Label", Title(id).ToUpperInvariant(), height * 0.55f, Color.white, Theme.Bold, TextAlignmentOptions.Center);
             label.characterSpacing = 4f;
-            label.rectTransform.Fill();
+            label.textWrappingMode = TextWrappingModes.NoWrap;
             label.raycastTarget = false;
-            chip.Size(label.GetPreferredValues().x + height, height);
-            chip.GetComponent<LayoutElement>().flexibleWidth = 0f;
+            // V2: sized by layout from its label (it measured the text when made, and a chip made while hidden, as on
+            // the home menu's profile card, measured 0 wide: "BE...").
+            var fit = chip.gameObject.AddComponent<HorizontalLayoutGroup>();
+            var pad = Mathf.RoundToInt(height / 2f);
+            fit.padding = new RectOffset(pad, pad, 0, 0);
+            fit.childAlignment = TextAnchor.MiddleCenter;
+            fit.childControlWidth = fit.childControlHeight = true;
+            fit.childForceExpandWidth = false;
+            fit.childForceExpandHeight = true;
+            chip.Size(-1f, height, 0f);
+            var element = chip.GetComponent<LayoutElement>();
+            element.preferredWidth = element.minWidth = -1f;
             Ui.Tip(chip, Title(id), null, About(id));
             return chip.rectTransform;
         }

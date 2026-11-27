@@ -11,23 +11,34 @@ namespace Protobot.Motion {
     // V2: what putting a band on and changing one share: its bar (which band, how many side by side, wraps), its loop
     // round posts, the stretch readout and colors, the "finger" a band is stretched to while it's dragged.
     public static class BandUi {
+        /// <summary>V2: the one rubber band, by size (the user wanted one kind, not every seller's): #32, #64, #117B.</summary>
+        public static readonly string[] BandSizes = { "V32", "V64", "RS117" };
+
+        public static string SizeName(ElasticKind k) => k.key switch {
+            "V32" => "#32  (3 1/8\" x 1/8\")", "V64" => "#64  (3 1/2\" x 1/4\")", "RS117" => "#117B  (7\" x 1/8\")", _ => k.name,
+        };
+
         public static RectTransform Bar(Transform parent, ElasticKind kind, int bands, int wraps, Action<ElasticKind> onKind,
-                                        Action<int> onBands, Action<int> onWraps, Action onDone, string done = "Done") {
+                                        Action<int> onBands, Action<int> onWraps, Action onDone, string done = "Done",
+                                        float stretch = 0f, Action<float> onStretch = null) {
             var bar = Ui.Panel(parent, "Band Bar", Theme.Panel, 10f).rectTransform;
             bar.anchorMin = bar.anchorMax = new Vector2(0f, 1f);
             bar.pivot = new Vector2(0f, 1f);
             bar.anchoredPosition = new Vector2(76f, -(Layout.TopBarBottom + 60f));
-            bar.sizeDelta = new Vector2(640f, 0f);
+            bar.sizeDelta = new Vector2(780f, 0f);
             Ui.Column(bar, 8f, new RectOffset(12, 12, 10, 10));
             bar.gameObject.AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
             bar.GetChild(0).gameObject.AddComponent<LayoutElement>().ignoreLayout = true;
             var row = Ui.Rect("Row", bar);
             Ui.Row(row, 10f);
             row.Size(-1, 30f);
-            var same = ElasticKind.All.Where(k => k.tubing == kind.tubing).ToList();
-            Popup.Choice(row, same.Select(k => k.name).ToArray(), Mathf.Max(0, same.IndexOf(kind)), i => onKind(same[i]), 230f).Size(230f, 28f);
+            // V2: bands come in sizes of one rubber (a band of another kind from an older build keeps its own in the list).
+            var same = kind.tubing ? ElasticKind.All.Where(k => k.tubing).ToList() : BandSizes.Select(ElasticKind.Of).ToList();
+            if (!same.Contains(kind)) same.Add(kind);
+            Popup.Choice(row, same.Select(k => kind.tubing ? k.name : SizeName(k)).ToArray(), Mathf.Max(0, same.IndexOf(kind)), i => onKind(same[i]), 180f).Size(180f, 28f);
             Stepper(row, kind.tubing ? "Loops" : "Bands", bands, 1, 6, onBands, "Side by side: more bands pull harder.");
             Stepper(row, "Wraps", wraps, 1, 4, onWraps, "Times round the posts: each wrap is shorter, so it stretches more and pulls harder.");
+            if (onStretch != null && !kind.tubing) StretchStepper(row, stretch, kind.maxStretch, onStretch);
             var gap = Ui.Rect("Gap", row);
             gap.Size(-1, 28f, 1f);
             Ui.Button(row, "Done", done, onDone, false, 6f).Size(-1, 28f);
@@ -50,6 +61,25 @@ namespace Protobot.Motion {
             plus.Size(28f, 28f);
             plus.interactable = value < max;
             Ui.Tip(holder, label, null, tip);
+        }
+
+        /// <summary>V2: "Stretch − 2.0x +": how far the band is stretched on its posts, a quarter at a time (it sets the
+        /// band's own length: a tighter band pulls harder).</summary>
+        public static void StretchStepper(Transform parent, float stretch, float max, Action<float> changed) {
+            var holder = Ui.Rect("Stretch", parent);
+            Ui.Row(holder, 4f);
+            holder.Size(-1, 28f);
+            Ui.Text(holder, "Label", "Stretch", Theme.FontSmall, Theme.TextDim).Size(50f, 28f);
+            var now = Mathf.Round(stretch * 4f) / 4f;
+            var minus = Ui.Button(holder, "Less", "−", () => changed(Mathf.Max(1.25f, now - 0.25f)), false, 5f);
+            minus.Size(28f, 28f);
+            minus.interactable = now > 1.25f;
+            Ui.Text(holder, "Value", stretch.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture) + "x", Theme.FontBody, Theme.Text, Theme.Medium, TMPro.TextAlignmentOptions.Center).Size(46f, 28f);
+            var plus = Ui.Button(holder, "More", "+", () => changed(Mathf.Min(max, now + 0.25f)), false, 5f);
+            plus.Size(28f, 28f);
+            plus.interactable = now < max;
+            Ui.Tip(holder, "Stretch", null, "How far it's stretched on its posts (its loop over its own length). More stretch pulls harder; past "
+                + max.ToString("0", System.Globalization.CultureInfo.InvariantCulture) + "x it can snap.");
         }
 
         public static BandShape Shape(ElasticKind kind, IList<BandPost> posts) {
@@ -341,7 +371,8 @@ namespace Protobot.Motion {
             if (band != null && band.TryGetComponent(out MeshRenderer r) && r.enabled != shown) r.enabled = shown;
         }
 
-        private void Apply(List<BandPost> posts, ElasticKind kind = null, int bands = -1, int wraps = -1) {
+        private void Apply(List<BandPost> posts, ElasticKind kind = null, int bands = -1, int wraps = -1, float stretch = 0f) {
+            var sameKind = kind == null || kind == band.kind;
             kind ??= band.kind;
             if (bands < 0) bands = band.bands;
             if (wraps < 0) wraps = band.wraps;
@@ -352,7 +383,9 @@ namespace Protobot.Motion {
                 return;
             }
             var before = new ElasticBand.LoopElement(band);
-            var natural = kind.tubing ? (band.kind.tubing && band.rest > 0f ? band.rest : BandUi.Natural(kind, shape.length, wraps)) : 0f;
+            // V2: a band keeps the stretch it was set to (its own length) until its size changes; Stretch sets it.
+            var natural = kind.tubing ? (band.kind.tubing && band.rest > 0f ? band.rest : BandUi.Natural(kind, shape.length, wraps))
+                : stretch > 1f ? shape.length * wraps / stretch : sameKind ? band.rest : 0f;
             band.UseKind(kind);
             band.Set(posts, bands, wraps, natural, shape.normal);
             StateSystem.AddElement(before);
@@ -387,7 +420,9 @@ namespace Protobot.Motion {
                 k => Apply(band.posts.Select(p => p.Copy()).ToList(), k),
                 b => Apply(band.posts.Select(p => p.Copy()).ToList(), null, b),
                 w => Apply(band.posts.Select(p => p.Copy()).ToList(), null, -1, w),
-                () => GameObject.Find("Primary Selection Manager")?.GetComponent<SelectionSystem.SelectionManager>()?.ClearCurrent());
+                () => GameObject.Find("Primary Selection Manager")?.GetComponent<SelectionSystem.SelectionManager>()?.ClearCurrent(),
+                "Done", shown.Shape != null && shown.Shape.Valid ? shown.Stretch(shown.Shape.length) : 1f,
+                s => Apply(band.posts.Select(p => p.Copy()).ToList(), null, -1, -1, s));
             panel.name = "Band Panel";
             if (shown.kind.tubing) {
                 // Tubing is cut to a length and tied: its natural loop.
