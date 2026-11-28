@@ -25,6 +25,7 @@
 - **RoboSource spacers**: they no longer look inside out (their faces were drawn from the inside).
 - **Shaft collars on a motor's shaft hold now**: a shaft in a V5 motor fastened nothing (the collars, channels and gears on it weren't part of the robot, so moving the robot left them behind). Builds that have this are fixed when they open.
 - **Linear slides**: the slide truck sits in its slide member the way VEX's does, held in by the member's lips with its face just out of them (it sat against the back with its sides in the walls). The classic inner and outer slide trucks go in and round the structure rail (Structure > Rails > Rail). Builds saved with trucks the old way keep sliding.
+  - **Slide a truck while building**: select a slide truck and drag the arrow beside it to slide it along its rail or slide member, with everything fastened to it (a stage, and a carriage riding in that stage); it snaps like the Transform tool (Shift: free). Slide it right off the end and it's no longer held by the rail.
 - **Parts list**: the anti-static omni and traction wheels are gone (they were the same models as the omni and traction wheels; builds that use them still open).
 
 ## Also in this update (build 87)

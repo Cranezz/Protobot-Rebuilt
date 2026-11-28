@@ -1477,6 +1477,7 @@ namespace Protobot.Motion {
         // V2: a slide truck slides along its member (free, with the acetal's light drag), between the member's ends.
         private void MakeSlideTrucks() {
             foreach (var truck in FindObjectsByType<SlideTruck>(FindObjectsSortMode.None)) {
+                truck.Check();   // V2 (build 88): (a build just opened may not have linked it yet: it fell off its slide)
                 if (truck.Member == null || !bodyOf.TryGetValue(truck.gameObject, out var a) || !bodyOf.TryGetValue(truck.Member, out var b) || a == b) continue;
                 var (point, along, low, high) = SlideTruck.Track(truck.Member);
                 var x = Vector3.Dot(truck.transform.position - point, along);

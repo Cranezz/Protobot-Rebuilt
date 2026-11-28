@@ -151,13 +151,14 @@ namespace Protobot.Motion {
         private static readonly Quaternion TruckTurn = Quaternion.AngleAxis(-90f, Vector3.forward);   // (before build 88)
 
         /// <summary>Where a truck goes in this member, nearest the point.</summary>
-        public static Displacement Seat(GameObject member, Vector3 near, bool free = false, string truckId = TruckId, Bounds? truckBounds = null) {
+        public static Displacement Seat(GameObject member, Vector3 near, bool free = false, string truckId = TruckId, Bounds? truckBounds = null, bool inside = true) {
             var mesh = member.GetComponent<MeshFilter>().sharedMesh;
             var f = FrameOf(mesh);
             var b = mesh.bounds;
             var x = member.transform.InverseTransformPoint(near).x;
             if (!free) x = Mathf.Round(x * 16f) / 16f;
-            x = Mathf.Clamp(x, b.min.x + HalfLength, b.max.x - HalfLength);
+            // (inside: wholly on the member; else anywhere along its line: a truck slid partly off an end, TruckSlider)
+            if (inside) x = Mathf.Clamp(x, b.min.x + HalfLength, b.max.x - HalfLength);
             var open = member.transform.TransformDirection(f.OpenDir);
             var length = member.transform.right;
             if (truckId == TruckId) {
@@ -192,7 +193,9 @@ namespace Protobot.Motion {
         }
 
         private void LateUpdate() {
-            if (seenVersion == Dynamics.Version) return;
+            // (one not held looks again every half second or so: a build just opened, an undo, a truck slid back on
+            // can settle a frame after the version changed)
+            if (seenVersion == Dynamics.Version && (Member != null || (Time.frameCount + GetInstanceID()) % 30 != 0)) return;
             seenVersion = Dynamics.Version;
             Check();
         }
@@ -200,13 +203,21 @@ namespace Protobot.Motion {
         private static bool At(Displacement seat, Transform t) =>
             (seat.translation.Position - t.position).sqrMagnitude < 0.03f * 0.03f && Quaternion.Angle(seat.rotation.Orientation, t.rotation) < 3f;
 
-        /// <summary>Finds the member it's seated in (or none) and links them.</summary>
+        // Whether a truck at this point is still partly on the member (slid off an end only when it's wholly off).
+        private static bool OnMember(GameObject member, Vector3 at) {
+            var b = member.GetComponent<MeshFilter>().sharedMesh.bounds;
+            var x = member.transform.InverseTransformPoint(at).x;
+            return x > b.min.x - HalfLength + 0.02f && x < b.max.x + HalfLength - 0.02f;
+        }
+
+        /// <summary>Finds the member it's seated in (or none) and links them. A truck slid partly off an end
+        /// (TruckSlider) is still held; wholly off, it isn't.</summary>
         public void Check() {
             GameObject found = null;
             var truckId = id;
             foreach (var obj in PartsManager.FindLoadedObjects()) {
                 if (obj == null || obj == gameObject || obj.IsDeleted() || !IsMember(obj)) continue;
-                if ((Fits(obj, truckId) && At(Seat(obj, transform.position, true, truckId, Bounds()), transform))
+                if ((Fits(obj, truckId) && OnMember(obj, transform.position) && At(Seat(obj, transform.position, true, truckId, Bounds(), false), transform))
                     || (IsVexMember(obj) && At(LegacySeat(obj, transform.position, truckId, Bounds()), transform))) {
                     found = obj;
                     break;
