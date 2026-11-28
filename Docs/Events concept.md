@@ -4,7 +4,7 @@ A community member wants to run "Robot in 1 Hour": everyone builds a robot in an
 bracket. This plan makes that (and ordinary tournaments with robots people already have) something anyone can host
 from inside Protobot, the way a real VEX event runs, without needing their own Discord server.
 
-Nothing here is built yet. It uses what Protobot already has: online matches (Lobby + Relay), accounts, Cloud Save and
+**Built in build 88** (see "What's built" at the end). It uses what Protobot already has: online matches (Lobby + Relay), accounts, Cloud Save and
 Cloud Code (the server side that can't be cheated), the notice cards (top right), replays and the leaderboards page.
 
 ## 1. What a player sees
@@ -133,3 +133,27 @@ players. If the host leaves, it keeps running automatically.
   match chat, voice rooms) inside the category.
 - Made by `Tools/Discord/setup_server.py roles event`.
 - **Give the role**: Server Settings > Members > the member > + > Event Coordinator.
+
+## 6. What's built (build 88)
+
+- **Server**: Cloud Code `Events` (`Assets/Protobot/Cloud/Events.js`), one script with an `action`. Cloud Save custom data
+  "events": one item per event (key = its code), "index" (every event: the public list, at most 3 events going per host)
+  and "champions" (newest first, 200 kept). Time-based steps happen on the first call after their time (`Process`): the
+  start time, the build timer's end (or everyone pressing I'm done), calling a match as soon as both players are free,
+  no-shows at the call deadline, a score sent by only one player taken after 2 minutes, a stuck match played again
+  after 9 minutes, scores that disagree played again after 10 minutes unless the host decides. Ties are played again.
+  Both no-shows: the higher seed goes through. Event names and host messages go through the name filter.
+- **App**: `Online/Events.cs` (`Events`: server calls, joined events in PlayerPrefs `V2.Events.Joined`, the locked-in
+  robot's copy in persistentDataPath/Events/<code>; `EventsRunner`: polling every 15 s or 3 s, the cards, the match flow,
+  the build timer bar), `Online/EventPages.cs` (Multiplayer > Events: join with a code, your events, open events,
+  champions; Host an event; the event page with countdown, your robot, your match, bracket, players, what happened,
+  host controls).
+- **A match**: the higher seed (red) hosts an invite-only 1v1 session and sends its code with `here` every 8 s; the
+  other joins it; both apps set their alliance and Ready, and the host starts it as soon as both are ready. Each sends
+  its score at the end (`SkillsGame.Post` -> `Events.MatchFinished`). After a tie both drop back to the lobby and it
+  starts again.
+- **Not yet**: double elimination, round robin, qualifications, 2v2 alliances, seeding by skills score, spectating,
+  posting to Discord, the winners' screen on the field, the final's replay, rule checks beyond "it has a Brain".
+- **Testing**: `Tools/AgentTesting/cs/t_ev.cs` + `ev.sh` (create/open/call/join/ready/shot), a second copy with
+  `-profile p2 -age-test adult -open BUILD -event CODE -eventauto -autoready`; `cs/t_ev_cleanup.cs` deletes every item
+  of "events" (test data only!). The server logic can be run locally with node and a fake Cloud Save.

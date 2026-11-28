@@ -38,6 +38,7 @@ namespace Protobot.Motion {
             if (Placement.IsPlacing) Placement.Instance.StopPlacing();
             ChainTool.Stop();
             TubeTool.Stop();
+            StringTool.Stop();   // V2 (build 88)
             foreach (var manager in FindObjectsByType<SelectionSystem.SelectionManager>(FindObjectsSortMode.None)) manager.ClearCurrent();
             active = Ui.Rect("Elastic Tool", Interface.Interface.Root).Fill().gameObject.AddComponent<ElasticTool>();
             active.kind = ElasticKind.Of(key);

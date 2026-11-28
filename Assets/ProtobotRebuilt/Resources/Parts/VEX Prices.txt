@@ -131,6 +131,7 @@ Elbow             | 276-8637 | 13.29 | 8  | each | V5 Pneumatics 90-Degree Elbow
 Tee               | 276-8638 | 15.99 | 5  | each | T Pneumatic Fittings (5-pack)
 
 # ---- the rest
+^STRG-VEX         | 276-1546 | 18.99 | 1  | inches 48 | Winch and Pulley Kit (one 4 ft section of 1/8" nylon rope, pulleys, winch drums, ratchet)
 ^BAND-V32         | 275-1089 | 3.49  | 20 | each | Synthetic Rubber Band #32 (20-pack)
 ^BAND-V64         | 276-3990 | 4.49  | 10 | each | Synthetic Rubber Band #64 (10-pack)
 License Plate     | 276-3938 | 6.29  | 1  | each | VEX V5 Competition License Plate Kit

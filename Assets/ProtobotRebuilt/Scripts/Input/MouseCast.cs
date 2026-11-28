@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Protobot {
@@ -92,7 +93,43 @@ namespace Protobot {
                 best.normal = facing;
                 best.point = nearFace;
             }
-            return best;
+            return best.collider != null ? TopOfStack(best, mouseRay, maxDistance) : best;
+        }
+
+        // V2 (build 88): holes in line (a bearing's hole over a C-channel's, a washer on a plate) are the same spot on
+        // screen, and the lower one could be a pixel nearer the mouse: a screw went to the channel's face, half sunk in
+        // the bearing (a tester's report). From the picked hole, up the stack of holes that touch it (each one's far
+        // face on or past the near face of the one below), the top one wins; a hole further off (a C-channel's other
+        // flange) isn't part of the stack.
+        private static RaycastHit TopOfStack(RaycastHit best, Ray mouseRay, float maxDistance) {
+            var axis = best.collider.transform.forward;
+            var up = best.normal;   // toward the camera
+            var found = new List<(RaycastHit hit, float near, float far)>();
+            foreach (var candidate in Physics.SphereCastAll(new Ray(best.point + up * 2f, -up), 0.05f, 2.2f, 1 << HoleCollider.HOLE_COLLISIONS_LAYER, QueryTriggerInteraction.Collide)) {
+                var hole = candidate.collider.transform;
+                if (candidate.collider == best.collider || !candidate.collider.CompareTag("HoleCollider")) continue;
+                if (hole.root.gameObject.layer == Placement.PLACEMENT_LAYER || hole.root.gameObject.layer == 12) continue;
+                if (Vector3.Cross(hole.forward, axis).magnitude > 0.05f) continue;
+                var off = hole.position - best.collider.transform.position;
+                if ((off - axis * Vector3.Dot(off, axis)).magnitude > 0.04f) continue;   // on the same line
+                var middle = Vector3.Dot(hole.position - best.point, up);
+                var half = hole.lossyScale.z / 2f;
+                found.Add((candidate, middle + half, middle - half));
+            }
+            found.Sort((a, b) => a.far.CompareTo(b.far));
+            var top = best;
+            var topNear = 0f;   // the picked hole's near face is best.point
+            foreach (var f in found) {
+                if (f.near <= topNear + 0.005f) continue;          // not above the stack's top
+                if (f.far > topNear + 0.03f) break;                // a gap: not touching
+                var nearFace = best.point + up * f.near;
+                if (Vector3.Distance(mouseRay.origin, nearFace) > maxDistance + 0.5f) break;
+                top = f.hit;
+                top.normal = up;
+                top.point = nearFace;
+                topNear = f.near;
+            }
+            return top;
         }
 
         public void ResetLayerMask() => layerMask = LayerMask.GetMask("Default", "HoleCollisions");

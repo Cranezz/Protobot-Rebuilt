@@ -141,7 +141,6 @@ namespace Protobot.Game {
     public static class ElementShapes {
         public const float PinMass = 0.11f, CupMass = 0.065f, ToggleMass = 0.35f;
         private static PhysicsMaterial plastic;
-        private static readonly Dictionary<Mesh, (float zLow, float zHigh, float[] radius)> Profiles = new();
         private static readonly Dictionary<(Mesh, int), Mesh> Wedges = new();
 
         public static PhysicsMaterial Plastic => plastic != null ? plastic : plastic = new PhysicsMaterial("Game Plastic") {
@@ -211,18 +210,22 @@ namespace Protobot.Game {
         }
 
         /// <summary>
-        /// A cup half (its mesh runs along +Z from the cup's middle) as a ring of thin convex wedges following the outer
-        /// surface: 8 round, 2 bands along. Shared meshes per band; each wedge is a child turned round the axis.
+        /// A cup half (its mesh runs along +Z from the cup's middle) as a ring of thin convex wedges round its wall: 16 round,
+        /// 4 bands along. Shared meshes per band; each wedge is a child turned round the axis.
+        /// V2 (build 88): the wedges surround the drawn surface. They were 8 flats inside it and 2 straight bands per half,
+        /// so the drawn cup was 3.25" across but its shape 2.99", with parts of the surface up to 0.4" outside it: a
+        /// roller or claw sank into the cup without touching it (a tester: "the cup can't be grabbed, or part of it").
         /// </summary>
         public static void CupHalf(Transform owner, Mesh mesh, Matrix4x4 local, int layer) {
-            var (zLow, zHigh, radius) = Profile(mesh);
-            const int Around = 8, Bands = 2;
+            var profile = Profile(mesh);
+            const int Around = 16, Bands = 4;
             var holder = new GameObject("Half") { layer = layer }.transform;
             holder.SetParent(owner, false);
             holder.localPosition = local.GetColumn(3);
             holder.localRotation = local.rotation;
+            holder.localScale = local.lossyScale;
             for (var band = 0; band < Bands; band++) {
-                var wedge = Wedge(mesh, band, Bands, Around, zLow, zHigh, radius);
+                var wedge = Wedge(mesh, band, Bands, Around, profile);
                 for (var i = 0; i < Around; i++) {
                     var go = new GameObject("Wall") { layer = layer };
                     go.transform.SetParent(holder, false);
@@ -236,22 +239,34 @@ namespace Protobot.Game {
             }
         }
 
-        // The outer radius of a cup half along its axis, in 16 slices.
-        private static (float, float, float[]) Profile(Mesh mesh) {
-            if (Profiles.TryGetValue(mesh, out var known)) return known;
+        private class CupProfile {
+            public float zLow, zHigh;
+            public float[] outer, inner;   // radius of the outside and of the inside (the hollow) by slice along the axis
+        }
+
+        private static readonly Dictionary<Mesh, CupProfile> CupProfiles = new();
+
+        // The outside and inside radius of a cup half along its axis, in 32 slices.
+        private static CupProfile Profile(Mesh mesh) {
+            if (CupProfiles.TryGetValue(mesh, out var known)) return known;
             var vertices = mesh.vertices;
             var zLow = vertices.Min(v => v.z);
             var zHigh = vertices.Max(v => v.z);
-            const int Slices = 16;
-            var radius = new float[Slices + 1];
+            const int Slices = 32;
+            var outer = new float[Slices + 1];
+            var inner = Enumerable.Repeat(float.MaxValue, Slices + 1).ToArray();
             foreach (var v in vertices) {
                 var slice = Mathf.Clamp(Mathf.RoundToInt((v.z - zLow) / (zHigh - zLow) * Slices), 0, Slices);
-                radius[slice] = Mathf.Max(radius[slice], new Vector2(v.x, v.y).magnitude);
+                var r = new Vector2(v.x, v.y).magnitude;
+                outer[slice] = Mathf.Max(outer[slice], r);
+                if (r > 0.3f) inner[slice] = Mathf.Min(inner[slice], r);
             }
-            for (var i = 1; i <= Slices; i++) if (radius[i] < 0.3f) radius[i] = radius[i - 1];
-            for (var i = Slices - 1; i >= 0; i--) if (radius[i] < 0.3f) radius[i] = radius[i + 1];
-            Profiles[mesh] = (zLow, zHigh, radius);
-            return (zLow, zHigh, radius);
+            for (var i = 1; i <= Slices; i++) if (outer[i] < 0.3f) outer[i] = outer[i - 1];
+            for (var i = Slices - 1; i >= 0; i--) if (outer[i] < 0.3f) outer[i] = outer[i + 1];
+            for (var i = 0; i <= Slices; i++) inner[i] = inner[i] > outer[i] ? outer[i] : inner[i];
+            var profile = new CupProfile { zLow = zLow, zHigh = zHigh, outer = outer, inner = inner };
+            CupProfiles[mesh] = profile;
+            return profile;
         }
 
         private static float RadiusAt(float z, float zLow, float zHigh, float[] radius) {
@@ -260,18 +275,37 @@ namespace Protobot.Game {
             return Mathf.Lerp(radius[i], radius[i + 1], t - i);
         }
 
-        private static Mesh Wedge(Mesh source, int band, int bands, int around, float zLow, float zHigh, float[] radius) {
+        private static Mesh Wedge(Mesh source, int band, int bands, int around, CupProfile profile) {
             if (Wedges.TryGetValue((source, band), out var known) && known != null) return known;
-            const float Wall = 0.12f;
+            var zLow = profile.zLow;
+            var zHigh = profile.zHigh;
             var z0 = Mathf.Lerp(zLow, zHigh, band / (float)bands);
             var z1 = Mathf.Lerp(zLow, zHigh, (band + 1) / (float)bands);
-            var r0 = RadiusAt(z0, zLow, zHigh, radius);
-            var r1 = RadiusAt(z1, zLow, zHigh, radius);
-            var half = Mathf.PI / around * 1.08f;   // a little overlap so nothing slips between wedges
+            // Each face is a straight line along the band, moved out to the highest point of the profile in it: the
+            // outside never lies beyond the shape (nothing sinks into the cup), the inside never inside the hollow (a
+            // pin nests as deep as in VEX's model).
+            float o0 = RadiusAt(z0, zLow, zHigh, profile.outer), o1 = RadiusAt(z1, zLow, zHigh, profile.outer);
+            float i0 = RadiusAt(z0, zLow, zHigh, profile.inner), i1 = RadiusAt(z1, zLow, zHigh, profile.inner);
+            var slices = profile.outer.Length - 1;
+            float outerExcess = 0f, innerExcess = 0f;
+            for (var k = 0; k <= slices; k++) {
+                var z = Mathf.Lerp(zLow, zHigh, k / (float)slices);
+                if (z < z0 - 1e-4f || z > z1 + 1e-4f) continue;
+                var t = (z - z0) / Mathf.Max(1e-4f, z1 - z0);
+                outerExcess = Mathf.Max(outerExcess, profile.outer[k] - Mathf.Lerp(o0, o1, t));
+                innerExcess = Mathf.Max(innerExcess, profile.inner[k] - Mathf.Lerp(i0, i1, t));
+            }
+            o0 += outerExcess;
+            o1 += outerExcess;
+            i0 = Mathf.Min(i0 + innerExcess, o0 - 0.06f);
+            i1 = Mathf.Min(i1 + innerExcess, o1 - 0.06f);
+            var half = Mathf.PI / around * 1.04f;            // a little overlap so nothing slips between wedges
+            var outward = 1f / Mathf.Sqrt(Mathf.Cos(half));  // the outside flats a hair in, their corners a hair out
+            var inward = 1f / Mathf.Cos(half);               // the inside flats on the hollow's surface
             var points = new List<Vector3>();
-            foreach (var (z, r) in new[] { (z0, r0), (z1, r1) })
+            foreach (var (z, o, i) in new[] { (z0, o0, i0), (z1, o1, i1) })
                 foreach (var a in new[] { -half, half })
-                    foreach (var rr in new[] { r, r - Wall }) {
+                    foreach (var rr in new[] { o * outward, i * inward }) {
                         var c = Mathf.Cos(a) * rr;
                         var s = Mathf.Sin(a) * rr;
                         points.Add(new Vector3(c, s, z));

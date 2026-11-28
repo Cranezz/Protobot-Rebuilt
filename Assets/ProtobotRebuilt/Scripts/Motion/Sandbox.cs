@@ -15,7 +15,7 @@ namespace Protobot.Motion {
     // (a cylinder mounted backwards lifts its body off a heavy robot). Wheels roll; omni wheels' rollers let them
     // slide sideways. Nothing is grounded. The build is shown by copies of its parts: stopping puts it back as it
     // was. Controls: ControlsPanel (drive with W/A/S/D and the arrows, or a gamepad).
-    public class Sandbox : MonoBehaviour {
+    public partial class Sandbox : MonoBehaviour {   // V2 (build 88): partial (Sandbox.Strings.cs)
         public const int Layer = 16, GroundLayer = 17;
         public const float Gravity = 386.09f;          // in/s²
         public const float NewtonMeter = 1550.0031f;   // kg·in²/s² (masses are in kg, lengths in inches)
@@ -134,6 +134,10 @@ namespace Protobot.Motion {
             // V2: its shafts' hinges (with each one's ratio), whose drives hold a stopped train (GearboxFriction).
             public readonly List<(ConfigurableJoint joint, float k)> hinges = new();
             public float holding = -1f;   // the torque the hinges' drives hold now
+            // V2 (build 88, string phase 3): which way each hinge's angular X turns its rotor (+1/-1), and whether the
+            // motors drive this train through those hinges' drives (trains without wheels: winches, arms, lifts).
+            public readonly List<float> hingeSigns = new();
+            public bool byJoint;
             // V2 (advanced gear kit): racks and lead screw nuts it drives along their slide joint (k: inches per radian
             // of the train's turn), and the way its first rotor can't turn (a ratchet: +1 / -1, 0 free).
             public readonly List<(Rigidbody rb, Rigidbody frame, Vector3 axisLocal, float k)> sliders = new();
@@ -392,6 +396,9 @@ namespace Protobot.Motion {
             foreach (var (owner, other) in new[] { (body, frame), (frame, body) })
                 foreach (var joint in owner.GetComponents<ConfigurableJoint>()) {
                     if (joint.connectedBody != other || joint.angularXMotion != ConfigurableJointMotion.Free) continue;
+                    // V2 (build 88): a hinge turns about one axis; a chain's or string's stop joint turns every way (the
+                    // second string on an arm took the first one's stop for a hinge through its point and held nothing)
+                    if (joint.angularYMotion == ConfigurableJointMotion.Free && joint.angularZMotion == ConfigurableJointMotion.Free) continue;
                     var axis = joint.transform.TransformDirection(joint.axis).normalized;
                     var anchor = joint.transform.TransformPoint(joint.anchor);
                     if (Vector3.ProjectOnPlane(point - anchor, axis).magnitude < 0.05f) return true;
@@ -437,7 +444,9 @@ namespace Protobot.Motion {
                 var now = joint.transform.TransformPoint(anchorLocal);
                 var wall = now + way * step;
                 joint.connectedAnchor = st.frame.transform.InverseTransformPoint(wall - way * StopReach);
-                joint.linearLimit = new SoftJointLimit { limit = StopReach };
+                // V2 (build 88): acting a little before it's reached (Sandbox.Strings' StringContact): a motor at its full
+                // stall torque (the hinge drives) pushed an arm's sprocket 0.3" past its wall
+                joint.linearLimit = new SoftJointLimit { limit = StopReach, contactDistance = StringContact };
             }
         }
 
@@ -601,6 +610,7 @@ namespace Protobot.Motion {
             foreach (var renderer in hidden)
                 if (renderer != null) renderer.enabled = true;
             hidden.Clear();
+            elementColliders.Clear();   // V2 (build 88)
             if (root != null) Destroy(root.gameObject);
         }
 
@@ -658,7 +668,8 @@ namespace Protobot.Motion {
 
             root = new GameObject("Simulation").transform;
             var parts = FindObjectsByType<SavedObject>(FindObjectsSortMode.None)
-                        .Where(s => s.gameObject.activeInHierarchy && !s.gameObject.IsDeleted() && s.GetComponent<ChainLoop>() == null && s.GetComponent<ElasticBand>() == null && s.GetComponent<PneumaticTube>() == null)
+                        .Where(s => s.gameObject.activeInHierarchy && !s.gameObject.IsDeleted() && s.GetComponent<ChainLoop>() == null && s.GetComponent<ElasticBand>() == null && s.GetComponent<PneumaticTube>() == null
+                                    && s.GetComponent<StringLine>() == null)   // V2 (build 88): strings follow their parts (MakeStrings)
                         .Select(s => s.gameObject).ToList();
             if (parts.Count == 0) throw new System.Exception("there's nothing in the build");
             var cylinders = parts.Select(p => p.GetComponent<PneumaticCylinder>()).Where(c => c != null && c.enabled && c.Rod != null).ToList();
@@ -771,6 +782,13 @@ namespace Protobot.Motion {
                     var ba = a.bounds;
                     ba.Expand(NearGap * 2f);
                     if (!ba.Intersects(b.bounds)) continue;
+                    // V2 (build 88): a loose game element (a Cup or Pin placed in a claw or intake) collides with what it
+                    // starts beside, or the parts meant to grab it went through it; only one buried in a part is let be.
+                    if (elementColliders.Contains(a) || elementColliders.Contains(b)) {
+                        if (Physics.ComputePenetration(a, a.transform.position, a.transform.rotation, b, b.transform.position, b.transform.rotation, out _, out var depth) && depth > 0.25f)
+                            Physics.IgnoreCollision(a, b, true);
+                        continue;
+                    }
                     if (Physics.ComputePenetration(a, a.transform.position, a.transform.rotation, b, b.transform.position, b.transform.rotation, out _, out _)
                         || Near(a, b))
                         Physics.IgnoreCollision(a, b, true);
@@ -787,11 +805,15 @@ namespace Protobot.Motion {
             StillChains();
             MakeTensioners();   // V2
             MakeChainStops();   // V2
+            MakeStrings();   // V2 (build 88)
             AirSupply.Begin(parts);   // V2: the robot's tanks (before the slides take their first pressure)
             MakeSlides(cylinders);
         }
 
         private const float NearGap = 0.1f;
+
+        // V2 (build 88): the colliders of loose game elements in the build (Cups, Pins...: SkillsGame.IsGameElement).
+        private readonly HashSet<Collider> elementColliders = new();
 
         private static bool Near(Collider a, Collider b) {
             var p = b.ClosestPoint(a.bounds.center);
@@ -1324,6 +1346,12 @@ namespace Protobot.Motion {
                 collider.sharedMaterial = kind == WheelKind.Omni ? Material(0f) : kind == WheelKind.Traction ? Material(1f)
                     : kind == WheelKind.Flex ? Material(1.2f) : Material(0.35f);
                 if (kind == WheelKind.Flex) FlexGrip.Register(collider);
+                // V2 (build 88): a game element placed in the build: flex wheels grip it softly, as the game's own pieces.
+                if (body.nodes.Count == 1 && node.TryGetComponent(out SavedObject saved) && saved.id != null && Game.SkillsGame.IsGameElement(saved.id)) {
+                    elementColliders.Add(collider);
+                    FlexGrip.RegisterElement(collider);
+                    rb.maxDepenetrationVelocity = 25f;
+                }
                 body.colliders++;
                 if (kind == WheelKind.Omni) omnis.Add(new Wheel { rb = rb, collider = collider, radius = RimRadius(collider.sharedMesh, WheelAxis(node), shape.transform.lossyScale.x) });
             }
@@ -1464,10 +1492,14 @@ namespace Protobot.Motion {
                 joint.xMotion = ConfigurableJointMotion.Limited;
                 joint.yMotion = joint.zMotion = ConfigurableJointMotion.Locked;
                 joint.angularXMotion = joint.angularYMotion = joint.angularZMotion = ConfigurableJointMotion.Locked;
-                joint.linearLimit = new SoftJointLimit { limit = Mathf.Max(0.01f, (high - low) / 2f) };
+                // V2 (build 88): the limit acts a little before the end (as the string stops do): a lift's chain driven
+                // at stall pushed its stage half an inch past the slide's end
+                joint.linearLimit = new SoftJointLimit { limit = Mathf.Max(0.01f, (high - low) / 2f), contactDistance = 0.1f };
                 joint.xDrive = new JointDrive { positionSpring = 0f, positionDamper = 0.3f * Newton, maximumForce = 0.5f * Newton };
                 joint.targetVelocity = Vector3.zero;
-                joint.enableCollision = false;
+                // V2 (build 88): the stage and what it slides in still collide (a hard stop on the tower stops the
+                // stage); parts that start out touching (the truck in its channel) are let be pair by pair as always
+                joint.enableCollision = true;
                 joint.enablePreprocessing = false;
             }
         }
@@ -1584,11 +1616,26 @@ namespace Protobot.Motion {
                     train.rotors.Add((body.rb, HingedTo(body.rb), body.rb.transform.InverseTransformDirection(rotor.axis), body.rb.transform.InverseTransformPoint(rotor.start), system.ratio[rotor]));
                     // V2: its hinges, for the stopped motors' hold (Hold)
                     foreach (var hinge in body.rb.GetComponents<ConfigurableJoint>())
-                        if (hinge.angularXMotion == ConfigurableJointMotion.Free) train.hinges.Add((hinge, system.ratio[rotor]));
+                        if (hinge.angularXMotion == ConfigurableJointMotion.Free) {
+                            train.hinges.Add((hinge, system.ratio[rotor]));
+                            train.hingeSigns.Add(Mathf.Sign(Vector3.Dot(hinge.transform.TransformDirection(hinge.axis), rotor.axis)));
+                        }
                     foreach (var holder in bodies)
                         foreach (var hinge in holder.rb.GetComponents<ConfigurableJoint>())
-                            if (hinge.connectedBody == body.rb && hinge.angularXMotion == ConfigurableJointMotion.Free) train.hinges.Add((hinge, system.ratio[rotor]));
+                            if (hinge.connectedBody == body.rb && hinge.angularXMotion == ConfigurableJointMotion.Free) {
+                                train.hinges.Add((hinge, system.ratio[rotor]));
+                                train.hingeSigns.Add(-Mathf.Sign(Vector3.Dot(hinge.transform.TransformDirection(hinge.axis), rotor.axis)));
+                            }
                 }
+                // V2 (build 88): a train with no wheels (a winch, an arm, a lift) is driven through its hinges' drives,
+                // so the physics solves the motor with what stops it: a stalled winch pulls with its stall torque.
+                // Drivetrains keep the step below (their behaviour is measured and tuned).
+                train.byJoint = !JointMotorsOff && system.sliders.Count == 0 && !system.rotors.Any(r => r.parts.Any(p => p != null && KindOf(p) != WheelKind.None))
+                    && !system.chains.Any(c => c.chain != null && c.chain.style != "chain");
+                if (train.byJoint)
+                    foreach (var rotor in system.rotors)
+                        if (rotor.motors.Count > 0 && bodyOf.TryGetValue(rotor.shaft, out var held))
+                            foreach (var motor in rotor.motors) AddArmature(held.rb, motor);
                 foreach (var motor in system.Motors)
                     if (bodyOf.TryGetValue(motor.gameObject, out var motorBody) && !seen.Contains(motorBody.rb))
                         train.motors.Add((motor, system.MotorRatio(motor)));
@@ -1843,11 +1890,12 @@ namespace Protobot.Motion {
             foreach (var train in trains)
                 foreach (var (motor, _) in train.motors) { if (Paused) motor.Silence(); else motor.Sound(motor.Level); }
             if (Paused && Keyboard.current != null && Tools.Keybinds.Pressed("StepFrame")) StepOnce();
+            DrawSlideStates();   // V2 (build 88: drawn in Update: the overlay hides labels drawn after its own LateUpdate)
+            DrawStrings(false);   // V2 (build 88)
         }
 
         private void LateUpdate() {
             if (instance != this) return;   // V2
-            DrawSlideStates();   // V2
             PickTracked();
             if (PivotCamera.Main == null) return;
             Vector3? target = View == CameraMode.Robot && main != null && main.rb != null ? main.rb.worldCenterOfMass
@@ -1891,6 +1939,8 @@ namespace Protobot.Motion {
             PullBands();   // V2
             foreach (var st in tensions) Tension(st);   // V2: chain tensioners
             foreach (var st in stops) ChainStop(st);    // V2: chains don't stretch
+            foreach (var st in strings) StringStop(st);   // V2 (build 88): nor does string
+            SkipTeeth();
             HoldStill();   // V2
         }
 
@@ -2009,8 +2059,20 @@ namespace Protobot.Motion {
             var turning = 0f;
             foreach (var (motor, k) in train.motors) turning = Mathf.Max(turning, Mathf.Abs(k * speed) / Mathf.Max(FreeSpeed(motor), 1e-3f));
             var brake = coasting ? GearboxFriction : Mathf.Clamp(turning / BrakeBand, GearboxFriction, 1f);
-            Hold(train, stopped ? (hold ? most : most * brake) : 0f);
-            var next = (inertia * speed + a * dt) / (inertia + b * dt);
+            float next;
+            if (train.byJoint && !stopped && b > 0f) {
+                // V2 (build 88): the motors as the hinges' velocity drives: torque = b (a / b - speed), capped at the
+                // stall torque, which PhysX solves with everything else (a string, a hard stop): a stalled winch gets
+                // its full stall torque (stepping it here gave a light rotor a I / (I + b dt), a few % of it). This
+                // step only keeps the rotors at their ratios.
+                var aim = a / b;
+                if (train.blocked != 0 && Mathf.Sign(aim) == train.blocked) aim = 0f;
+                DriveHinges(train, aim, b, most);
+                next = train.blocked != 0 && Mathf.Sign(speed) == train.blocked ? 0f : speed;
+            } else {
+                Hold(train, stopped ? (hold ? most : most * brake) : 0f);
+                next = (inertia * speed + a * dt) / (inertia + b * dt);
+            }
             // V2: hold mode (Controls.Hold): not driven, its motors stop the train where it is (up to their stall torque).
             if (hold) next = 0f;
             // V2: a ratchet's pawl: never the way it holds.
@@ -2038,6 +2100,47 @@ namespace Protobot.Motion {
                 rb.WakeUp();
             }
             foreach (var (motor, k) in train.motors) motor.Level = k * next / FreeSpeed(motor);
+        }
+
+        // V2 (build 88): a V5 motor's own rotor turns 3600 rpm inside (its cartridge gears it down 36:1, 18:1 or 6:1),
+        // so its inertia shows at the output shaft times the ratio squared. VEX doesn't publish it; a small 11 W motor's
+        // rotor is about 1e-6 kg m² (a 100 rpm motor then gets to full speed in ~6 ms with nothing on it). On a light
+        // drum or arm that's most of what turns (100 rpm: ~2 kg in², a 4" C-channel arm is 0.06), and without it the
+        // physics couldn't hold a light drum stalled against a tight string (it shook a light robot about). It's
+        // added the same about every axis (the drum's hinge holds the others).
+        internal static float RotorInertia = 1e-6f;   // kg m²
+        private const float InternalSpeed = 3600f * 2f * Mathf.PI / 60f;   // rad/s
+
+        private static void AddArmature(Rigidbody body, MotorDrive motor) {
+            if (body == null || motor == null || RotorInertia <= 0f) return;
+            var ratio = InternalSpeed / Mathf.Max(FreeSpeed(motor), 1e-3f);
+            var j = RotorInertia / (0.0254f * 0.0254f) * ratio * ratio;   // kg in²
+            var tensor = body.inertiaTensor;
+            var rotation = body.inertiaTensorRotation;
+            body.inertiaTensor = tensor + Vector3.one * j;
+            body.inertiaTensorRotation = rotation;
+        }
+
+        // V2 (build 88): which way a ConfigurableJoint's targetAngularVelocity turns its body against its angular X
+        // (tests flip it to check).
+        internal static float JointDriveSign = 1f;
+        // V2 (build 88, tests): the old way for every train (the motor stepped in Turn, no rotor inertia: compare runs)
+        internal static bool JointMotorsOff;
+
+        // V2 (build 88): the motors through the hinges: each hinge's drive aims at its ratio of the train's speed `aim`,
+        // with its share of the damping `damper` and of the stall torque `most` (sum of k * k * damper / sum = damper).
+        private static void DriveHinges(Train train, float aim, float damper, float most) {
+            train.holding = -1f;   // (Hold sets them again when the motors stop)
+            var sum = 0f;
+            foreach (var (_, k) in train.hinges) sum += k * k;
+            if (sum <= 0f) return;
+            for (var i = 0; i < train.hinges.Count; i++) {
+                var (joint, k) = train.hinges[i];
+                if (joint == null) continue;
+                var sign = i < train.hingeSigns.Count ? train.hingeSigns[i] : 1f;
+                joint.targetAngularVelocity = new Vector3(JointDriveSign * sign * k * aim, 0f, 0f);
+                joint.angularXDrive = new JointDrive { positionSpring = 0f, positionDamper = damper / sum, maximumForce = most * Mathf.Abs(k) / sum };
+            }
         }
 
         // V2: the train's hinges hold up to this torque at the motors (each shares it by its ratio).
@@ -2394,7 +2497,7 @@ namespace Protobot.Motion {
 
         // V2: what a cylinder's air is doing, shown on it for 1.5 s after its key changes it (with one end of air
         // a loose rod looks just like one held out, so pressing the key seemed to do nothing).
-        private void DrawSlideStates() {
+        private bool DrawSlideStates() {
             var any = false;
             foreach (var slide in slides) {
                 if (Time.unscaledTime - slide.changedAt > 1.5f || slide.rod == null) continue;
@@ -2404,6 +2507,7 @@ namespace Protobot.Motion {
                 var text = slide.loose ? "Loose (no air)" : (slide.extended ? "Air: out" : "Air: in") + (slide.psi < AirSupply.MaxPsi - 0.5f ? " · " + Mathf.RoundToInt(slide.psi) + " psi" : "");
                 Interface.Overlay.Text(at + new Vector2(0f, 28f), text, slide.loose ? Interface.Theme.TextDim : Interface.Theme.Accent, null, true);
             }
+            return any;
         }
         /// <summary>V2: the rigid body a build part rides on in the simulation, or null.</summary>
         /// <summary>V2: the build renderer a simulation copy draws (replays record which part it is), or null.</summary>

@@ -41,6 +41,13 @@ namespace Protobot.Online {
             AgeCheck.Ensure(() => { if (screen != null) screen.Refresh(true); }, () => { if (screen != null) screen.BackToMenu(); });
         }
 
+        /// <summary>V2 (build 88): an event's page (the match card's "Event page", the build timer).</summary>
+        public static void OpenEvent(string code) {
+            if (screen == null) screen = OnlineScreen.Create();
+            screen.ShowEvent(code);
+            AgeCheck.Ensure(() => { if (screen != null) screen.Refresh(true); }, () => { if (screen != null) screen.BackToMenu(); });
+        }
+
         public static void Close() {
             if (screen != null) screen.Close();
         }
@@ -128,8 +135,8 @@ namespace Protobot.Online {
     }
 
     /// <summary>The screen itself (see OnlineWindow).</summary>
-    public class OnlineScreen : MonoBehaviour {
-        public enum Page { Servers, Leaderboard, Host, Lobby, Account }
+    public partial class OnlineScreen : MonoBehaviour {   // V2 (build 88): partial, the events pages are in EventPages.cs
+        public enum Page { Servers, Leaderboard, Host, Lobby, Account, Events, EventHost, Event }
 
         private Page page;
         private RectTransform root, nav, card, content;
@@ -192,7 +199,7 @@ namespace Protobot.Online {
             gap.Size(-1, 22f);
             nav = Ui.Rect("Pages", left);
             Ui.Column(nav, 8f);
-            nav.Size(-1, 300f);
+            nav.Size(-1, 380f);   // V2 (build 88): room for Events
 
             // Right: the page.
             card = OnlineWindow.GlassPanel(root, "Card").rectTransform;
@@ -259,6 +266,7 @@ namespace Protobot.Online {
             ViewHider.Set(this, true);
             MatchSessions.Changed += MarkDirty;
             MatchSessions.Ended += OnEnded;
+            Online.Events.Changed += EventsChanged;   // V2 (build 88)
             Accounts.Changed += ShowName;
             Badges.Changed += MarkDirty;   // V2: badges loaded or earned
             AgeCheck.Changed += AgeChanged;
@@ -278,6 +286,8 @@ namespace Protobot.Online {
         }
 
         private void OnDestroy() {
+            Online.Events.Changed -= EventsChanged;   // V2 (build 88)
+            if (EventsRunner.Watching == shownEvent) EventsRunner.Watching = null;
             Accounts.Changed -= ShowName;
             Badges.Changed -= MarkDirty;
             AgeCheck.Changed -= AgeChanged;
@@ -313,8 +323,10 @@ namespace Protobot.Online {
                 status.transform.parent.Find("Status").GetComponent<Image>().color = online ? Theme.Success : OnlineServices.Problem.Length > 0 ? Theme.Danger : Theme.TextFaint;
             }
             if (page == Page.Servers && !loading && refreshAt > 0f && t > refreshAt && !InputEvents.TextInput.IsTyping) Refresh();
+            LiveUpdate();   // V2 (build 88)
             if (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame && Dialog.OpenCount == 0 && !Popup.IsOpen && !InputEvents.TextInput.IsTyping) {
-                if (page == Page.Host || page == Page.Leaderboard || page == Page.Account) Show(Page.Servers);
+                if (page == Page.EventHost || page == Page.Event) Show(Page.Events);   // V2 (build 88)
+                else if (page == Page.Host || page == Page.Leaderboard || page == Page.Account || page == Page.Events) Show(Page.Servers);
                 else if (page == Page.Servers) BackToMenu();
             }
         }
@@ -408,6 +420,8 @@ namespace Protobot.Online {
         // ------------------------------------------------------------------ the pages
 
         private void Rebuild() {
+            live.Clear();   // V2 (build 88): the events pages' countdowns
+            EventsRunner.Watching = page == Page.Event ? shownEvent : null;
             for (var i = nav.childCount - 1; i >= 0; i--) Destroy(nav.GetChild(i).gameObject);
             for (var i = content.childCount - 1; i >= 0; i--) Destroy(content.GetChild(i).gameObject);
             if (page == Page.Lobby && MatchSessions.Current == null) page = Page.Servers;
@@ -425,6 +439,10 @@ namespace Protobot.Online {
                 board = null;
                 Show(Page.Leaderboard);
             });
+            NavButton("Events", page == Page.Events || page == Page.EventHost || page == Page.Event, () => {   // V2 (build 88)
+                eventsList = null;
+                Show(Page.Events);
+            });
             NavButton("Profile", page == Page.Account, () => {   // V2: was Account
                 stats = null;
                 Show(Page.Account);
@@ -439,6 +457,9 @@ namespace Protobot.Online {
             if (page == Page.Servers) Servers();
             else if (page == Page.Leaderboard) Leaderboard();
             else if (page == Page.Account) Account();
+            else if (page == Page.Events) EventsPage();      // V2 (build 88)
+            else if (page == Page.EventHost) EventHostPage();
+            else if (page == Page.Event) EventPage();
             else Host();
         }
 

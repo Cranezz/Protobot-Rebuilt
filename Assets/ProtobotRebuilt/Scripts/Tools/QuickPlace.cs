@@ -302,7 +302,7 @@ namespace Protobot.Tools {
         /// <summary>V2: the free push-in port of a pneumatic fitting under the mouse (none while a tool that picks
         /// things is open).</summary>
         private static HoleCollider HoverPort() {
-            if (Motion.TubeTool.Active || Motion.ElasticTool.Active || Motion.ChainTool.Active || ColorPickerOpen() || MotorKeys()) return null;
+            if (Motion.TubeTool.Active || Motion.ElasticTool.Active || Motion.StringTool.Active || Motion.ChainTool.Active || ColorPickerOpen() || MotorKeys()) return null;
             var hole = HoverHole();
             if (hole != null) return Motion.PneumaticTube.IsPort(hole) && !Motion.PneumaticTube.PortTaken(hole) ? hole : null;
             // On a fitting (a screw here) or a valve/tee's body: its free port nearest the mouse, close to it.
@@ -326,7 +326,7 @@ namespace Protobot.Tools {
         /// <summary>V2: the free port of the brain, a motor or a sensor under the mouse (not over an empty hole:
         /// that's for a spacer).</summary>
         private static Motion.WirePort HoverWirePort() {
-            if (Motion.TubeTool.Active || Motion.ElasticTool.Active || Motion.ChainTool.Active || ColorPickerOpen() || MotorKeys() || Camera.main == null) return null;
+            if (Motion.TubeTool.Active || Motion.ElasticTool.Active || Motion.StringTool.Active || Motion.ChainTool.Active || ColorPickerOpen() || MotorKeys() || Camera.main == null) return null;
             var hole = HoverHole();
             if (hole != null && hole.IsEmpty && !Motion.WirePorts.IsBrain(hole.transform.parent != null ? hole.transform.parent.gameObject : null)) return null;
             var ray = MouseRay();

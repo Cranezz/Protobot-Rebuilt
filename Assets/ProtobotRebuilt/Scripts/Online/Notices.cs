@@ -89,6 +89,21 @@ namespace Protobot.Online {
                 primary = primary, onPrimary = onPrimary, secondary = secondary, onSecondary = onSecondary });
         }
 
+        /// <summary>V2 (build 88): an event's card ("your match is up", building started): shown before the others, even
+        /// during a game's run (only an online match holds it back); seen once (its id).</summary>
+        public static void Show(string id, string title, string text, string primary, Action onPrimary, string secondary, Action onSecondary) {
+            if (Seen().Contains(id) || current?.id == id || waiting.Any(w => w.id == id)) return;
+            waiting.Insert(0, new Item { id = id, kind = "event", title = title, text = text,
+                primary = primary, onPrimary = onPrimary, secondary = secondary, onSecondary = onSecondary });
+        }
+
+        /// <summary>V2 (build 88): takes a card back (waiting or showing) when what it says is over (a match called
+        /// that has begun or been decided).</summary>
+        public static void Withdraw(string id) {
+            waiting.RemoveAll(w => w.id == id);
+            if (current?.id == id) Close();
+        }
+
         // ------------------------------------------------------------------ showing them
 
         /// <summary>A game's run or an online match is going: cards wait for it to end.</summary>
@@ -96,7 +111,8 @@ namespace Protobot.Online {
             (Game.SkillsGame.Active && Motion.Sandbox.Running) || OnlineMatch.Active;
 
         private void Update() {
-            if (shown != null || waiting.Count == 0 || Interface.Interface.Root == null || Busy) return;
+            if (shown != null || waiting.Count == 0 || Interface.Interface.Root == null) return;
+            if (Busy && !(waiting[0].kind == "event" && !OnlineMatch.Active)) return;   // V2: event cards don't wait for a game's run
             current = waiting[0];
             waiting.RemoveAt(0);
             Build(current);
@@ -189,11 +205,15 @@ namespace Protobot.Online {
                 });
                 send.onClick.AddListener(() => _ = Answer(item, field, send, column));
             }
-            else if (item.kind == "update") {
-                Ui.Button(buttons, "Later", "Later", () => Dismiss(item), false, 6f).Size(-1, 32f);
+            else if (item.kind == "update" || item.kind == "event") {
+                if (item.kind == "update") Ui.Button(buttons, "Later", "Later", () => Dismiss(item), false, 6f).Size(-1, 32f);
                 if (item.secondary != null)
-                    Ui.Button(buttons, "Secondary", item.secondary, () => item.onSecondary?.Invoke(), false, 6f).Size(-1, 32f);
+                    Ui.Button(buttons, "Secondary", item.secondary, () => {
+                        if (item.kind == "event") Dismiss(item);
+                        item.onSecondary?.Invoke();
+                    }, false, 6f).Size(-1, 32f);
                 Ui.Button(buttons, "Primary", item.primary, () => {
+                    if (item.kind == "event") MarkSeen(item.id);
                     Close();
                     item.onPrimary?.Invoke();
                 }, true, 6f).Size(-1, 32f);

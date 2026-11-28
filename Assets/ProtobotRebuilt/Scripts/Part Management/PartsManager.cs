@@ -25,6 +25,7 @@ namespace Protobot {
             partTypes = partTypes.Append(Motion.ElasticPartGenerator.CreateType()).ToArray();
             partTypes = partTypes.Append(Motion.TubePartGenerator.CreateType()).ToArray();
             partTypes = partTypes.Append(Motion.WirePartGenerator.CreateType()).ToArray();   // V2: cables
+            partTypes = partTypes.Append(Motion.StringPartGenerator.CreateType()).ToArray();   // V2 (build 88): string
         }
 
         public static PartType GetPartType(string id) {

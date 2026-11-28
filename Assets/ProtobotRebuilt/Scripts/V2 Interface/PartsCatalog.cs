@@ -155,7 +155,7 @@ namespace Protobot.Interface {
         // the saw) are left out too; Hidden keeps them from coming back at the end of a section.
         private static readonly HashSet<string> Hidden = new() {
             "OVSG", "OVTG", "OVAG",   // V2: duplicates of OVGL's goals
-            "BAND", "PTUB", "WIRE",   // V2: bands, tubing and cables are made by their tools (listed as actions)
+            "BAND", "PTUB", "WIRE", "STRG",   // V2: bands, tubing and cables are made by their tools (listed as actions)
             "CHAN", "VXCCHANNELSTOCK", "VXANGLESTOCK", "VXPLATESTOCK", "VXSLIDEASSEMBLYP", "VXSTANDOFFVEX", "VXV5ELECTRONICS",
             "WSHR", "VXCHAIN9P", "VXGUSSETSVEX",   // V2: replaced by the new washers, made by the Chain tool, the original's gussets
         };
@@ -297,9 +297,15 @@ namespace Protobot.Interface {
                 Group(s, "Cams and cranks", "MCMS", Leaf(s, "Cam follower", "MCMS", "Cam Follower"), Leaf(s, "Drop off cam", "MCMS", "Drop Off Cam"),
                     Leaf(s, "Hand crank", "MCMS", "Hand Crank"), Leaf(s, "Rack", "MCMS", "Rack"),
                     Leaf(s, "Cam follower mounting bracket", "VXADVANCEDGEARS", "Cam Follower Mounting Bracket")),   // V2: holds the follower
-                Group(s, "Winch and ratchet", "VXADVANCEDGEARS", Vex(s, "VXADVANCEDGEARS", o => Contains(o, "Winch Drum", "Winch Pawl", "Ratchet"))),
-                Group(s, "Differential and joints", "VXADVANCEDGEARS", Vex(s, "VXADVANCEDGEARS", o => Contains(o, "Differential", "Universal Joint"))),
-                Group(s, "Pulley", "VXMOTIONPARTS", Vex(s, "VXMOTIONPARTS", o => o == "Pulley"))));
+                Group(s, "Differential and joints", "VXADVANCEDGEARS", Vex(s, "VXADVANCEDGEARS", o => Contains(o, "Differential", "Universal Joint")))));
+            // V2 (build 88): string, with VEX's Winch and Pulley Kit (276-1546: winch drum, ratchet, pawl, pulleys) as VEX
+            // sells it.
+            Add(Group(s, "String and pulleys", "VXMOTIONPARTS",
+                new[] { new CatalogNode { section = s, name = "String", action = "string:VEX", iconType = "VXMOTIONPARTS",
+                                          tip = "String or rope: click where it's tied, each pulley, post or hole it goes round or through, then the last point "
+                                                + "again (or Enter) to tie it off. Ending on a winch drum winds it on. Its kind and slack are in the bar." } }
+                    .Concat(Vex(s, "VXMOTIONPARTS", o => o == "Pulley"))
+                    .Concat(Vex(s, "VXADVANCEDGEARS", o => Contains(o, "Winch Drum", "Winch Pawl", "Ratchet")))));
             // V2: VEX's linear slide (the truck seats in a slide member and slides along it: Motion/SlideTruck), then
             // the original's slide pieces.
             Add(Group(s, "Linear motion", "LMTK",
@@ -314,13 +320,12 @@ namespace Protobot.Interface {
 
         private static CatalogNode Wheels() {
             const string s = "Motion";
-            CatalogNode VexWheels(string name, Func<string, bool> filter) => Group(s, name, "VXWHEELS", Vex(s, "VXWHEELS", filter));
             return Group(s, "Wheels", "OMNI",
                 Group(s, "Omni wheels", "OMNI", Sizes(s, "OMNI", "V2", o => Pretty(o) + " omni wheel")),
                 Group(s, "Traction wheels", "TWHL", Sizes(s, "TWHL", "V2", o => Pretty(o) + " traction wheel")
                     .Concat(Vex(s, "VXWHEELS", o => o == "4\" Traction Tire"))),
-                VexWheels("Anti-static omni wheels", o => Contains(o, "Omni") && Contains(o, "Anti Static")),
-                VexWheels("Anti-static traction wheels", o => Contains(o, "Traction") && Contains(o, "Anti Static")),
+                // V2 (build 88): VEX's anti-static omni and traction wheels left out: the same models as the ones above
+                // (the user's call); builds that used them still open.
                 Group(s, "Mecanum wheels", "MECN",
                     new[] { Leaf(s, "4\" mecanum wheel", "MECN") }.Concat(Vex(s, "VXWHEELS", o => Contains(o, "Mecanum") && o.StartsWith("2\"")))),
                 Group(s, "Older wheels (V1)", "OMNI", Sizes(s, "OMNI", "V1", o => Pretty(o) + " omni wheel (V1)")

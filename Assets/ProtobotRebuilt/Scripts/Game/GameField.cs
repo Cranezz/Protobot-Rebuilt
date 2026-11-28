@@ -81,6 +81,7 @@ namespace Protobot.Game {
                 field.collision.gameObject.SetActive(false);   // only its meshes and places are used
             }
             field.Read();
+            field.DressLoaders();   // V2 (build 88): clear tubes with red/blue collars
             field.MakeColliders();
             if (skills) field.HideForSkills();
             else field.HideOffField();   // V2: a match starts with its Goals set up as the model shows
@@ -164,23 +165,120 @@ namespace Protobot.Game {
                 foreach (var filter in t.GetComponentsInChildren<MeshFilter>(true)) {
                     if (filter.sharedMesh == null || !filter.sharedMesh.isReadable) continue;
                     if (toggle && filter.name.StartsWith("276-9250-023")) continue;   // the bar turns: made per run
-                    if (filter.name.Contains("AprilTag") || filter.sharedMesh.bounds.size.magnitude < 0.4f) continue;
+                    if (filter.name.Contains("AprilTag") || filter.name.EndsWith("Collars") || filter.sharedMesh.bounds.size.magnitude < 0.4f) continue;
                     var go = new GameObject(filter.name) { layer = Sandbox.FieldLayer };
-                    go.transform.SetParent(Column(filter.transform) ?? colliders, false);
+                    var column = loader ? Column(filter.transform) : null;
+                    go.transform.SetParent(column ?? colliders, false);
                     go.transform.SetPositionAndRotation(filter.transform.position, filter.transform.rotation);
                     go.transform.localScale = filter.transform.lossyScale;
                     var mc = go.AddComponent<MeshCollider>();
                     mc.sharedMesh = filter.sharedMesh;
-                    mc.sharedMaterial = ElementShapes.Plastic;
+                    mc.sharedMaterial = column != null ? Slick : ElementShapes.Plastic;   // V2: the sliding tube is smooth
                 }
             }
         }
 
+        // ------------------------------------------------------------------ V2: the Loaders look like VEX's
+
+        // The field model's Loader tube (276-9250-031) is one mesh in one color, but VEX's Loader is clear polycarbonate
+        // with an Alliance-colored collar at the bottom (to 4.4" up, with its lip) and at the top (from 12.45", with the
+        // handle's arms) (Appendix A's Loader drawing and Figures SG11-1/2). The tube is drawn in the field's clear plastic
+        // and the collars laid over it, cut from the light model's copy of the tube (readable: the full model's isn't).
+        private const float CollarBottom = 4.5f, CollarTop = 12.45f;
+
+        private void DressLoaders() {
+            var clear = display.GetComponentsInChildren<Renderer>(true).SelectMany(r => r.sharedMaterials).FirstOrDefault(m => m != null && m.name == "Field Clear");
+            if (clear == null) return;
+            var sources = collision.GetComponentsInChildren<MeshFilter>(true).Where(f => f.name.StartsWith("276-9250-031") && f.sharedMesh != null && f.sharedMesh.isReadable).ToList();
+            foreach (var renderer in display.GetComponentsInChildren<MeshRenderer>(true)) {
+                if (!renderer.name.StartsWith("276-9250-031") || renderer.name.EndsWith("Collars")) continue;
+                var center = MeshBounds(renderer.transform).center;
+                var source = sources.OrderBy(f => (MeshBounds(f.transform).center - center).sqrMagnitude).FirstOrDefault();
+                if (source == null || (MeshBounds(source.transform).center - center).magnitude > 1f) continue;
+                var collars = CollarMesh(source, renderer.transform);
+                if (collars == null) continue;
+                var colored = renderer.sharedMaterial;
+                var go = new GameObject(renderer.name + " Collars") { layer = renderer.gameObject.layer };
+                go.transform.SetParent(renderer.transform, false);
+                go.AddComponent<MeshFilter>().sharedMesh = collars;
+                go.AddComponent<MeshRenderer>().sharedMaterial = colored;
+                renderer.sharedMaterials = Enumerable.Repeat(clear, renderer.sharedMaterials.Length).ToArray();
+                renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            }
+        }
+
+        // The collar triangles of a (readable) tube mesh, in the space of `into` (the drawn tube).
+        private Mesh CollarMesh(MeshFilter source, Transform into) {
+            var mesh = source.sharedMesh;
+            var v = mesh.vertices;
+            var n = mesh.normals;
+            var tris = mesh.triangles;
+            var toWorld = source.transform.localToWorldMatrix;
+            var toInto = into.worldToLocalMatrix;
+            var height = new float[v.Length];
+            var local = new Vector3[v.Length];
+            var normals = new Vector3[v.Length];
+            for (var i = 0; i < v.Length; i++) {
+                var w = toWorld.MultiplyPoint3x4(v[i]);
+                height[i] = display.InverseTransformPoint(w).y;
+                local[i] = toInto.MultiplyPoint3x4(w);
+                normals[i] = n.Length == v.Length ? toInto.MultiplyVector(toWorld.MultiplyVector(n[i])).normalized : Vector3.up;
+            }
+            System.Func<int, int> Band = i => height[i] < CollarBottom ? 0 : height[i] > CollarTop ? 1 : -1;
+            var kept = new List<int>();
+            for (var t = 0; t + 2 < tris.Length; t += 3) {
+                var b = Band(tris[t]);
+                if (b >= 0 && Band(tris[t + 1]) == b && Band(tris[t + 2]) == b) kept.AddRange(new[] { tris[t], tris[t + 1], tris[t + 2] });
+            }
+            if (kept.Count == 0) return null;
+            var map = new Dictionary<int, int>();
+            var verts = new List<Vector3>();
+            var norms = new List<Vector3>();
+            var outTris = new int[kept.Count];
+            for (var k = 0; k < kept.Count; k++) {
+                if (!map.TryGetValue(kept[k], out var j)) {
+                    j = map[kept[k]] = verts.Count;
+                    verts.Add(local[kept[k]]);
+                    norms.Add(normals[kept[k]]);
+                }
+                outTris[k] = j;
+            }
+            // A hair outside the tube's own faces (now clear), so the clear plastic isn't drawn over them.
+            var box = new Bounds(verts[0], Vector3.zero);
+            foreach (var p in verts) box.Encapsulate(p);
+            var up = into.InverseTransformDirection(display.up).normalized;
+            for (var i = 0; i < verts.Count; i++) {
+                var d = verts[i] - box.center;
+                var along = Vector3.Dot(d, up) * up;
+                verts[i] = box.center + along + (d - along) * 1.015f;
+            }
+            var result = new Mesh { name = "Loader Collars" };
+            result.SetVertices(verts);
+            result.SetNormals(norms);
+            result.SetTriangles(outTris, 0);
+            result.RecalculateBounds();
+            return result;
+        }
+
         // ------------------------------------------------------------------ V2: the Loaders' columns go up and down
 
-        // A Loader is a clear column, open top and bottom, that the drive team raises and lowers (Figure L-1): down,
-        // the Match Loads stand inside it on the tiles; raised, a robot takes the bottom one through the opening.
-        public const float LoaderLift = 3f;
+        // A Loader is a clear column, open top and bottom, that the drive team raises and lowers by its handle (rule SG11;
+        // Appendix A's Loader drawing): down, its bottom is just off the tiles and the Match Loads stand inside it; raised,
+        // the whole tube (its red collars, the handle and the collar bolts riding in the black bracket's slots) slides up
+        // 8.6" (top 14.37" -> 22.97", the bottom collar stopping at the bracket's top, 11.85"), so a robot can take the
+        // bottom Match Load through the opening under it. Only the black bracket (276-9250-032) stays.
+        public const float LoaderLift = 8.6f;
+        public const float LoaderSpeed = 16f;    // in/s: a drive team member lifts it in about half a second
+
+        // The tube's plastic is smooth: lifting it doesn't drag the Match Loads inside up or over.
+        private static PhysicsMaterial slick;
+        private static PhysicsMaterial Slick => slick != null ? slick : slick = new PhysicsMaterial("Loader Plastic") {
+            staticFriction = 0.05f, dynamicFriction = 0.03f, bounciness = 0f,
+            frictionCombine = PhysicsMaterialCombine.Minimum, bounceCombine = PhysicsMaterialCombine.Minimum,
+        };
+
+        // A Loader's parts that move with its tube: everything in its assembly but the black bracket.
+        private static bool MovesWithTube(Transform t) => !t.name.StartsWith("276-9250-032") && !t.name.StartsWith("276-9250-830");
         public const float LoaderTop = 14.4f;   // its height (Match Loads that don't fit don't go in)
 
         private class LoaderColumn {
@@ -196,10 +294,12 @@ namespace Protobot.Game {
 
         private readonly List<LoaderColumn> columns = new();
 
-        // The column's own collider holder (276-9250-031: the clear column), null for any other mesh.
+        // The column's own collider holder for a mesh of a Loader that moves with its tube, null for the bracket.
         private Transform Column(Transform mesh) {
-            if (!mesh.name.StartsWith("276-9250-031")) return null;
-            var c = ColumnFor(mesh, true);
+            if (!MovesWithTube(mesh)) return null;
+            var tube = mesh.parent != null ? mesh.parent.GetComponentsInChildren<Transform>(true).FirstOrDefault(x => x.name.StartsWith("276-9250-031")) : null;
+            if (tube == null) return null;
+            var c = ColumnFor(tube, true);
             return c?.holder;
         }
 
@@ -217,10 +317,12 @@ namespace Protobot.Game {
             column.body = column.holder.gameObject.AddComponent<Rigidbody>();
             column.body.isKinematic = true;
             foreach (var t in display.GetComponentsInChildren<Transform>(true))
-                if (t.name.StartsWith("276-9250-031") && t.name.Contains(red ? "Red" : "Blue") && (ToField(MeshBounds(t).center) - p).magnitude < 3f) {
-                    column.drawn.Add(t);
-                    column.drawnFrom.Add(t.localPosition);
-                }
+                if (t.name.StartsWith("276-9250-031") && !t.name.EndsWith("Collars") && t.name.Contains(red ? "Red" : "Blue") && (ToField(MeshBounds(t).center) - p).magnitude < 3f && t.parent != null)
+                    foreach (Transform part in t.parent)   // V2: the tube with its collars, handle and collar bolts
+                        if (MovesWithTube(part) && !column.drawn.Contains(part)) {
+                            column.drawn.Add(part);
+                            column.drawnFrom.Add(part.localPosition);
+                        }
             columns.Add(column);
             return column;
         }
@@ -244,7 +346,7 @@ namespace Protobot.Game {
         private void FixedUpdate() {
             foreach (var c in columns) {
                 if (Mathf.Approximately(c.lift, c.target)) continue;
-                c.lift = Mathf.MoveTowards(c.lift, c.target, 12f * Time.fixedDeltaTime);
+                c.lift = Mathf.MoveTowards(c.lift, c.target, LoaderSpeed * Time.fixedDeltaTime);
                 Place(c);
             }
         }

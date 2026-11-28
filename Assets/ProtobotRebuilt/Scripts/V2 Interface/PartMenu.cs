@@ -37,7 +37,7 @@ namespace Protobot.Interface {
             if (!mouse.rightButton.wasReleasedThisFrame || !pressed) return;
             pressed = false;
             if ((mouse.position.ReadValue() - pressedAt).magnitude > 5f || Time.unscaledTime - pressedTime > 0.5f) return;
-            if (InputEvents.TextInput.ShortcutsPaused || Motion.Sandbox.Running || Motion.ChainTool.Active || Motion.ElasticTool.Active || Motion.TubeTool.Active) return;
+            if (InputEvents.TextInput.ShortcutsPaused || Motion.Sandbox.Running || Motion.ChainTool.Active || Motion.ElasticTool.Active || Motion.TubeTool.Active || Motion.StringTool.Active) return;
 
             var camera = Camera.main;
             if (camera == null || !Physics.Raycast(camera.ScreenPointToRay(pressedAt), out var hit, Mathf.Infinity, LayerMask.GetMask("Default", "HoleCollisions")))
@@ -66,6 +66,13 @@ namespace Protobot.Interface {
             // V2: a band's posts, count and wraps; tubing from a fitting's end.
             if (saved.TryGetComponent(out Motion.ElasticBand band))
                 options.Add(("Edit band", () => Motion.BandEditor.Select(band)));
+            // V2 (build 88): a string's points; a pulley or winch drum starts one.
+            if (saved.TryGetComponent(out Motion.StringLine stringLine))
+                options.Add(("Edit string", () => Motion.StringEditor.Select(stringLine)));
+            if (Motion.StringUi.IsGrooved(saved.gameObject)) {
+                var from = saved.gameObject;
+                options.Add(("Run string from here", () => Motion.StringTool.BeginFrom(from)));
+            }
             var port = Motion.TubeTool.PortNear(saved.gameObject, hit.point);
             if (port != null)
                 options.Add(("Run tubing from here", () => Motion.TubeTool.Begin(port)));

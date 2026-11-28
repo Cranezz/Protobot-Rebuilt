@@ -854,11 +854,14 @@ namespace Protobot.Game {
                     text.text = $"{char.ToUpper(SkillsGame.LoadName(kind)[0])}{SkillsGame.LoadName(kind).Substring(1)}  ({left} left)";
                 }
                 loaderButton.GetComponentInChildren<TextMeshProUGUI>().text = "Into the " + (game.loader == 0 ? "first" : "second") + (game.Red ? " red" : " blue") + " Loader (click to switch)";
-                raiseButton.GetComponentInChildren<TextMeshProUGUI>().text = game.LoaderUp ? "Lower the Loader" : "Raise the Loader (a robot takes the bottom one)";
+                var key = Tools.Keybinds.Label("RaiseLoader");   // V2 (build 88): its key
+                raiseButton.GetComponentInChildren<TextMeshProUGUI>().text = (game.LoaderUp ? "Lower the Loader" : "Raise the Loader") + (key != "" ? "  (" + key + ")" : "");
             }
 
             private void Update() {
                 if (game == null || clock == null) return;
+                // V2 (build 88): the Loader's key, while the run is on (not while typing).
+                if (game.state == SkillsGame.State.Running && !InputEvents.TextInput.IsTyping && Tools.Keybinds.Pressed("RaiseLoader")) game.ToggleLoader();
                 // V2: a match shows its period (autonomous counts its own 0:15).
                 clock.text = Clock(game.InAutonomous ? game.timeLeft - SkillsGame.DriverSeconds : game.timeLeft);
                 if (label != null) label.text = game.mode == SkillsGame.Mode.Programming ? "PROGRAM         SCORE" : game.mode == SkillsGame.Mode.Skills ? "TIME            SCORE" : game.InAutonomous ? "AUTONOMOUS        SCORE" : "DRIVER            SCORE";

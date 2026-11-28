@@ -18,11 +18,15 @@ namespace Protobot.Online {
             var open = Argument("-open");
             var code = Argument("-join");
             var host = Argument("-host");
-            if (string.IsNullOrEmpty(open) && string.IsNullOrEmpty(code) && string.IsNullOrEmpty(host)) return;
-            _ = Run(open, code, Argument("-team"), host, HasFlag("-autostart"));
+            var eventCode = Argument("-event");   // V2 (build 88, testing): join this event and lock in the opened build
+            if (string.IsNullOrEmpty(open) && string.IsNullOrEmpty(code) && string.IsNullOrEmpty(host) && string.IsNullOrEmpty(eventCode)) return;
+            _ = Run(open, code, Argument("-team"), host, HasFlag("-autostart"), eventCode);
         }
 
-        private static async Task Run(string open, string code, string team, string host, bool autostart) {
+        /// <summary>"-eventauto" (testing): an event match called for this player is joined at once.</summary>
+        public static readonly bool EventAuto = Environment.GetCommandLineArgs().Contains("-eventauto");
+
+        private static async Task Run(string open, string code, string team, string host, bool autostart, string eventCode = null) {
             await Task.Delay(3000); // let the app finish starting (menus, part types)
             if (!string.IsNullOrEmpty(open)) {
                 CloseLaunchWindow();
@@ -34,6 +38,20 @@ namespace Protobot.Online {
                 }
                 else Debug.Log("[Online] -open " + open + ": couldn't read it");
                 await Task.Delay(1500);   // screws find their holes
+            }
+            if (!string.IsNullOrEmpty(eventCode)) {
+                for (var i = 0; i < 30 && !(OnlineServices.SignedIn && AgeCheck.Ready); i++) {
+                    if (i == 0) _ = OnlineServices.Start();
+                    await Task.Delay(1000);
+                }
+                var joined = await Events.Call("join", eventCode, new System.Collections.Generic.Dictionary<string, object> { { "name", OnlineServices.Name } });
+                Debug.Log("[Event] -event " + eventCode + ": join " + (Events.Ok(joined) ? "ok" : Events.Reason(joined)));
+                if (Events.Ok(joined)) {
+                    Events.Remember(eventCode);
+                    var lockProblem = await Events.LockIn(eventCode);
+                    Debug.Log("[Event] -event " + eventCode + ": lock in " + (lockProblem ?? "ok"));
+                }
+                return;
             }
             if (!string.IsNullOrEmpty(host)) {
                 await HostAndWait(host, team, autostart);

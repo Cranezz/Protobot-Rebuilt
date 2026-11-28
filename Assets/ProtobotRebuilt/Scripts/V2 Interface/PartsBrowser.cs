@@ -719,6 +719,10 @@ namespace Protobot.Interface {
                 Motion.TubeTool.Begin();
                 return;
             }
+            if (node.action != null && node.action.StartsWith("string:")) {   // V2 (build 88): string, routed post to post
+                Motion.StringTool.Begin(node.action.Substring("string:".Length));
+                return;
+            }
             if (node.action != null && node.action.StartsWith("band:")) {   // V2: a band round its posts
                 Motion.ElasticTool.Begin(node.action.Substring("band:".Length));
                 return;

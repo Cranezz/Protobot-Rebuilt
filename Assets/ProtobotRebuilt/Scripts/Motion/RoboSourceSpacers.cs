@@ -74,7 +74,9 @@ namespace Protobot.Motion {
                 var i = verts.Count;
                 verts.AddRange(new[] { a, b, c, d });
                 normals.AddRange(new[] { na, nb, nc, nd });
-                tris.AddRange(new[] { i, i + 1, i + 2, i, i + 2, i + 3 });
+                // V2 (build 88): wound clockwise as seen from the side its normal faces (Unity's front face); they were
+                // the other way round, so every face was drawn from inside and the spacers looked inside out.
+                tris.AddRange(new[] { i, i + 2, i + 1, i, i + 3, i + 2 });
             }
             for (var s = 0; s < Sides; s++) {
                 var a0 = s * Mathf.PI * 2f / Sides;

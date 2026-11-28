@@ -67,7 +67,7 @@ namespace Protobot.Online {
         private enum Msg : byte {
             Plan = 1, Robot = 2, Loaded = 3, Go = 4, Spawn = 7, Drop = 8, Finish = 9, Abort = 10, Chunk = 11, Final = 12,
             State = 13, Claim = 14, Owner = 15, Release = 16, Collect = 17, Everything = 18, Hold = 19, Disable = 20,
-            Rejoin = 21, RejoinReady = 22, Sync = 23,
+            Rejoin = 21, RejoinReady = 22, Sync = 23, Loader = 24,
         }
         private const string Channel = "protobot.match";
         private const int ChunkSize = 1000;
@@ -267,6 +267,7 @@ namespace Protobot.Online {
                 return;
             }
             me = seat.robot;
+            Events.MatchBegan();   // V2 (build 88): an event's match has begun (its no-show clock stops)
             // V2: the robot must be able to play before anything closes (a player was left in build mode mid-match).
             var robotProblem = SkillsGame.RobotProblem();
             if (robotProblem != null) {
@@ -510,6 +511,12 @@ namespace Protobot.Online {
                 case Msg.Drop:
                     if (IsHost) HostDrop(data);
                     break;
+                case Msg.Loader:   // V2 (build 88): a Loader raised/lowered: the host passes it on to everyone
+                    if (data.Length >= 3 && game != null) {
+                        game.SetLoader(data[0] == 1, data[1], data[2] == 1);
+                        if (IsHost) ToClients(Msg.Loader, data, true);
+                    }
+                    break;
                 case Msg.Finish:
                     if (game != null && !IsHost) game.FinishNow();
                     break;
@@ -648,6 +655,11 @@ namespace Protobot.Online {
                     return (new Vector2(0f, forward), new Vector2(turn, 0f));
                 };
             }
+            game.onlineLoader = (red, index, raised) => {   // V2 (build 88)
+                var bytes = new[] { (byte)(red ? 1 : 0), (byte)index, (byte)(raised ? 1 : 0) };
+                if (IsHost) ToClients(Msg.Loader, bytes, true);
+                else ToHost(Msg.Loader, bytes, true);
+            };
             game.onlineMayStart = true;
             game.StartRun();
             game.onlineMayStart = false;

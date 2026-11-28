@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -14,6 +14,9 @@ namespace Protobot.EditorTools {
             if (Tag != null) Tags[part] = Tag;
             return part;
         }
+
+        /// <summary>V2 (build 88): a part made like the rigs' own (other rig builders: CascadeLiftRig).</summary>
+        public static GameObject Make(string id, Vector3 position, Quaternion rotation) => Part(id, position, rotation);
 
         /// <summary>V2 (tutorial videos): when set, every part made is listed in <see cref="Tags"/> under it (the
         /// stages a demo reveals).</summary>
@@ -850,6 +853,119 @@ namespace Protobot.EditorTools {
             Nut(new Vector3(postAt.x, top2 - 2f * half, postAt.z), up);
             Post("2", Hole(4.5f, -1.5f));
             return made.GetRange(start, made.Count - start);
+        }
+
+        public static readonly Dictionary<string, GameObject> StringParts = new();
+
+        /// <summary>V2 (build 88, string phase 2): a 4" C-channel arm on a shaft collar that a 100 rpm motor (U/J, hold)
+        /// swings over a 25 x 25 plate, a screw standing up through the arm's tip as its post, and three 2" spacer posts
+        /// on the plate ("A" at (-4.5, 3), "B" at (-3.5, 3), "C" at (-4, -3)). FinishStringRig ties the strings after the
+        /// screws connect.</summary>
+        public static List<GameObject> StringRig(Vector3 origin) {
+            var start = made.Count;
+            StringParts.Clear();
+            var up = Vector3.up;
+            const float half = 0.023f;
+            var plate = Part("PLTE-25-25", origin, Quaternion.LookRotation(up, Vector3.forward));
+            StringParts["plate"] = plate;
+            Vector3 Hole(float x, float z) => origin + new Vector3(x, 0f, z);
+            var p1 = Hole(0f, 0f);
+            StringParts["motor"] = Motor(p1 - up * half, up, Vector3.forward);
+            foreach (var d in new[] { 0.5f, 1.0f }) Screw(p1 + new Vector3(0f, half, d), up);
+            StringParts["shaft"] = Shaft(p1 + up * 0.7f, up, 4);
+            var r = Vector3.left;
+            var h = p1 + up * 2f;
+            var collarTurn = Quaternion.LookRotation(up, -r);
+            Part("CLMP-Normal-Normal", h - collarTurn * new Vector3(0f, 0.007f, 0f), collarTurn);
+            var channelTurn = Quaternion.LookRotation(-r, up);
+            var channel = Part("CCHL-1x2-8", h + r * (0.2165f + 0.0555f) + channelTurn * new Vector3(0.5f, 0f, 0f), channelTurn);
+            Screw(h + r * (0.2165f + 0.0625f), r, "1/4in");
+            StringParts["arm"] = channel;
+            Physics.SyncTransforms();
+            // The arm's post: a screw up through both flanges at its tip, a nut on top, the shank standing above it.
+            var flanges = channel.GetComponentsInChildren<HoleCollider>(true).Where(x => Mathf.Abs(x.transform.forward.y) > 0.98f).ToList();
+            var far = flanges.Max(x => Vector3.ProjectOnPlane(x.transform.position - p1, up).magnitude);
+            var tip = flanges.Where(x => Vector3.ProjectOnPlane(x.transform.position - p1, up).magnitude > far - 0.05f).OrderBy(x => x.transform.position.y).ToList();
+            var bottom = tip[0].transform.position - up * tip[0].transform.lossyScale.z / 2f;
+            var topFace = tip[^1].transform.position + up * tip[^1].transform.lossyScale.z / 2f;
+            StringParts["arm post"] = Screw(bottom, -up, "2.00in");
+            Nut(topFace, -up);
+            // The plate's posts: two 1" spacers on a screw up from under the plate, a nut on top.
+            GameObject Post(string key, Vector3 at) {
+                var low = Stand(Spacer1, at + up * half);
+                var high = Stand(Spacer1, new Vector3(at.x, Top(low), at.z));
+                Screw(at - up * half, -up, "2.50in");
+                Nut(new Vector3(at.x, Top(high), at.z), -up);
+                StringParts[key] = high;
+                return high;
+            }
+            Post("A", Hole(-4.5f, 3f));
+            Post("B", Hole(-3.5f, 3f));
+            Post("C", Hole(-4f, -3f));
+            // Feet: 2" standoffs under the corners, so the plate stands flat (not on the motor under it).
+            foreach (var (x, z) in new[] { (-5.5f, -5.5f), (5.5f, -5.5f), (-5.5f, 5.5f), (5.5f, 5.5f) }) {
+                Stand("SNDF-2.00in", Hole(x, z) - up * (half + 2f));
+                Screw(Hole(x, z) + up * half, up, "3/8in");
+            }
+            return made.GetRange(start, made.Count - start);
+        }
+
+        /// <summary>After StringRig's screws have connected: the motor (100 rpm, hold, U/J) and a VEX rope string: "stop"
+        /// = the arm's post tied to post A; "tackle" = post A, round the arm's post, to post B (the arm pulled by two
+        /// strands); "both" = the stop to A and another to C (the arm can't swing either way). slack: inches over tight.</summary>
+        public static string FinishStringRig(string mode, float slack) {
+            var log = new System.Text.StringBuilder();
+            foreach (var line in Motion.StringLine.All.ToList()) if (line != null) Object.DestroyImmediate(line.gameObject);
+            var motor = StringParts["motor"].GetComponent<Motion.MotorDrive>();
+            motor.SetCartridge(100, false);
+            Motion.Controls.SetName(motor.gameObject, "String arm");
+            Motion.Controls.SetHold(motor.gameObject, true);
+            Motion.Controls.SetForwardKey(motor.gameObject, UnityEngine.InputSystem.Key.U);
+            Motion.Controls.SetReverseKey(motor.gameObject, UnityEngine.InputSystem.Key.J);
+            Motion.BandPost PostOn(GameObject part, float y) {
+                var b = part.GetComponent<Renderer>().bounds;
+                var ray = new Ray(new Vector3(b.center.x, y, b.center.z + 6f), Vector3.back);
+                return Motion.StringUi.PostAt(ray, out var post) ? post : null;
+            }
+            var armPost = StringParts["arm post"];
+            var armY = armPost.GetComponent<Renderer>().bounds.max.y - 0.35f;
+            void Make(float turns, params (GameObject part, float y)[] route) {
+                var nodes = new List<Motion.StringNode>();
+                foreach (var (part, y) in route) {
+                    var post = PostOn(part, y);
+                    if (post == null) { log.AppendLine("no post on " + part.name); return; }
+                    nodes.Add(new Motion.StringNode { post = post });
+                    log.AppendLine("  post on " + (post.part != null ? post.part.name : "-") + " r " + post.radius.ToString("F3") + " axis " + post.Axis.ToString("F2") + " at " + post.Center.ToString("F2"));
+                }
+                Motion.StringUi.MarkSpools(nodes);
+                if (turns > 0f) nodes[^1].spool = true;   // (winch: wound on the shaft at its end)
+                var kind = Motion.StringKind.Of("VEX");
+                var path = Motion.StringLine.PathOf(nodes, kind, turns);
+                if (!path.Valid) { log.AppendLine("path: " + path.problem); return; }
+                var generator = PartsManager.GetPartType("STRG").GetComponent<PartGenerator>();
+                generator.param1.value = kind.key;
+                var obj = generator.Generate(nodes[0].post.Center, Quaternion.identity);
+                made.Add(obj);
+                var line = obj.GetComponent<Motion.StringLine>();
+                line.Set(nodes, path.tight + slack, turns);
+                log.AppendLine("string " + line.Describe().Replace('\n', ' ') + " ways " + string.Join(",", path.ways));
+            }
+            var postY = Top(StringParts["A"]) - 0.3f;
+            if (mode == "stop" || mode == "both") Make(0f, (armPost, armY), (StringParts["A"], postY));
+            if (mode == "both") Make(0f, (armPost, armY), (StringParts["C"], postY));
+            if (mode == "tackle") Make(0f, (StringParts["A"], postY), (armPost, armY), (StringParts["B"], postY));
+            // V2 (phase 3): "winch" = post A to the motor's shaft above the arm, three turns wound on it.
+            // V2 (phase 4): "pin" = a 1" standoff standing loose on the plate over a hole (a release pin) tied to post A;
+            // the test lifts the standoff out of the loop.
+            if (mode == "pin") {
+                var pin = Stand("SNDF-1.00in", StringParts["plate"].transform.position + new Vector3(3f, 0.023f, 3f));
+                made.Add(pin);
+                StringParts["pin"] = pin;
+                Physics.SyncTransforms();
+                Make(0f, (pin, pin.GetComponent<Renderer>().bounds.min.y + 0.4f), (StringParts["A"], postY));
+            }
+            if (mode == "winch") Make(3f, (StringParts["A"], postY), (StringParts["shaft"], StringParts["shaft"].GetComponent<Renderer>().bounds.max.y - 0.6f));
+            return log.ToString();
         }
 
         /// <summary>After TensionerRig's screws have connected: joints, the plate grounded, motors, bands, chains.</summary>

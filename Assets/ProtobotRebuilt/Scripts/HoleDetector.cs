@@ -93,10 +93,16 @@ namespace Protobot {
         }
 
         // Whether a point is inside a hole collider's box (its mesh spans -0.5..0.5, scaled by the transform).
+        // V2 (build 88): measured along the hole's own axes, not through its inverse transform: a V5 motor's shaft hole
+        // is 0 deep, its inverse collapsed the depth, and every hole in line with it (the collars and channels on the
+        // motor's shaft) counted as inside it, so a shaft in a motor never held anything.
         private static bool Contains(Transform hole, Vector3 point) {
-            var local = hole.InverseTransformPoint(point);
             const float inside = 0.49f;
-            return Mathf.Abs(local.x) < inside && Mathf.Abs(local.y) < inside && Mathf.Abs(local.z) < inside;
+            var d = point - hole.position;
+            var s = hole.lossyScale;
+            return Mathf.Abs(Vector3.Dot(d, hole.right)) < inside * Mathf.Abs(s.x)
+                   && Mathf.Abs(Vector3.Dot(d, hole.up)) < inside * Mathf.Abs(s.y)
+                   && Mathf.Abs(Vector3.Dot(d, hole.forward)) < inside * Mathf.Abs(s.z);
         }
 
         private void OnTriggerStay(Collider other) {

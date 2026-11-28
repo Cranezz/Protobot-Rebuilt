@@ -27,6 +27,8 @@ namespace Protobot.Motion {
             // V2 (advanced gear kit): what it drives in a straight line, each with how far it's gone and where its
             // parts started (a follower: its cam's reach when the run began).
             public readonly List<(Slider slider, List<(Transform t, Vector3 at)> start, float moved, float reach)> sliders = new();
+            // V2 (build 88, string phase 3): strings wound on a drum (or shaft) the system turns: which end.
+            public readonly List<(StringLine line, Rotor rotor, int end)> winches = new();
         }
 
         /// <summary>V2: starts turning a system by hand or by motor (null and why when it can't). The motor runs and
@@ -59,6 +61,19 @@ namespace Protobot.Motion {
             run.parts = moved;
             run.before = moved.Select(p => (IElement)new ObjectElement(p)).ToList();
             foreach (var (chain, _, _) in system.chains) run.before.Add(new ChainLoop.PhaseElement(chain));
+            // V2 (build 88): winches: a string with an end wound on a part that turns winds on or off as it turns.
+            foreach (var line in StringLine.All) {
+                if (line == null || line.nodes.Count < 2 || line.gameObject.IsDeleted()) continue;
+                foreach (var end in new[] { 0, line.nodes.Count - 1 }) {
+                    var node = line.nodes[end];
+                    if (!node.spool || !node.Round || node.post.part == null) continue;
+                    var rotor = system.rotors.FirstOrDefault(r => r.parts.Contains(node.post.part));
+                    if (rotor == null) continue;
+                    run.winches.Add((line, rotor, end));
+                    run.before.Add(new StringLine.StringElement(line));
+                    break;
+                }
+            }
             return run;
         }
 
@@ -78,8 +93,17 @@ namespace Protobot.Motion {
                 if (room * step <= 0f) scale = 0f;
                 else if (step / room > 1f) scale = Mathf.Min(scale, room / step);
             }
+            // V2 (build 88): a winch winds until its string is tight (what it pulls doesn't move in the build: in
+            // Simulate it does) and unwinds until it's all off the drum.
+            foreach (var (line, rotor, end) in run.winches) {
+                var wind = degrees * WindPerDegree(line, rotor, end, system.ratio[rotor], out var path);
+                if (Mathf.Abs(wind) < 1e-7f || path == null) continue;
+                var room = wind > 0f ? Mathf.Max(0f, line.length - path.tight) : path.wound;
+                if (Mathf.Abs(wind) > room) scale = Mathf.Min(scale, room / Mathf.Abs(wind));
+            }
             degrees *= scale;
             if (Mathf.Abs(degrees) < 1e-6f) return 0f;
+            var winds = run.winches.Select(w => degrees * WindPerDegree(w.line, w.rotor, w.end, system.ratio[w.rotor], out _)).ToList();
             run.turned += degrees;
             // V2: each part's new pose from where it was before this step (parents set before their children), so a
             // part inside another that turns on a different shaft (a universal joint's far yoke) isn't turned twice.
@@ -116,7 +140,32 @@ namespace Protobot.Motion {
                     if (t != null) t.position = at + slider.axis * moved;
                 run.sliders[i] = (slider, start, moved, reach);
             }
+            for (var i = 0; i < run.winches.Count; i++) {
+                var (line, _, end) = run.winches[i];
+                if (line == null || Mathf.Abs(winds[i]) < 1e-7f) continue;
+                var r = line.nodes[end].post.radius + line.kind.DrawRadius;
+                line.turns = Mathf.Max(0f, line.turns + winds[i] / (2f * Mathf.PI * Mathf.Max(r, 1e-3f)));
+                line.length -= winds[i];
+                line.Refresh(true);
+            }
             return degrees;
+        }
+
+        // V2 (build 88): inches of string a winch winds on (+) or off per degree of its system's first rotor. The
+        // string leaves the drum at a point that stays put while the drum turns under it; the coil lies behind that
+        // point (StringPath.Of), so turning the drum the way the string goes round it pays out at the first point and
+        // winds on at the last.
+        public static float WindPerDegree(StringLine line, Rotor rotor, int end, float ratio, out StringPath path) {
+            path = null;
+            if (line == null || rotor == null) return 0f;
+            path = StringLine.PathOf(line.nodes, line.kind, line.turns);
+            if (!path.Valid || path.ways.Length <= end) return 0f;
+            var node = line.nodes[end];
+            var axis = node.post.Axis.normalized;
+            var way = path.ways[end] != 0 ? path.ways[end] : 1;
+            var r = node.post.radius + line.kind.DrawRadius;
+            var turn = ratio * Mathf.Sign(Vector3.Dot(rotor.axis, axis)) * Mathf.Deg2Rad;   // the drum about the post's axis
+            return -r * turn * (end == 0 ? way : -way);
         }
 
         /// <summary>V2: one undo step for the run (nothing when it didn't turn).</summary>
@@ -282,6 +331,11 @@ namespace Protobot.Motion {
                 if (chain != null) {
                     chain.Save();
                     after.Add(new ChainLoop.PhaseElement(chain));
+                }
+            foreach (var (line, _, _) in run.winches)
+                if (line != null) {
+                    line.Save();
+                    after.Add(new StringLine.StringElement(line));
                 }
             StateSystem.AddState(new State(after));
         }

@@ -56,6 +56,7 @@ namespace Protobot.Motion {
             if (Placement.IsPlacing) Placement.Instance.StopPlacing();
             ChainTool.Stop();
             ElasticTool.Stop();
+            StringTool.Stop();   // V2 (build 88)
             foreach (var manager in FindObjectsByType<SelectionSystem.SelectionManager>(FindObjectsSortMode.None)) manager.ClearCurrent();
             active = Ui.Rect("Tube Tool", Interface.Interface.Root).Fill().gameObject.AddComponent<TubeTool>();
             active.Build();

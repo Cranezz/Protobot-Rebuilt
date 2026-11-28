@@ -911,8 +911,25 @@ namespace Protobot.Game {
         /// <summary>V2: raises or lowers this Alliance's chosen Loader (the drive team does it by hand).</summary>
         public void ToggleLoader() {
             if (field == null) return;
-            field.SetLoaderRaised(loader, Red, !LoaderUp);
+            // SG11: Drive Team Members operate their Loaders only in the Driver Controlled Period.
+            if (InAutonomous) {
+                Interface.Interface.Say("The Loader can only be raised in driver control (SG11)", false);
+                return;
+            }
+            var raised = !LoaderUp;
+            field.SetLoaderRaised(loader, Red, raised);
+            onlineLoader?.Invoke(Red, loader, raised);   // V2: online, every computer's field raises it too
             Audio.Sounds.Play(Audio.Sounds.Tick);
+            Changed?.Invoke();
+        }
+
+        /// <summary>V2: online, raising/lowering a Loader is sent to the others (red, which Loader, raised).</summary>
+        public Action<bool, int, bool> onlineLoader;
+
+        /// <summary>V2: a Loader raised or lowered on another computer (online).</summary>
+        public void SetLoader(bool red, int index, bool raised) {
+            if (field == null || field.LoaderRaised(index, red) == raised) return;
+            field.SetLoaderRaised(index, red, raised);
             Changed?.Invoke();
         }
 
@@ -1088,6 +1105,7 @@ namespace Protobot.Game {
             try {
                 if (online && score.match) {
                     Online.Accounts.RecordMatch(Red ? score.red : score.blue, Red ? score.blue : score.red);
+                    Online.Events.MatchFinished(Red ? score.red : score.blue, Red ? score.blue : score.red);   // V2 (build 88): an event's match
                     return;
                 }
                 if (!SkillsRun || online || !Legal) return;

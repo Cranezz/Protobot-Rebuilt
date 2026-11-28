@@ -147,7 +147,7 @@ namespace Protobot.Builds {
             Changed(ref placing, Placement.IsPlacing && Placement.Instance != null ? PlacingName() : null, "place");
             if (manager == null) manager = FindAnyObjectByType<BuildsManager>();
             Changed(ref buildPath, manager != null ? (manager.buildPath ?? "") + " \"" + ModelExport.BuildName() + "\"" : null, "build");
-            var window = Motion.TubeTool.Active ? "tube/cable tool" : Motion.ElasticTool.Active ? "band tool" : Motion.ChainTool.Active ? "chain tool" : null;
+            var window = Motion.TubeTool.Active ? "tube/cable tool" : Motion.StringTool.Active ? "string tool" : Motion.ElasticTool.Active ? "band tool" : Motion.ChainTool.Active ? "chain tool" : null;
             Changed(ref toolWindow, window, "window");
             if (Motion.Sandbox.Running != sim) {
                 sim = Motion.Sandbox.Running;

@@ -53,6 +53,7 @@ namespace Protobot.Tools {
             Add("NudgeAway", game, "Nudge away from the audience", "UpArrow", true);
             Add("TurnLeft", game, "Turn 5° counterclockwise (Shift 0.5°)", "Q", true);
             Add("TurnRight", game, "Turn 5° clockwise", "E", true);
+            Add("RaiseLoader", game, "Match: raise or lower your Loader (driver control)", "L");   // V2 (build 88)
             const string sketch = "Sketch editor";
             Add("SketchUndo", sketch, "Undo", "Ctrl+Z");
             Add("SketchRedo", sketch, "Redo", "Ctrl+Y");

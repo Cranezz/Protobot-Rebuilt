@@ -15,6 +15,7 @@ namespace Protobot.Motion {
             else if (action == "wire:V5") texture = Cable(false);
             else if (action == "wire:3W") texture = Cable(true);
             else if (action.StartsWith("band:")) texture = Band(ElasticKind.Of(action.Substring(5)));
+            else if (action.StartsWith("string:")) texture = Rope();   // V2 (build 88)
             else return null;
             texture.name = "Icon " + action;
             return made[action] = texture;
@@ -111,6 +112,35 @@ namespace Protobot.Motion {
                     c = Over(c, edge, inside + 2.5f);
                     c = Over(c, plug, inside + 0.5f);
                 }
+                return c;
+            });
+        }
+
+        // V2 (build 88): string over a green VEX pulley, a knot on one end, the other hanging.
+        private static Texture2D Rope() {
+            var rope = new Color(0.93f, 0.92f, 0.88f, 1f);
+            var edge = new Color(0.45f, 0.46f, 0.5f, 1f);
+            var green = new Color(0.2f, 0.62f, 0.38f, 1f);
+            var dark = new Color(0.1f, 0.34f, 0.2f, 1f);
+            Vector2 center = new(64f, 78f);
+            const float Pulley = 24f, Over = 27f;
+            return Paint(p => {
+                var c = new Color(0f, 0f, 0f, 0f);
+                var d = Vector2.Distance(p, center);
+                c = StrandIcons.Over(c, green, Pulley - d + 0.5f);
+                c = StrandIcons.Over(c, dark, Pulley - 4f - d + 0.5f > 0f && d > Pulley - 8f ? 1f : 0f);
+                c = StrandIcons.Over(c, new Color(0.4f, 0.42f, 0.46f, 1f), 6f - d + 0.5f);
+                // The string: over the top half of the pulley, then down both sides.
+                float s;
+                if (p.y >= center.y) s = Mathf.Abs(d - Over);
+                else s = Mathf.Min(Segment(p, new Vector2(center.x - Over, center.y), new Vector2(center.x - Over, 22f)),
+                                   Segment(p, new Vector2(center.x + Over, center.y), new Vector2(center.x + Over, 34f)));
+                c = StrandIcons.Over(c, edge, 4.5f - s + 0.5f);
+                c = StrandIcons.Over(c, rope, 3f - s + 0.5f);
+                // A knot at the left end.
+                var k = Vector2.Distance(p, new Vector2(center.x - Over, 20f));
+                c = StrandIcons.Over(c, edge, 8f - k + 0.5f);
+                c = StrandIcons.Over(c, rope, 6.5f - k + 0.5f);
                 return c;
             });
         }

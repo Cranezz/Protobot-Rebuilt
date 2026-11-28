@@ -72,13 +72,13 @@ namespace Protobot.Builds {
             var name = part != null && part.TryGetComponent(out PartName pn) ? pn.name : "";
             foreach (var rule in Rules) {
                 if (!rule.pattern.IsMatch(rule.byName ? name : id)) continue;
-                return (rule, Share(rule, id));
+                return (rule, Share(rule, id, part));
             }
             return (null, 1f);
         }
 
         // A cut part's share of its stock piece: holes along it, inches of shaft, or holes of plate area.
-        private static float Share(Rule rule, string id) {
+        private static float Share(Rule rule, string id, GameObject part = null) {
             var parts = id.Split('-');
             float Number(string s) {
                 var m = Regex.Match(s ?? "", @"[\d.]+");
@@ -90,6 +90,8 @@ namespace Protobot.Builds {
                     return holes > 0f && rule.stockA > 0f ? Mathf.Min(1f, holes / rule.stockA) : 1f;
                 }
                 case "inches": {
+                    // V2 (build 88): a string's length to cut (it can take more than one piece of stock)
+                    if (part != null && part.TryGetComponent(out Motion.StringLine line) && rule.stockA > 0f) return line.CutLength / rule.stockA;
                     var length = Number(parts.Last());
                     return length > 0f && rule.stockA > 0f ? Mathf.Min(1f, length / rule.stockA) : 1f;
                 }
@@ -200,7 +202,13 @@ namespace Protobot.Builds {
         private static float Units(Rule rule, List<float> pieces) {
             if (rule.stock != "holes" && rule.stock != "inches") return pieces.Sum();
             var sticks = new List<float>();
-            foreach (var piece in pieces.OrderByDescending(p => p)) {
+            foreach (var whole in pieces.OrderByDescending(p => p)) {
+                // V2 (build 88): a piece longer than the stock (a long string) takes whole pieces, then the rest
+                var piece = whole;
+                while (piece > 1f + 1e-4f) {
+                    sticks.Add(0f);
+                    piece -= 1f;
+                }
                 var i = sticks.FindIndex(left => left + 1e-4f >= piece);
                 if (i >= 0) sticks[i] -= piece;
                 else sticks.Add(1f - piece);
